@@ -80,3 +80,13 @@ clearBtn.addEventListener('click', () => {
   liveEntryInput.value = '';
 });
 document.querySelector('.container').appendChild(clearBtn);
+
+const addLiveItemBtn = document.getElementById('addLiveItem');
+addLiveItemBtn.addEventListener('click', () => {
+  const item = liveEntryInput.value.trim();
+  if (item) {
+    liveCounts[item] = (liveCounts[item] || 0) + 1;
+    updateLiveTable();
+    liveEntryInput.value = '';
+  }
+});
