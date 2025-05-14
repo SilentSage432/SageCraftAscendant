@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appliance Inventory Auditor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🧾 Appliance Inventory Auditor</h1>
+
+    <section>
+      <h2>Live Entry Mode (Scan or Type)</h2>
+      <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
+    </section>
+
+    <section>
+      <h2>Live Counts</h2>
+      <table id="liveCountTable">
+        <thead>
+          <tr>
+            <th>Item #</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Step 1: Enter On-Hand Counts</h2>
+      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

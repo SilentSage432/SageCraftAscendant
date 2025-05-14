@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+  }
+  
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  button {
+    display: block;
+    width: 100%;
+    background: #3498db;
+    color: white;
+    font-size: 16px;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  button:hover {
+    background: #2980b9;
+  }
+  
+  #resultsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  #resultsTable th, #resultsTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  #resultsTable th {
+    background-color: #2c3e50;
+    color: white;
+  }
+  
+  .over td {
+    background-color: #d4edda; /* green */
+  }
+  
+  .under td {
+    background-color: #f8d7da; /* red */
+  }
+  
+  .match td {
+    background-color: #ffffff; /* white */
+  }
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  h1, h2 {
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  textarea {
+    height: 80px;
+    font-size: 13px;
+  }
+
+  #resultsTable {
+    font-size: 12px;
+  }
+}
