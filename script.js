@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
+        liveEntryInput.focus();
       }
     }
   });
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
+        liveEntryInput.focus();
       }
     };
 
