@@ -221,4 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('inventorySession', JSON.stringify(session));
     console.log('Auto-saved session');
   }, 30000);
+
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker registered ✅', reg))
+      .catch(err => console.error('Service Worker registration failed ❌', err));
+  }
 });
