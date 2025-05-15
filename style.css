@@ -18,6 +18,10 @@ body {
   h1, h2 {
     text-align: center;
     color: #2c3e50;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
   }
   
   textarea {
@@ -34,7 +38,7 @@ body {
   button {
     display: block;
     width: 100%;
-    background: #3498db;
+    background: #555;
     color: white;
     font-size: 16px;
     padding: 12px;
@@ -46,7 +50,7 @@ body {
   }
   
   button:hover {
-    background: #2980b9;
+    background: #333;
   }
   
   #resultsTable {
@@ -100,4 +104,50 @@ body {
   #resultsTable {
     font-size: 12px;
   }
+}
+section button {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  font-size: 16px;
+  border: none;
+  background-color: #555;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+section button:hover {
+  background-color: #333;
+}
+section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+section:nth-of-type(odd) {
+  background-color: #fafafa;
+}
+
+section:nth-of-type(even) {
+  background-color: #ffffff;
+}
+
+section {
+  padding: 20px;
+  border-radius: 6px;
 }

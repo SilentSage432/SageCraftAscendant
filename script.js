@@ -8,7 +8,27 @@ document.addEventListener('DOMContentLoaded', () => {
   liveQtyInput.id = 'liveQtyInput';
   liveQtyInput.placeholder = 'Qty';
   liveEntryInput.insertAdjacentElement('afterend', liveQtyInput);
+  const categoryInput = document.createElement('select');
+  categoryInput.id = 'categoryInput';
+  ['Laundry', 'Fridges & Freezers', 'Ranges', 'Dishwashers', 'Wall Ovens', 'Cooktops', 'OTR Microwaves', 'Microwaves (Countertop)', 'Vent Hoods', 'Beverage & Wine Coolers', 'Other / Misc'].forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryInput.appendChild(opt);
+  });
+  liveQtyInput.insertAdjacentElement('afterend', categoryInput);
   const liveTableBody = document.querySelector('#liveCountTable tbody');
+
+  // Insert summary bar below the live count table
+  const summaryBar = document.createElement('div');
+  summaryBar.id = 'summaryBar';
+  summaryBar.style.marginTop = '20px';
+  summaryBar.style.padding = '10px';
+  summaryBar.style.border = '1px solid #ccc';
+  summaryBar.style.borderRadius = '5px';
+  summaryBar.style.backgroundColor = '#f9f9f9';
+  summaryBar.style.fontWeight = 'bold';
+  document.querySelector('#liveCountTable').insertAdjacentElement('afterend', summaryBar);
 
   liveEntryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -16,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0 };
+          liveCounts[item] = { count: 0, category: categoryInput.value };
         }
         const qty = parseInt(liveQtyInput.value) || 1;
         liveCounts[item].count += qty;
@@ -29,6 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateLiveTable() {
     liveTableBody.innerHTML = '';
+    const headerRow = document.querySelector('#liveCountTable thead tr');
+    if (!headerRow.querySelector('.category-header')) {
+      const catTh = document.createElement('th');
+      catTh.textContent = 'Category';
+      catTh.className = 'category-header';
+      headerRow.appendChild(catTh);
+    }
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
     const onHandMap = {};
@@ -41,14 +68,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const count = obj.count;
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
+      const category = obj.category || '';
       const row = `<tr class="${diff < 0 ? 'under' : diff > 0 ? 'over' : 'match'}">
         <td>${item}</td>
         <td>${expected}</td>
         <td>${count}</td>
         <td>${diff > 0 ? '+' + diff : diff}</td>
+        <td>${category}</td>
       </tr>`;
       liveTableBody.innerHTML += row;
     });
+
+    // Update the summary bar
+    let totalItems = 0;
+    let totalUnits = 0;
+    let matches = 0;
+    let overs = 0;
+    let unders = 0;
+
+    Object.entries(liveCounts).forEach(([item, obj]) => {
+      totalItems += 1;
+      totalUnits += obj.count;
+      const expected = onHandMap[item] || 0;
+      const diff = obj.count - expected;
+      if (diff === 0) matches++;
+      else if (diff > 0) overs++;
+      else unders++;
+    });
+
+    summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
   }
 
   const clearBtn = document.createElement('button');
@@ -58,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLiveTable();
     liveEntryInput.value = '';
   });
-  document.querySelector('.container').appendChild(clearBtn);
 
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
@@ -72,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0 };
+          liveCounts[item] = { count: 0, category: categoryInput.value };
         }
         const qty = parseInt(liveQtyInput.value) || 1;
         liveCounts[item].count += qty;
@@ -105,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
       // Deep assign for count structure
       Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-        liveCounts[k] = { count: v.count };
+        liveCounts[k] = { count: v.count, category: v.category };
       });
       document.getElementById('onHandInput').value = session.onHandText;
       updateLiveTable();
@@ -115,15 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.querySelector('.container').appendChild(saveSessionBtn);
-  document.querySelector('.container').appendChild(loadSessionBtn);
-
   // Download Excel button (SheetJS)
   const excelBtn = document.createElement('button');
   excelBtn.textContent = 'Download Excel';
   excelBtn.addEventListener('click', () => {
     const wb = XLSX.utils.book_new();
-    const ws_data = [['Item #', 'Expected', 'Found', 'Difference']];
+    const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category']];
 
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
@@ -137,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const count = obj.count;
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
-      ws_data.push([item, expected, count, diff]);
+      ws_data.push([item, expected, count, diff, obj.category || '']);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
@@ -163,6 +207,4 @@ document.addEventListener('DOMContentLoaded', () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
     XLSX.writeFile(wb, 'inventory_report.xlsx');
   });
-
-  document.querySelector('.container').appendChild(excelBtn);
 });

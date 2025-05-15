@@ -11,7 +11,12 @@
     <h1>🧾 Appliance Inventory Auditor</h1>
 
     <section>
-      <h2>Live Entry Mode (Scan or Type)</h2>
+      <h2>Step 1: Enter On-Hand Counts</h2>
+      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+    </section>
+
+    <section>
+      <h2>Live Entry Mode</h2>
       <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
       <button id="addLiveItem">Add Item</button>
     </section>
@@ -30,8 +35,11 @@
     </section>
 
     <section>
-      <h2>Step 1: Enter On-Hand Counts</h2>
-      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+      <h2>Session Controls</h2>
+      <button id="clearLiveTable">Clear Live Table</button>
+      <button id="saveSession">Save Session</button>
+      <button id="loadSession">Load Session</button>
+      <button id="downloadExcel">Download Excel</button>
     </section>
 
   </div>
