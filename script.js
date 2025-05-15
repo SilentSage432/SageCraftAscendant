@@ -13,7 +13,26 @@ document.addEventListener('DOMContentLoaded', () => {
   liveEntryInput.insertAdjacentElement('afterend', liveQtyInput);
   const categoryInput = document.createElement('select');
   categoryInput.id = 'categoryInput';
-  ['Laundry', 'Fridges & Freezers', 'Ranges', 'Dishwashers', 'Wall Ovens', 'Cooktops', 'OTR Microwaves', 'Microwaves (Countertop)', 'Vent Hoods', 'Beverage & Wine Coolers', 'Other / Misc'].forEach(cat => {
+  [
+    'Laundry',
+    'Fridges & Freezers',
+    'Ranges',
+    'Dishwashers',
+    'Wall Ovens',
+    'Cooktops',
+    'OTR Microwaves',
+    'Microwaves (Countertop)',
+    'Vent Hoods',
+    'Beverage & Wine Coolers',
+    'Cabinets',
+    'Countertops',
+    'Interior Doors',
+    'Exterior Doors',
+    'Storm Doors',
+    'Windows',
+    'Commodity Moulding',
+    'Other / Misc'
+  ].forEach(cat => {
     const opt = document.createElement('option');
     opt.value = cat;
     opt.textContent = cat;
