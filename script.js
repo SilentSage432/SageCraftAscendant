@@ -117,4 +117,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.container').appendChild(saveSessionBtn);
   document.querySelector('.container').appendChild(loadSessionBtn);
+
+  // Download Excel button (SheetJS)
+  const excelBtn = document.createElement('button');
+  excelBtn.textContent = 'Download Excel';
+  excelBtn.addEventListener('click', () => {
+    const wb = XLSX.utils.book_new();
+    const ws_data = [['Item #', 'Expected', 'Found', 'Difference']];
+
+    const onHandText = document.getElementById('onHandInput').value;
+    const onHandLines = onHandText.trim().split(/\n+/);
+    const onHandMap = {};
+    onHandLines.forEach(line => {
+      const [item, count] = line.split(':');
+      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
+    });
+
+    Object.entries(liveCounts).forEach(([item, obj]) => {
+      const count = obj.count;
+      const expected = onHandMap[item] || 0;
+      const diff = count - expected;
+      ws_data.push([item, expected, count, diff]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let row = 1; row <= range.e.r; row++) {
+      const diffCellRef = XLSX.utils.encode_cell({ c: 3, r: row });
+      const diffValue = ws[diffCellRef].v;
+      let fillColor = null;
+      if (diffValue > 0) fillColor = 'C6EFCE'; // green
+      else if (diffValue < 0) fillColor = 'FFC7CE'; // red
+      if (fillColor) {
+        ws[diffCellRef].s = {
+          fill: {
+            patternType: 'solid',
+            fgColor: { rgb: fillColor }
+          }
+        };
+      }
+    }
+
+    wb.Sheets['Inventory'] = ws;
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+    XLSX.writeFile(wb, 'inventory_report.xlsx');
+  });
+
+  document.querySelector('.container').appendChild(excelBtn);
 });
