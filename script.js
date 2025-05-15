@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  let currentLocation = '';
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const liveCounts = {};
   const liveEntryInput = document.getElementById('liveEntry');
@@ -51,6 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
       lines.forEach(item => {
         const trimmed = item.trim();
         if (!trimmed) return;
+        if (trimmed.startsWith('LOC-')) {
+          currentLocation = trimmed.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
+          alert(`📍 Current location set to: ${currentLocation}`);
+          return;
+        }
         let mappedItem = upcToItem[trimmed] || trimmed;
         if (!upcToItem[trimmed]) {
           const userDefined = prompt(`UPC ${trimmed} is not linked to a Lowe's item #. Please enter it now:`);
@@ -64,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
           liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
         }
         liveCounts[mappedItem].count += 1;
+        liveCounts[mappedItem].location = currentLocation;
       });
       batchInput.value = '';
       updateLiveTable();
@@ -108,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const item = liveEntryInput.value.trim();
       if (item) {
+        if (item.startsWith('LOC-')) {
+          currentLocation = item.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
+          alert(`📍 Current location set to: ${currentLocation}`);
+          liveEntryInput.value = '';
+          return;
+        }
         let mappedItem = upcToItem[item] || item;
         if (!upcToItem[item]) {
           const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
@@ -122,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const qty = parseInt(liveQtyInput.value) || 1;
         liveCounts[mappedItem].count += qty;
+        liveCounts[mappedItem].location = currentLocation;
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
@@ -139,6 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
       catTh.className = 'category-header';
       headerRow.appendChild(catTh);
     }
+    if (!headerRow.querySelector('.location-header')) {
+      const locTh = document.createElement('th');
+      locTh.textContent = 'Location';
+      locTh.className = 'location-header';
+      headerRow.appendChild(locTh);
+    }
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
     const onHandMap = {};
@@ -152,12 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
       const category = obj.category || '';
+      const location = obj.location || '';
       const row = `<tr class="${diff < 0 ? 'under' : diff > 0 ? 'over' : 'match'}">
         <td>${item}</td>
         <td>${expected}</td>
         <td>${count}</td>
         <td>${diff > 0 ? '+' + diff : diff}</td>
         <td>${category}</td>
+        <td>${location}</td>
       </tr>`;
       liveTableBody.innerHTML += row;
     });
@@ -208,6 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const item = liveEntryInput.value.trim();
       if (item) {
+        if (item.startsWith('LOC-')) {
+          currentLocation = item.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
+          alert(`📍 Current location set to: ${currentLocation}`);
+          liveEntryInput.value = '';
+          return;
+        }
         let mappedItem = upcToItem[item] || item;
         if (!upcToItem[item]) {
           const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
@@ -222,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const qty = parseInt(liveQtyInput.value) || 1;
         liveCounts[mappedItem].count += qty;
+        liveCounts[mappedItem].location = currentLocation;
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
@@ -252,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (session) {
         Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
         Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-          liveCounts[k] = { count: v.count, category: v.category };
+          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
         });
         document.getElementById('onHandInput').value = session.onHandText;
         updateLiveTable();
@@ -267,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (excelBtn) {
     excelBtn.addEventListener('click', () => {
       const wb = XLSX.utils.book_new();
-      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category']];
+      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category', 'Location']];
 
       const onHandText = document.getElementById('onHandInput').value;
       const onHandLines = onHandText.trim().split(/\n+/);
@@ -281,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const count = obj.count;
         const expected = onHandMap[item] || 0;
         const diff = count - expected;
-        ws_data.push([item, expected, count, diff, obj.category || '']);
+        ws_data.push([item, expected, count, diff, obj.category || '', obj.location || '']);
       });
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
