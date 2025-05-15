@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
   const liveCounts = {};
+  const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
   const liveQtyInput = document.createElement('input');
   liveQtyInput.type = 'number';
@@ -51,6 +52,100 @@ document.addEventListener('DOMContentLoaded', () => {
   summaryBar.style.backgroundColor = '#f9f9f9';
   summaryBar.style.fontWeight = 'bold';
   document.querySelector('#liveCountTable').insertAdjacentElement('afterend', summaryBar);
+
+  // Insert compare week dropdown above the live table (after summaryBar)
+  const compareSection = document.createElement('div');
+  compareSection.id = 'compareSelector';
+  compareSection.style.marginTop = '20px';
+  compareSection.innerHTML = `
+    <label for="compareWeek">Compare to:</label>
+    <select id="compareWeek">
+      <option value="">Most Recent</option>
+    </select>
+  `;
+  summaryBar.insertAdjacentElement('afterend', compareSection);
+
+  // Populate the dropdown with weekly counts dates
+  const compareWeekSelect = document.getElementById('compareWeek');
+  Object.keys(weeklyCounts).sort().reverse().forEach(date => {
+    const opt = document.createElement('option');
+    opt.value = date;
+    opt.textContent = date;
+    compareWeekSelect.appendChild(opt);
+  });
+
+  // Update table when dropdown selection changes
+  compareWeekSelect.addEventListener('change', updateLiveTable);
+
+  // ---- Add "View Trends" button below the comparison dropdown ----
+  const trendBtn = document.createElement('button');
+  trendBtn.textContent = '📈 View Trends';
+  trendBtn.id = 'viewTrendsBtn';
+  trendBtn.style.marginTop = '10px';
+  compareSection.insertAdjacentElement('afterend', trendBtn);
+
+  // ---- Event listener for "View Trends" ----
+  trendBtn.addEventListener('click', () => {
+    const modal = document.createElement('div');
+    modal.id = 'trendModal';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = '#1e1e1e';
+    modal.style.color = '#fff';
+    modal.style.padding = '20px';
+    modal.style.border = '1px solid #ccc';
+    modal.style.zIndex = '9999';
+    modal.style.maxHeight = '80vh';
+    modal.style.overflowY = 'auto';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.marginBottom = '10px';
+    closeBtn.addEventListener('click', () => modal.remove());
+    modal.appendChild(closeBtn);
+
+    Object.keys(liveCounts).forEach(item => {
+      const container = document.createElement('div');
+      container.style.margin = '10px 0';
+      const title = document.createElement('h3');
+      title.textContent = `Item ${item}`;
+      container.appendChild(title);
+
+      // Compose trend data for this item
+      const trendData = Object.entries(weeklyCounts)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([date, counts]) => ({ date, count: counts[item] || 0 }));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 100;
+      const ctx = canvas.getContext('2d');
+
+      // Draw line chart
+      ctx.beginPath();
+      // Find max count for scaling
+      const maxCount = Math.max(1, ...trendData.map(p => p.count));
+      trendData.forEach((point, i) => {
+        const x = trendData.length === 1 ? canvas.width/2 : i * (canvas.width / (trendData.length - 1));
+        const y = canvas.height - (point.count / maxCount * canvas.height);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#4bc0c0';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      const label = document.createElement('p');
+      label.textContent = trendData.map(d => `${d.date}: ${d.count}`).join(' | ');
+      container.appendChild(canvas);
+      container.appendChild(label);
+      modal.appendChild(container);
+    });
+
+    document.body.appendChild(modal);
+  });
 
   const batchSection = document.createElement('section');
   batchSection.innerHTML = `
@@ -106,6 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       batchInput.value = '';
       updateLiveTable();
+      const today = new Date().toISOString().split('T')[0];
+      weeklyCounts[today] = {};
+      Object.entries(liveCounts).forEach(([k, v]) => {
+        weeklyCounts[today][k] = v.count;
+      });
+      localStorage.setItem('weeklyCounts', JSON.stringify(weeklyCounts));
       liveEntryInput.focus();
     });
   }
@@ -202,6 +303,13 @@ document.addEventListener('DOMContentLoaded', () => {
       locTh.className = 'location-header';
       headerRow.appendChild(locTh);
     }
+    if (!headerRow.querySelector('.previous-header')) {
+      ['Previous', 'Δ from Last Week'].forEach(label => {
+        const th = document.createElement('th');
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+    }
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
     const onHandMap = {};
@@ -210,17 +318,52 @@ document.addEventListener('DOMContentLoaded', () => {
       if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
     });
 
+    const previousDates = Object.keys(weeklyCounts).sort().reverse();
+    // Get selected week from dropdown, or fallback to most recent previous week
+    const selectedWeek = document.getElementById('compareWeek')?.value;
+    const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
+
     Object.entries(liveCounts).forEach(([item, obj]) => {
       const count = obj.count;
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
+      const previous = lastWeek ? lastWeek[item] || 0 : '';
+      const weekDiff = lastWeek ? count - previous : '';
       const category = obj.category || '';
       const location = obj.location || '';
+
+      // --- Smart discrepancy/trend icons ---
+      let icon = '';
+      // Down arrow if counts are decreasing for 2+ weeks
+      if (previous !== '' && weekDiff < 0) {
+        // Check for 2+ week decreasing trend
+        let decreasing = false;
+        if (previousDates.length >= 3) {
+          // Get counts for this item for last 3 weeks (including this)
+          const idx = previousDates.indexOf(selectedWeek || previousDates[0]);
+          const w0 = liveCounts[item]?.count || 0;
+          const w1 = weeklyCounts[previousDates[idx + 1]] ? (weeklyCounts[previousDates[idx + 1]][item] || 0) : null;
+          const w2 = weeklyCounts[previousDates[idx + 2]] ? (weeklyCounts[previousDates[idx + 2]][item] || 0) : null;
+          if (w1 !== null && w2 !== null && w0 < w1 && w1 < w2) {
+            decreasing = true;
+          }
+        }
+        if (decreasing || previousDates.length < 3) icon = '📉';
+      }
+      // Up arrow for sharp increase from last week
+      else if (previous !== '' && weekDiff > 5) {
+        icon = '📈';
+      }
+      // Red flag if no expected on-hand count
+      if (!onHandMap[item]) icon += ' ❌';
+
       const row = `<tr class="${diff < 0 ? 'under' : diff > 0 ? 'over' : 'match'}">
-        <td>${item}</td>
+        <td>${item} ${icon}</td>
         <td>${expected}</td>
         <td>${count}</td>
         <td>${diff > 0 ? '+' + diff : diff}</td>
+        <td>${previous !== '' ? previous : '-'}</td>
+        <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
         <td>${category}</td>
         <td>${location}</td>
       </tr>`;
@@ -246,6 +389,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
     summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
   }
+  // --- Add "Clear History" button below summaryBar ---
+  const clearHistoryBtn = document.createElement('button');
+  clearHistoryBtn.textContent = '🧹 Clear History';
+  clearHistoryBtn.id = 'clearHistory';
+  clearHistoryBtn.style.marginTop = '20px';
+  summaryBar.insertAdjacentElement('afterend', clearHistoryBtn);
+
+  clearHistoryBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all historical weekly data? This will not affect your current session or saved Excel reports.')) {
+      const today = new Date().toISOString().split('T')[0];
+      localStorage.setItem(`archivedWeeklyCounts_${today}`, JSON.stringify(weeklyCounts));
+      localStorage.removeItem('weeklyCounts');
+      alert('Weekly history cleared! A snapshot has been saved.');
+      location.reload();
+    }
+  });
+
+  // --- Add "View Archive Snapshots" button below the clear history button ---
+  const viewArchiveBtn = document.createElement('button');
+  viewArchiveBtn.textContent = '🗂 View Archive Snapshots';
+  viewArchiveBtn.style.marginTop = '10px';
+  clearHistoryBtn.insertAdjacentElement('afterend', viewArchiveBtn);
+
+  viewArchiveBtn.addEventListener('click', () => {
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = '#1e1e1e';
+    modal.style.color = '#fff';
+    modal.style.padding = '20px';
+    modal.style.border = '1px solid #ccc';
+    modal.style.zIndex = '9999';
+    modal.style.maxHeight = '80vh';
+    modal.style.overflowY = 'auto';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.marginBottom = '10px';
+    closeBtn.addEventListener('click', () => modal.remove());
+    modal.appendChild(closeBtn);
+
+    const archiveKeys = Object.keys(localStorage).filter(key => key.startsWith('archivedWeeklyCounts_')).sort().reverse();
+
+    if (archiveKeys.length === 0) {
+      modal.appendChild(document.createTextNode('No archived snapshots found.'));
+    } else {
+      archiveKeys.forEach(key => {
+        const section = document.createElement('div');
+        section.style.marginBottom = '15px';
+        const label = document.createElement('h4');
+        label.textContent = key;
+        section.appendChild(label);
+
+        const archive = JSON.parse(localStorage.getItem(key));
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.innerHTML = '<thead><tr><th>Item</th><th>Count</th></tr></thead><tbody>' +
+          Object.entries(archive).map(([item, count]) => `<tr><td>${item}</td><td>${count}</td></tr>`).join('') +
+          '</tbody>';
+        section.appendChild(table);
+        modal.appendChild(section);
+      });
+    }
+
+    document.body.appendChild(modal);
+  });
 
   function saveUPCMap() {
     localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
@@ -354,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (excelBtn) {
     excelBtn.addEventListener('click', () => {
       const wb = XLSX.utils.book_new();
-      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category', 'Location']];
+      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
 
       const onHandText = document.getElementById('onHandInput').value;
       const onHandLines = onHandText.trim().split(/\n+/);
@@ -364,11 +576,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
       });
 
+      const previousDates = Object.keys(weeklyCounts).sort().reverse();
+      const lastWeek = previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null;
+
       Object.entries(liveCounts).forEach(([item, obj]) => {
         const count = obj.count;
         const expected = onHandMap[item] || 0;
         const diff = count - expected;
-        ws_data.push([item, expected, count, diff, obj.category || '', obj.location || '']);
+        const previous = lastWeek ? lastWeek[item] || 0 : '';
+        const weekDiff = lastWeek ? count - previous : '';
+        ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
       });
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
