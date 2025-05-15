@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
   summaryBar.style.padding = '10px';
   summaryBar.style.border = '1px solid #ccc';
   summaryBar.style.borderRadius = '5px';
-  summaryBar.style.backgroundColor = '#f9f9f9';
   summaryBar.style.fontWeight = 'bold';
   document.querySelector('#liveCountTable').insertAdjacentElement('afterend', summaryBar);
 

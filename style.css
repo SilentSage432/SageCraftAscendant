@@ -70,16 +70,33 @@ button:hover {
   color: white;
 }
 
+#liveCountTable th {
+  background-color: #222;
+  color: #ffffff;
+  border-color: #555;
+  font-size: 14px;
+  padding: 6px;
+  white-space: nowrap;
+}
+
+#liveCountTable {
+  font-size: 13px;
+  table-layout: auto;
+}
+
 .over td {
   background-color: #d4edda; /* green */
+  color: #1a1a1a;
 }
 
 .under td {
   background-color: #f8d7da; /* red */
+  color: #1a1a1a;
 }
 
 .match td {
-  background-color: #ffffff; /* white */
+  background-color: #e0e0e0; /* light gray for dark mode */
+  color: #121212;
 }
 
 @media (max-width: 600px) {
@@ -103,6 +120,22 @@ button:hover {
 
   #resultsTable {
     font-size: 12px;
+  }
+
+  #liveCountTable th,
+  #liveCountTable td {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    display: block;
+  }
+
+  #summaryBar {
+    font-size: 14px;
   }
 }
 section button {
@@ -175,6 +208,7 @@ table {
   background-color: #1e1e1e;
   color: #e0e0e0;
   border-color: #444;
+  word-break: break-word;
 }
 
 th, td {
@@ -197,9 +231,27 @@ button:hover {
 }
 
 #summaryBar {
-  background-color: #222;
-  border-color: #444;
-  color: #ddd;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+#summaryBar span,
+#summaryBar .match-icon,
+#summaryBar .over-icon,
+#summaryBar .under-icon {
+  color: #e0e0e0 !important;
+  font-weight: 600;
+}
+
+#summaryBar .summary-label {
+  color: #e0e0e0;
+  background-color: transparent;
+  font-size: 15px;
 }
 
 /* Dark mode enhancements */
@@ -225,4 +277,14 @@ button:hover {
 section {
   margin-bottom: 40px;
   padding: 25px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  display: block;
+}
+
+.table-wrapper table {
+  min-width: 600px;
 }
