@@ -99,13 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
   }
 
-  const clearBtn = document.createElement('button');
-  clearBtn.textContent = 'Clear Live Table';
-  clearBtn.addEventListener('click', () => {
-    Object.keys(liveCounts).forEach(key => delete liveCounts[key]);
-    updateLiveTable();
-    liveEntryInput.value = '';
-  });
+  const clearBtn = document.getElementById('clearLiveTable');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      Object.keys(liveCounts).forEach(key => delete liveCounts[key]);
+      liveEntryInput.value = '';
+      liveQtyInput.value = '1';
+      updateLiveTable();
+      summaryBar.innerHTML = '';
+    });
+  }
 
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
@@ -133,78 +136,89 @@ document.addEventListener('DOMContentLoaded', () => {
     addLiveItemBtn.addEventListener('touchend', handleAddItem);
   }
   // Save/Load Session buttons
-  const saveSessionBtn = document.createElement('button');
-  saveSessionBtn.textContent = 'Save Session';
-  saveSessionBtn.addEventListener('click', () => {
+  const saveSessionBtn = document.getElementById('saveSession');
+  if (saveSessionBtn) {
+    saveSessionBtn.addEventListener('click', () => {
+      const session = {
+        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+        onHandText: document.getElementById('onHandInput').value
+      };
+      localStorage.setItem('inventorySession', JSON.stringify(session));
+      alert('Session saved!');
+    });
+  }
+
+  const loadSessionBtn = document.getElementById('loadSession');
+  if (loadSessionBtn) {
+    loadSessionBtn.addEventListener('click', () => {
+      const session = JSON.parse(localStorage.getItem('inventorySession'));
+      if (session) {
+        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+        Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
+          liveCounts[k] = { count: v.count, category: v.category };
+        });
+        document.getElementById('onHandInput').value = session.onHandText;
+        updateLiveTable();
+        alert('Session loaded!');
+      } else {
+        alert('No saved session found.');
+      }
+    });
+  }
+
+  const excelBtn = document.getElementById('downloadExcel');
+  if (excelBtn) {
+    excelBtn.addEventListener('click', () => {
+      const wb = XLSX.utils.book_new();
+      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category']];
+
+      const onHandText = document.getElementById('onHandInput').value;
+      const onHandLines = onHandText.trim().split(/\n+/);
+      const onHandMap = {};
+      onHandLines.forEach(line => {
+        const [item, count] = line.split(':');
+        if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
+      });
+
+      Object.entries(liveCounts).forEach(([item, obj]) => {
+        const count = obj.count;
+        const expected = onHandMap[item] || 0;
+        const diff = count - expected;
+        ws_data.push([item, expected, count, diff, obj.category || '']);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      for (let row = 1; row <= range.e.r; row++) {
+        const diffCellRef = XLSX.utils.encode_cell({ c: 3, r: row });
+        const diffValue = ws[diffCellRef].v;
+        let fillColor = null;
+        if (diffValue > 0) fillColor = 'C6EFCE';
+        else if (diffValue < 0) fillColor = 'FFC7CE';
+        if (fillColor) {
+          ws[diffCellRef].s = {
+            fill: {
+              patternType: 'solid',
+              fgColor: { rgb: fillColor }
+            }
+          };
+        }
+      }
+
+      wb.Sheets['Inventory'] = ws;
+      XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+      XLSX.writeFile(wb, 'inventory_report.xlsx');
+    });
+  }
+
+  // Auto-save session every 30 seconds
+  setInterval(() => {
     const session = {
       liveCounts: JSON.parse(JSON.stringify(liveCounts)),
       onHandText: document.getElementById('onHandInput').value
     };
     localStorage.setItem('inventorySession', JSON.stringify(session));
-    alert('Session saved!');
-  });
-
-  const loadSessionBtn = document.createElement('button');
-  loadSessionBtn.textContent = 'Load Session';
-  loadSessionBtn.addEventListener('click', () => {
-    const session = JSON.parse(localStorage.getItem('inventorySession'));
-    if (session) {
-      Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-      // Deep assign for count structure
-      Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-        liveCounts[k] = { count: v.count, category: v.category };
-      });
-      document.getElementById('onHandInput').value = session.onHandText;
-      updateLiveTable();
-      alert('Session loaded!');
-    } else {
-      alert('No saved session found.');
-    }
-  });
-
-  // Download Excel button (SheetJS)
-  const excelBtn = document.createElement('button');
-  excelBtn.textContent = 'Download Excel';
-  excelBtn.addEventListener('click', () => {
-    const wb = XLSX.utils.book_new();
-    const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Category']];
-
-    const onHandText = document.getElementById('onHandInput').value;
-    const onHandLines = onHandText.trim().split(/\n+/);
-    const onHandMap = {};
-    onHandLines.forEach(line => {
-      const [item, count] = line.split(':');
-      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
-    });
-
-    Object.entries(liveCounts).forEach(([item, obj]) => {
-      const count = obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = count - expected;
-      ws_data.push([item, expected, count, diff, obj.category || '']);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    for (let row = 1; row <= range.e.r; row++) {
-      const diffCellRef = XLSX.utils.encode_cell({ c: 3, r: row });
-      const diffValue = ws[diffCellRef].v;
-      let fillColor = null;
-      if (diffValue > 0) fillColor = 'C6EFCE'; // green
-      else if (diffValue < 0) fillColor = 'FFC7CE'; // red
-      if (fillColor) {
-        ws[diffCellRef].s = {
-          fill: {
-            patternType: 'solid',
-            fgColor: { rgb: fillColor }
-          }
-        };
-      }
-    }
-
-    wb.Sheets['Inventory'] = ws;
-    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-    XLSX.writeFile(wb, 'inventory_report.xlsx');
-  });
+    console.log('Auto-saved session');
+  }, 30000);
 });
