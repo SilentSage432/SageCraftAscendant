@@ -1,5 +1,5 @@
 {
-  "name": "Appliance Inventory Auditor",
+  "name": "Inventory Auditor",
   "short_name": "Inventory Auditor",
   "start_url": "./index.html",
   "display": "standalone",
