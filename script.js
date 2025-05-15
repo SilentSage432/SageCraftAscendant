@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const liveCounts = {};
   const liveEntryInput = document.getElementById('liveEntry');
   const liveQtyInput = document.createElement('input');
@@ -30,16 +31,97 @@ document.addEventListener('DOMContentLoaded', () => {
   summaryBar.style.fontWeight = 'bold';
   document.querySelector('#liveCountTable').insertAdjacentElement('afterend', summaryBar);
 
+  const batchSection = document.createElement('section');
+  batchSection.innerHTML = `
+    <h2>Batch Paste Mode</h2>
+    <textarea id="batchInput" placeholder="Paste barcode list here (one per line)"></textarea>
+    <div style="margin-top: 10px;">
+      <button id="processBatch">Process Batch</button>
+      <button id="clearBatch">Clear Batch</button>
+    </div>
+    <div id="batchPreview" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;"></div>
+  `;
+  document.querySelector('.container').appendChild(batchSection);
+
+  const processBatchBtn = document.getElementById('processBatch');
+  const batchInput = document.getElementById('batchInput');
+  if (processBatchBtn) {
+    processBatchBtn.addEventListener('click', () => {
+      const lines = batchInput.value.trim().split(/\r?\n/);
+      lines.forEach(item => {
+        const trimmed = item.trim();
+        if (!trimmed) return;
+        let mappedItem = upcToItem[trimmed] || trimmed;
+        if (!upcToItem[trimmed]) {
+          const userDefined = prompt(`UPC ${trimmed} is not linked to a Lowe's item #. Please enter it now:`);
+          if (userDefined) {
+            upcToItem[trimmed] = userDefined;
+            saveUPCMap();
+            mappedItem = userDefined;
+          }
+        }
+        if (!liveCounts[mappedItem]) {
+          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
+        }
+        liveCounts[mappedItem].count += 1;
+      });
+      batchInput.value = '';
+      updateLiveTable();
+      liveEntryInput.focus();
+    });
+  }
+
+  const clearBatchBtn = document.getElementById('clearBatch');
+  if (clearBatchBtn) {
+    clearBatchBtn.addEventListener('click', () => {
+      batchInput.value = '';
+      liveEntryInput.focus();
+    });
+  }
+
+  // Live preview for batch input
+  batchInput.addEventListener('input', () => {
+    const lines = batchInput.value.trim().split(/\r?\n/);
+    const counts = {};
+    lines.forEach(line => {
+      const item = line.trim();
+      if (!item) return;
+      counts[item] = (counts[item] || 0) + 1;
+    });
+
+    const previewDiv = document.getElementById('batchPreview');
+    if (Object.keys(counts).length === 0) {
+      previewDiv.innerHTML = '';
+      return;
+    }
+
+    let previewHTML = '<h3>Preview</h3><table style="width:100%; border-collapse: collapse;"><thead><tr><th>Item #</th><th>Qty</th></tr></thead><tbody>';
+    Object.entries(counts).forEach(([item, qty]) => {
+      previewHTML += `<tr><td>${item}</td><td>${qty}</td></tr>`;
+    });
+    previewHTML += '</tbody></table>';
+    previewDiv.innerHTML = previewHTML;
+  });
+
   liveEntryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const item = liveEntryInput.value.trim();
       if (item) {
-        if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0, category: categoryInput.value };
+        let mappedItem = upcToItem[item] || item;
+        if (!upcToItem[item]) {
+          const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+          if (userDefined) {
+            upcToItem[item] = userDefined;
+            saveUPCMap();
+            mappedItem = userDefined;
+          }
+        }
+        if (!liveCounts[mappedItem]) {
+          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
         }
         const qty = parseInt(liveQtyInput.value) || 1;
-        liveCounts[item].count += qty;
+        liveCounts[mappedItem].count += qty;
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
@@ -100,6 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
     summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
   }
 
+  function saveUPCMap() {
+    localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
+  }
+
   const clearBtn = document.getElementById('clearLiveTable');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
@@ -122,11 +208,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const item = liveEntryInput.value.trim();
       if (item) {
-        if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0, category: categoryInput.value };
+        let mappedItem = upcToItem[item] || item;
+        if (!upcToItem[item]) {
+          const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+          if (userDefined) {
+            upcToItem[item] = userDefined;
+            saveUPCMap();
+            mappedItem = userDefined;
+          }
+        }
+        if (!liveCounts[mappedItem]) {
+          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
         }
         const qty = parseInt(liveQtyInput.value) || 1;
-        liveCounts[item].count += qty;
+        liveCounts[mappedItem].count += qty;
         updateLiveTable();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
