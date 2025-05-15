@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   let currentLocation = '';
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
+  const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
   const liveCounts = {};
   const liveEntryInput = document.getElementById('liveEntry');
   const liveQtyInput = document.createElement('input');
@@ -53,8 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const trimmed = item.trim();
         if (!trimmed) return;
         if (trimmed.startsWith('LOC-')) {
-          currentLocation = trimmed.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
-          alert(`📍 Current location set to: ${currentLocation}`);
+          const tagCode = trimmed.slice(4).toUpperCase();
+          let name = locationMap[tagCode];
+          if (!name) {
+            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+            if (name) {
+              locationMap[tagCode] = name;
+              saveLocationMap();
+            }
+          }
+          if (name) {
+            currentLocation = name;
+            alert(`📍 Current location set to: ${name}`);
+          }
+          liveEntryInput.value = '';
           return;
         }
         let mappedItem = upcToItem[trimmed] || trimmed;
@@ -116,8 +129,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (item.startsWith('LOC-')) {
-          currentLocation = item.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
-          alert(`📍 Current location set to: ${currentLocation}`);
+          const tagCode = item.slice(4).toUpperCase();
+          let name = locationMap[tagCode];
+          if (!name) {
+            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+            if (name) {
+              locationMap[tagCode] = name;
+              saveLocationMap();
+            }
+          }
+          if (name) {
+            currentLocation = name;
+            alert(`📍 Current location set to: ${name}`);
+          }
           liveEntryInput.value = '';
           return;
         }
@@ -208,6 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
   }
 
+  function saveLocationMap() {
+    localStorage.setItem('locationMap', JSON.stringify(locationMap));
+  }
+
   const clearBtn = document.getElementById('clearLiveTable');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
@@ -231,8 +259,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (item.startsWith('LOC-')) {
-          currentLocation = item.slice(4).toUpperCase(); // e.g. LOC-BAY1 → BAY1
-          alert(`📍 Current location set to: ${currentLocation}`);
+          const tagCode = item.slice(4).toUpperCase();
+          let name = locationMap[tagCode];
+          if (!name) {
+            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+            if (name) {
+              locationMap[tagCode] = name;
+              saveLocationMap();
+            }
+          }
+          if (name) {
+            currentLocation = name;
+            alert(`📍 Current location set to: ${name}`);
+          }
           liveEntryInput.value = '';
           return;
         }
