@@ -1,21 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
   const liveCounts = {};
   const liveEntryInput = document.getElementById('liveEntry');
+  const liveQtyInput = document.createElement('input');
+  liveQtyInput.type = 'number';
+  liveQtyInput.min = '1';
+  liveQtyInput.value = '1';
+  liveQtyInput.id = 'liveQtyInput';
+  liveQtyInput.placeholder = 'Qty';
+  liveEntryInput.insertAdjacentElement('afterend', liveQtyInput);
   const liveTableBody = document.querySelector('#liveCountTable tbody');
-
-  // Batch tag selector
-  const batchTags = ["Backstock", "Aisle 1", "Aisle 2", "Display", "Scratch & Dent"];
-  const tagSelector = document.createElement('select');
-  tagSelector.id = 'tagSelector';
-  batchTags.forEach(tag => {
-    const option = document.createElement('option');
-    option.value = tag;
-    option.textContent = tag;
-    tagSelector.appendChild(option);
-  });
-  // Insert tagSelector just below the liveEntry input and above the Add Item button
-  const liveEntrySection = liveEntryInput.closest('section');
-  liveEntrySection.insertBefore(tagSelector, liveEntryInput.nextSibling);
 
   liveEntryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -23,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0, tag: tagSelector.value };
+          liveCounts[item] = { count: 0 };
         }
-        liveCounts[item].count += 1;
+        const qty = parseInt(liveQtyInput.value) || 1;
+        liveCounts[item].count += qty;
         updateLiveTable();
         liveEntryInput.value = '';
+        liveQtyInput.value = '1';
       }
     }
   });
@@ -41,19 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const [item, count] = line.split(':');
       if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
     });
-    // Table header: Add "Tag"
-    const table = liveTableBody.parentElement;
-    const headerRow = table.parentElement.querySelector('thead tr');
-    if (headerRow && !headerRow.querySelector('.tag-header')) {
-      const tagTh = document.createElement('th');
-      tagTh.textContent = 'Tag';
-      tagTh.className = 'tag-header';
-      headerRow.appendChild(tagTh);
-    }
 
     Object.entries(liveCounts).forEach(([item, obj]) => {
       const count = obj.count;
-      const tag = obj.tag || '';
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
       const row = `<tr class="${diff < 0 ? 'under' : diff > 0 ? 'over' : 'match'}">
@@ -61,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${expected}</td>
         <td>${count}</td>
         <td>${diff > 0 ? '+' + diff : diff}</td>
-        <td>${tag}</td>
       </tr>`;
       liveTableBody.innerHTML += row;
     });
@@ -88,11 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = liveEntryInput.value.trim();
       if (item) {
         if (!liveCounts[item]) {
-          liveCounts[item] = { count: 0, tag: tagSelector.value };
+          liveCounts[item] = { count: 0 };
         }
-        liveCounts[item].count += 1;
+        const qty = parseInt(liveQtyInput.value) || 1;
+        liveCounts[item].count += qty;
         updateLiveTable();
         liveEntryInput.value = '';
+        liveQtyInput.value = '1';
       }
     };
 
@@ -117,9 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const session = JSON.parse(localStorage.getItem('inventorySession'));
     if (session) {
       Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-      // Deep assign for tag/count structure
+      // Deep assign for count structure
       Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-        liveCounts[k] = { count: v.count, tag: v.tag };
+        liveCounts[k] = { count: v.count };
       });
       document.getElementById('onHandInput').value = session.onHandText;
       updateLiveTable();
