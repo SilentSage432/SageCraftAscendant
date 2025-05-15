@@ -40,6 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
     categoryInput.appendChild(opt);
   });
   liveQtyInput.insertAdjacentElement('afterend', categoryInput);
+
+  // --- Location status visual indicator ---
+  const locationStatus = document.createElement('div');
+  locationStatus.id = 'locationStatus';
+  locationStatus.style.marginTop = '10px';
+  locationStatus.style.fontWeight = 'bold';
+  locationStatus.textContent = '📍 No Active Bay';
+  locationStatus.style.color = 'red';
+  categoryInput.insertAdjacentElement('afterend', locationStatus);
+
+  function updateLocationStatus() {
+    if (currentLocation) {
+      locationStatus.textContent = `📍 Active Bay: ${currentLocation}`;
+      locationStatus.style.color = 'limegreen';
+    } else {
+      locationStatus.textContent = '📍 No Active Bay';
+      locationStatus.style.color = 'red';
+    }
+  }
   const liveTableBody = document.querySelector('#liveCountTable tbody');
 
   // Insert summary bar below the live count table
@@ -167,22 +186,39 @@ document.addEventListener('DOMContentLoaded', () => {
       lines.forEach(item => {
         const trimmed = item.trim();
         if (!trimmed) return;
-        if (trimmed.startsWith('LOC-')) {
-          const tagCode = trimmed.slice(4).toUpperCase();
-          let name = locationMap[tagCode];
-          if (!name) {
-            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+        // Unified location/product detection and handling
+        if (!upcToItem[trimmed] && !locationMap[trimmed]) {
+          const type = confirm(`Is "${trimmed}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
+          if (type) {
+            const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
             if (name) {
-              locationMap[tagCode] = name;
-              saveLocationMap();
+            locationMap[trimmed] = name;
+            saveLocationMap();
+            currentLocation = name;
+            updateLocationStatus();
+            alert(`📍 Current location set to: ${name}`);
+            liveEntryInput.value = '';
+            return;
             }
           }
-          if (name) {
-            currentLocation = name;
-            alert(`📍 Current location set to: ${name}`);
+        }
+        if (locationMap[trimmed]) {
+          if (currentLocation === locationMap[trimmed]) {
+            const close = confirm(`You scanned the current location tag (${trimmed}) again.\nWould you like to CLOSE this bay?`);
+            if (close) {
+              currentLocation = '';
+              updateLocationStatus();
+              alert('📦 Current location cleared.');
+            }
+            liveEntryInput.value = '';
+            return;
+          } else {
+            currentLocation = locationMap[trimmed];
+            updateLocationStatus();
+            alert(`📍 Current location set to: ${currentLocation}`);
+            liveEntryInput.value = '';
+            return;
           }
-          liveEntryInput.value = '';
-          return;
         }
         let mappedItem = upcToItem[trimmed] || trimmed;
         if (!upcToItem[trimmed]) {
@@ -248,22 +284,39 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const item = liveEntryInput.value.trim();
       if (item) {
-        if (item.startsWith('LOC-')) {
-          const tagCode = item.slice(4).toUpperCase();
-          let name = locationMap[tagCode];
-          if (!name) {
-            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+        // Unified location/product detection and handling
+        if (!upcToItem[item] && !locationMap[item]) {
+          const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
+          if (type) {
+            const name = prompt(`🗂 Please enter a name for location "${item}":`);
             if (name) {
-              locationMap[tagCode] = name;
+              locationMap[item] = name;
               saveLocationMap();
+              currentLocation = name;
+              updateLocationStatus();
+              alert(`📍 Current location set to: ${name}`);
+              liveEntryInput.value = '';
+              return;
             }
           }
-          if (name) {
-            currentLocation = name;
-            alert(`📍 Current location set to: ${name}`);
+        }
+        if (locationMap[item]) {
+          if (currentLocation === locationMap[item]) {
+            const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
+            if (close) {
+              currentLocation = '';
+              updateLocationStatus();
+              alert('📦 Current location cleared.');
+            }
+            liveEntryInput.value = '';
+            return;
+          } else {
+            currentLocation = locationMap[item];
+            updateLocationStatus();
+            alert(`📍 Current location set to: ${currentLocation}`);
+            liveEntryInput.value = '';
+            return;
           }
-          liveEntryInput.value = '';
-          return;
         }
         let mappedItem = upcToItem[item] || item;
         if (!upcToItem[item]) {
@@ -489,22 +542,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const item = liveEntryInput.value.trim();
       if (item) {
-        if (item.startsWith('LOC-')) {
-          const tagCode = item.slice(4).toUpperCase();
-          let name = locationMap[tagCode];
-          if (!name) {
-            name = prompt(`🗂 This location tag (${tagCode}) is not labeled yet. Please enter a name:`);
+        // Unified location/product detection and handling
+        if (!upcToItem[item] && !locationMap[item]) {
+          const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
+          if (type) {
+            const name = prompt(`🗂 Please enter a name for location "${item}":`);
             if (name) {
-              locationMap[tagCode] = name;
+              locationMap[item] = name;
               saveLocationMap();
+              currentLocation = name;
+              updateLocationStatus();
+              alert(`📍 Current location set to: ${name}`);
+              liveEntryInput.value = '';
+              return;
             }
           }
-          if (name) {
-            currentLocation = name;
-            alert(`📍 Current location set to: ${name}`);
+        }
+        if (locationMap[item]) {
+          if (currentLocation === locationMap[item]) {
+            const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
+            if (close) {
+              currentLocation = '';
+              updateLocationStatus();
+              alert('📦 Current location cleared.');
+            }
+            liveEntryInput.value = '';
+            return;
+          } else {
+            currentLocation = locationMap[item];
+            updateLocationStatus();
+            alert(`📍 Current location set to: ${currentLocation}`);
+            liveEntryInput.value = '';
+            return;
           }
-          liveEntryInput.value = '';
-          return;
         }
         let mappedItem = upcToItem[item] || item;
         if (!upcToItem[item]) {
@@ -565,6 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const excelBtn = document.getElementById('downloadExcel');
   if (excelBtn) {
     excelBtn.addEventListener('click', () => {
+      // Ensure header includes 'Location'
       const wb = XLSX.utils.book_new();
       const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
 
@@ -585,6 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const diff = count - expected;
         const previous = lastWeek ? lastWeek[item] || 0 : '';
         const weekDiff = lastWeek ? count - previous : '';
+        // Ensure location is included as a dedicated column
         ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
       });
 
@@ -630,3 +702,5 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => console.error('Service Worker registration failed ❌', err));
   }
 });
+  // Update location status on load
+  updateLocationStatus();
