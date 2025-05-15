@@ -49,13 +49,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', () => {
+    let lastTriggerTime = 0;
+
+    const handleAddItem = () => {
+      const now = Date.now();
+      if (now - lastTriggerTime < 300) return; // prevent double trigger
+      lastTriggerTime = now;
+
       const item = liveEntryInput.value.trim();
       if (item) {
         liveCounts[item] = (liveCounts[item] || 0) + 1;
         updateLiveTable();
         liveEntryInput.value = '';
       }
-    });
+    };
+
+    addLiveItemBtn.addEventListener('click', handleAddItem);
+    addLiveItemBtn.addEventListener('touchend', handleAddItem);
   }
 });
