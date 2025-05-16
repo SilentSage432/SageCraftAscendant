@@ -278,65 +278,74 @@ document.addEventListener('DOMContentLoaded', () => {
     previewDiv.innerHTML = previewHTML;
   });
 
+
+  // --- Unified handler for scan input (manual or barcode scan) ---
+  function handleScannedInput(item) {
+    if (!item) return;
+
+    if (!upcToItem[item] && !locationMap[item]) {
+      const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
+      if (type) {
+        const name = prompt(`🗂 Please enter a name for location "${item}":`);
+        if (name) {
+          locationMap[item] = name;
+          saveLocationMap();
+          currentLocation = name;
+          updateLocationStatus();
+          alert(`📍 Current location set to: ${name}`);
+          liveEntryInput.value = '';
+          return;
+        }
+      }
+    }
+
+    if (locationMap[item]) {
+      if (currentLocation === locationMap[item]) {
+        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
+        if (close) {
+          currentLocation = '';
+          updateLocationStatus();
+          alert('📦 Current location cleared.');
+        }
+        liveEntryInput.value = '';
+        return;
+      } else {
+        currentLocation = locationMap[item];
+        updateLocationStatus();
+        alert(`📍 Current location set to: ${currentLocation}`);
+        liveEntryInput.value = '';
+        return;
+      }
+    }
+
+    let mappedItem = upcToItem[item] || item;
+    if (!upcToItem[item]) {
+      const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+      if (userDefined) {
+        upcToItem[item] = userDefined;
+        saveUPCMap();
+        mappedItem = userDefined;
+      }
+    }
+
+    if (!liveCounts[mappedItem]) {
+      liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
+    }
+    const qty = parseInt(liveQtyInput.value) || 1;
+    liveCounts[mappedItem].count += qty;
+    liveCounts[mappedItem].location = currentLocation;
+    updateLiveTable();
+    liveEntryInput.value = '';
+    liveQtyInput.value = '1';
+    liveEntryInput.focus();
+  }
+
+  // Use the unified handler for barcode/manual entry
   liveEntryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const item = liveEntryInput.value.trim();
-      if (item) {
-        // Unified location/product detection and handling
-        if (!upcToItem[item] && !locationMap[item]) {
-          const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
-          if (type) {
-            const name = prompt(`🗂 Please enter a name for location "${item}":`);
-            if (name) {
-              locationMap[item] = name;
-              saveLocationMap();
-              currentLocation = name;
-              updateLocationStatus();
-              alert(`📍 Current location set to: ${name}`);
-              liveEntryInput.value = '';
-              return;
-            }
-          }
-        }
-        if (locationMap[item]) {
-          if (currentLocation === locationMap[item]) {
-            const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
-            if (close) {
-              currentLocation = '';
-              updateLocationStatus();
-              alert('📦 Current location cleared.');
-            }
-            liveEntryInput.value = '';
-            return;
-          } else {
-            currentLocation = locationMap[item];
-            updateLocationStatus();
-            alert(`📍 Current location set to: ${currentLocation}`);
-            liveEntryInput.value = '';
-            return;
-          }
-        }
-        let mappedItem = upcToItem[item] || item;
-        if (!upcToItem[item]) {
-          const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
-          if (userDefined) {
-            upcToItem[item] = userDefined;
-            saveUPCMap();
-            mappedItem = userDefined;
-          }
-        }
-        if (!liveCounts[mappedItem]) {
-          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
-        }
-        const qty = parseInt(liveQtyInput.value) || 1;
-        liveCounts[mappedItem].count += qty;
-        liveCounts[mappedItem].location = currentLocation;
-        updateLiveTable();
-        liveEntryInput.value = '';
-        liveQtyInput.value = '1';
-        liveEntryInput.focus();
-      }
+      handleScannedInput(item);
     }
   });
 
