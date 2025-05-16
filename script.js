@@ -340,12 +340,25 @@ document.addEventListener('DOMContentLoaded', () => {
     liveEntryInput.focus();
   }
 
-  // Use the unified handler for barcode/manual entry
+  // --- Barcode scanner/autoprocess input field logic ---
+  let scanTimeout = null;
+
+  function autoTriggerScan() {
+    const item = liveEntryInput.value.trim();
+    if (item) {
+      handleScannedInput(item);
+    }
+  }
+
+  liveEntryInput.addEventListener('input', () => {
+    if (scanTimeout) clearTimeout(scanTimeout);
+    scanTimeout = setTimeout(autoTriggerScan, 150); // wait briefly after input settles
+  });
+
   liveEntryInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const item = liveEntryInput.value.trim();
-      handleScannedInput(item);
+      autoTriggerScan();
     }
   });
 
