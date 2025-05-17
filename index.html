@@ -48,7 +48,18 @@
 
   </div>
 
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="script.js"></script>
+
+  <div id="customModal" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
+      <h3 id="modalPromptText"></h3>
+      <div style="margin-top:15px;">
+        <button id="modalBtnLocation" style="margin:5px;">📍 Bay Location</button>
+        <button id="modalBtnProduct" style="margin:5px;">📦 Product</button>
+        <button id="modalBtnCancel" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

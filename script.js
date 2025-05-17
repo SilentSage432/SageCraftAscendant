@@ -1,10 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Custom modal prompt for unrecognized code type ---
+  function showCustomPrompt(item) {
+    return new Promise(resolve => {
+      const overlay = document.getElementById('customModal');
+      document.getElementById('modalPromptText').textContent = `Unrecognized code: "${item}" — what type of tag is this?`;
+      overlay.style.display = 'flex';
+
+      const cleanup = (result) => {
+        overlay.style.display = 'none';
+        resolve(result);
+      };
+
+      document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
+      document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
+      document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
+    });
+  }
   let currentLocation = '';
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
   const liveCounts = {};
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
+  // Set inputmode and pattern for mobile number pad
+  liveEntryInput.setAttribute('inputmode', 'numeric');
+  liveEntryInput.setAttribute('pattern', '\\d*');
   const liveQtyInput = document.createElement('input');
   liveQtyInput.type = 'number';
   liveQtyInput.min = '1';
@@ -49,6 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
   locationStatus.textContent = '📍 No Active Bay';
   locationStatus.style.color = 'red';
   categoryInput.insertAdjacentElement('afterend', locationStatus);
+
+  // --- Manual Entry Mode Toggle ---
+  const manualModeToggle = document.createElement('label');
+  manualModeToggle.innerHTML = `
+    <input type="checkbox" id="manualToggle" checked style="margin-right:5px;"> Auto-Scan Mode
+  `;
+  manualModeToggle.style.display = 'block';
+  manualModeToggle.style.marginTop = '10px';
+  locationStatus.insertAdjacentElement('afterend', manualModeToggle);
 
   function updateLocationStatus() {
     if (currentLocation) {
@@ -187,10 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!trimmed) return;
         // Unified location/product detection and handling
         if (!upcToItem[trimmed] && !locationMap[trimmed]) {
-          const type = confirm(`Is "${trimmed}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
-          if (type) {
-            const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
-            if (name) {
+      showCustomPrompt(trimmed).then(response => {
+        if (response === 'location') {
+          const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
+          if (name) {
             locationMap[trimmed] = name;
             saveLocationMap();
             currentLocation = name;
@@ -198,8 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`📍 Current location set to: ${name}`);
             liveEntryInput.value = '';
             return;
-            }
           }
+        } else if (response === 'product') {
+          processProduct(trimmed);
+        } else {
+          liveEntryInput.value = '';
+        }
+      });
+      return;
         }
         if (locationMap[trimmed]) {
           if (currentLocation === locationMap[trimmed]) {
@@ -284,19 +319,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!item) return;
 
     if (!upcToItem[item] && !locationMap[item]) {
-      const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
-      if (type) {
-        const name = prompt(`🗂 Please enter a name for location "${item}":`);
-        if (name) {
-          locationMap[item] = name;
-          saveLocationMap();
-          currentLocation = name;
-          updateLocationStatus();
-          alert(`📍 Current location set to: ${name}`);
+      showCustomPrompt(item).then(response => {
+        if (response === 'location') {
+          const name = prompt(`🗂 Please enter a name for location "${item}":`);
+          if (name) {
+            locationMap[item] = name;
+            saveLocationMap();
+            currentLocation = name;
+            updateLocationStatus();
+            alert(`📍 Current location set to: ${name}`);
+            liveEntryInput.value = '';
+            return;
+          }
+        } else if (response === 'product') {
+          processProduct(item);
+        } else {
           liveEntryInput.value = '';
-          return;
         }
-      }
+      });
+      return;
     }
 
     if (locationMap[item]) {
@@ -318,6 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    processProduct(item);
+  }
+
+  // --- Helper to process product scan ---
+  function processProduct(item) {
     let mappedItem = upcToItem[item] || item;
     if (!upcToItem[item]) {
       const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
@@ -352,7 +398,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   liveEntryInput.addEventListener('input', () => {
     if (scanTimeout) clearTimeout(scanTimeout);
-    scanTimeout = setTimeout(autoTriggerScan, 150); // wait briefly after input settles
+    scanTimeout = setTimeout(() => {
+      const manualToggle = document.getElementById('manualToggle');
+      if (manualToggle?.checked) autoTriggerScan();
+    }, 150); // wait briefly after input settles
   });
 
   liveEntryInput.addEventListener('keypress', (e) => {
@@ -383,6 +432,13 @@ document.addEventListener('DOMContentLoaded', () => {
         th.textContent = label;
         headerRow.appendChild(th);
       });
+    }
+    // Add Edit column header if not present
+    if (!headerRow.querySelector('.edit-header')) {
+      const editTh = document.createElement('th');
+      editTh.textContent = 'Edit';
+      editTh.className = 'edit-header';
+      headerRow.appendChild(editTh);
     }
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
@@ -431,7 +487,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Red flag if no expected on-hand count
       if (!onHandMap[item]) icon += ' ❌';
 
-      const row = `<tr class="${diff < 0 ? 'under' : diff > 0 ? 'over' : 'match'}">
+      // --- Create row with Edit button ---
+      const tr = document.createElement('tr');
+      tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
+      tr.innerHTML = `
         <td>${item} ${icon}</td>
         <td>${expected}</td>
         <td>${count}</td>
@@ -440,8 +499,30 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
         <td>${category}</td>
         <td>${location}</td>
-      </tr>`;
-      liveTableBody.innerHTML += row;
+        <td><button class="editRow" data-id="${item}">✏️</button></td>
+      `;
+      liveTableBody.appendChild(tr);
+    });
+
+    // Add edit row logic
+    document.querySelectorAll('.editRow').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.dataset.id;
+        const current = liveCounts[item];
+        const newItem = prompt('Edit Item #:', item);
+        if (!newItem) return;
+        const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
+        const newCategory = prompt('Edit Category:', current.category || '') || '';
+        const newLocation = prompt('Edit Location:', current.location || '') || '';
+
+        delete liveCounts[item];
+        liveCounts[newItem] = {
+          count: newCount,
+          category: newCategory,
+          location: newLocation
+        };
+        updateLiveTable();
+      });
     });
 
     // Update the summary bar
@@ -533,6 +614,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(modal);
   });
 
+  // --- Add "Clear Snapshots" button ---
+  const clearSnapshotsBtn = document.createElement('button');
+  clearSnapshotsBtn.textContent = '🗑️ Clear Snapshots';
+  clearSnapshotsBtn.style.marginTop = '10px';
+  viewArchiveBtn.insertAdjacentElement('afterend', clearSnapshotsBtn);
+
+  clearSnapshotsBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to delete all archived snapshot data? This cannot be undone.')) {
+      Object.keys(localStorage)
+        .filter(key => key.startsWith('archivedWeeklyCounts_'))
+        .forEach(key => localStorage.removeItem(key));
+      alert('All archived snapshots have been cleared.');
+    }
+  });
+
   function saveUPCMap() {
     localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
   }
@@ -565,19 +661,25 @@ document.addEventListener('DOMContentLoaded', () => {
       if (item) {
         // Unified location/product detection and handling
         if (!upcToItem[item] && !locationMap[item]) {
-          const type = confirm(`Is "${item}" a LOCATION tag?\n\nPress OK for Location\nPress Cancel for Product`);
-          if (type) {
-            const name = prompt(`🗂 Please enter a name for location "${item}":`);
-            if (name) {
-              locationMap[item] = name;
-              saveLocationMap();
-              currentLocation = name;
-              updateLocationStatus();
-              alert(`📍 Current location set to: ${name}`);
+          showCustomPrompt(item).then(response => {
+            if (response === 'location') {
+              const name = prompt(`🗂 Please enter a name for location "${item}":`);
+              if (name) {
+                locationMap[item] = name;
+                saveLocationMap();
+                currentLocation = name;
+                updateLocationStatus();
+                alert(`📍 Current location set to: ${name}`);
+                liveEntryInput.value = '';
+                return;
+              }
+            } else if (response === 'product') {
+              processProduct(item);
+            } else {
               liveEntryInput.value = '';
-              return;
             }
-          }
+          });
+          return;
         }
         if (locationMap[item]) {
           if (currentLocation === locationMap[item]) {
