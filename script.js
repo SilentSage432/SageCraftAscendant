@@ -70,6 +70,110 @@ document.addEventListener('DOMContentLoaded', () => {
   locationStatus.style.color = 'red';
   categoryInput.insertAdjacentElement('afterend', locationStatus);
 
+  // --- Export/Import Bay Locations buttons ---
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = '📤 Export Bay Locations';
+  exportBtn.style.marginTop = '10px';
+  locationStatus.insertAdjacentElement('afterend', exportBtn);
+
+  const importBtn = document.createElement('button');
+  importBtn.textContent = '📥 Import Bay Locations';
+  importBtn.style.marginLeft = '10px';
+  exportBtn.insertAdjacentElement('afterend', importBtn);
+
+  // --- Export/Import UPC Mappings buttons ---
+  const exportUPCBtn = document.createElement('button');
+  exportUPCBtn.textContent = '📤 Export UPC Mappings';
+  exportUPCBtn.style.marginTop = '10px';
+  manualModeToggle?.insertAdjacentElement('afterend', exportUPCBtn);
+
+  const importUPCBtn = document.createElement('button');
+  importUPCBtn.textContent = '📥 Import UPC Mappings';
+  importUPCBtn.style.marginLeft = '10px';
+  exportUPCBtn.insertAdjacentElement('afterend', importUPCBtn);
+
+  // --- Export locationMap as JSON ---
+  exportBtn.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(locationMap, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bay-locations-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // --- Import locationMap from file ---
+  importBtn.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          if (typeof imported === 'object' && imported !== null) {
+            Object.assign(locationMap, imported);
+            saveLocationMap();
+            alert('Bay location map imported successfully!');
+          } else {
+            alert('Invalid format.');
+          }
+        } catch (err) {
+          alert('Error reading file.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+
+  // --- Export UPC Mappings as JSON ---
+  exportUPCBtn.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(upcToItem, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'upc-mappings-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // --- Import UPC Mappings from file ---
+  importUPCBtn.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          if (typeof imported === 'object' && imported !== null) {
+            Object.assign(upcToItem, imported);
+            saveUPCMap();
+            alert('UPC mappings imported successfully!');
+          } else {
+            alert('Invalid UPC mapping format.');
+          }
+        } catch (err) {
+          alert('Error reading UPC file.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+
   // --- Manual Entry Mode Toggle ---
   const manualModeToggle = document.createElement('label');
   manualModeToggle.innerHTML = `
@@ -77,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   manualModeToggle.style.display = 'block';
   manualModeToggle.style.marginTop = '10px';
-  locationStatus.insertAdjacentElement('afterend', manualModeToggle);
+  importBtn.insertAdjacentElement('afterend', manualModeToggle);
 
   function updateLocationStatus() {
     if (currentLocation) {
