@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div id="batchPreview" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;"></div>
   `;
-  document.querySelector('.container').appendChild(batchSection);
+  document.getElementById('settings').appendChild(batchSection);
 
   const processBatchBtn = document.getElementById('processBatch');
   const batchInput = document.getElementById('batchInput');
