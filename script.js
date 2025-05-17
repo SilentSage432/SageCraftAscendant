@@ -62,6 +62,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveCounts = {};
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
+  // --- Datalist for liveEntryInput suggestions ---
+  const datalist = document.createElement('datalist');
+  datalist.id = 'itemSuggestions';
+  document.body.appendChild(datalist);
+  liveEntryInput.setAttribute('list', 'itemSuggestions');
+  // --- Update item suggestions for datalist ---
+  function updateSuggestions() {
+    const items = new Set([
+      ...Object.keys(upcToItem),
+      ...Object.values(upcToItem),
+      ...Object.keys(liveCounts)
+    ]);
+    datalist.innerHTML = '';
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      datalist.appendChild(opt);
+    });
+  }
+  updateSuggestions();
 
   // --- Voice-Friendly Helper and Parser for On-Hand Input ---
   const onHandInput = document.getElementById('onHandInput');
@@ -326,6 +346,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   const liveTableBody = document.querySelector('#liveCountTable tbody');
+  // --- Insert Live Search Bar (moved to after live count table exists) ---
+  const liveTable = document.getElementById('liveCountTable');
+  if (liveTable) {
+    const searchWrapper = document.createElement('div');
+    searchWrapper.id = 'searchWrapper';
+    searchWrapper.style.margin = '10px 0';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = '🔍 Search item, category, or location...';
+    searchInput.id = 'liveSearchInput';
+    searchInput.style.width = '100%';
+    searchInput.style.padding = '6px';
+    searchInput.style.borderRadius = '4px';
+    searchInput.style.border = '1px solid #ccc';
+
+    searchWrapper.appendChild(searchInput);
+
+    // --- Add clear and reset filter buttons for live search ---
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = '❌';
+    clearBtn.title = 'Clear search';
+    clearBtn.style.marginLeft = '5px';
+    clearBtn.style.padding = '6px';
+    clearBtn.style.borderRadius = '4px';
+    clearBtn.style.border = '1px solid #ccc';
+    clearBtn.onclick = () => {
+      searchInput.value = '';
+      updateLiveTable();
+    };
+
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = '🔁 Reset Filters';
+    resetBtn.title = 'Show all items';
+    resetBtn.style.marginLeft = '5px';
+    resetBtn.style.padding = '6px';
+    resetBtn.style.borderRadius = '4px';
+    resetBtn.style.border = '1px solid #ccc';
+    resetBtn.onclick = () => {
+      searchInput.value = '';
+      updateLiveTable();
+    };
+
+    searchWrapper.appendChild(clearBtn);
+    searchWrapper.appendChild(resetBtn);
+
+    // Insert searchWrapper before liveTable
+    liveTable.insertAdjacentElement('beforebegin', searchWrapper);
+  }
 
   // Insert summary bar below the live count table
   const summaryBar = document.createElement('div');
@@ -549,6 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
     liveCounts[mappedItem].count += qty;
     liveCounts[mappedItem].location = currentLocation;
     updateLiveTable();
+    updateSuggestions();
     liveEntryInput.value = '';
     liveQtyInput.value = '1';
     liveEntryInput.focus();
@@ -580,7 +650,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function updateLiveTable() {
+    // --- Category color map ---
+    const categoryColors = {
+      'Laundry': '#8ecae6',
+      'Fridges & Freezers': '#219ebc',
+      'Ranges': '#ffb703',
+      'Dishwashers': '#fb8500',
+      'Wall Ovens': '#ff6b6b',
+      'Cooktops': '#ffd166',
+      'OTR Microwaves': '#9b5de5',
+      'Microwaves (Countertop)': '#3a86ff',
+      'Vent Hoods': '#8338ec',
+      'Beverage & Wine Coolers': '#ff006e',
+      'Cabinets': '#8d99ae',
+      'Countertops': '#b5ead7',
+      'Interior Doors': '#ffdac1',
+      'Exterior Doors': '#e0aaff',
+      'Storm Doors': '#bc6c25',
+      'Windows': '#588157',
+      'Commodity Moulding': '#adb5bd',
+      'Other / Misc': '#f4a261'
+    };
     liveTableBody.innerHTML = '';
+    const searchTerm = document.getElementById('liveSearchInput')?.value.toLowerCase().trim() || '';
     const headerRow = document.querySelector('#liveCountTable thead tr');
     if (!headerRow.querySelector('.category-header')) {
       const catTh = document.createElement('th');
@@ -622,6 +714,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
 
     Object.entries(liveCounts).forEach(([item, obj]) => {
+      // --- Live search filter ---
+      if (searchTerm &&
+          !item.toLowerCase().includes(searchTerm) &&
+          !(obj.category || '').toLowerCase().includes(searchTerm) &&
+          !(obj.location || '').toLowerCase().includes(searchTerm)) {
+        return;
+      }
       const count = obj.count;
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
@@ -655,43 +754,134 @@ document.addEventListener('DOMContentLoaded', () => {
       // Red flag if no expected on-hand count
       if (!onHandMap[item]) icon += ' ❌';
 
-      // --- Create row with Edit button ---
+      // --- Create row with editable cells and Edit button ---
       const tr = document.createElement('tr');
       tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
+      // Set background color by category if defined
+      if (categoryColors[obj.category]) {
+        tr.style.backgroundColor = categoryColors[obj.category];
+      }
       tr.innerHTML = `
         <td>${item} ${icon}</td>
         <td>${expected}</td>
-        <td>${count}</td>
+        <td class="editable" data-field="count" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${count}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
         <td>${diff > 0 ? '+' + diff : diff}</td>
         <td>${previous !== '' ? previous : '-'}</td>
         <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
-        <td>${category}</td>
-        <td>${location}</td>
+        <td class="editable" data-field="category" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${category}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
+        <td class="editable" data-field="location" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${location}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
         <td><button class="editRow" data-id="${item}">✏️</button></td>
       `;
       liveTableBody.appendChild(tr);
     });
 
-    // Add edit row logic
+    // Add edit/delete row logic with custom modal prompt
     document.querySelectorAll('.editRow').forEach(btn => {
       btn.addEventListener('click', () => {
         const item = btn.dataset.id;
-        const current = liveCounts[item];
-        const newItem = prompt('Edit Item #:', item);
-        if (!newItem) return;
-        const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
-        const newCategory = prompt('Edit Category:', current.category || '') || '';
-        const newLocation = prompt('Edit Location:', current.location || '') || '';
+        // Custom modal-style prompt for Edit/Delete
+        const overlay = document.createElement('div');
+        overlay.id = 'editDeletePrompt';
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        overlay.innerHTML = `
+          <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
+            <p>What would you like to do with "<strong>${item}</strong>"?</p>
+            <button id="editBtn">✏️ Edit</button>
+            <button id="deleteBtn">🗑️ Delete</button>
+            <button id="cancelBtn">❌ Cancel</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
 
-        delete liveCounts[item];
-        liveCounts[newItem] = {
-          count: newCount,
-          category: newCategory,
-          location: newLocation
+        document.getElementById('editBtn').onclick = () => {
+          document.body.removeChild(overlay);
+          const current = liveCounts[item];
+          const newItem = prompt('Edit Item #:', item);
+          if (!newItem) return;
+          const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
+          const newCategory = prompt('Edit Category:', current.category || '') || '';
+          const newLocation = prompt('Edit Location:', current.location || '') || '';
+          delete liveCounts[item];
+          liveCounts[newItem] = {
+            count: newCount,
+            category: newCategory,
+            location: newLocation
+          };
+          updateLiveTable();
         };
-        updateLiveTable();
+
+        document.getElementById('deleteBtn').onclick = () => {
+          if (confirm(`Are you sure you want to delete "${item}"?`)) {
+            delete liveCounts[item];
+            updateLiveTable();
+          }
+          document.body.removeChild(overlay);
+        };
+
+        document.getElementById('cancelBtn').onclick = () => {
+          document.body.removeChild(overlay);
+        };
       });
     });
+
+    // Add inline editable logic for Found, Category, and Location cells
+    document.querySelectorAll('.editable').forEach(cell => {
+      // Only allow one edit at a time per cell
+      const span = cell.querySelector('span[contenteditable]');
+      const saveBtn = cell.querySelector('button.saveEdit');
+      let originalValue = span ? span.textContent : '';
+      // Save on button click
+      if (saveBtn && span) {
+        saveBtn.onclick = (e) => {
+          e.stopPropagation();
+          const field = cell.dataset.field;
+          const id = cell.dataset.id;
+          const newValue = span.textContent.trim();
+          if (field === 'count') {
+            liveCounts[id].count = parseInt(newValue) || 0;
+          } else {
+            liveCounts[id][field] = newValue;
+          }
+          updateLiveTable();
+        };
+      }
+      // Save on Enter, cancel on Esc
+      if (span) {
+        span.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (saveBtn) saveBtn.click();
+          } else if (e.key === 'Escape') {
+            span.textContent = originalValue;
+            span.blur();
+          }
+        });
+        span.addEventListener('focus', () => {
+          originalValue = span.textContent;
+        });
+        span.addEventListener('blur', () => {
+          // When losing focus, don't auto-save (require save button or Enter)
+        });
+      }
+    });
+    // (END updateLiveTable)
 
     // Update the summary bar
     let totalItems = 0;
@@ -731,7 +921,24 @@ document.addEventListener('DOMContentLoaded', () => {
       liveEntryInput.value = '';
       liveQtyInput.value = '1';
       updateLiveTable();
+      updateSuggestions();
       summaryBar.innerHTML = '';
+    });
+  }
+
+  // Clear history button
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all historical weekly data? This will not affect your current session or saved Excel reports.')) {
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem(`archivedWeeklyCounts_${today}`, JSON.stringify(weeklyCounts));
+        localStorage.removeItem('weeklyCounts');
+        alert('Weekly history cleared! A snapshot has been saved.');
+        updateLiveTable();
+        updateSuggestions();
+        summaryBar.innerHTML = '';
+      }
     });
   }
   // Add item button
@@ -800,6 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
         liveCounts[mappedItem].count += qty;
         liveCounts[mappedItem].location = currentLocation;
         updateLiveTable();
+        updateSuggestions();
         liveEntryInput.value = '';
         liveQtyInput.value = '1';
         liveEntryInput.focus();
@@ -1153,5 +1361,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   document.head.appendChild(gisScript);
 });
+
+// --- Attach live search event ---
+const searchBox = document.getElementById('liveSearchInput');
+if (searchBox) {
+  searchBox.addEventListener('input', updateLiveTable);
+}
   // Update location status on load
   // (Moved inside DOMContentLoaded, so this will already be called)
