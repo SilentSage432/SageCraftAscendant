@@ -102,6 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveCounts = {};
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
+  function restoreFocusToEntry() {
+    setTimeout(() => {
+      liveEntryInput.focus();
+    }, 100);
+  }
   // --- Datalist for liveEntryInput suggestions ---
   const datalist = document.createElement('datalist');
   datalist.id = 'itemSuggestions';
@@ -503,12 +508,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updateLocationStatus();
             alert(`📍 Current location set to: ${name}`);
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           }
         } else if (response === 'product') {
           processProduct(trimmed);
         } else {
           liveEntryInput.value = '';
+          restoreFocusToEntry();
         }
       });
       return;
@@ -522,12 +529,14 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('📦 Current location cleared.');
             }
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           } else {
             currentLocation = locationMap[trimmed];
             updateLocationStatus();
             alert(`📍 Current location set to: ${currentLocation}`);
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           }
         }
@@ -606,12 +615,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updateLocationStatus();
             alert(`📍 Current location set to: ${name}`);
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           }
         } else if (response === 'product') {
           processProduct(item);
         } else {
           liveEntryInput.value = '';
+          restoreFocusToEntry();
         }
       });
       return;
@@ -626,12 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('📦 Current location cleared.');
         }
         liveEntryInput.value = '';
+        restoreFocusToEntry();
         return;
       } else {
         currentLocation = locationMap[item];
         updateLocationStatus();
         alert(`📍 Current location set to: ${currentLocation}`);
         liveEntryInput.value = '';
+        restoreFocusToEntry();
         return;
       }
     }
@@ -661,8 +674,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSuggestions();
     showScanMappingLog(item, mappedItem);
     liveEntryInput.value = '';
+    restoreFocusToEntry();
     liveQtyInput.value = '1';
-    liveEntryInput.focus();
   }
 
   // --- Barcode scanner/autoprocess input field logic ---
@@ -1004,12 +1017,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateLocationStatus();
                 alert(`📍 Current location set to: ${name}`);
                 liveEntryInput.value = '';
+                restoreFocusToEntry();
                 return;
               }
             } else if (response === 'product') {
               processProduct(item);
             } else {
               liveEntryInput.value = '';
+              restoreFocusToEntry();
             }
           });
           return;
@@ -1023,12 +1038,14 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('📦 Current location cleared.');
             }
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           } else {
             currentLocation = locationMap[item];
             updateLocationStatus();
             alert(`📍 Current location set to: ${currentLocation}`);
             liveEntryInput.value = '';
+            restoreFocusToEntry();
             return;
           }
         }
@@ -1050,8 +1067,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLiveTable();
         updateSuggestions();
         liveEntryInput.value = '';
+        restoreFocusToEntry();
         liveQtyInput.value = '1';
-        liveEntryInput.focus();
       }
     };
     addLiveItemBtn.addEventListener('click', handleAddItem);
@@ -1386,6 +1403,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Activate the default tab on load
   document.querySelector('.tablink[data-tab="entry"]').classList.add('active');
   document.getElementById('entry').classList.add('active');
+  // Focus the liveEntry input on load
+  liveEntryInput.focus();
   // Dynamically load the Google API script
   const gapiScript = document.createElement('script');
   gapiScript.src = 'https://apis.google.com/js/api.js';
