@@ -1,4 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Google Drive Integration ---
+  const CLIENT_ID = '1009062770217-7irsj0citcrif5tqlt9u76q01u839uic.apps.googleusercontent.com';
+  const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+  function gapiInit() {
+    gapi.load('client:auth2', async () => {
+      await gapi.client.init({
+        clientId: CLIENT_ID,
+        scope: SCOPES
+      });
+      console.log('✅ Google API initialized');
+    });
+  }
+
+  function handleAuthClick() {
+    gapi.auth2.getAuthInstance().signIn().then(() => {
+      alert('🔓 Authenticated with Google Drive');
+    });
+  }
+
+  function uploadExcelToDrive(fileBlob) {
+    const metadata = {
+      name: 'inventory_report.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    };
+
+    const accessToken = gapi.auth.getToken().access_token;
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', fileBlob);
+
+    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
+      body: form
+    }).then(res => res.json())
+      .then(val => alert('✅ Uploaded to Google Drive!'))
+      .catch(err => alert('❌ Upload failed: ' + err.message));
+  }
   // --- Custom modal prompt for unrecognized code type ---
   function showCustomPrompt(item) {
     return new Promise(resolve => {
@@ -993,9 +1032,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       wb.Sheets['Inventory'] = ws;
       XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+      // --- Google Drive upload ---
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      uploadExcelToDrive(blob);
       XLSX.writeFile(wb, 'inventory_report.xlsx');
     });
     // --- Attach event listener to "Merge Master Report" button in HTML ---
+  // --- Google Drive Auth Button Listener ---
+  const authBtn = document.getElementById('authGoogleDrive');
+  if (authBtn) {
+    authBtn.addEventListener('click', () => {
+      console.log("🔘 Google Drive auth button clicked");
+      gapiInit();
+      setTimeout(() => handleAuthClick(), 500);
+    });
+  }
     const mergeReportBtn = document.getElementById('mergeReport');
     if (mergeReportBtn) {
       mergeReportBtn.addEventListener('click', () => {
