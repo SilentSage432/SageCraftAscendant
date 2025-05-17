@@ -22,9 +22,131 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveCounts = {};
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
+
+  // --- Voice-Friendly Helper and Parser for On-Hand Input ---
+  const onHandInput = document.getElementById('onHandInput');
+  if (onHandInput) {
+    const voiceHint = document.createElement('div');
+    voiceHint.id = 'voiceHint';
+    voiceHint.textContent = '🎙️ Tip: Tap your keyboard mic to speak item and count (e.g. "670009 4")';
+    voiceHint.style.fontSize = '0.9em';
+    voiceHint.style.marginTop = '6px';
+    voiceHint.style.color = 'gray';
+    onHandInput.insertAdjacentElement('afterend', voiceHint);
+
+    // Auto-format input when pasted or changed
+    onHandInput.addEventListener('blur', () => {
+      const lines = onHandInput.value.trim().split(/\r?\n/);
+      const formatted = lines.map(line => {
+        const parts = line.trim().split(/\s+/);
+        if (parts.length === 2 && /^\d{5,6}$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+          return `${parts[0]}:${parts[1]}`;
+        }
+        return line;
+      });
+      onHandInput.value = formatted.join('\n');
+    });
+  }
   // Set inputmode and pattern for mobile number pad
   liveEntryInput.setAttribute('inputmode', 'numeric');
   liveEntryInput.setAttribute('pattern', '\\d*');
+  // --- SETTINGS: Apply saved preferences on load ---
+  // Dark mode
+  if (localStorage.getItem('darkModeEnabled') === 'true') {
+    document.body.classList.add('dark-mode');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) darkModeToggle.checked = true;
+  }
+
+  // Font size
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  if (fontSizeSelect) {
+    fontSizeSelect.value = localStorage.getItem('fontSize') || 'medium';
+    document.body.style.fontSize =
+      fontSizeSelect.value === 'large' ? '18px' :
+      fontSizeSelect.value === 'small' ? '12px' : '14px';
+  }
+
+  // Autosave enabled
+  const autosaveToggle = document.getElementById('autosaveToggle');
+  if (autosaveToggle) autosaveToggle.checked = localStorage.getItem('autosaveEnabled') !== 'false';
+
+  // Autosave interval
+  const autosaveIntervalSelect = document.getElementById('autosaveIntervalSelect');
+  if (autosaveIntervalSelect) autosaveIntervalSelect.value = localStorage.getItem('autosaveInterval') || '3';
+
+  // Batch scan mode
+  const batchScanToggle = document.getElementById('batchScanToggle');
+  if (batchScanToggle) batchScanToggle.checked = localStorage.getItem('batchScanMode') === 'true';
+
+  // Numeric keypad
+  const numericKeypadToggle = document.getElementById('numericKeypadToggle');
+  if (numericKeypadToggle) numericKeypadToggle.checked = localStorage.getItem('numericKeypad') === 'true';
+  if (numericKeypadToggle && liveEntryInput) {
+    const mode = numericKeypadToggle.checked ? 'numeric' : 'text';
+    liveEntryInput.setAttribute('inputmode', mode);
+  }
+
+  // Keep snapshots
+  const keepSnapshotsToggle = document.getElementById('keepSnapshotsToggle');
+  if (keepSnapshotsToggle) keepSnapshotsToggle.checked = localStorage.getItem('keepSnapshots') !== 'false';
+
+  // --- SETTINGS: Event listeners for preference changes ---
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkModeEnabled', 'true');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkModeEnabled', 'false');
+      }
+    });
+  }
+
+  // Font size toggle
+  if (fontSizeSelect) {
+    fontSizeSelect.addEventListener('change', (e) => {
+      const size = e.target.value;
+      localStorage.setItem('fontSize', size);
+      document.body.style.fontSize = size === 'large' ? '18px' : size === 'small' ? '12px' : '14px';
+    });
+  }
+
+  // Autosave settings
+  if (autosaveToggle) {
+    autosaveToggle.addEventListener('change', (e) => {
+      localStorage.setItem('autosaveEnabled', e.target.checked);
+    });
+  }
+  if (autosaveIntervalSelect) {
+    autosaveIntervalSelect.addEventListener('change', (e) => {
+      localStorage.setItem('autosaveInterval', e.target.value);
+    });
+  }
+
+  // Batch scan and numeric keypad
+  if (batchScanToggle) {
+    batchScanToggle.addEventListener('change', (e) => {
+      localStorage.setItem('batchScanMode', e.target.checked);
+    });
+  }
+  if (numericKeypadToggle) {
+    numericKeypadToggle.addEventListener('change', (e) => {
+      localStorage.setItem('numericKeypad', e.target.checked);
+      const mode = e.target.checked ? 'numeric' : 'text';
+      if (liveEntryInput) liveEntryInput.setAttribute('inputmode', mode);
+    });
+  }
+
+  // Keep snapshot toggle
+  if (keepSnapshotsToggle) {
+    keepSnapshotsToggle.addEventListener('change', (e) => {
+      localStorage.setItem('keepSnapshots', e.target.checked);
+    });
+  }
   const liveQtyInput = document.createElement('input');
   liveQtyInput.type = 'number';
   liveQtyInput.min = '1';
@@ -70,27 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
   locationStatus.style.color = 'red';
   categoryInput.insertAdjacentElement('afterend', locationStatus);
 
-  // --- Export/Import Bay Locations buttons ---
-  const exportBtn = document.createElement('button');
-  exportBtn.textContent = '📤 Export Bay Locations';
-  exportBtn.style.marginTop = '10px';
-  locationStatus.insertAdjacentElement('afterend', exportBtn);
-
-  const importBtn = document.createElement('button');
-  importBtn.textContent = '📥 Import Bay Locations';
-  importBtn.style.marginLeft = '10px';
-  exportBtn.insertAdjacentElement('afterend', importBtn);
-
-  // --- Export/Import UPC Mappings buttons ---
-  const exportUPCBtn = document.createElement('button');
-  exportUPCBtn.textContent = '📤 Export UPC Mappings';
-  exportUPCBtn.style.marginTop = '10px';
-  manualModeToggle?.insertAdjacentElement('afterend', exportUPCBtn);
-
-  const importUPCBtn = document.createElement('button');
-  importUPCBtn.textContent = '📥 Import UPC Mappings';
-  importUPCBtn.style.marginLeft = '10px';
-  exportUPCBtn.insertAdjacentElement('afterend', importUPCBtn);
 
   // --- Export locationMap as JSON ---
   exportBtn.addEventListener('click', () => {
@@ -174,14 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     input.click();
   });
 
-  // --- Manual Entry Mode Toggle ---
-  const manualModeToggle = document.createElement('label');
-  manualModeToggle.innerHTML = `
-    <input type="checkbox" id="manualToggle" checked style="margin-right:5px;"> Auto-Scan Mode
-  `;
-  manualModeToggle.style.display = 'block';
-  manualModeToggle.style.marginTop = '10px';
-  importBtn.insertAdjacentElement('afterend', manualModeToggle);
 
   function updateLocationStatus() {
     if (currentLocation) {
@@ -741,6 +834,9 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('locationMap', JSON.stringify(locationMap));
   }
 
+  // --- Ensure critical buttons are assigned after DOMContentLoaded ---
+  // Manual toggle, import/export, and mapping buttons are now static in HTML. Only add event listeners.
+  // Clear live table button
   const clearBtn = document.getElementById('clearLiveTable');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
@@ -751,16 +847,14 @@ document.addEventListener('DOMContentLoaded', () => {
       summaryBar.innerHTML = '';
     });
   }
-
+  // Add item button
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
     let lastTriggerTime = 0;
-
     const handleAddItem = () => {
       const now = Date.now();
       if (now - lastTriggerTime < 300) return; // prevent double trigger
       lastTriggerTime = now;
-
       const item = liveEntryInput.value.trim();
       if (item) {
         // Unified location/product detection and handling
@@ -824,7 +918,6 @@ document.addEventListener('DOMContentLoaded', () => {
         liveEntryInput.focus();
       }
     };
-
     addLiveItemBtn.addEventListener('click', handleAddItem);
     addLiveItemBtn.addEventListener('touchend', handleAddItem);
   }
@@ -840,7 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Session saved!');
     });
   }
-
   const loadSessionBtn = document.getElementById('loadSession');
   if (loadSessionBtn) {
     loadSessionBtn.addEventListener('click', () => {
@@ -858,14 +950,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
   const excelBtn = document.getElementById('downloadExcel');
   if (excelBtn) {
     excelBtn.addEventListener('click', () => {
       // Ensure header includes 'Location'
       const wb = XLSX.utils.book_new();
       const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
-
       const onHandText = document.getElementById('onHandInput').value;
       const onHandLines = onHandText.trim().split(/\n+/);
       const onHandMap = {};
@@ -873,10 +963,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const [item, count] = line.split(':');
         if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
       });
-
       const previousDates = Object.keys(weeklyCounts).sort().reverse();
       const lastWeek = previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null;
-
       Object.entries(liveCounts).forEach(([item, obj]) => {
         const count = obj.count;
         const expected = onHandMap[item] || 0;
@@ -886,9 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ensure location is included as a dedicated column
         ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
       });
-
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
-
       const range = XLSX.utils.decode_range(ws['!ref']);
       for (let row = 1; row <= range.e.r; row++) {
         const diffCellRef = XLSX.utils.encode_cell({ c: 3, r: row });
@@ -905,59 +991,75 @@ document.addEventListener('DOMContentLoaded', () => {
           };
         }
       }
-
       wb.Sheets['Inventory'] = ws;
       XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-
       XLSX.writeFile(wb, 'inventory_report.xlsx');
     });
-
-    // --- Insert Merge Master Report button ---
-    const mergeReportBtn = document.createElement('button');
-    mergeReportBtn.textContent = '🧬 Merge Master Report';
-    mergeReportBtn.id = 'mergeReport';
-    mergeReportBtn.style.marginTop = '10px';
-    mergeReportBtn.style.display = 'block';
-    excelBtn.insertAdjacentElement('afterend', mergeReportBtn);
-
-    mergeReportBtn.addEventListener('click', () => {
-      const savedKeys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
-      if (savedKeys.length === 0) {
-        alert('No saved sessions found to merge.');
-        return;
-      }
-
-      const wb = XLSX.utils.book_new();
-      savedKeys.forEach(key => {
-        const session = JSON.parse(localStorage.getItem(key));
-        if (!session || !session.liveCounts) return;
-
-        const ws_data = [['Item #', 'Found', 'Category', 'Location']];
-        Object.entries(session.liveCounts).forEach(([item, obj]) => {
-          ws_data.push([item, obj.count, obj.category || '', obj.location || '']);
+    // --- Attach event listener to "Merge Master Report" button in HTML ---
+    const mergeReportBtn = document.getElementById('mergeReport');
+    if (mergeReportBtn) {
+      mergeReportBtn.addEventListener('click', () => {
+        const savedKeys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
+        if (savedKeys.length === 0) {
+          alert('No saved sessions found to merge.');
+          return;
+        }
+        const wb = XLSX.utils.book_new();
+        savedKeys.forEach(key => {
+          const session = JSON.parse(localStorage.getItem(key));
+          if (!session || !session.liveCounts) return;
+          const ws_data = [['Item #', 'Found', 'Category', 'Location']];
+          Object.entries(session.liveCounts).forEach(([item, obj]) => {
+            ws_data.push([item, obj.count, obj.category || '', obj.location || '']);
+          });
+          const sheetName = key.replace('inventorySession_', '');
+          const ws = XLSX.utils.aoa_to_sheet(ws_data);
+          XLSX.utils.book_append_sheet(wb, ws, sheetName);
         });
-
-        const sheetName = key.replace('inventorySession_', '');
-        const ws = XLSX.utils.aoa_to_sheet(ws_data);
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        XLSX.writeFile(wb, 'merged_inventory_report.xlsx');
       });
-
-      XLSX.writeFile(wb, 'merged_inventory_report.xlsx');
-    });
+    }
   }
 
-  // Auto-save session every 30 seconds
-  setInterval(() => {
-    const session = {
-      liveCounts: JSON.parse(JSON.stringify(liveCounts)),
-      onHandText: document.getElementById('onHandInput').value
-    };
-    localStorage.setItem('inventorySession', JSON.stringify(session));
-    // Also store versioned session for merge report
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    localStorage.setItem(`inventorySession_${timestamp}`, JSON.stringify(session));
-    console.log('Auto-saved session');
-  }, 30000);
+  // --- Auto-save session at configured interval (default 30 seconds) ---
+  function getAutosaveIntervalMs() {
+    const intervalElem = document.getElementById('autosaveIntervalSelect');
+    let mins = 0.5;
+    if (intervalElem) {
+      const val = parseFloat(intervalElem.value);
+      if (!isNaN(val)) mins = val;
+    }
+    return mins * 60 * 1000;
+  }
+
+  let autosaveTimer = null;
+  function setupAutosaveLoop() {
+    if (autosaveTimer) clearInterval(autosaveTimer);
+    // Only run autosave if enabled
+    const enabled = document.getElementById('autosaveToggle')?.checked !== false;
+    if (!enabled) return;
+    const interval = getAutosaveIntervalMs();
+    autosaveTimer = setInterval(() => {
+      const session = {
+        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+        onHandText: document.getElementById('onHandInput').value
+      };
+      localStorage.setItem('inventorySession', JSON.stringify(session));
+      // Also store versioned session for merge report
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      localStorage.setItem(`inventorySession_${timestamp}`, JSON.stringify(session));
+      console.log('Auto-saved session');
+    }, interval);
+  }
+  // Start autosave on load if enabled
+  setupAutosaveLoop();
+  // Re-setup autosave on interval or enabled/disabled change
+  if (autosaveIntervalSelect) {
+    autosaveIntervalSelect.addEventListener('change', setupAutosaveLoop);
+  }
+  if (autosaveToggle) {
+    autosaveToggle.addEventListener('change', setupAutosaveLoop);
+  }
 
   // --- Auto-generate Excel file every 10 minutes ---
   function pad(n) {
@@ -1011,6 +1113,26 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(reg => console.log('Service Worker registered ✅', reg))
       .catch(err => console.error('Service Worker registration failed ❌', err));
   }
+
+  // --- Tab Switching Logic ---
+  const tabLinks = document.querySelectorAll('.tablink');
+  const tabSections = document.querySelectorAll('.tab-section');
+
+  tabLinks.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-tab');
+      tabSections.forEach(section => {
+        section.classList.remove('active');
+      });
+      tabLinks.forEach(b => b.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      btn.classList.add('active');
+    });
+  });
+
+  // Activate the default tab on load
+  document.querySelector('.tablink[data-tab="entry"]').classList.add('active');
+  document.getElementById('entry').classList.add('active');
 });
   // Update location status on load
-  updateLocationStatus();
+  // (Moved inside DOMContentLoaded, so this will already be called)

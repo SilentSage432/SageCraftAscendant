@@ -5,51 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventory Auditor</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1e1e1e" />
 </head>
 <body>
-  <div class="container">
+  <header class="topbar">
     <h1>🧾 Inventory Auditor</h1>
+    <nav class="nav-tabs">
+      <button id="hamburgerMenu" class="hamburger-btn">☰</button>
+      <div id="menuDropdown" class="dropdown-menu" style="display: none;">
+        <button class="tablink" data-tab="entry">📝 Entry</button>
+        <button class="tablink" data-tab="reports">📊 Reports</button>
+        <button class="tablink" data-tab="sessions">💾 Sessions</button>
+        <button class="tablink" data-tab="settings">⚙️ Settings</button>
+      </div>
+    </nav>
+  </header>
 
-    <section>
+  <div class="container">
+    <main class="tab-content">
+    <section id="entry" class="tab-section active">
       <h2>Step 1: Enter On-Hand Counts</h2>
       <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
-    </section>
 
-    <section>
-      <h2>Live Entry Mode</h2>
-      <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
-      <button id="addLiveItem">Add Item</button>
-    </section>
+      <div id="entryControls">
+        <label id="manualModeToggle">
+          <input type="checkbox" id="manualToggle" checked />
+          Auto-Scan Mode
+        </label>
 
-    <section>
-      <h2>Live Counts</h2>
-      <div class="table-wrapper">
-        <table id="liveCountTable">
-          <thead>
-            <tr>
-              <th>Item #</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="import-export-group">
+          <button id="exportBtn">📤 Export Bay Locations</button>
+          <button id="importBtn">📥 Import Bay Locations</button>
+          <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+          <button id="importUPCBtn">📥 Import UPC Mappings</button>
+        </div>
+
+        <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
+        <button id="addLiveItem">Add Item</button>
       </div>
+
+      <section>
+        <h2>Live Counts</h2>
+        <div class="table-wrapper">
+          <table id="liveCountTable">
+            <thead>
+              <tr>
+                <th>Item #</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
     </section>
 
-    <section>
+    <section id="reports" class="tab-section">
+      <h2>Export Tools</h2>
+      <button id="downloadExcel">Download Excel</button>
+      <button id="mergeReport">🧬 Merge Master Report</button>
+    </section>
+
+    <section id="sessions" class="tab-section">
       <h2>Session Controls</h2>
       <button id="clearLiveTable">Clear Live Table</button>
       <button id="saveSession">Save Session</button>
       <button id="loadSession">Load Session</button>
-      <button id="downloadExcel">Download Excel</button>
     </section>
 
-  </div>
+    <section id="settings" class="tab-section">
+      <h2>Settings</h2>
 
-</script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
+      <div class="settings-group">
+        <h3>🖼 Appearance</h3>
+        <label>
+          <input type="checkbox" id="darkModeToggle" />
+          Enable Dark Mode
+        </label>
+        <label>
+          Font Size:
+          <select id="fontSizeSelect">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>📦 Scan Behavior</h3>
+        <label>
+          <input type="checkbox" id="batchScanToggle" />
+          Enable Batch Scan Mode
+        </label>
+        <label>
+          <input type="checkbox" id="numericKeypadToggle" />
+          Use Numeric Keypad for Manual Entry
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>⏱ Autosave</h3>
+        <label>
+          Autosave Every:
+          <select id="autosaveIntervalSelect">
+            <option value="1">1 min</option>
+            <option value="3" selected>3 min</option>
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+          </select>
+        </label>
+        <label>
+          <input type="checkbox" id="autosaveToggle" checked />
+          Enable Autosave
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <h3>🧹 Data Management</h3>
+        <button id="downloadBackupBtn">Download Backup</button>
+        <button id="clearSessionsBtn">Clear All Sessions</button>
+        <label>
+          <input type="checkbox" id="keepSnapshotsToggle" checked />
+          Keep Snapshots After Excel Export
+        </label>
+      </div>
+    </section>
+    </main>
+  </div>
 
   <div id="customModal" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
@@ -61,9 +143,37 @@
       </div>
     </div>
   </div>
-</footer>
+
   <footer style="text-align:center; margin-top:30px; font-size:12px; color:gray;">
     Inventory Auditor — v2.0.0
   </footer>
+
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    document.getElementById("hamburgerMenu").addEventListener("click", function () {
+      const menu = document.getElementById("menuDropdown");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    });
+
+    const tabLinks = document.querySelectorAll(".tablink");
+    const tabSections = document.querySelectorAll(".tab-section");
+
+    tabLinks.forEach(link => {
+      link.addEventListener("click", function () {
+        const target = link.getAttribute("data-tab");
+
+        tabSections.forEach(section => {
+          if (section.id === target) {
+            section.classList.add("active");
+          } else {
+            section.classList.remove("active");
+          }
+        });
+
+        document.getElementById("menuDropdown").style.display = "none";
+      });
+    });
+  </script>
 </body>
 </html>
