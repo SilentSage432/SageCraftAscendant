@@ -23,122 +23,112 @@
 
   <div class="container">
     <main class="tab-content">
-    <section id="entry" class="tab-section active">
-      <section>
+      <section id="entry" class="tab-section active">
         <h2>Live Counts</h2>
         <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
           <table id="liveCountTable">
             <thead>
-              <tr>
-                <th>Item #</th>
-                <th>Count</th>
-              </tr>
+              <tr><th>Item #</th><th>Count</th></tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
+
         <div id="entryControls">
-          <label id="manualModeToggle">
-            <input type="checkbox" id="manualToggle" checked />
-            Auto-Scan Mode
-          </label>
-
-          <button id="toggleImportExport">📂 Import/Export Options</button>
-          <div id="importExportControls" class="hidden">
-            <button id="exportBtn">📤 Export Bay Locations</button>
-            <button id="importBtn">📥 Import Bay Locations</button>
-            <button id="exportUPCBtn">📤 Export UPC Mappings</button>
-            <button id="importUPCBtn">📥 Import UPC Mappings</button>
-          </div>
-
           <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
           <button id="addLiveItem">Add Item</button>
+          <button id="toggleAdvancedControls">⚙️ More Options</button>
+
+          <div id="advancedControls" class="hidden">
+            <!-- Auto-Scan Mode -->
+            <label id="manualModeToggle">
+              <input type="checkbox" id="manualToggle" checked />
+              Auto-Scan Mode
+            </label>
+
+            <!-- Import/Export -->
+            <button id="toggleImportExport">📂 Import/Export Options</button>
+            <div id="importExportControls" class="hidden">
+              <button id="exportBtn">📤 Export Bay Locations</button>
+              <button id="importBtn">📥 Import Bay Locations</button>
+              <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+              <button id="importUPCBtn">📥 Import UPC Mappings</button>
+            </div>
+
+            <!-- Snapshot/Trend Buttons -->
+            <button id="clearHistoryBtn">🧹 Clear History</button>
+            <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
+            <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
+            <button id="viewTrends">📈 View Trends</button>
+          </div>
+        </div>
+
+        <h2>On-Hand Counts</h2>
+        <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+      </section>
+
+      <section id="reports" class="tab-section">
+        <h2>Export Tools</h2>
+        <button id="authGoogleDrive">🔐 Connect Google Drive</button>
+        <button id="downloadExcel">⬇️ Download Excel</button>
+        <button id="mergeReport">🧬 Merge Master Report</button>
+      </section>
+
+      <section id="sessions" class="tab-section">
+        <h2>Session Controls</h2>
+        <button id="clearLiveTable">🗑️ Clear Live Table</button>
+        <button id="saveSession">💾 Save Session</button>
+        <button id="loadSession">📥 Load Session</button>
+      </section>
+
+      <section id="settings" class="tab-section">
+        <h2>Settings</h2>
+        <div class="settings-group">
+          <h3>🖼 Appearance</h3>
+          <label><input type="checkbox" id="darkModeToggle" /> Enable Dark Mode</label>
+          <label>Font Size:
+            <select id="fontSizeSelect">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="settings-group">
+          <h3>📦 Scan Behavior</h3>
+          <label><input type="checkbox" id="batchScanToggle" /> Enable Batch Scan Mode</label>
+          <label><input type="checkbox" id="numericKeypadToggle" /> Use Numeric Keypad for Manual Entry</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>⏱ Autosave</h3>
+          <label>Autosave Every:
+            <select id="autosaveIntervalSelect">
+              <option value="1">1 min</option>
+              <option value="3" selected>3 min</option>
+              <option value="5">5 min</option>
+              <option value="10">10 min</option>
+            </select>
+          </label>
+          <label><input type="checkbox" id="autosaveToggle" checked /> Enable Autosave</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>🧹 Data Management</h3>
+          <button id="downloadBackupBtn">Download Backup</button>
+          <button id="clearSessionsBtn">Clear All Sessions</button>
+          <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>📚 Session Manager</h3>
+          <button id="viewSavedSessions">📂 View Saved Sessions</button>
+          <button id="mergeReport">🧬 Merge Master Report</button>
+          <button id="clearAllSessions">🗑️ Clear All Saved Sessions</button>
+          <div id="savedSessionsList" style="margin-top: 10px;"></div>
         </div>
       </section>
-      <h2>On-Hand Counts</h2>
-      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
-    </section>
-
-    <section id="reports" class="tab-section">
-      <h2>Export Tools</h2>
-      <button id="authGoogleDrive">🔐 Connect Google Drive</button>
-      <button id="downloadExcel">Download Excel</button>
-      <button id="mergeReport">🧬 Merge Master Report</button>
-    </section>
-
-    <section id="sessions" class="tab-section">
-      <h2>Session Controls</h2>
-      <button id="clearLiveTable">Clear Live Table</button>
-      <button id="saveSession">Save Session</button>
-      <button id="loadSession">Load Session</button>
-    </section>
-
-    <section id="settings" class="tab-section">
-      <h2>Settings</h2>
-
-      <div class="settings-group">
-        <h3>🖼 Appearance</h3>
-        <label>
-          <input type="checkbox" id="darkModeToggle" />
-          Enable Dark Mode
-        </label>
-        <label>
-          Font Size:
-          <select id="fontSizeSelect">
-            <option value="small">Small</option>
-            <option value="medium" selected>Medium</option>
-            <option value="large">Large</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="settings-group">
-        <h3>📦 Scan Behavior</h3>
-        <label>
-          <input type="checkbox" id="batchScanToggle" />
-          Enable Batch Scan Mode
-        </label>
-        <label>
-          <input type="checkbox" id="numericKeypadToggle" />
-          Use Numeric Keypad for Manual Entry
-        </label>
-      </div>
-
-      <div class="settings-group">
-        <h3>⏱ Autosave</h3>
-        <label>
-          Autosave Every:
-          <select id="autosaveIntervalSelect">
-            <option value="1">1 min</option>
-            <option value="3" selected>3 min</option>
-            <option value="5">5 min</option>
-            <option value="10">10 min</option>
-          </select>
-        </label>
-        <label>
-          <input type="checkbox" id="autosaveToggle" checked />
-          Enable Autosave
-        </label>
-      </div>
-
-      <div class="settings-group">
-        <h3>🧹 Data Management</h3>
-        <button id="downloadBackupBtn">Download Backup</button>
-        <button id="clearSessionsBtn">Clear All Sessions</button>
-        <label>
-          <input type="checkbox" id="keepSnapshotsToggle" checked />
-          Keep Snapshots After Excel Export
-        </label>
-      </div>
-
-      <div class="settings-group">
-        <h3>📚 Session Manager</h3>
-        <button id="viewSavedSessions">📂 View Saved Sessions</button>
-        <button id="mergeReport">🧬 Merge Master Report</button>
-        <button id="clearAllSessions">🗑️ Clear All Saved Sessions</button>
-        <div id="savedSessionsList" style="margin-top: 10px;"></div>
-      </div>
-    </section>
     </main>
   </div>
 
@@ -159,6 +149,7 @@
 
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="script.js"></script>
+
   <script>
     document.getElementById("hamburgerMenu").addEventListener("click", function () {
       const menu = document.getElementById("menuDropdown");
@@ -171,23 +162,19 @@
     tabLinks.forEach(link => {
       link.addEventListener("click", function () {
         const target = link.getAttribute("data-tab");
-
-        tabSections.forEach(section => {
-          if (section.id === target) {
-            section.classList.add("active");
-          } else {
-            section.classList.remove("active");
-          }
-        });
-
+        tabSections.forEach(section => section.classList.toggle("active", section.id === target));
         document.getElementById("menuDropdown").style.display = "none";
       });
     });
-  </script>
-  <script>
+
     document.getElementById("toggleImportExport").addEventListener("click", function () {
       const controls = document.getElementById("importExportControls");
       controls.classList.toggle("hidden");
+    });
+
+    document.getElementById("toggleAdvancedControls").addEventListener("click", function () {
+      const adv = document.getElementById("advancedControls");
+      adv.classList.toggle("hidden");
     });
   </script>
 </body>
