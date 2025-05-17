@@ -59,6 +59,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentLocation = '';
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
+
+  // --- Visual scan mapping log for mapped codes ---
+  function showScanMappingLog(scannedCode, mappedItem) {
+    const log = document.createElement('div');
+    log.textContent = `✅ Code ${scannedCode} recognized as Lowe’s #${mappedItem}`;
+    log.style.position = 'fixed';
+    log.style.bottom = '15px';
+    log.style.left = '50%';
+    log.style.transform = 'translateX(-50%)';
+    log.style.backgroundColor = '#222';
+    log.style.color = '#fff';
+    log.style.padding = '8px 14px';
+    log.style.borderRadius = '6px';
+    log.style.fontSize = '14px';
+    log.style.zIndex = '9999';
+    document.body.appendChild(log);
+    setTimeout(() => document.body.removeChild(log), 3000);
+  }
   const liveCounts = {};
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
@@ -619,6 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
     liveCounts[mappedItem].location = currentLocation;
     updateLiveTable();
     updateSuggestions();
+    showScanMappingLog(item, mappedItem);
     liveEntryInput.value = '';
     liveQtyInput.value = '1';
     liveEntryInput.focus();

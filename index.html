@@ -16,6 +16,7 @@
         <button class="tablink" data-tab="entry">📝 Entry</button>
         <button class="tablink" data-tab="reports">📊 Reports</button>
         <button class="tablink" data-tab="sessions">💾 Sessions</button>
+        <button class="tablink" data-tab="mappings">🧠 Mappings</button>
         <button class="tablink" data-tab="settings">⚙️ Settings</button>
       </div>
     </nav>
@@ -79,6 +80,20 @@
         <button id="clearLiveTable">🗑️ Clear Live Table</button>
         <button id="saveSession">💾 Save Session</button>
         <button id="loadSession">📥 Load Session</button>
+      </section>
+
+      <section id="mappings" class="tab-section">
+        <h2>🧠 Mapping Manager</h2>
+        <div style="margin-bottom: 10px;">
+          <button id="exportMappings">📤 Export Mappings</button>
+          <button id="importMappings">📥 Import Mappings</button>
+        </div>
+        <table id="mappingsTable" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr><th>Scanned Code</th><th>Mapped Item #</th><th>Type</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </section>
 
       <section id="settings" class="tab-section">
