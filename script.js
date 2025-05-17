@@ -1,13 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- Google Drive Integration ---
-  const CLIENT_ID = '1009062770217-7irsj0citcrif5tqlt9u76q01u839uic.apps.googleusercontent.com';
+  const CLIENT_ID = '1009062770217-i80a4rigia3vbsvmqbnngli08ojanhmd.apps.googleusercontent.com';
   const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
   function gapiInit() {
     gapi.load('client:auth2', async () => {
       await gapi.client.init({
         clientId: CLIENT_ID,
-        scope: SCOPES
+        scope: SCOPES,
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
       });
       console.log('✅ Google API initialized');
     });
@@ -1043,9 +1044,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const authBtn = document.getElementById('authGoogleDrive');
   if (authBtn) {
     authBtn.addEventListener('click', () => {
-      console.log("🔘 Google Drive auth button clicked");
-      gapiInit();
-      setTimeout(() => handleAuthClick(), 500);
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              gapi.client.setToken({ access_token: tokenResponse.access_token });
+              alert('🔓 Authenticated with Google Drive');
+            } else {
+              alert('❌ Token generation failed');
+            }
+          }
+        });
+        tokenClient.requestAccessToken();
+      } else {
+        alert('Google Identity Services not available.');
+      }
     });
   }
     const mergeReportBtn = document.getElementById('mergeReport');
@@ -1275,6 +1290,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Activate the default tab on load
   document.querySelector('.tablink[data-tab="entry"]').classList.add('active');
   document.getElementById('entry').classList.add('active');
+  // Dynamically load the Google API script
+  const gapiScript = document.createElement('script');
+  gapiScript.src = 'https://apis.google.com/js/api.js';
+  gapiScript.onload = () => {
+    console.log("📦 Google API script loaded");
+  };
+  document.head.appendChild(gapiScript);
+
+  // Dynamically inject Google Identity Services script
+  const gisScript = document.createElement('script');
+  gisScript.src = 'https://accounts.google.com/gsi/client';
+  gisScript.onload = () => {
+    console.log('🔐 Google Identity Services loaded');
+  };
+  document.head.appendChild(gisScript);
 });
   // Update location status on load
   // (Moved inside DOMContentLoaded, so this will already be called)
