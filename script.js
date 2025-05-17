@@ -908,13 +908,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       wb.Sheets['Inventory'] = ws;
       XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+
       XLSX.writeFile(wb, 'inventory_report.xlsx');
     });
-    // --- Add "🧬 Merge Master Report" button below Excel ---
+
+    // --- Insert Merge Master Report button ---
     const mergeReportBtn = document.createElement('button');
     mergeReportBtn.textContent = '🧬 Merge Master Report';
     mergeReportBtn.id = 'mergeReport';
     mergeReportBtn.style.marginTop = '10px';
+    mergeReportBtn.style.display = 'block';
     excelBtn.insertAdjacentElement('afterend', mergeReportBtn);
 
     mergeReportBtn.addEventListener('click', () => {
