@@ -24,29 +24,9 @@
   <div class="container">
     <main class="tab-content">
     <section id="entry" class="tab-section active">
-      <h2>Step 1: Enter On-Hand Counts</h2>
-      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
-
-      <div id="entryControls">
-        <label id="manualModeToggle">
-          <input type="checkbox" id="manualToggle" checked />
-          Auto-Scan Mode
-        </label>
-
-        <div class="import-export-group">
-          <button id="exportBtn">📤 Export Bay Locations</button>
-          <button id="importBtn">📥 Import Bay Locations</button>
-          <button id="exportUPCBtn">📤 Export UPC Mappings</button>
-          <button id="importUPCBtn">📥 Import UPC Mappings</button>
-        </div>
-
-        <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
-        <button id="addLiveItem">Add Item</button>
-      </div>
-
       <section>
         <h2>Live Counts</h2>
-        <div class="table-wrapper">
+        <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
           <table id="liveCountTable">
             <thead>
               <tr>
@@ -58,6 +38,27 @@
           </table>
         </div>
       </section>
+      <h2>On-Hand Counts</h2>
+      <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+
+      <div id="entryControls">
+        <label id="manualModeToggle">
+          <input type="checkbox" id="manualToggle" checked />
+          Auto-Scan Mode
+        </label>
+
+        <button id="toggleImportExport">📂 Import/Export Options</button>
+        <div id="importExportControls" class="hidden">
+          <button id="exportBtn">📤 Export Bay Locations</button>
+          <button id="importBtn">📥 Import Bay Locations</button>
+          <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+          <button id="importUPCBtn">📥 Import UPC Mappings</button>
+        </div>
+
+        <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
+        <button id="addLiveItem">Add Item</button>
+      </div>
+
     </section>
 
     <section id="reports" class="tab-section">
@@ -183,6 +184,12 @@
 
         document.getElementById("menuDropdown").style.display = "none";
       });
+    });
+  </script>
+  <script>
+    document.getElementById("toggleImportExport").addEventListener("click", function () {
+      const controls = document.getElementById("importExportControls");
+      controls.classList.toggle("hidden");
     });
   </script>
 </body>
