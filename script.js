@@ -39,11 +39,33 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(val => alert('✅ Uploaded to Google Drive!'))
       .catch(err => alert('❌ Upload failed: ' + err.message));
   }
-  // --- Custom modal prompt for unrecognized code type ---
+  // --- Custom modal prompt for unrecognized code type with smart guess ---
+  function guessCodeType(code) {
+    if (/^\d{15}$/.test(code)) {
+      const prefix = code.slice(0, 3);
+      if (prefix === '000' || prefix === '900' || prefix === '100') {
+        return 'location';
+      }
+    }
+    if (/^\d{12}$/.test(code)) {
+      return 'product';
+    }
+    return null;
+  }
+
   function showCustomPrompt(item) {
     return new Promise(resolve => {
+      const guess = guessCodeType(item);
       const overlay = document.getElementById('customModal');
-      document.getElementById('modalPromptText').textContent = `Unrecognized code: "${item}" — what type of tag is this?`;
+
+      let message = `Unrecognized code: "${item}" — what type of tag is this?`;
+      if (guess === 'location') {
+        message = `This looks like a Location Tag (15-digit starting with ${item.slice(0, 3)}). Confirm?`;
+      } else if (guess === 'product') {
+        message = `This looks like a Product UPC (12-digit code). Confirm?`;
+      }
+
+      document.getElementById('modalPromptText').textContent = message;
       overlay.style.display = 'flex';
 
       const cleanup = (result) => {
