@@ -806,6 +806,37 @@ document.addEventListener('DOMContentLoaded', () => {
       XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
       XLSX.writeFile(wb, 'inventory_report.xlsx');
     });
+    // --- Add "🧬 Merge Master Report" button below Excel ---
+    const mergeReportBtn = document.createElement('button');
+    mergeReportBtn.textContent = '🧬 Merge Master Report';
+    mergeReportBtn.id = 'mergeReport';
+    mergeReportBtn.style.marginTop = '10px';
+    excelBtn.insertAdjacentElement('afterend', mergeReportBtn);
+
+    mergeReportBtn.addEventListener('click', () => {
+      const savedKeys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
+      if (savedKeys.length === 0) {
+        alert('No saved sessions found to merge.');
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+      savedKeys.forEach(key => {
+        const session = JSON.parse(localStorage.getItem(key));
+        if (!session || !session.liveCounts) return;
+
+        const ws_data = [['Item #', 'Found', 'Category', 'Location']];
+        Object.entries(session.liveCounts).forEach(([item, obj]) => {
+          ws_data.push([item, obj.count, obj.category || '', obj.location || '']);
+        });
+
+        const sheetName = key.replace('inventorySession_', '');
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      XLSX.writeFile(wb, 'merged_inventory_report.xlsx');
+    });
   }
 
   // Auto-save session every 30 seconds
@@ -815,8 +846,57 @@ document.addEventListener('DOMContentLoaded', () => {
       onHandText: document.getElementById('onHandInput').value
     };
     localStorage.setItem('inventorySession', JSON.stringify(session));
+    // Also store versioned session for merge report
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    localStorage.setItem(`inventorySession_${timestamp}`, JSON.stringify(session));
     console.log('Auto-saved session');
   }, 30000);
+
+  // --- Auto-generate Excel file every 10 minutes ---
+  function pad(n) {
+    return n < 10 ? '0' + n : n;
+  }
+
+  function downloadAutoExcelBackup() {
+    const wb = XLSX.utils.book_new();
+    const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
+
+    const onHandText = document.getElementById('onHandInput').value;
+    const onHandLines = onHandText.trim().split(/\n+/);
+    const onHandMap = {};
+    onHandLines.forEach(line => {
+      const [item, count] = line.split(':');
+      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
+    });
+
+    const previousDates = Object.keys(weeklyCounts).sort().reverse();
+    const lastWeek = previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null;
+
+    Object.entries(liveCounts).forEach(([item, obj]) => {
+      const count = obj.count;
+      const expected = onHandMap[item] || 0;
+      const diff = count - expected;
+      const previous = lastWeek ? lastWeek[item] || 0 : '';
+      const weekDiff = lastWeek ? count - previous : '';
+      ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    wb.Sheets['Inventory'] = ws;
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+    XLSX.writeFile(wb, `inventory-backup-${timestamp}.xlsx`);
+  }
+
+  // Auto-generate Excel file every 10 minutes
+  setInterval(() => {
+    if (Object.keys(liveCounts).length > 0) {
+      downloadAutoExcelBackup();
+      console.log('🔄 Auto-downloaded Excel backup');
+    }
+  }, 10 * 60 * 1000);
 
   // Register service worker for PWA
   if ('serviceWorker' in navigator) {
