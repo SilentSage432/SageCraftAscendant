@@ -37,28 +37,26 @@
             <tbody></tbody>
           </table>
         </div>
+        <div id="entryControls">
+          <label id="manualModeToggle">
+            <input type="checkbox" id="manualToggle" checked />
+            Auto-Scan Mode
+          </label>
+
+          <button id="toggleImportExport">📂 Import/Export Options</button>
+          <div id="importExportControls" class="hidden">
+            <button id="exportBtn">📤 Export Bay Locations</button>
+            <button id="importBtn">📥 Import Bay Locations</button>
+            <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+            <button id="importUPCBtn">📥 Import UPC Mappings</button>
+          </div>
+
+          <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
+          <button id="addLiveItem">Add Item</button>
+        </div>
       </section>
       <h2>On-Hand Counts</h2>
       <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
-
-      <div id="entryControls">
-        <label id="manualModeToggle">
-          <input type="checkbox" id="manualToggle" checked />
-          Auto-Scan Mode
-        </label>
-
-        <button id="toggleImportExport">📂 Import/Export Options</button>
-        <div id="importExportControls" class="hidden">
-          <button id="exportBtn">📤 Export Bay Locations</button>
-          <button id="importBtn">📥 Import Bay Locations</button>
-          <button id="exportUPCBtn">📤 Export UPC Mappings</button>
-          <button id="importUPCBtn">📥 Import UPC Mappings</button>
-        </div>
-
-        <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
-        <button id="addLiveItem">Add Item</button>
-      </div>
-
     </section>
 
     <section id="reports" class="tab-section">
