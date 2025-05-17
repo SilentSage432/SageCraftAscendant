@@ -1,36 +1,42 @@
-const CACHE_NAME = 'inventory-tool-v2'; // updated version
-const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  './icons/icon-192x192.png',
-  './icons/icon-512x512.png'
-];
+// Updated service worker with cache versioning
+const CACHE_VERSION = 'v2';
+const CACHE_NAME = `inventory-cache-${CACHE_VERSION}`;
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  self.skipWaiting(); // Activate immediately
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll([
+        './',
+        './index.html',
+        './style.css',
+        './script.js',
+        './manifest.json',
+        './icons/icon-192x192.png',
+        './icons/icon-512x512.png'
+      ]);
+    })
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(keys => {
       return Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       );
     })
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
