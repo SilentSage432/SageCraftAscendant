@@ -1114,6 +1114,96 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => console.error('Service Worker registration failed ❌', err));
   }
 
+  // --- Session Manager Logic ---
+  const savedSessionsList = document.getElementById('savedSessionsList');
+  const viewSavedSessionsBtn = document.getElementById('viewSavedSessions');
+  const clearAllSessionsBtn = document.getElementById('clearAllSessions');
+
+  function renderSavedSessions() {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
+    if (keys.length === 0) {
+      if (savedSessionsList) savedSessionsList.innerHTML = '<p>No saved sessions found.</p>';
+      return;
+    }
+
+    const list = document.createElement('ul');
+    list.style.listStyle = 'none';
+    list.style.padding = 0;
+
+    keys.sort().reverse().forEach(key => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '6px';
+      const dateLabel = key.replace('inventorySession_', '');
+      const loadBtn = document.createElement('button');
+      loadBtn.textContent = `📥 Load ${dateLabel}`;
+      loadBtn.style.marginRight = '6px';
+      loadBtn.onclick = () => {
+        const session = JSON.parse(localStorage.getItem(key));
+        if (!session || !session.liveCounts) return alert('Invalid session data.');
+        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+        Object.entries(session.liveCounts).forEach(([k, v]) => {
+          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+        });
+        document.getElementById('onHandInput').value = session.onHandText || '';
+        updateLiveTable();
+        alert(`Session from ${dateLabel} loaded.`);
+      };
+
+      const exportBtn = document.createElement('button');
+      exportBtn.textContent = '📤 Export';
+      exportBtn.style.marginRight = '6px';
+      exportBtn.onclick = () => {
+        const session = localStorage.getItem(key);
+        const blob = new Blob([session], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${key}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '🗑️ Delete';
+      deleteBtn.onclick = () => {
+        if (confirm(`Delete session ${dateLabel}?`)) {
+          localStorage.removeItem(key);
+          renderSavedSessions();
+        }
+      };
+
+      li.appendChild(loadBtn);
+      li.appendChild(exportBtn);
+      li.appendChild(deleteBtn);
+      list.appendChild(li);
+    });
+
+    if (savedSessionsList) {
+      savedSessionsList.innerHTML = '';
+      savedSessionsList.appendChild(list);
+    }
+  }
+
+  if (viewSavedSessionsBtn) {
+    viewSavedSessionsBtn.addEventListener('click', () => {
+      renderSavedSessions();
+    });
+  }
+
+  if (clearAllSessionsBtn) {
+    clearAllSessionsBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete all saved sessions? This cannot be undone.')) {
+        Object.keys(localStorage)
+          .filter(k => k.startsWith('inventorySession_'))
+          .forEach(k => localStorage.removeItem(k));
+        renderSavedSessions();
+        alert('All saved sessions cleared.');
+      }
+    });
+  }
+
   // --- Tab Switching Logic ---
   const tabLinks = document.querySelectorAll('.tablink');
   const tabSections = document.querySelectorAll('.tab-section');
