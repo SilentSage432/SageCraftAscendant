@@ -220,13 +220,16 @@ document.addEventListener('DOMContentLoaded', () => {
           const reader = new FileReader();
           reader.onload = () => {
             const content = reader.result.trim();
-            document.getElementById('onHandInput').value = content;
-            localStorage.setItem('onHandBackup', content);
-            const now = new Date();
-            const formatted = now.toLocaleTimeString();
-            const statusDiv = document.getElementById('onHandLastSaved');
-            if (statusDiv) {
-              statusDiv.textContent = `📥 Loaded: ${formatted}`;
+            const onHandInput = document.getElementById('onHandInput');
+            if (onHandInput) {
+              onHandInput.value = content;
+              localStorage.setItem('onHandBackup', content);
+              const now = new Date();
+              const formatted = now.toLocaleTimeString();
+              const statusDiv = document.getElementById('onHandLastSaved');
+              if (statusDiv) {
+                statusDiv.textContent = `📥 Loaded: ${formatted}`;
+              }
             }
           };
           reader.readAsText(file);
