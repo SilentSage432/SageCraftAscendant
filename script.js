@@ -39,6 +39,74 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(val => alert('✅ Uploaded to Google Drive!'))
       .catch(err => alert('❌ Upload failed: ' + err.message));
   }
+
+  // --- Google Drive: Save/Load Session as JSON file ---
+  function saveSessionToDrive() {
+    const session = {
+      liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+      onHandText: document.getElementById('onHandInput').value
+    };
+    const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
+    const metadata = {
+      name: 'active_session.json',
+      mimeType: 'application/json'
+    };
+
+    const accessToken = gapi.auth.getToken().access_token;
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', blob);
+
+    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
+      body: form
+    }).then(res => res.json())
+      .then(val => alert('✅ Session saved to Google Drive!'))
+      .catch(err => alert('❌ Save failed: ' + err.message));
+  }
+
+  function loadSessionFromDrive() {
+    const accessToken = gapi.auth.getToken().access_token;
+    fetch("https://www.googleapis.com/drive/v3/files?q=name='active_session.json' and trashed=false", {
+      headers: new Headers({ Authorization: 'Bearer ' + accessToken })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.files || data.files.length === 0) {
+          alert('❌ No session file found in Drive.');
+          return;
+        }
+        const fileId = data.files[0].id;
+        return fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+          headers: new Headers({ Authorization: 'Bearer ' + accessToken })
+        });
+      })
+      .then(res => res && res.json ? res.json() : Promise.reject(new Error('No file response')))
+      .then(session => {
+        if (!session || !session.liveCounts) {
+          alert('❌ Invalid session format.');
+          return;
+        }
+        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+        Object.entries(session.liveCounts).forEach(([k, v]) => {
+          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+        });
+        document.getElementById('onHandInput').value = session.onHandText || '';
+        updateLiveTable();
+        alert('📥 Session loaded from Drive!');
+      })
+      .catch(err => alert('❌ Load failed: ' + err.message));
+  }
+  // --- Google Drive Save/Load Session Button Listeners ---
+  const saveToDriveBtn = document.getElementById('saveToDrive');
+  if (saveToDriveBtn) {
+    saveToDriveBtn.addEventListener('click', saveSessionToDrive);
+  }
+  const loadFromDriveBtn = document.getElementById('loadFromDrive');
+  if (loadFromDriveBtn) {
+    loadFromDriveBtn.addEventListener('click', loadSessionFromDrive);
+  }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
     if (/^\d{15}$/.test(code)) {
@@ -138,6 +206,35 @@ document.addEventListener('DOMContentLoaded', () => {
     voiceHint.style.marginTop = '6px';
     voiceHint.style.color = 'gray';
     onHandInput.insertAdjacentElement('afterend', voiceHint);
+
+    // --- Auto-Save On Hand Input ---
+    let lastOnHandSaveTime = '';
+    const saveOnHandToLocal = () => {
+      const currentText = onHandInput.value.trim();
+      localStorage.setItem('onHandBackup', currentText);
+      const now = new Date();
+      lastOnHandSaveTime = now.toLocaleTimeString();
+      document.getElementById('onHandLastSaved').textContent = `📥 Last Auto-Saved: ${lastOnHandSaveTime}`;
+    };
+    onHandInput.addEventListener('input', () => {
+      saveOnHandToLocal();
+    });
+
+    // Add visual timestamp below input
+    const lastSavedDiv = document.createElement('div');
+    lastSavedDiv.id = 'onHandLastSaved';
+    lastSavedDiv.style.fontSize = '0.85em';
+    lastSavedDiv.style.marginTop = '4px';
+    lastSavedDiv.style.color = 'lime';
+    lastSavedDiv.textContent = '📥 Last Auto-Saved: Not yet';
+    onHandInput.insertAdjacentElement('afterend', lastSavedDiv);
+
+    // Restore from backup if available
+    const savedBackup = localStorage.getItem('onHandBackup');
+    if (savedBackup && !onHandInput.value.trim()) {
+      onHandInput.value = savedBackup;
+      lastSavedDiv.textContent = '📥 Restored from backup';
+    }
 
     // Auto-format input when pasted or changed
     onHandInput.addEventListener('blur', () => {
