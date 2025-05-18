@@ -1420,6 +1420,51 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🔐 Google Identity Services loaded');
   };
   document.head.appendChild(gisScript);
+
+  // --- Audit Rotation Table Logic ---
+  const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {
+    'Laundry': '',
+    'Fridges & Freezers': '',
+    'Ranges': '',
+    'Dishwashers': '',
+    'Wall Ovens': '',
+    'Cooktops': '',
+    'OTR Microwaves': '',
+    'Microwaves (Countertop)': '',
+    'Vent Hoods': '',
+    'Beverage & Wine Coolers': '',
+    'Cabinets': '',
+    'Countertops': '',
+    'Interior Doors': '',
+    'Exterior Doors': '',
+    'Storm Doors': '',
+    'Windows': '',
+    'Commodity Moulding': '',
+    'Other / Misc': ''
+  };
+
+  function renderRotationTable() {
+    const rotationDiv = document.getElementById('rotationTable');
+    if (!rotationDiv) return;
+
+    let tableHTML = '<table><thead><tr><th>Category</th><th>Last Audited</th><th>Due Again</th></tr></thead><tbody>';
+    Object.entries(rotationData).forEach(([cat, lastDate]) => {
+      const dueDate = lastDate ? new Date(new Date(lastDate).getTime() + 7 * 24 * 60 * 60 * 1000) : '';
+      const dueText = dueDate ? dueDate.toISOString().split('T')[0] : '';
+      tableHTML += `<tr><td>${cat}</td><td>${lastDate || '-'}</td><td>${dueText || '-'}</td></tr>`;
+    });
+    tableHTML += '</tbody></table>';
+    rotationDiv.innerHTML = tableHTML;
+  }
+
+  function updateRotationDate(category) {
+    const today = new Date().toISOString().split('T')[0];
+    rotationData[category] = today;
+    localStorage.setItem('auditRotation', JSON.stringify(rotationData));
+    renderRotationTable();
+  }
+
+  renderRotationTable();
 });
 
 // --- Attach live search event ---
