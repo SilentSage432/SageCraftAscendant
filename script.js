@@ -219,11 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!file) return;
           const reader = new FileReader();
           reader.onload = () => {
-            onHandInput.value = reader.result.trim();
-            localStorage.setItem('onHandBackup', reader.result.trim());
+            const content = reader.result.trim();
+            document.getElementById('onHandInput').value = content;
+            localStorage.setItem('onHandBackup', content);
             const now = new Date();
             const formatted = now.toLocaleTimeString();
-            document.getElementById('onHandLastSaved').textContent = `📥 Loaded: ${formatted}`;
+            const statusDiv = document.getElementById('onHandLastSaved');
+            if (statusDiv) {
+              statusDiv.textContent = `📥 Loaded: ${formatted}`;
+            }
           };
           reader.readAsText(file);
         };
