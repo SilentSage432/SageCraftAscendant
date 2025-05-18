@@ -214,7 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.txt,.csv';
-        input.onchange = (e) => {
+        input.style.display = 'none';
+        document.body.appendChild(input);
+        input.addEventListener('change', (e) => {
           const file = e.target.files[0];
           if (!file) return;
           const reader = new FileReader();
@@ -233,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           };
           reader.readAsText(file);
-        };
+        });
         input.click();
       });
     }
