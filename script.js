@@ -242,6 +242,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         input.click();
       });
+      // --- Add upload logic for on-hand data (after file parsing logic) ---
+      uploadOnHandFileBtn.addEventListener('click', () => {
+        const onHandText = document.getElementById('onHandInput').value;
+        if (!onHandText.trim()) {
+          alert('No on-hand data found to upload.');
+          return;
+        }
+        localStorage.setItem('onHandBackup', onHandText);
+        alert('✅ On-hand counts uploaded and saved to local backup!');
+      });
     }
 
     // --- Auto-Save On Hand Input ---
@@ -1503,6 +1513,72 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Session Manager Logic ---
+  // --- Import Excel Session File ---
+  const importExcelSessionBtn = document.getElementById('importExcelSession');
+  const triggerImportExcelSessionBtn = document.getElementById('triggerImportExcelSession');
+
+  if (triggerImportExcelSessionBtn && importExcelSessionBtn) {
+    triggerImportExcelSessionBtn.addEventListener('click', () => {
+      importExcelSessionBtn.click();
+    });
+
+    importExcelSessionBtn.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.name.endsWith('.xlsx')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          const header = rows[0];
+          const itemIndex = header.findIndex(h => /item/i.test(h));
+          const countIndex = header.findIndex(h => /found/i.test(h));
+          const categoryIndex = header.findIndex(h => /category/i.test(h));
+          const locationIndex = header.findIndex(h => /location/i.test(h));
+
+          Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const item = row[itemIndex];
+            if (!item) continue;
+            liveCounts[item] = {
+              count: parseInt(row[countIndex]) || 0,
+              category: row[categoryIndex] || '',
+              location: row[locationIndex] || ''
+            };
+          }
+          updateLiveTable();
+          alert('📥 Excel session imported!');
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const imported = JSON.parse(reader.result);
+            if (imported && imported.liveCounts) {
+              Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+              Object.entries(imported.liveCounts).forEach(([k, v]) => {
+                liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+              });
+              document.getElementById('onHandInput').value = imported.onHandText || '';
+              updateLiveTable();
+              alert('📥 Excel session imported successfully!');
+            } else {
+              alert('❌ Invalid session file.');
+            }
+          } catch (err) {
+            alert('❌ Failed to parse session file.');
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
   const savedSessionsList = document.getElementById('savedSessionsList');
   const viewSavedSessionsBtn = document.getElementById('viewSavedSessions');
   const clearAllSessionsBtn = document.getElementById('clearAllSessions');
