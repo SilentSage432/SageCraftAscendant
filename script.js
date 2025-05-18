@@ -1247,6 +1247,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function downloadAutoExcelBackup() {
+    if (Object.keys(liveCounts).length === 0) {
+      console.log("⏭️ Skipping Excel backup — no data to export.");
+      return;
+    }
     const wb = XLSX.utils.book_new();
     const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
 
