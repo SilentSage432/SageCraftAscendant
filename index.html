@@ -66,6 +66,8 @@
         </div>
 
         <h2>On-Hand Counts</h2>
+        <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
+        <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
         <textarea id="onHandInput" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
       </section>
 
@@ -141,6 +143,7 @@
           <h3>☁️ Cloud Sync</h3>
           <button id="saveToDrive">💾 Save Session to Google Drive</button>
           <button id="loadFromDrive">📥 Load Session from Google Drive</button>
+          <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
         </div>
 
         <div class="settings-group">

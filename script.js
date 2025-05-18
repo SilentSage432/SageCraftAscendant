@@ -207,6 +207,30 @@ document.addEventListener('DOMContentLoaded', () => {
     voiceHint.style.color = 'gray';
     onHandInput.insertAdjacentElement('afterend', voiceHint);
 
+    // --- Upload On-Hand File (.txt or .csv) ---
+    const uploadOnHandFileBtn = document.getElementById('uploadOnHandFileBtn');
+    if (uploadOnHandFileBtn) {
+      uploadOnHandFileBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.txt,.csv';
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            onHandInput.value = reader.result.trim();
+            localStorage.setItem('onHandBackup', reader.result.trim());
+            const now = new Date();
+            const formatted = now.toLocaleTimeString();
+            document.getElementById('onHandLastSaved').textContent = `📥 Loaded: ${formatted}`;
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      });
+    }
+
     // --- Auto-Save On Hand Input ---
     let lastOnHandSaveTime = '';
     const saveOnHandToLocal = () => {
@@ -292,6 +316,55 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keep snapshots
   const keepSnapshotsToggle = document.getElementById('keepSnapshotsToggle');
   if (keepSnapshotsToggle) keepSnapshotsToggle.checked = localStorage.getItem('keepSnapshots') !== 'false';
+
+  // --- Drive Sync Toggle ---
+  const driveSyncToggle = document.getElementById('driveSyncToggle');
+  if (driveSyncToggle) driveSyncToggle.checked = localStorage.getItem('driveSyncEnabled') === 'true';
+  if (driveSyncToggle) {
+    driveSyncToggle.addEventListener('change', (e) => {
+      localStorage.setItem('driveSyncEnabled', e.target.checked);
+      if (e.target.checked) startAutoDriveSync();
+      else stopAutoDriveSync();
+    });
+  }
+  // --- Auto Drive Sync Logic ---
+  let driveSyncTimer = null;
+
+  function startAutoDriveSync() {
+    if (driveSyncTimer) clearInterval(driveSyncTimer);
+    const enabled = document.getElementById('driveSyncToggle')?.checked;
+    if (!enabled) return;
+
+    driveSyncTimer = setInterval(() => {
+      const session = {
+        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+        onHandText: document.getElementById('onHandInput').value
+      };
+      const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
+      const metadata = {
+        name: 'active_session.json',
+        mimeType: 'application/json'
+      };
+      const accessToken = gapi.auth.getToken().access_token;
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', blob);
+
+      fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
+        body: form
+      })
+        .then(res => res.json())
+        .then(val => console.log('🔄 Auto-synced session to Drive'))
+        .catch(err => console.log('❌ Drive sync failed: ' + err.message));
+    }, 5 * 60 * 1000); // every 5 minutes
+  }
+
+  function stopAutoDriveSync() {
+    if (driveSyncTimer) clearInterval(driveSyncTimer);
+    driveSyncTimer = null;
+  }
 
   // --- SETTINGS: Event listeners for preference changes ---
   // Dark mode toggle
@@ -1338,6 +1411,11 @@ document.addEventListener('DOMContentLoaded', () => {
     autosaveToggle.addEventListener('change', setupAutosaveLoop);
   }
 
+  // At end of DOMContentLoaded, start auto Drive sync if enabled
+  if (localStorage.getItem('driveSyncEnabled') === 'true') {
+    startAutoDriveSync();
+  }
+
   // --- Auto-generate Excel file every 10 minutes ---
   function pad(n) {
     return n < 10 ? '0' + n : n;
@@ -1575,3 +1653,14 @@ if (searchBox) {
 }
   // Update location status on load
   // (Moved inside DOMContentLoaded, so this will already be called)
+// On window load, attempt to load session from Drive if enabled and not already loaded
+window.addEventListener('load', () => {
+  if (localStorage.getItem('driveSyncEnabled') === 'true') {
+    // attempt to load from Drive if not already loaded
+    if (Object.keys(liveCounts).length === 0) {
+      if (typeof loadSessionFromDrive === 'function') {
+        loadSessionFromDrive();
+      }
+    }
+  }
+});
