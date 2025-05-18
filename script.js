@@ -208,19 +208,23 @@ document.addEventListener('DOMContentLoaded', () => {
     onHandInput.insertAdjacentElement('afterend', voiceHint);
 
     // --- Upload On-Hand File (.txt or .csv) ---
-    const uploadOnHandFileBtn = document.getElementById('uploadOnHandFileBtn');
+    const uploadOnHandFileBtn = document.getElementById('uploadOnHandFile');
     if (uploadOnHandFileBtn) {
+      console.log("Upload button found:", uploadOnHandFileBtn);
       uploadOnHandFileBtn.addEventListener('click', () => {
+        console.log("Upload button clicked");
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.txt,.csv';
         input.style.display = 'none';
         document.body.appendChild(input);
         input.addEventListener('change', (e) => {
+          console.log("File input triggered", e.target.files);
           const file = e.target.files[0];
           if (!file) return;
           const reader = new FileReader();
           reader.onload = () => {
+            console.log("File read complete", reader.result.slice(0, 100));
             const content = reader.result.trim();
             const onHandInput = document.getElementById('onHandInput');
             if (onHandInput) {
@@ -1412,6 +1416,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Start autosave on load if enabled
   setupAutosaveLoop();
+
+  // Auto-restore session on load if available
+  const existingSession = localStorage.getItem('inventorySession');
+  if (existingSession) {
+    const confirmRestore = confirm("🧭 A previous session was found. Would you like to restore it?");
+    if (confirmRestore) {
+      const session = JSON.parse(existingSession);
+      Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+      Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
+        liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+      });
+      document.getElementById('onHandInput').value = session.onHandText || '';
+      updateLiveTable();
+      alert("✅ Previous session restored.");
+    }
+  }
   // Re-setup autosave on interval or enabled/disabled change
   if (autosaveIntervalSelect) {
     autosaveIntervalSelect.addEventListener('change', setupAutosaveLoop);
