@@ -797,11 +797,61 @@ document.addEventListener('DOMContentLoaded', () => {
     if (liveQty) liveQty.value = '1';
   }
 
-  function processScan(item) {
+  async function processScan(item) {
     if (!item) return;
+
+    // Handle unknown codes
+    if (!upcToItem[item] && !locationMap[item]) {
+      const response = await showCustomPrompt(item);
+      if (response === 'location') {
+        const name = prompt(`🗂 Please enter a name for location "${item}":`);
+        if (name) {
+          locationMap[item] = name;
+          saveLocationMap();
+          currentLocation = name;
+          updateLocationStatus();
+          alert(`📍 Current location set to: ${name}`);
+          resetScanInput();
+        }
+        return;
+      } else if (response === 'product') {
+        const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+        if (userDefined) {
+          upcToItem[item] = userDefined;
+          saveUPCMap();
+          item = userDefined;
+        } else {
+          resetScanInput();
+          return;
+        }
+      } else {
+        // Cancel
+        resetScanInput();
+        return;
+      }
+    }
+
+    // Handle known location codes
+    if (locationMap[item]) {
+      if (currentLocation === locationMap[item]) {
+        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
+        if (close) {
+          currentLocation = '';
+          updateLocationStatus();
+          alert('📦 Current location cleared.');
+        }
+      } else {
+        currentLocation = locationMap[item];
+        updateLocationStatus();
+        alert(`📍 Current location set to: ${currentLocation}`);
+      }
+      resetScanInput();
+      return;
+    }
+
+    // Handle known product codes
     if (!liveCounts[item]) {
       liveCounts[item] = 0;
-      // Optional: play sound
       const sound = new Audio('sounds/mystic-ping.mp3');
       sound.play().catch(err => console.warn('Sound error', err));
     }
