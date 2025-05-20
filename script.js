@@ -1620,8 +1620,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Activate the default tab on load
-  document.querySelector('.tablink[data-tab="count"]').classList.add('active');
   document.getElementById('count').classList.add('active');
+  document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
   // Focus the liveEntry input on load
   restoreFocusToEntry();
   // Dynamically load the Google API script
@@ -1684,6 +1684,3 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   renderRotationTable();
-});
-
-});
