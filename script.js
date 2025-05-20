@@ -1301,13 +1301,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    console.log("🔍 processScan triggered with:", item);
     if (!item) return;
 
     // Handle unknown codes - always prompt for clarification, prevent auto-add
     if (!upcToItem[item] && !locationMap[item]) {
+      console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
       const response = await showCustomPrompt(item);
       updateSuggestions();
       updateLiveTable();
+
       if (response === 'location') {
         const name = prompt(`🗂 Please enter a name for location "${item}":`);
         if (name) {
@@ -1316,7 +1319,6 @@ document.addEventListener('DOMContentLoaded', () => {
           currentLocation = name;
           updateLocationStatus();
           alert(`📍 Current location set to: ${name}`);
-          resetScanInput();
         }
         resetScanInput();
         return;

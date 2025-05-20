@@ -252,6 +252,25 @@
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Main script -->
+  <script>
+function showCustomPrompt(item) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('customModal');
+    document.getElementById('modalPromptText').textContent = `What type of code is "${item}"?`;
+
+    overlay.style.display = 'flex';
+
+    const cleanup = (result) => {
+      overlay.style.display = 'none';
+      resolve(result);
+    };
+
+    document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
+    document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
+    document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
+  });
+}
+  </script>
   <script src="script.js" defer></script>
 </body>
 </html>
