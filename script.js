@@ -1,5 +1,6 @@
 // Wrap all logic in DOMContentLoaded, and move everything inside
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("✅ DOMContentLoaded has fired");
   // --- Ensure global variables are declared at the top ---
   // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
   // --- New item sound and glow trigger ---
@@ -474,86 +475,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // --- Export locationMap as JSON ---
-  exportBtn.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(locationMap, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'bay-locations-backup.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(locationMap, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bay-locations-backup.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
 
   // --- Import locationMap from file ---
-  importBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const imported = JSON.parse(reader.result);
-          if (typeof imported === 'object' && imported !== null) {
-            Object.assign(locationMap, imported);
-            saveLocationMap();
-            alert('Bay location map imported successfully!');
-          } else {
-            alert('Invalid format.');
+  const importBtn = document.getElementById('importBtn');
+  if (importBtn) {
+    importBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const imported = JSON.parse(reader.result);
+            if (typeof imported === 'object' && imported !== null) {
+              Object.assign(locationMap, imported);
+              saveLocationMap();
+              alert('Bay location map imported successfully!');
+            } else {
+              alert('Invalid format.');
+            }
+          } catch (err) {
+            alert('Error reading file.');
           }
-        } catch (err) {
-          alert('Error reading file.');
-        }
+        };
+        reader.readAsText(file);
       };
-      reader.readAsText(file);
-    };
-    input.click();
-  });
+      input.click();
+    });
+  }
 
   // --- Export UPC Mappings as JSON ---
-  exportUPCBtn.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(upcToItem, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'upc-mappings-backup.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
+  const exportUPCBtn = document.getElementById('exportUPCBtn');
+  if (exportUPCBtn) {
+    exportUPCBtn.addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(upcToItem, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'upc-mappings-backup.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
 
   // --- Import UPC Mappings from file ---
-  importUPCBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const imported = JSON.parse(reader.result);
-          if (typeof imported === 'object' && imported !== null) {
-            Object.assign(upcToItem, imported);
-            saveUPCMap();
-            alert('UPC mappings imported successfully!');
-          } else {
-            alert('Invalid UPC mapping format.');
+  const importUPCBtn = document.getElementById('importUPCBtn');
+  if (importUPCBtn) {
+    importUPCBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const imported = JSON.parse(reader.result);
+            if (typeof imported === 'object' && imported !== null) {
+              Object.assign(upcToItem, imported);
+              saveUPCMap();
+              alert('UPC mappings imported successfully!');
+            } else {
+              alert('Invalid UPC mapping format.');
+            }
+          } catch (err) {
+            alert('Error reading UPC file.');
           }
-        } catch (err) {
-          alert('Error reading UPC file.');
-        }
+        };
+        reader.readAsText(file);
       };
-      reader.readAsText(file);
-    };
-    input.click();
-  });
+      input.click();
+    });
+  }
 
 
   function updateLocationStatus() {
