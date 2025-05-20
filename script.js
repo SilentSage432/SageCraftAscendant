@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   const liveQtyInput = document.getElementById('liveQty');
-  if (liveQtyInput) liveQtyInput.blur();
+  // if (liveQtyInput) liveQtyInput.blur(); // Disabled to prevent focus conflict
   const categoryInput = document.getElementById('liveCategory');
 
   // --- Location status visual indicator ---
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // --- Restored clean scanning logic ---
-  const liveEntry = document.getElementById('liveEntry');
+  // const liveEntry = document.getElementById('liveEntry');
   const liveQty = document.getElementById('liveQty');
   const liveTableBody = document.querySelector('#liveCountTable tbody');
   const addLiveItemBtn = document.getElementById('addLiveItem');
@@ -862,11 +862,11 @@ document.addEventListener('DOMContentLoaded', () => {
     resetScanInput();
   }
 
-  if (liveEntry) {
-    liveEntry.addEventListener('keypress', e => {
+  if (liveEntryInput) {
+    liveEntryInput.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const val = liveEntry.value.trim();
+        const val = liveEntryInput.value.trim();
         processScan(val);
       }
     });
@@ -874,8 +874,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (addLiveItemBtn) {
     addLiveItemBtn.addEventListener('click', () => {
-      if (!liveEntry) return;
-      const val = liveEntry.value.trim();
+      if (!liveEntryInput) return;
+      const val = liveEntryInput.value.trim();
       processScan(val);
     });
   }
