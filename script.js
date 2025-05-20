@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function restoreFocusToEntry() {
     setTimeout(() => {
       liveEntryInput.focus();
-    }, 100);
+    }, 50);
   }
   // --- Datalist for liveEntryInput suggestions ---
   const datalist = document.createElement('datalist');
@@ -783,17 +783,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLocation = name;
             updateLocationStatus();
             alert(`📍 Current location set to: ${name}`);
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
           }
         } else if (response === 'product') {
           processProduct(item);
-          restoreFocusToEntry();
-        } else {
-          liveEntryInput.value = '';
-          restoreFocusToEntry();
         }
+        // Always clear and reset after processing
+        liveEntryInput.value = '';
+        liveQtyInput.value = '1';
+        restoreFocusToEntry();
       });
       return;
     }
@@ -806,21 +803,20 @@ document.addEventListener('DOMContentLoaded', () => {
           updateLocationStatus();
           alert('📦 Current location cleared.');
         }
-        liveEntryInput.value = '';
-        restoreFocusToEntry();
-        return;
       } else {
         currentLocation = locationMap[item];
         updateLocationStatus();
         alert(`📍 Current location set to: ${currentLocation}`);
-        liveEntryInput.value = '';
-        restoreFocusToEntry();
-        return;
       }
+      liveEntryInput.value = '';
+      liveQtyInput.value = '1';
+      restoreFocusToEntry();
+      return;
     }
 
     processProduct(item);
     liveEntryInput.value = '';
+    liveQtyInput.value = '1';
     restoreFocusToEntry();
   }
 
@@ -865,9 +861,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLiveTable();
     updateSuggestions();
     showScanMappingLog(item, mappedItem);
-    liveEntryInput.value = '';
-    restoreFocusToEntry();
-    liveQtyInput.value = '1';
   }
 
   // --- Barcode scanner/autoprocess input field logic ---
@@ -880,12 +873,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Add event listeners for scan input
   liveEntryInput.addEventListener('input', () => {
     if (scanTimeout) clearTimeout(scanTimeout);
     scanTimeout = setTimeout(() => {
       const manualToggle = document.getElementById('manualToggle');
-      if (manualToggle?.checked) autoTriggerScan();
-    }, 150); // wait briefly after input settles
+      if (manualToggle?.checked) {
+        autoTriggerScan();
+      }
+    }, 100);
   });
 
   liveEntryInput.addEventListener('keypress', (e) => {
@@ -1190,84 +1186,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  // Add item button
+  // Add event listener for Add Item button
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
-    let lastTriggerTime = 0;
-    const handleAddItem = () => {
-      const now = Date.now();
-      if (now - lastTriggerTime < 300) return; // prevent double trigger
-      lastTriggerTime = now;
+    addLiveItemBtn.addEventListener('click', () => {
+      console.log('Add Item button clicked');
       const item = liveEntryInput.value.trim();
-      if (item) {
-        // Unified location/product detection and handling
-        if (!upcToItem[item] && !locationMap[item]) {
-          showCustomPrompt(item).then(response => {
-            if (response === 'location') {
-              const name = prompt(`🗂 Please enter a name for location "${item}":`);
-              if (name) {
-                locationMap[item] = name;
-                saveLocationMap();
-                currentLocation = name;
-                updateLocationStatus();
-                alert(`📍 Current location set to: ${name}`);
-                liveEntryInput.value = '';
-                restoreFocusToEntry();
-                return;
-              }
-            } else if (response === 'product') {
-              processProduct(item);
-            } else {
-              liveEntryInput.value = '';
-              restoreFocusToEntry();
-            }
-          });
-          return;
-        }
-        if (locationMap[item]) {
-          if (currentLocation === locationMap[item]) {
-            const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
-            if (close) {
-              currentLocation = '';
-              updateLocationStatus();
-              alert('📦 Current location cleared.');
-            }
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
-          } else {
-            currentLocation = locationMap[item];
-            updateLocationStatus();
-            alert(`📍 Current location set to: ${currentLocation}`);
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
-          }
-        }
-        let mappedItem = upcToItem[item] || item;
-        if (!upcToItem[item]) {
-          const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
-          if (userDefined) {
-            upcToItem[item] = userDefined;
-            saveUPCMap();
-            mappedItem = userDefined;
-          }
-        }
-        if (!liveCounts[mappedItem]) {
-          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
-        }
-        const qty = parseInt(liveQtyInput.value) || 1;
-        liveCounts[mappedItem].count += qty;
-        liveCounts[mappedItem].location = currentLocation;
-        updateLiveTable();
-        updateSuggestions();
-        liveEntryInput.value = '';
-        restoreFocusToEntry();
-        liveQtyInput.value = '1';
+      if (!item) {
+        alert('Please enter or scan an item before adding.');
+        return;
       }
-    };
-    addLiveItemBtn.addEventListener('click', handleAddItem);
-    addLiveItemBtn.addEventListener('touchend', handleAddItem);
+      handleScannedInput(item);
+    });
   }
   // Save/Load Session buttons
   const saveSessionBtn = document.getElementById('saveSession');
