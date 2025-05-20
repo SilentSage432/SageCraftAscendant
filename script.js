@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- New item sound and glow trigger ---
+  const newItemSound = new Audio('sounds/mystic-ping.mp3');
+  function playNewItemSound() {
+    newItemSound.currentTime = 0;
+    newItemSound.play().catch(err => {
+      console.warn("Sound error:", err);
+    });
+  }
   // --- Google Drive Integration ---
   const CLIENT_ID = '1009062770217-i80a4rigia3vbsvmqbnngli08ojanhmd.apps.googleusercontent.com';
   const SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -860,6 +868,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!liveCounts[mappedItem]) {
       liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
     }
+    // --- Sound and glow trigger for new items ---
+    if (!liveCounts[mappedItem]) {
+      playNewItemSound();
+      // Delay to let DOM update before flashing the row
+      setTimeout(() => {
+        const tableRows = document.querySelectorAll("#liveCountTable tbody tr");
+        const lastRow = tableRows[tableRows.length - 1];
+        if (lastRow) {
+          lastRow.classList.add("new-item-flash");
+          setTimeout(() => lastRow.classList.remove("new-item-flash"), 1200);
+        }
+      }, 150);
+    }
     const qty = parseInt(liveQtyInput.value) || 1;
     liveCounts[mappedItem].count += qty;
     liveCounts[mappedItem].location = currentLocation;
@@ -1009,7 +1030,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.style.backgroundColor = categoryColors[obj.category];
       }
       tr.innerHTML = `
-        <td>${item} ${icon}</td>
+        <td>
+          ${item} ${icon}
+          ${category ? `<span class="category-badge">${category}</span>` : ''}
+        </td>
         <td>${expected}</td>
         <td class="editable" data-field="count" data-id="${item}">
           <span contenteditable="true" spellcheck="false">${count}</span>
@@ -1430,16 +1454,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auto-restore session on load if available
   const existingSession = localStorage.getItem('inventorySession');
   if (existingSession) {
-    const confirmRestore = confirm("🧭 A previous session was found. Would you like to restore it?");
-    if (confirmRestore) {
-      const session = JSON.parse(existingSession);
-      Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-      Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-        liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-      });
-      document.getElementById('onHandInput').value = session.onHandText || '';
-      updateLiveTable();
-      alert("✅ Previous session restored.");
+    try {
+      const parsed = JSON.parse(existingSession);
+      const hasValidData = parsed && parsed.liveCounts && Object.keys(parsed.liveCounts).length > 0;
+      if (hasValidData) {
+        const confirmRestore = confirm("🧭 A previous session was found. Would you like to restore it?");
+        if (confirmRestore) {
+          Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+          Object.entries(parsed.liveCounts).forEach(([k, v]) => {
+            liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+          });
+          document.getElementById('onHandInput').value = parsed.onHandText || '';
+          updateLiveTable();
+          alert("✅ Previous session restored.");
+        }
+      }
+    } catch (e) {
+      console.warn("Invalid saved session:", e);
     }
   }
   // Re-setup autosave on interval or enabled/disabled change

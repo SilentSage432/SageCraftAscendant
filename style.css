@@ -1,6 +1,9 @@
+/* Animated gradient-glow for headings */
 h1, h2, h3 {
-  color: #d4c3ff;
-  text-shadow: 0 0 5px #9b59b6, 0 0 10px #6a0dad;
+  background: linear-gradient(90deg, #d6bbff, #9b59b6, #d6bbff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientGlow 6s infinite linear;
   border-bottom: 2px solid #4e2a84;
 }
 
@@ -395,7 +398,7 @@ body {
   margin: 0;
   background: linear-gradient(to right, #0f0f2c, #1a0b2e);
   background-attachment: fixed;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Cinzel', serif;
   color: #f0e6ff;
   min-height: 100vh;
   overflow-x: hidden;
@@ -408,11 +411,7 @@ body {
   box-shadow: 0 0 15px rgba(114, 66, 255, 0.3);
 }
 
-h1, h2, h3 {
-  color: #d6bbff;
-  text-shadow: 0 0 5px #8b5cf6;
-  border-bottom: 2px solid #4e2a84;
-}
+/* The above h1, h2, h3 style is now updated above for animated gradient */
 
 button {
   background: linear-gradient(145deg, #6c2fd1, #8f3aff);
@@ -422,7 +421,8 @@ button {
   padding: 10px 15px;
   border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+  /* Glowing effect for main action buttons */
+  box-shadow: 0 0 10px #a97ff3, 0 0 20px #a97ff366;
   transition: all 0.3s ease;
 }
 
@@ -591,24 +591,28 @@ footer {
 }
 
 .nav-tabs .tablink {
-  background: transparent;
-  border: 1px solid #9b59b6;
-  color: #d4c3ff;
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 6px;
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: 2px solid #8f3aff;
+  background: rgba(60, 20, 100, 0.3);
+  color: #dcd2ff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.nav-tabs .tablink.active {
-  background: #6a0dad;
-  color: #fff;
-  box-shadow: 0 0 10px #a97ff3;
+  box-shadow: 0 0 8px rgba(147, 51, 234, 0.2);
 }
 
 .nav-tabs .tablink:hover {
-  background: #7c3bed;
-  color: #fff;
+  background: rgba(130, 55, 230, 0.3);
+  box-shadow: 0 0 12px #c084fc;
+  color: #ffffff;
+}
+
+.nav-tabs .tablink.active {
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  box-shadow: 0 0 18px #a97ff3, inset 0 0 8px #8f3aff66;
+  color: #ffffff;
 }
 .tab-section {
   padding: 20px;
@@ -655,4 +659,144 @@ input[type="file"]::file-selector-button:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated glowing gradient for headings */
+@keyframes gradientGlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Magical overlay background effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('/images/magic-overlay.png') repeat;
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: -1;
+}
+/* --- Logo Banner Styles --- */
+.logo-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-out;
+}
+
+.logo-icon {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 0 8px #a97ff3);
+  margin-bottom: 5px;
+}
+
+.logo-title {
+  font-size: 2rem;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  background: linear-gradient(90deg, #d6bbff, #8f3aff, #d6bbff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientGlow 6s infinite linear;
+  text-shadow: 0 0 6px #6a0dad;
+  margin: 0;
+}
+.category-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(144, 62, 255, 0.15);
+  color: #d6bbff;
+  border: 1px solid #8b5cf6;
+  box-shadow: 0 0 8px rgba(160, 82, 255, 0.3);
+  text-shadow: 0 0 3px #9b59b6;
+  margin-right: 8px;
+  margin-bottom: 6px;
+}
+.category-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(144, 62, 255, 0.15);
+  color: #d6bbff;
+  border: 1px solid #8b5cf6;
+  box-shadow: 0 0 8px rgba(160, 82, 255, 0.3);
+  text-shadow: 0 0 3px #9b59b6;
+  margin-right: 8px;
+  margin-bottom: 6px;
+}
+
+/* --- Audit Rotation Fancy Table Enhancements --- */
+#audit table {
+  background: rgba(40, 20, 60, 0.3);
+  border: 1px solid #7d3cff;
+  border-radius: 10px;
+  box-shadow: 0 0 12px #a97ff344;
+  overflow: hidden;
+  width: 100%;
+}
+
+#audit thead {
+  background: #3b2a72;
+  color: #fff;
+}
+
+#audit th,
+#audit td {
+  padding: 12px 10px;
+  border: 1px solid #5e3ec6;
+  text-align: center;
+}
+
+#audit tbody tr:hover {
+  background-color: rgba(147, 112, 219, 0.2);
+  box-shadow: 0 0 8px #8e44ad66;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: white;
+  display: inline-block;
+}
+
+.status-on-time {
+  background-color: #2ecc71;
+  box-shadow: 0 0 5px #2ecc71aa;
+}
+
+.status-due-soon {
+  background-color: #f1c40f;
+  box-shadow: 0 0 5px #f1c40faa;
+}
+
+.status-overdue {
+  background-color: #e74c3c;
+  box-shadow: 0 0 5px #e74c3caa;
+}
+# Glow animation for newly scanned items
+@keyframes flash-glow {
+  0% {
+    background-color: #6a0dad33;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.new-item-flash {
+  animation: flash-glow 1.2s ease-out;
 }

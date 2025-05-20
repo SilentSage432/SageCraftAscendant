@@ -10,22 +10,23 @@
   <meta name="theme-color" content="#1e1e2f" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#2a003f" />
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body class="dark-theme electric-fantasy">
   <header class="topbar mystic-header">
-    <h1>Inventory Auditor</h1>
+    <div class="logo-banner">
+      <img src="icon/auditor-logo.png" alt="Inventory Auditor Logo" class="logo-icon" />
+      <h1 class="logo-title">Inventory Auditor</h1>
+    </div>
     <nav class="nav-tabs">
       <button id="hamburgerMenu" class="hamburger-btn">☰</button>
       <div id="menuDropdown" class="dropdown-menu" style="display: none;">
-        <button class="tablink" data-tab="entry">📝 Entry</button>
-        <button class="tablink" data-tab="reports">📊 Reports</button>
-        <button class="tablink" data-tab="sessions">💾 Sessions</button>
-        <button class="tablink" data-tab="mappings">🧠 Mappings</button>
-        <button class="tablink" data-tab="settings">⚙️ Settings</button>
-        <button class="tablink" data-tab="audit">🕒 Audit Rotation</button>
+        <button class="tablink" data-tab="count">🔢 Count Mode</button>
+        <button class="tablink" data-tab="vault">📂 Session Vault</button>
+        <button class="tablink" data-tab="tools">🛠 Tools & Settings</button>
+        <button class="tablink" data-tab="audit">📊 Reports & Audit</button>
       </div>
     </nav>
   </header>
@@ -33,14 +34,23 @@
   <div class="container neon-container">
     <div class="fantasy-wrapper electric-vibe">
       <main class="tab-content">
-      <section id="entry" class="tab-section active panel-glow">
+      <section id="count" class="tab-section active panel-glow">
         <h2>Live Counts</h2>
         <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
           <table id="liveCountTable">
             <thead>
               <tr><th>Item #</th><th>Count</th></tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              <!-- TEMPORARY: Example row for category badge visual test -->
+              <tr>
+                <td>
+                  1002178967
+                  <span class="category-badge">Laundry</span>
+                </td>
+                <td>5</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
@@ -90,7 +100,7 @@
         <button id="mergeReport">🧬 Merge Master Report</button>
       </section>
 
-      <section id="sessions" class="tab-section panel-glow">
+      <section id="vault" class="tab-section panel-glow">
         <h2>Session Controls</h2>
         <button id="clearLiveTable">🗑️ Clear Live Table</button>
         <button id="saveSession">💾 Save Session</button>
@@ -113,7 +123,7 @@
         </table>
       </section>
 
-      <section id="settings" class="tab-section panel-glow">
+      <section id="tools" class="tab-section panel-glow">
         <h2>Settings</h2>
         <div class="settings-group">
           <h3>🖼 Appearance</h3>
@@ -207,6 +217,24 @@
   <script src="script.js"></script>
 
   <script>
+    document.getElementById("saveSession").addEventListener("click", () => {
+      if (typeof liveCounts === 'undefined' || Object.keys(liveCounts).length === 0) {
+        alert("No session data to save.");
+        return;
+      }
+
+      const sessionName = prompt("Enter a name for this session:");
+      if (!sessionName) return;
+
+      const savedSessions = JSON.parse(localStorage.getItem("inventorySessions") || "{}");
+      savedSessions[sessionName] = liveCounts;
+
+      localStorage.setItem("inventorySessions", JSON.stringify(savedSessions));
+      alert(`Session "${sessionName}" saved successfully.`);
+    });
+  </script>
+
+  <script>
     document.getElementById("hamburgerMenu").addEventListener("click", function () {
       const menu = document.getElementById("menuDropdown");
       menu.style.display = menu.style.display === "block" ? "none" : "block";
@@ -233,5 +261,88 @@
       adv.classList.toggle("hidden");
     });
   </script>
+
+  <script>
+    // Dynamically generate and display saved session options when the "View Saved Sessions" button is clicked
+    document.getElementById("viewSavedSessions").addEventListener("click", () => {
+      const container = document.getElementById("savedSessionsList");
+      container.innerHTML = "";
+      const savedSessions = JSON.parse(localStorage.getItem("inventorySessions") || "{}");
+
+      if (Object.keys(savedSessions).length === 0) {
+        container.innerHTML = "<p style='color:#ccc;'>No saved sessions found.</p>";
+        return;
+      }
+
+      const list = document.createElement("ul");
+      list.style.listStyle = "none";
+      list.style.padding = "0";
+
+      Object.keys(savedSessions).forEach(name => {
+        const row = document.createElement("li");
+        row.style.marginBottom = "10px";
+
+        const loadBtn = document.createElement("button");
+        loadBtn.textContent = `📥 Load "${name}"`;
+        loadBtn.style.marginRight = "8px";
+        loadBtn.addEventListener("click", () => {
+          liveCounts = savedSessions[name];
+          updateLiveTable();
+          alert(`Session "${name}" loaded successfully.`);
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "🗑️ Delete";
+        deleteBtn.addEventListener("click", () => {
+          if (confirm(`Are you sure you want to delete session "${name}"?`)) {
+            delete savedSessions[name];
+            localStorage.setItem("inventorySessions", JSON.stringify(savedSessions));
+            row.remove();
+            alert(`Session "${name}" deleted.`);
+          }
+        });
+
+        row.appendChild(loadBtn);
+        row.appendChild(deleteBtn);
+        list.appendChild(row);
+      });
+
+      container.appendChild(list);
+    });
+  </script>
+  <script>
+  const newItemSound = new Audio('sounds/mystic-ping.mp3');
+
+  function playNewItemSound() {
+    newItemSound.currentTime = 0;
+    newItemSound.play().catch((e) => {
+      console.warn('Sound play blocked or failed:', e);
+    });
+  }
+
+  // Wrap original addLiveItem logic with sound trigger
+  document.getElementById("addLiveItem").addEventListener("click", function () {
+    const input = document.getElementById("liveEntry");
+    const item = input.value.trim();
+
+    if (!item) return;
+
+    const icon = ""; // or derive from logic
+    const count = 1;
+
+    if (!liveCounts[item]) {
+      playNewItemSound();
+    }
+
+    if (liveCounts[item]) {
+      liveCounts[item].count += count;
+    } else {
+      liveCounts[item] = { count: count, category: "", location: "" };
+    }
+
+    input.value = "";
+    updateLiveTable();
+  });
+</script>
 </body>
 </html>
