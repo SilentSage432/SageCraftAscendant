@@ -182,9 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
   function restoreFocusToEntry() {
-    setTimeout(() => {
-      liveEntryInput.focus();
-    }, 50);
+    // Disabled during scan reset troubleshooting
+    // setTimeout(() => {
+    //   liveEntryInput.focus();
+    // }, 50);
   }
   // --- Datalist for liveEntryInput suggestions ---
   const datalist = document.createElement('datalist');
