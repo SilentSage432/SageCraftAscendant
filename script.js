@@ -1173,20 +1173,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  // Add event listener for Add Item button
-  const addLiveItemBtn = document.getElementById('addLiveItem');
-  if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', () => {
-      const liveEntryInput = document.getElementById('liveEntry');
-      if (!liveEntryInput) return;
-      const item = liveEntryInput.value.trim();
-      if (!item) {
-        alert('Please enter or scan an item before adding.');
-        return;
-      }
-      handleScannedInput(item);
-    });
-  }
   // Save/Load Session buttons
   const saveSessionBtn = document.getElementById('saveSession');
   if (saveSessionBtn) {
