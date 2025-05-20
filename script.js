@@ -1306,6 +1306,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle unknown codes - always prompt for clarification, prevent auto-add
     if (!upcToItem[item] && !locationMap[item]) {
       const response = await showCustomPrompt(item);
+      updateSuggestions();
+      updateLiveTable();
       if (response === 'location') {
         const name = prompt(`🗂 Please enter a name for location "${item}":`);
         if (name) {
@@ -1316,6 +1318,7 @@ document.addEventListener('DOMContentLoaded', () => {
           alert(`📍 Current location set to: ${name}`);
           resetScanInput();
         }
+        resetScanInput();
         return;
       } else if (response === 'product') {
         const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
@@ -1327,6 +1330,8 @@ document.addEventListener('DOMContentLoaded', () => {
           resetScanInput();
           return;
         }
+        resetScanInput();
+        return;
       } else {
         resetScanInput();
         return;
