@@ -45,10 +45,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
   // --- New item sound and glow trigger ---
   const newItemSound = new Audio('sounds/mystic-ping.mp3');
+  // Sound enabled flag from localStorage (default true)
+  const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
   function playNewItemSound() {
+    if (!soundEnabled) return;
     newItemSound.currentTime = 0;
     newItemSound.play().catch(err => {
       console.warn("Sound error:", err);
+    });
+  }
+  // --- Sound toggle in settings panel ---
+  // Insert sound toggle checkbox into settings panel (Settings tab)
+  const soundToggleLabel = document.createElement('label');
+  soundToggleLabel.innerHTML = `<input type="checkbox" id="soundToggle" /> Enable Scan Sound`;
+  const settingsGroup = document.querySelector('#tools .settings-group');
+  if (settingsGroup) {
+    settingsGroup.appendChild(soundToggleLabel);
+    const soundToggle = document.getElementById('soundToggle');
+    soundToggle.checked = soundEnabled;
+    soundToggle.addEventListener('change', (e) => {
+      localStorage.setItem('soundEnabled', e.target.checked);
     });
   }
   // --- Google Drive Integration ---
@@ -1209,8 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle known product codes
     if (!liveCounts[item]) {
       liveCounts[item] = 0;
-      const sound = new Audio('sounds/mystic-ping.mp3');
-      sound.play().catch(err => console.warn('Sound error', err));
+      playNewItemSound();
     }
     // Always register a quantity of 1 per scan, do not reference liveQtyInput
     const qty = 1;
@@ -2034,4 +2049,39 @@ document.addEventListener('DOMContentLoaded', () => {
     renderRotationTable();
   }
   renderRotationTable();
+
+  // --- Audit Reminder Toasts for categories needing auditing soon ---
+  function showAuditReminderToasts() {
+    const today = new Date();
+    const now = today.getTime();
+
+    Object.entries(rotationData).forEach(([category, lastDate]) => {
+      if (!lastDate) return;
+
+      const last = new Date(lastDate).getTime();
+      const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+
+      if (diffDays >= 6) { // Show reminder if due tomorrow or overdue
+        const toast = document.createElement('div');
+        toast.textContent = `⏳ Reminder: "${category}" needs auditing soon!`;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = '#550000';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 18px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontSize = '14px';
+        toast.style.zIndex = '9999';
+        toast.style.boxShadow = '0 0 10px #aa0000';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 5000);
+      }
+    });
+  }
+
+  showAuditReminderToasts();
 });
