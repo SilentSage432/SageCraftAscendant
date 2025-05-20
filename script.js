@@ -1175,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function processScan(item) {
     if (!item) return;
 
-    // Handle unknown codes
+    // Handle unknown codes - always prompt for clarification, prevent auto-add
     if (!upcToItem[item] && !locationMap[item]) {
       const response = await showCustomPrompt(item);
       if (response === 'location') {
