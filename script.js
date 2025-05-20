@@ -772,136 +772,62 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  // --- Scanning input logic: seamless, robust version ---
-  // Debounce timeout for scan input
-  let scanTimeout = null;
+  // --- Restored clean scanning logic ---
+  const liveEntry = document.getElementById('liveEntry');
+  const liveQty = document.getElementById('liveQty');
+  const liveTableBody = document.querySelector('#liveCountTable tbody');
+  const addLiveItemBtn = document.getElementById('addLiveItem');
+  const liveCounts = window.liveCounts || {}; // fallback if not global
 
-  // Helper to clear and refocus the scan input
+  function updateLiveTable() {
+    if (!liveTableBody) return;
+    liveTableBody.innerHTML = '';
+    Object.entries(liveCounts).forEach(([item, count]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${item}</td><td>${count}</td>`;
+      liveTableBody.appendChild(tr);
+    });
+  }
+
   function resetScanInput() {
-    liveEntryInput.value = '';
-    liveEntryInput.focus();
-    liveQtyInput.value = '1';
+    if (liveEntry) {
+      liveEntry.value = '';
+      liveEntry.focus();
+    }
+    if (liveQty) liveQty.value = '1';
   }
 
-  // Debounced input event: triggers scan if manual toggle is on
-  liveEntryInput.addEventListener('input', () => {
-    if (scanTimeout) clearTimeout(scanTimeout);
-    scanTimeout = setTimeout(() => {
-      const manualToggle = document.getElementById('manualToggle');
-      if (manualToggle && manualToggle.checked) {
-        autoTriggerScan();
-      }
-    }, 200);
-  });
-
-  // Enter key: triggers scan immediately
-  liveEntryInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      autoTriggerScan();
-    }
-  });
-
-  // Main scan handler: triggered by input or enter
-  function autoTriggerScan() {
-    const item = liveEntryInput.value.trim();
+  function processScan(item) {
     if (!item) return;
-    handleScannedInput(item);
-  }
-
-  // Async scan processing logic
-  async function handleScannedInput(item) {
-    if (!item) return;
-
-    // If unknown code, prompt user to identify
-    if (!upcToItem[item] && !locationMap[item]) {
-      try {
-        const response = await showCustomPrompt(item);
-        if (response === 'location') {
-          const name = prompt(`🗂 Please enter a name for location "${item}":`);
-          if (name) {
-            locationMap[item] = name;
-            saveLocationMap();
-            currentLocation = name;
-            updateLocationStatus();
-            alert(`📍 Current location set to: ${name}`);
-          }
-        } else if (response === 'product') {
-          processProduct(item);
-        }
-      } catch (e) {
-        console.error('Error handling custom prompt:', e);
-      }
-      resetScanInput();
-      return;
+    if (!liveCounts[item]) {
+      liveCounts[item] = 0;
+      // Optional: play sound
+      const sound = new Audio('sounds/mystic-ping.mp3');
+      sound.play().catch(err => console.warn('Sound error', err));
     }
-
-    // Handle location tag scans
-    if (locationMap[item]) {
-      if (currentLocation === locationMap[item]) {
-        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
-        if (close) {
-          currentLocation = '';
-          updateLocationStatus();
-          alert('📦 Current location cleared.');
-        }
-      } else {
-        currentLocation = locationMap[item];
-        updateLocationStatus();
-        alert(`📍 Current location set to: ${currentLocation}`);
-      }
-      resetScanInput();
-      return;
-    }
-
-    // Process known product scans
-    processProduct(item);
+    const qty = liveQty ? parseInt(liveQty.value) || 1 : 1;
+    liveCounts[item] += qty;
+    updateLiveTable();
     resetScanInput();
   }
 
-  // Process scanned product item
-  function processProduct(item) {
-    let mappedItem = upcToItem[item] || item;
-
-    if (!upcToItem[item]) {
-      const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
-      if (userDefined) {
-        upcToItem[item] = userDefined;
-        saveUPCMap();
-        mappedItem = userDefined;
+  if (liveEntry) {
+    liveEntry.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = liveEntry.value.trim();
+        processScan(val);
       }
-    }
-
-    if (!liveCounts[mappedItem]) {
-      liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
-      playNewItemSound();
-      setTimeout(() => {
-        const tableRows = document.querySelectorAll("#liveCountTable tbody tr");
-        const lastRow = tableRows[tableRows.length - 1];
-        if (lastRow) {
-          lastRow.classList.add("new-item-flash");
-          setTimeout(() => lastRow.classList.remove("new-item-flash"), 1200);
-        }
-      }, 150);
-    }
-
-    if (!upcToItem[item]) {
-      liveEntryInput.classList.add("scan-error");
-      setTimeout(() => {
-        liveEntryInput.classList.remove("scan-error");
-      }, 400);
-    }
-
-    const qty = parseInt(liveQtyInput.value) || 1;
-    liveCounts[mappedItem].count += qty;
-    liveCounts[mappedItem].location = currentLocation;
-
-    updateLiveTable();
-    updateSuggestions();
-    showScanMappingLog(item, mappedItem);
+    });
   }
 
-  function updateLiveTable() {
+  if (addLiveItemBtn) {
+    addLiveItemBtn.addEventListener('click', () => {
+      if (!liveEntry) return;
+      const val = liveEntry.value.trim();
+      processScan(val);
+    });
+  }
     // --- Category color map ---
     const categoryColors = {
       'Laundry': '#8ecae6',
@@ -1200,7 +1126,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const addLiveItemBtn = document.getElementById('addLiveItem');
   if (addLiveItemBtn) {
     addLiveItemBtn.addEventListener('click', () => {
-      console.log('Add Item button clicked');
+      const liveEntryInput = document.getElementById('liveEntry');
+      if (!liveEntryInput) return;
       const item = liveEntryInput.value.trim();
       if (!item) {
         alert('Please enter or scan an item before adding.');

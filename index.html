@@ -24,48 +24,53 @@
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body class="dark-theme electric-fantasy">
-  <div class="floating-nav">
-    <button class="nav-icon" data-tab="count" title="Count Mode">🔢</button>
-    <button class="nav-icon" data-tab="vault" title="Session Vault">📂</button>
-    <button class="nav-icon" data-tab="tools" title="Tools & Settings">🛠</button>
-    <button class="nav-icon" data-tab="audit" title="Audit Reports">📊</button>
+  <!-- Floating navigation for main tabs -->
+  <div class="floating-nav" role="navigation" aria-label="Main tabs">
+    <button class="nav-icon" data-tab="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
+    <button class="nav-icon" data-tab="vault" title="Session Vault" aria-label="Session Vault">📂</button>
+    <button class="nav-icon" data-tab="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
+    <button class="nav-icon" data-tab="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
   </div>
-  <header class="topbar mystic-header">
+
+  <header class="topbar mystic-header" role="banner">
     <div class="logo-banner">
       <img src="icon/auditor-logo.png" alt="Inventory Auditor Logo" class="logo-icon" />
       <h1 class="logo-title">Inventory Auditor</h1>
     </div>
   </header>
 
-  <div class="container neon-container">
+  <main class="container neon-container" role="main">
     <div class="fantasy-wrapper electric-vibe">
-      <main class="tab-content">
-      <section id="count" class="tab-section active panel-glow">
+      <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
+
+        <!-- Live count table -->
         <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
-          <table id="liveCountTable">
+          <table id="liveCountTable" aria-describedby="liveCountsDesc">
+            <caption id="liveCountsDesc" class="sr-only">Table showing live counts of scanned items</caption>
             <thead>
-              <tr><th>Item #</th><th>Count</th></tr>
+              <tr>
+                <th scope="col">Item #</th>
+                <th scope="col">Count</th>
+              </tr>
             </thead>
             <tbody>
-              <!-- TEMPORARY: Example row for category badge visual test -->
+              <!-- Example row -->
               <tr>
-                <td>
-                  1002178967
-                  <span class="category-badge">Laundry</span>
-                </td>
+                <td>1002178967 <span class="category-badge">Laundry</span></td>
                 <td>5</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div id="entryControls" class="scan-capsule">
+        <!-- Scan entry capsule -->
+        <div id="entryControls" class="scan-capsule" role="region" aria-label="Scan Entry Controls">
           <h3>📲 Scan Entry</h3>
           <div class="scan-fields">
-            <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
-            <input type="number" id="liveQty" value="1" min="1" class="qty-input" />
-            <select id="liveCategory" class="category-select">
+            <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
+            <input type="number" id="liveQty" value="1" min="1" class="qty-input" aria-label="Quantity to add" />
+            <select id="liveCategory" class="category-select" aria-label="Select item category">
               <option value="Laundry">Laundry</option>
               <option value="Fridges & Freezers">Fridges & Freezers</option>
               <option value="Ranges">Ranges</option>
@@ -86,17 +91,19 @@
               <option value="Other / Misc">Other / Misc</option>
             </select>
           </div>
+
           <div class="scan-buttons">
-            <button id="addLiveItem">Add Item</button>
-            <button id="toggleAdvancedControls">⚙️ More Options</button>
+            <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
+            <button id="toggleAdvancedControls" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
           </div>
-          <div id="advancedControls" class="hidden">
+
+          <div id="advancedControls" class="hidden" aria-hidden="true">
             <label id="manualModeToggle">
               <input type="checkbox" id="manualToggle" checked />
               Auto-Scan Mode
             </label>
-            <button id="toggleImportExport">📂 Import/Export Options</button>
-            <div id="importExportControls" class="hidden">
+            <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">📂 Import/Export Options</button>
+            <div id="importExportControls" class="hidden" aria-hidden="true">
               <button id="exportBtn">📤 Export Bay Locations</button>
               <button id="importBtn">📥 Import Bay Locations</button>
               <button id="exportUPCBtn">📤 Export UPC Mappings</button>
@@ -113,20 +120,22 @@
         <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
         <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
-          <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+          <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:
+1002178967: 3
+1002101223: 5"></textarea>
           <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
           </div>
         </div>
       </section>
 
-      <section id="exportTools" class="tab-section panel-glow">
+      <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
         <h2>Export Tools</h2>
         <button id="authGoogleDrive">🔐 Connect Google Drive</button>
         <button id="downloadExcel">⬇️ Download Excel</button>
         <button id="mergeReport">🧬 Merge Master Report</button>
       </section>
 
-      <section id="vault" class="tab-section panel-glow">
+      <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
         <h2>Session Controls</h2>
         <button id="clearLiveTable">🗑️ Clear Live Table</button>
         <button id="saveSession">💾 Save Session</button>
@@ -135,7 +144,7 @@
         <button id="triggerImportExcelSession">📂 Import Excel Session</button>
       </section>
 
-      <section id="mappings" class="tab-section panel-glow">
+      <section id="mappings" class="tab-section panel-glow" role="tabpanel" aria-label="Mapping Manager">
         <h2>🧠 Mapping Manager</h2>
         <div style="margin-bottom: 10px;">
           <button id="exportMappings">📤 Export Mappings</button>
@@ -149,7 +158,7 @@
         </table>
       </section>
 
-      <section id="tools" class="tab-section panel-glow">
+      <section id="tools" class="tab-section panel-glow" role="tabpanel" aria-label="Settings">
         <h2>Settings</h2>
         <div class="settings-group">
           <h3>🖼 Appearance</h3>
@@ -205,7 +214,8 @@
           <div id="savedSessionsList" style="margin-top: 10px;"></div>
         </div>
       </section>
-      <section id="audit" class="tab-section panel-glow">
+
+      <section id="audit" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Rotation Schedule">
         <h2>🕒 Audit Rotation Schedule</h2>
         <p>This tool helps you track which categories need to be audited based on their rotation schedule.</p>
         <table id="rotationTable" style="width:100%; border-collapse:collapse; margin-top: 15px;">
@@ -220,11 +230,11 @@
           <tbody></tbody>
         </table>
       </section>
-      </main>
     </div>
-  </div>
+  </main>
 
-  <div id="customModal" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+  <!-- Modal for unknown item prompt -->
+  <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
       <h3 id="modalPromptText"></h3>
       <div style="margin-top:15px;">
@@ -239,137 +249,9 @@
     Inventory Auditor — v2.0.0 ⚡
   </footer>
 
+  <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- Main script -->
   <script src="script.js"></script>
-
-  <script>
-    document.getElementById("saveSession").addEventListener("click", () => {
-      if (typeof liveCounts === 'undefined' || Object.keys(liveCounts).length === 0) {
-        alert("No session data to save.");
-        return;
-      }
-
-      const sessionName = prompt("Enter a name for this session:");
-      if (!sessionName) return;
-
-      const savedSessions = JSON.parse(localStorage.getItem("inventorySessions") || "{}");
-      savedSessions[sessionName] = liveCounts;
-
-      localStorage.setItem("inventorySessions", JSON.stringify(savedSessions));
-      alert(`Session "${sessionName}" saved successfully.`);
-    });
-  </script>
-
-
-  <script>
-    // Dynamically generate and display saved session options when the "View Saved Sessions" button is clicked
-    document.getElementById("viewSavedSessions").addEventListener("click", () => {
-      const container = document.getElementById("savedSessionsList");
-      container.innerHTML = "";
-      const savedSessions = JSON.parse(localStorage.getItem("inventorySessions") || "{}");
-
-      if (Object.keys(savedSessions).length === 0) {
-        container.innerHTML = "<p style='color:#ccc;'>No saved sessions found.</p>";
-        return;
-      }
-
-      const list = document.createElement("ul");
-      list.style.listStyle = "none";
-      list.style.padding = "0";
-
-      Object.keys(savedSessions).forEach(name => {
-        const row = document.createElement("li");
-        row.style.marginBottom = "10px";
-
-        const loadBtn = document.createElement("button");
-        loadBtn.textContent = `📥 Load "${name}"`;
-        loadBtn.style.marginRight = "8px";
-        loadBtn.addEventListener("click", () => {
-          liveCounts = savedSessions[name];
-          updateLiveTable();
-          alert(`Session "${name}" loaded successfully.`);
-        });
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "🗑️ Delete";
-        deleteBtn.addEventListener("click", () => {
-          if (confirm(`Are you sure you want to delete session "${name}"?`)) {
-            delete savedSessions[name];
-            localStorage.setItem("inventorySessions", JSON.stringify(savedSessions));
-            row.remove();
-            alert(`Session "${name}" deleted.`);
-          }
-        });
-
-        row.appendChild(loadBtn);
-        row.appendChild(deleteBtn);
-        list.appendChild(row);
-      });
-
-      container.appendChild(list);
-    });
-  </script>
-  <script>
-  const newItemSound = new Audio('sounds/mystic-ping.mp3');
-
-  function playNewItemSound() {
-    newItemSound.currentTime = 0;
-    newItemSound.play().catch((e) => {
-      console.warn('Sound play blocked or failed:', e);
-    });
-  }
-
-  // Wrap original addLiveItem logic with sound trigger
-  document.getElementById("addLiveItem").addEventListener("click", function () {
-    const input = document.getElementById("liveEntry");
-    const item = input.value.trim();
-
-    if (!item) return;
-
-    const icon = ""; // or derive from logic
-    const count = 1;
-
-    if (!liveCounts[item]) {
-      playNewItemSound();
-    }
-
-    if (liveCounts[item]) {
-      liveCounts[item].count += count;
-    } else {
-      liveCounts[item] = { count: count, category: "", location: "" };
-    }
-
-    input.value = "";
-    updateLiveTable();
-  });
-  </script>
-
-  <script>
-    // Floating nav buttons activate tabs (refactored)
-    document.querySelectorAll('.floating-nav .nav-icon').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-
-        // Remove active class from all tab sections
-        document.querySelectorAll('.tab-section').forEach(section => {
-          section.classList.remove('active');
-        });
-
-        // Add active class to the target section
-        const targetSection = document.getElementById(targetTab);
-        if (targetSection) {
-          targetSection.classList.add('active');
-        }
-
-        // Update tab links to reflect active state
-        document.querySelectorAll('.tablink').forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('data-tab') === targetTab) {
-            link.classList.add('active');
-          }
-        });
-      });
-    });
-  </script>
 </body>
 </html>
