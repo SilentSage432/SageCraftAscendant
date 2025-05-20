@@ -1328,7 +1328,6 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
       } else {
-        // Cancel
         resetScanInput();
         return;
       }
@@ -1354,12 +1353,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle known product codes
     if (!liveCounts[item]) {
-      liveCounts[item] = 0;
+      liveCounts[item] = {
+        count: 0,
+        category: categoryInput.value,
+        location: currentLocation
+      };
       playNewItemSound();
     }
     // Always register a quantity of 1 per scan, do not reference liveQtyInput
     const qty = 1;
-    liveCounts[item] += qty;
+    if (typeof liveCounts[item] === 'object') {
+      liveCounts[item].count += qty;
+      liveCounts[item].category = liveCounts[item].category || categoryInput.value;
+      liveCounts[item].location = currentLocation;
+    } else {
+      // Backward compatibility: upgrade to object
+      liveCounts[item] = {
+        count: (liveCounts[item] || 0) + qty,
+        category: categoryInput.value,
+        location: currentLocation
+      };
+    }
     updateRotationDate(liveCounts[item].category);
     updateLiveTable();
     resetScanInput();
