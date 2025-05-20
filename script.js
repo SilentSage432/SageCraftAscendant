@@ -453,41 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('keepSnapshots', e.target.checked);
     });
   }
-  const liveQtyInput = document.createElement('input');
-  liveQtyInput.type = 'number';
-  liveQtyInput.min = '1';
-  liveQtyInput.value = '1';
-  liveQtyInput.id = 'liveQtyInput';
-  liveQtyInput.placeholder = 'Qty';
-  liveEntryInput.insertAdjacentElement('afterend', liveQtyInput);
-  const categoryInput = document.createElement('select');
-  categoryInput.id = 'categoryInput';
-  [
-    'Laundry',
-    'Fridges & Freezers',
-    'Ranges',
-    'Dishwashers',
-    'Wall Ovens',
-    'Cooktops',
-    'OTR Microwaves',
-    'Microwaves (Countertop)',
-    'Vent Hoods',
-    'Beverage & Wine Coolers',
-    'Cabinets',
-    'Countertops',
-    'Interior Doors',
-    'Exterior Doors',
-    'Storm Doors',
-    'Windows',
-    'Commodity Moulding',
-    'Other / Misc'
-  ].forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat;
-    opt.textContent = cat;
-    categoryInput.appendChild(opt);
-  });
-  liveQtyInput.insertAdjacentElement('afterend', categoryInput);
+  const liveQtyInput = document.getElementById('liveQty');
+  const categoryInput = document.getElementById('liveCategory');
 
   // --- Location status visual indicator ---
   const locationStatus = document.createElement('div');
@@ -880,6 +847,13 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => lastRow.classList.remove("new-item-flash"), 1200);
         }
       }, 150);
+    }
+    // --- Red shake animation for unrecognized UPC ---
+    if (!upcToItem[item]) {
+      liveEntryInput.classList.add("scan-error");
+      setTimeout(() => {
+        liveEntryInput.classList.remove("scan-error");
+      }, 400);
     }
     const qty = parseInt(liveQtyInput.value) || 1;
     liveCounts[mappedItem].count += qty;
@@ -1705,19 +1679,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabLinks.forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = btn.getAttribute('data-tab');
-      tabSections.forEach(section => {
-        section.classList.remove('active');
-      });
-      tabLinks.forEach(b => b.classList.remove('active'));
-      document.getElementById(target).classList.add('active');
-      btn.classList.add('active');
+      const targetTab = btn.getAttribute('data-tab');
+      tabSections.forEach(tab => tab.classList.remove('active'));
+      tabLinks.forEach(t => t.classList.remove('active'));
+      const newTab = document.getElementById(targetTab);
+      const newTabBtn = document.querySelector(`.tablink[data-tab="${targetTab}"]`);
+      if (newTab) newTab.classList.add('active');
+      if (newTabBtn) newTabBtn.classList.add('active');
     });
   });
 
+  // --- Floating Nav Tab Switching ---
+  const floatingNavButtons = document.querySelectorAll('.floating-nav .nav-icon');
+  floatingNavButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      tabSections.forEach(section => section.classList.remove('active'));
+      tabLinks.forEach(link => link.classList.remove('active'));
+      const newTab = document.getElementById(targetTab);
+      const correspondingBtn = document.querySelector(`.tablink[data-tab="${targetTab}"]`);
+      if (newTab) newTab.classList.add('active');
+      if (correspondingBtn) correspondingBtn.classList.add('active');
+    });
+  });
+  // --- Floating Nav Toggle Logic ---
+  const toggleFloatingNav = document.getElementById('toggleFloatingNav');
+  const floatingNav = document.querySelector('.floating-nav');
+
+  if (toggleFloatingNav && floatingNav) {
+    toggleFloatingNav.addEventListener('click', (e) => {
+      e.stopPropagation(); // prevent bubbling
+      floatingNav.classList.toggle('nav-collapsed');
+    });
+  }
+
   // Activate the default tab on load
-  document.querySelector('.tablink[data-tab="entry"]').classList.add('active');
-  document.getElementById('entry').classList.add('active');
+  document.querySelector('.tablink[data-tab="count"]').classList.add('active');
+  document.getElementById('count').classList.add('active');
   // Focus the liveEntry input on load
   liveEntryInput.focus();
   // Dynamically load the Google API script
@@ -1787,8 +1785,8 @@ const searchBox = document.getElementById('liveSearchInput');
 if (searchBox) {
   searchBox.addEventListener('input', updateLiveTable);
 }
-  // Update location status on load
-  // (Moved inside DOMContentLoaded, so this will already be called)
+// Update location status on load
+// (Moved inside DOMContentLoaded, so this will already be called)
 // On window load, attempt to load session from Drive if enabled and not already loaded
 window.addEventListener('load', () => {
   if (localStorage.getItem('driveSyncEnabled') === 'true') {

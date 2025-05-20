@@ -8,6 +8,15 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon/icon-192x192.png" type="image/png" />
   <meta name="theme-color" content="#1e1e2f" />
+  <!-- iOS PWA Splash and Icon Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Inventory Auditor">
+  <link rel="apple-touch-icon" href="icon/icon-192.png">
+
+  <!-- iOS Splash Screen (Portrait) -->
+  <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
@@ -15,20 +24,17 @@
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body class="dark-theme electric-fantasy">
+  <div class="floating-nav">
+    <button class="nav-icon" data-tab="count" title="Count Mode">🔢</button>
+    <button class="nav-icon" data-tab="vault" title="Session Vault">📂</button>
+    <button class="nav-icon" data-tab="tools" title="Tools & Settings">🛠</button>
+    <button class="nav-icon" data-tab="audit" title="Audit Reports">📊</button>
+  </div>
   <header class="topbar mystic-header">
     <div class="logo-banner">
       <img src="icon/auditor-logo.png" alt="Inventory Auditor Logo" class="logo-icon" />
       <h1 class="logo-title">Inventory Auditor</h1>
     </div>
-    <nav class="nav-tabs">
-      <button id="hamburgerMenu" class="hamburger-btn">☰</button>
-      <div id="menuDropdown" class="dropdown-menu" style="display: none;">
-        <button class="tablink" data-tab="count">🔢 Count Mode</button>
-        <button class="tablink" data-tab="vault">📂 Session Vault</button>
-        <button class="tablink" data-tab="tools">🛠 Tools & Settings</button>
-        <button class="tablink" data-tab="audit">📊 Reports & Audit</button>
-      </div>
-    </nav>
   </header>
 
   <div class="container neon-container">
@@ -54,19 +60,41 @@
           </table>
         </div>
 
-        <div id="entryControls">
-          <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
-          <button id="addLiveItem">Add Item</button>
-          <button id="toggleAdvancedControls">⚙️ More Options</button>
-
+        <div id="entryControls" class="scan-capsule">
+          <h3>📲 Scan Entry</h3>
+          <div class="scan-fields">
+            <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" />
+            <input type="number" id="liveQty" value="1" min="1" class="qty-input" />
+            <select id="liveCategory" class="category-select">
+              <option value="Laundry">Laundry</option>
+              <option value="Fridges & Freezers">Fridges & Freezers</option>
+              <option value="Ranges">Ranges</option>
+              <option value="Dishwashers">Dishwashers</option>
+              <option value="Wall Ovens">Wall Ovens</option>
+              <option value="Cooktops">Cooktops</option>
+              <option value="OTR Microwaves">OTR Microwaves</option>
+              <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
+              <option value="Vent Hoods">Vent Hoods</option>
+              <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
+              <option value="Cabinets">Cabinets</option>
+              <option value="Countertops">Countertops</option>
+              <option value="Interior Doors">Interior Doors</option>
+              <option value="Exterior Doors">Exterior Doors</option>
+              <option value="Storm Doors">Storm Doors</option>
+              <option value="Windows">Windows</option>
+              <option value="Commodity Moulding">Commodity Moulding</option>
+              <option value="Other / Misc">Other / Misc</option>
+            </select>
+          </div>
+          <div class="scan-buttons">
+            <button id="addLiveItem">Add Item</button>
+            <button id="toggleAdvancedControls">⚙️ More Options</button>
+          </div>
           <div id="advancedControls" class="hidden">
-            <!-- Auto-Scan Mode -->
             <label id="manualModeToggle">
               <input type="checkbox" id="manualToggle" checked />
               Auto-Scan Mode
             </label>
-
-            <!-- Import/Export -->
             <button id="toggleImportExport">📂 Import/Export Options</button>
             <div id="importExportControls" class="hidden">
               <button id="exportBtn">📤 Export Bay Locations</button>
@@ -74,8 +102,6 @@
               <button id="exportUPCBtn">📤 Export UPC Mappings</button>
               <button id="importUPCBtn">📥 Import UPC Mappings</button>
             </div>
-
-            <!-- Snapshot/Trend Buttons -->
             <button id="clearHistoryBtn">🧹 Clear History</button>
             <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
             <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
@@ -85,15 +111,15 @@
 
         <h2>On-Hand Counts</h2>
         <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
-<input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
-<div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
-  <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
-  <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
-  </div>
-</div>
+        <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
+          <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:\n1002178967: 3\n1002101223: 5"></textarea>
+          <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
+          </div>
+        </div>
       </section>
 
-      <section id="reports" class="tab-section panel-glow">
+      <section id="exportTools" class="tab-section panel-glow">
         <h2>Export Tools</h2>
         <button id="authGoogleDrive">🔐 Connect Google Drive</button>
         <button id="downloadExcel">⬇️ Download Excel</button>
@@ -343,6 +369,34 @@
     input.value = "";
     updateLiveTable();
   });
-</script>
+  </script>
+
+  <script>
+    // Floating nav buttons activate tabs (refactored)
+    document.querySelectorAll('.floating-nav .nav-icon').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+
+        // Remove active class from all tab sections
+        document.querySelectorAll('.tab-section').forEach(section => {
+          section.classList.remove('active');
+        });
+
+        // Add active class to the target section
+        const targetSection = document.getElementById(targetTab);
+        if (targetSection) {
+          targetSection.classList.add('active');
+        }
+
+        // Update tab links to reflect active state
+        document.querySelectorAll('.tablink').forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('data-tab') === targetTab) {
+            link.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

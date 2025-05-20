@@ -788,6 +788,7 @@ body::before {
   box-shadow: 0 0 5px #e74c3caa;
 }
 # Glow animation for newly scanned items
+
 @keyframes flash-glow {
   0% {
     background-color: #6a0dad33;
@@ -799,4 +800,151 @@ body::before {
 
 .new-item-flash {
   animation: flash-glow 1.2s ease-out;
+}
+
+/* --- Floating Nav --- */
+.floating-nav {
+  position: fixed;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: auto;
+  background: rgba(40, 20, 60, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(140, 100, 255, 0.2);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 0 18px rgba(147, 51, 234, 0.25);
+}
+
+.nav-icon {
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  border: 1px solid #8b5cf6;
+  color: #fff;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px #a97ff3, 0 0 15px rgba(147, 51, 234, 0.3);
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.nav-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px #c084fc;
+}
+
+
+@media (max-width: 600px) {
+  .floating-nav {
+    top: auto;
+    bottom: 20px;
+    left: 10px;
+    transform: none;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+  }
+
+  .nav-icon {
+    padding: 8px;
+    font-size: 16px;
+    box-shadow: 0 0 6px rgba(147, 51, 234, 0.3);
+  }
+}
+
+
+
+/* --- Enhanced Magical Table Styling --- */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 2px solid rgba(147, 51, 234, 0.4);
+  box-shadow: 0 0 12px rgba(147, 51, 234, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+thead th {
+  background: linear-gradient(145deg, #4e2a84, #6a0dad);
+  color: #e0dfff;
+  text-shadow: 0 0 4px #8f3aff;
+  font-size: 15px;
+  padding: 12px;
+}
+
+tbody tr {
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: rgba(147, 112, 219, 0.1);
+  box-shadow: 0 0 10px rgba(160, 82, 255, 0.2);
+}
+
+/* --- Scan Feedback Animation Styles --- */
+@keyframes flash-glow {
+  0% {
+    background-color: #6a0dad33;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.new-item-flash {
+  animation: flash-glow 1.2s ease-out;
+}
+
+@keyframes shake-error {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.scan-error {
+  animation: shake-error 0.4s ease-in-out;
+  background-color: rgba(255, 0, 77, 0.2);
+}
+
+/* --- Scan Capsule Styling --- */
+.scan-capsule {
+  background: rgba(40, 20, 60, 0.6);
+  border: 1px solid #7d3cff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 18px rgba(160, 82, 255, 0.25);
+}
+
+.scan-capsule h3 {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #d6bbff;
+  text-shadow: 0 0 4px #8f3aff;
+}
+
+.scan-fields {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.scan-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
