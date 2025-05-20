@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   criticalButtonIds.forEach(id => {
     const btn = document.getElementById(id);
     if (btn) {
-      console.log(`✅ Button "${id}" found and ready`);
+      // console.log(`✅ Button "${id}" found and ready`);
     } else {
       console.warn(`❌ Button "${id}" not found in DOM`);
     }
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scope: SCOPES,
         discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
       });
-      console.log('✅ Google API initialized');
+      // console.log('✅ Google API initialized');
     });
   }
 
@@ -179,6 +179,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const cleanup = (result) => {
         overlay.style.display = 'none';
         resolve(result);
+        // --- Toast logic to confirm selection ---
+        const toast = document.createElement('div');
+        toast.textContent = result === 'location' ? '📍 Bay Location tag confirmed' :
+                            result === 'product' ? '📦 Product UPC confirmed' :
+                            '❌ Scan canceled';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = '#222';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 18px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontSize = '14px';
+        toast.style.zIndex = '9999';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 3000);
       };
 
       document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
