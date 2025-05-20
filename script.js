@@ -563,7 +563,6 @@ document.addEventListener('DOMContentLoaded', () => {
       locationStatus.style.color = 'red';
     }
   }
-  const liveTableBody = document.querySelector('#liveCountTable tbody');
   // --- Insert Live Search Bar (moved to after live count table exists) ---
   const liveTable = document.getElementById('liveCountTable');
   if (liveTable) {
