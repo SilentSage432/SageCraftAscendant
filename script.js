@@ -458,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   const liveQtyInput = document.getElementById('liveQty');
+  if (liveQtyInput) liveQtyInput.blur();
   const categoryInput = document.getElementById('liveCategory');
 
   // --- Location status visual indicator ---
@@ -855,7 +856,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const sound = new Audio('sounds/mystic-ping.mp3');
       sound.play().catch(err => console.warn('Sound error', err));
     }
-    const qty = liveQty ? parseInt(liveQty.value) || 1 : 1;
+    // Always register a quantity of 1 per scan, do not reference liveQtyInput
+    const qty = 1;
     liveCounts[item] += qty;
     updateLiveTable();
     resetScanInput();
