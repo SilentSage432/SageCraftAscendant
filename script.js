@@ -389,6 +389,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (val) processScan(val);
       }
     });
+    // Add input event handler for mobile/soft-keyboard scanners
+    liveEntryInput.addEventListener('input', () => {
+      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
+      if (val.length >= 5) { // Adjust length threshold if needed
+        processScan(val);
+      }
+    });
   }
   if (addLiveItemBtn) {
     addLiveItemBtn.addEventListener('click', () => {
