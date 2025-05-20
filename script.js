@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     liveEntryInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault(); // prevent accidental form submits or focus shifts
-        const val = liveEntryInput.value.trim();
+        const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
         if (val) processScan(val);
       }
     });
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (addLiveItemBtn) {
     addLiveItemBtn.addEventListener('click', () => {
       console.log("📦 Add Item button clicked");
-      const val = liveEntryInput.value.trim();
+      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
       if (val) processScan(val);
     });
   }
