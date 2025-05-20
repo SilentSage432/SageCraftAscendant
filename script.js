@@ -666,27 +666,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!trimmed) return;
         // Unified location/product detection and handling
         if (!upcToItem[trimmed] && !locationMap[trimmed]) {
-      showCustomPrompt(trimmed).then(response => {
-        if (response === 'location') {
-          const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
-          if (name) {
-            locationMap[trimmed] = name;
-            saveLocationMap();
-            currentLocation = name;
-            updateLocationStatus();
-            alert(`📍 Current location set to: ${name}`);
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
-          }
-        } else if (response === 'product') {
-          processProduct(trimmed);
-        } else {
-          liveEntryInput.value = '';
-          restoreFocusToEntry();
-        }
-      });
-      return;
+          showCustomPrompt(trimmed).then(response => {
+            if (response === 'location') {
+              const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
+              if (name) {
+                locationMap[trimmed] = name;
+                saveLocationMap();
+                currentLocation = name;
+                updateLocationStatus();
+                alert(`📍 Current location set to: ${name}`);
+                liveEntryInput.value = '';
+                restoreFocusToEntry();
+                return;
+              }
+            } else if (response === 'product') {
+              processProduct(trimmed);
+              restoreFocusToEntry();
+            } else {
+              liveEntryInput.value = '';
+              restoreFocusToEntry();
+            }
+          });
+          return;
         }
         if (locationMap[trimmed]) {
           if (currentLocation === locationMap[trimmed]) {
@@ -731,7 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
         weeklyCounts[today][k] = v.count;
       });
       localStorage.setItem('weeklyCounts', JSON.stringify(weeklyCounts));
-      liveEntryInput.focus();
+      restoreFocusToEntry();
     });
   }
 
@@ -739,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (clearBatchBtn) {
     clearBatchBtn.addEventListener('click', () => {
       batchInput.value = '';
-      liveEntryInput.focus();
+      restoreFocusToEntry();
     });
   }
 
@@ -788,6 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else if (response === 'product') {
           processProduct(item);
+          restoreFocusToEntry();
         } else {
           liveEntryInput.value = '';
           restoreFocusToEntry();
@@ -818,6 +820,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     processProduct(item);
+    liveEntryInput.value = '';
+    restoreFocusToEntry();
   }
 
   // --- Helper to process product scan ---
@@ -1717,7 +1721,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.tablink[data-tab="count"]').classList.add('active');
   document.getElementById('count').classList.add('active');
   // Focus the liveEntry input on load
-  liveEntryInput.focus();
+  restoreFocusToEntry();
   // Dynamically load the Google API script
   const gapiScript = document.createElement('script');
   gapiScript.src = 'https://apis.google.com/js/api.js';
