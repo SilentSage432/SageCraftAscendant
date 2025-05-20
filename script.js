@@ -161,6 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 
+  // --- Scan Logic Setup ---
+  const liveEntryInput = document.getElementById('liveEntry');
+  const liveQtyInput = document.getElementById('liveQty');
+  const addLiveItemBtn = document.getElementById('addLiveItem');
+  const liveTableBody = document.querySelector('#liveCountTable tbody');
+  const categoryInput = document.getElementById('liveCategory');
+  const locationStatus = document.createElement('div');
+  locationStatus.id = 'locationStatus';
+  locationStatus.style.marginTop = '10px';
+  locationStatus.style.fontWeight = 'bold';
+  locationStatus.textContent = '📍 No Active Bay';
+  locationStatus.style.color = 'red';
+  categoryInput.insertAdjacentElement('afterend', locationStatus);
+
   // --- Visual scan mapping log for mapped codes ---
   function showScanMappingLog(scannedCode, mappedItem) {
     const log = document.createElement('div');
@@ -180,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // const liveCounts = {}; // Remove duplicate declaration; already declared at the top
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
-  const liveEntryInput = document.getElementById('liveEntry');
   function restoreFocusToEntry() {
     // Disabled during scan reset troubleshooting
     // setTimeout(() => {
@@ -457,18 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('keepSnapshots', e.target.checked);
     });
   }
-  const liveQtyInput = document.getElementById('liveQty');
   // if (liveQtyInput) liveQtyInput.blur(); // Disabled to prevent focus conflict
-  const categoryInput = document.getElementById('liveCategory');
-
-  // --- Location status visual indicator ---
-  const locationStatus = document.createElement('div');
-  locationStatus.id = 'locationStatus';
-  locationStatus.style.marginTop = '10px';
-  locationStatus.style.fontWeight = 'bold';
-  locationStatus.textContent = '📍 No Active Bay';
-  locationStatus.style.color = 'red';
-  categoryInput.insertAdjacentElement('afterend', locationStatus);
 
 
   // --- Export locationMap as JSON ---
@@ -776,8 +778,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Restored clean scanning logic ---
   // const liveEntry = document.getElementById('liveEntry');
   const liveQty = document.getElementById('liveQty');
-  const liveTableBody = document.querySelector('#liveCountTable tbody');
-  const addLiveItemBtn = document.getElementById('addLiveItem');
   const liveCounts = window.liveCounts || {}; // fallback if not global
 
   function updateLiveTable() {
@@ -863,11 +863,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (liveEntryInput) {
-    liveEntryInput.addEventListener('keypress', e => {
+    liveEntryInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
-        e.preventDefault();
+        e.preventDefault(); // prevent accidental focus shifts
         const val = liveEntryInput.value.trim();
-        processScan(val);
+        if (val) {
+          processScan(val);
+        }
       }
     });
   }
@@ -1177,12 +1179,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveSessionBtn = document.getElementById('saveSession');
   if (saveSessionBtn) {
     saveSessionBtn.addEventListener('click', () => {
+      const name = prompt("Enter a custom name for this session (e.g., 'Bay 18 PM'):");
+      if (!name) {
+        alert('Session name is required.');
+        return;
+      }
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const sessionKey = `inventorySession_${timestamp}_${name.replace(/\s+/g, '_')}`;
       const session = {
         liveCounts: JSON.parse(JSON.stringify(liveCounts)),
         onHandText: document.getElementById('onHandInput').value
       };
-      localStorage.setItem('inventorySession', JSON.stringify(session));
-      alert('Session saved!');
+      localStorage.setItem(sessionKey, JSON.stringify(session));
+      alert(`Session "${name}" saved!`);
     });
   }
   const loadSessionBtn = document.getElementById('loadSession');
@@ -1581,35 +1590,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Tab Switching Logic ---
-  const tabLinks = document.querySelectorAll('.tablink');
+  // --- Floating Nav Tab Switching (cleaned up) ---
   const tabSections = document.querySelectorAll('.tab-section');
-
-  tabLinks.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-      tabSections.forEach(tab => tab.classList.remove('active'));
-      tabLinks.forEach(t => t.classList.remove('active'));
-      const newTab = document.getElementById(targetTab);
-      const newTabBtn = document.querySelector(`.tablink[data-tab="${targetTab}"]`);
-      if (newTab) newTab.classList.add('active');
-      if (newTabBtn) newTabBtn.classList.add('active');
-    });
-  });
-
-  // --- Floating Nav Tab Switching ---
   const floatingNavButtons = document.querySelectorAll('.floating-nav .nav-icon');
+
   floatingNavButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
       tabSections.forEach(section => section.classList.remove('active'));
-      tabLinks.forEach(link => link.classList.remove('active'));
+      floatingNavButtons.forEach(b => b.classList.remove('active'));
       const newTab = document.getElementById(targetTab);
-      const correspondingBtn = document.querySelector(`.tablink[data-tab="${targetTab}"]`);
       if (newTab) newTab.classList.add('active');
-      if (correspondingBtn) correspondingBtn.classList.add('active');
+      btn.classList.add('active');
     });
   });
+
+  // Set default tab to 'count' on load
+  document.getElementById('count').classList.add('active');
+  document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
   // --- Floating Nav Toggle Logic ---
   const toggleFloatingNav = document.getElementById('toggleFloatingNav');
   const floatingNav = document.querySelector('.floating-nav');
@@ -1688,22 +1686,4 @@ document.addEventListener('DOMContentLoaded', () => {
   renderRotationTable();
 });
 
-  // --- Attach live search event ---
-  const searchBox = document.getElementById('liveSearchInput');
-  if (searchBox) {
-    searchBox.addEventListener('input', updateLiveTable);
-  }
-  // Update location status on load
-  // (Moved inside DOMContentLoaded, so this will already be called)
-  // On window load, attempt to load session from Drive if enabled and not already loaded
-  window.addEventListener('load', () => {
-    if (localStorage.getItem('driveSyncEnabled') === 'true') {
-      // attempt to load from Drive if not already loaded
-      if (Object.keys(liveCounts).length === 0) {
-        if (typeof loadSessionFromDrive === 'function') {
-          loadSessionFromDrive();
-        }
-      }
-    }
-  });
 });
