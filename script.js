@@ -380,6 +380,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Scan Logic Setup ---
   const liveEntryInput = document.getElementById('liveEntry');
+  // Add Enter key handler for liveEntryInput
+  if (liveEntryInput) {
+    liveEntryInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // prevent accidental form submits or focus shifts
+        const val = liveEntryInput.value.trim();
+        if (val) processScan(val);
+      }
+    });
+  }
   if (addLiveItemBtn) {
     addLiveItemBtn.addEventListener('click', () => {
       console.log("📦 Add Item button clicked");
