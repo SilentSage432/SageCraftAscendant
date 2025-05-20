@@ -794,7 +794,6 @@ document.addEventListener('DOMContentLoaded', () => {
       liveEntry.value = '';
       liveEntry.focus();
     }
-    if (liveQty) liveQty.value = '1';
   }
 
   async function processScan(item) {
