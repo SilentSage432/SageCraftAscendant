@@ -1,4 +1,4 @@
-  // --- Backup All Data Button ---
+// --- Backup All Data Button ---
   // At the end of DOMContentLoaded block, add a button to export all localStorage session and mapping data
   const backupBtn = document.createElement('button');
   backupBtn.textContent = '📦 Backup All Data';
@@ -39,12 +39,32 @@ function saveLocationMap() {
 }
 // Wrap all logic in DOMContentLoaded, and move everything inside
 document.addEventListener('DOMContentLoaded', () => {
-  // --- "More Options" toggle for advanced controls ---
+  console.log("✅ DOMContentLoaded fired and script.js is active");
+  // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
+  const addLiveItemBtn = document.getElementById('addLiveItem');
+  const saveToDriveBtn = document.getElementById('saveToDrive');
+  const loadFromDriveBtn = document.getElementById('loadFromDrive');
+
+
+  // Clear Live Table button
+  const clearLiveTableBtn = document.getElementById('clearLiveTable');
+  if (clearLiveTableBtn) {
+    clearLiveTableBtn.addEventListener('click', () => {
+      console.log("🧹 Clear Live Table button clicked");
+      Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+      liveEntryInput.value = '';
+      updateLiveTable();
+      updateSuggestions();
+      summaryBar.innerHTML = '';
+    });
+  }
+
+  // More Options (Advanced Controls) toggle
   const toggleAdvancedControls = document.getElementById('toggleAdvancedControls');
   const advancedControls = document.getElementById('advancedControls');
-
   if (toggleAdvancedControls && advancedControls) {
     toggleAdvancedControls.addEventListener('click', () => {
+      console.log("⚙️ More Options button clicked");
       const isExpanded = toggleAdvancedControls.getAttribute('aria-expanded') === 'true';
       toggleAdvancedControls.setAttribute('aria-expanded', !isExpanded);
       advancedControls.classList.toggle('hidden');
@@ -68,11 +88,83 @@ document.addEventListener('DOMContentLoaded', () => {
   criticalButtonIds.forEach(id => {
     const btn = document.getElementById(id);
     if (btn) {
-      // console.log(`✅ Button "${id}" found and ready`);
+      console.log(`✅ Button "${id}" found and ready`);
     } else {
       console.warn(`❌ Button "${id}" not found in DOM`);
     }
   });
+  // --- Ensure all critical button listeners are present ---
+  // Add missing event listeners for critical buttons if not already defined above
+  // 1. addLiveItem
+  if (!addLiveItemBtn) {
+    const addLiveItemBtn2 = document.getElementById('addLiveItem');
+    if (addLiveItemBtn2) {
+      addLiveItemBtn2.addEventListener('click', () => {
+        console.log('addLiveItem clicked!');
+      });
+    }
+  }
+  // 2. clearLiveTable (already handled above)
+  // 3. uploadOnHandFile (handled above)
+  // 4. saveToDrive
+  if (!saveToDriveBtn) {
+    const saveToDriveBtn2 = document.getElementById('saveToDrive');
+    if (saveToDriveBtn2) {
+      saveToDriveBtn2.addEventListener('click', () => {
+        console.log('saveToDrive clicked!');
+      });
+    }
+  }
+  // 5. loadFromDrive
+  if (!loadFromDriveBtn) {
+    const loadFromDriveBtn2 = document.getElementById('loadFromDrive');
+    if (loadFromDriveBtn2) {
+      loadFromDriveBtn2.addEventListener('click', () => {
+        console.log('loadFromDrive clicked!');
+      });
+    }
+  }
+  // 6. clearHistoryBtn (already handled above)
+  // 7. saveSession
+  const saveSessionBtnCheck = document.getElementById('saveSession');
+  if (saveSessionBtnCheck && !saveSessionBtnCheck.onclick && saveSessionBtnCheck.getAttribute('listener-attached') !== 'true') {
+    saveSessionBtnCheck.addEventListener('click', () => {
+      console.log('saveSession clicked!');
+    });
+    saveSessionBtnCheck.setAttribute('listener-attached', 'true');
+  }
+  // 8. loadSession
+  const loadSessionBtnCheck = document.getElementById('loadSession');
+  if (loadSessionBtnCheck && !loadSessionBtnCheck.onclick && loadSessionBtnCheck.getAttribute('listener-attached') !== 'true') {
+    loadSessionBtnCheck.addEventListener('click', () => {
+      console.log('loadSession clicked!');
+    });
+    loadSessionBtnCheck.setAttribute('listener-attached', 'true');
+  }
+  // 9. downloadExcel
+  const downloadExcelBtn = document.getElementById('downloadExcel');
+  if (downloadExcelBtn && !downloadExcelBtn.onclick && downloadExcelBtn.getAttribute('listener-attached') !== 'true') {
+    downloadExcelBtn.addEventListener('click', () => {
+      console.log('downloadExcel clicked!');
+    });
+    downloadExcelBtn.setAttribute('listener-attached', 'true');
+  }
+  // 10. authGoogleDrive
+  const authGoogleDriveBtn = document.getElementById('authGoogleDrive');
+  if (authGoogleDriveBtn && !authGoogleDriveBtn.onclick && authGoogleDriveBtn.getAttribute('listener-attached') !== 'true') {
+    authGoogleDriveBtn.addEventListener('click', () => {
+      console.log('authGoogleDrive clicked!');
+    });
+    authGoogleDriveBtn.setAttribute('listener-attached', 'true');
+  }
+  // 11. mergeReport
+  const mergeReportBtnCheck = document.getElementById('mergeReport');
+  if (mergeReportBtnCheck && !mergeReportBtnCheck.onclick && mergeReportBtnCheck.getAttribute('listener-attached') !== 'true') {
+    mergeReportBtnCheck.addEventListener('click', () => {
+      console.log('mergeReport clicked!');
+    });
+    mergeReportBtnCheck.setAttribute('listener-attached', 'true');
+  }
   // --- Ensure global variables are declared at the top ---
   // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
   // --- New item sound and glow trigger ---
@@ -201,8 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => alert('❌ Load failed: ' + err.message));
   }
   // --- Google Drive Save/Load Session Button Listeners ---
-  const saveToDriveBtn = document.getElementById('saveToDrive');
-  const loadFromDriveBtn = document.getElementById('loadFromDrive');
   if (saveToDriveBtn) {
     saveToDriveBtn.addEventListener('click', async () => {
       if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
@@ -290,8 +380,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Scan Logic Setup ---
   const liveEntryInput = document.getElementById('liveEntry');
+  if (addLiveItemBtn) {
+    addLiveItemBtn.addEventListener('click', () => {
+      console.log("📦 Add Item button clicked");
+      const val = liveEntryInput.value.trim();
+      if (val) processScan(val);
+    });
+  }
   const liveQtyInput = document.getElementById('liveQty');
-  const addLiveItemBtn = document.getElementById('addLiveItem');
   const liveTableBody = document.querySelector('#liveCountTable tbody');
   const categoryInput = document.getElementById('liveCategory');
   const locationStatus = document.createElement('div');
@@ -1281,13 +1377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', () => {
-      if (!liveEntryInput) return;
-      const val = liveEntryInput.value.trim();
-      processScan(val);
-    });
-  }
     // --- Category color map ---
     const categoryColors = {
       'Laundry': '#8ecae6',
@@ -1544,21 +1633,7 @@ document.addEventListener('DOMContentLoaded', () => {
     summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
 
   // --- Ensure critical buttons are assigned after DOMContentLoaded ---
-  // Manual toggle, import/export, and mapping buttons are now static in HTML. Only add event listeners.
-  // Clear live table button
-  const clearBtn = document.getElementById('clearLiveTable');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      console.log("🧹 Clear button clicked");
-      alert("🧼 Clear button is working!");
-      Object.keys(liveCounts).forEach(key => delete liveCounts[key]);
-      liveEntryInput.value = '';
-      liveQtyInput.value = '1';
-      updateLiveTable();
-      updateSuggestions();
-      summaryBar.innerHTML = '';
-    });
-  }
+  // (No duplicate clearLiveTable logic outside DOMContentLoaded; only the main one above with console.log.)
 
   // Clear history button
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
@@ -2028,109 +2103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const gapiScript = document.createElement('script');
   gapiScript.src = 'https://apis.google.com/js/api.js';
   gapiScript.onload = () => {
-    console.log("📦 Google API script loaded");
+    gapiInit();
   };
-  document.head.appendChild(gapiScript);
-
-  // Dynamically inject Google Identity Services script
-  const gisScript = document.createElement('script');
-  gisScript.src = 'https://accounts.google.com/gsi/client';
-  gisScript.onload = () => {
-    console.log('🔐 Google Identity Services loaded');
-  };
-  document.head.appendChild(gisScript);
-
-  // --- Audit Rotation Table Logic ---
-  const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {
-    'Laundry': '',
-    'Fridges & Freezers': '',
-    'Ranges': '',
-    'Dishwashers': '',
-    'Wall Ovens': '',
-    'Cooktops': '',
-    'OTR Microwaves': '',
-    'Microwaves (Countertop)': '',
-    'Vent Hoods': '',
-    'Beverage & Wine Coolers': '',
-    'Cabinets': '',
-    'Countertops': '',
-    'Interior Doors': '',
-    'Exterior Doors': '',
-    'Storm Doors': '',
-    'Windows': '',
-    'Commodity Moulding': '',
-    'Other / Misc': ''
-  };
-
-  function renderRotationTable() {
-    const rotationDiv = document.getElementById('rotationTable');
-    if (!rotationDiv) return;
-
-    let tableHTML = '<table><thead><tr><th>Category</th><th>Last Audited</th><th>Due Again</th></tr></thead><tbody>';
-    Object.entries(rotationData).forEach(([cat, lastDate]) => {
-      const dueDate = lastDate ? new Date(new Date(lastDate).getTime() + 7 * 24 * 60 * 60 * 1000) : '';
-      const dueText = dueDate ? dueDate.toISOString().split('T')[0] : '';
-      tableHTML += `<tr><td>${cat}</td><td>${lastDate || '-'}</td><td>${dueText || '-'}</td></tr>`;
-    });
-    tableHTML += '</tbody></table>';
-    rotationDiv.innerHTML = tableHTML;
-  }
-
-  function updateRotationDate(category) {
-    const today = new Date().toISOString().split('T')[0];
-    rotationData[category] = today;
-    localStorage.setItem('auditRotation', JSON.stringify(rotationData));
-    renderRotationTable();
-  }
-  renderRotationTable();
-
-  // --- Audit Reminder Toasts for categories needing auditing soon ---
-  function showAuditReminderToasts() {
-    const today = new Date();
-    const now = today.getTime();
-
-    Object.entries(rotationData).forEach(([category, lastDate]) => {
-      if (!lastDate) return;
-
-      const last = new Date(lastDate).getTime();
-      const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
-
-      if (diffDays >= 6) { // Show reminder if due tomorrow or overdue
-        const toast = document.createElement('div');
-        toast.textContent = `⏰ Audit Reminder: "${category}" is due for audit!`;
-        toast.style.position = 'fixed';
-        toast.style.bottom = '20px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.backgroundColor = '#ff9800';
-        toast.style.color = '#fff';
-        toast.style.padding = '10px 18px';
-        toast.style.borderRadius = '8px';
-        toast.style.fontSize = '14px';
-        toast.style.zIndex = '9999';
-        document.body.appendChild(toast);
-        setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 4000);
-      }
-    });
-  }
-  showAuditReminderToasts();
-
-  // --- Clear All UPC Mappings Button ---
-  // Add a button to the settings panel to clear upcToItemMap from localStorage
-  const clearMappingsBtn = document.createElement('button');
-  clearMappingsBtn.textContent = '🧹 Clear All UPC Mappings';
-  clearMappingsBtn.style.marginTop = '15px';
-  clearMappingsBtn.onclick = () => {
-    if (confirm('Are you sure you want to delete all saved UPC → Item mappings?')) {
-      localStorage.removeItem('upcToItemMap');
-      alert('✅ All UPC mappings cleared. You will be prompted again for unknown scans.');
-      location.reload(); // Refresh the app to clear in-memory map
-    }
-  };
-  // Add the button to the settings group
-  const settingsPanel = document.querySelector('#tools .settings-group');
-  if (settingsPanel) {
-    settingsPanel.appendChild(clearMappingsBtn);
-  }
+  document.body.appendChild(gapiScript);
+});
