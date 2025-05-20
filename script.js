@@ -7,6 +7,18 @@ function saveLocationMap() {
 }
 // Wrap all logic in DOMContentLoaded, and move everything inside
 document.addEventListener('DOMContentLoaded', () => {
+  // --- "More Options" toggle for advanced controls ---
+  const toggleAdvancedControls = document.getElementById('toggleAdvancedControls');
+  const advancedControls = document.getElementById('advancedControls');
+
+  if (toggleAdvancedControls && advancedControls) {
+    toggleAdvancedControls.addEventListener('click', () => {
+      const isExpanded = toggleAdvancedControls.getAttribute('aria-expanded') === 'true';
+      toggleAdvancedControls.setAttribute('aria-expanded', !isExpanded);
+      advancedControls.classList.toggle('hidden');
+      advancedControls.setAttribute('aria-hidden', isExpanded);
+    });
+  }
   // --- Audit critical buttons presence and listener hookup ---
   const criticalButtonIds = [
     'addLiveItem',
@@ -140,12 +152,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // --- Google Drive Save/Load Session Button Listeners ---
   const saveToDriveBtn = document.getElementById('saveToDrive');
-  if (saveToDriveBtn) {
-    saveToDriveBtn.addEventListener('click', saveSessionToDrive);
-  }
   const loadFromDriveBtn = document.getElementById('loadFromDrive');
+  if (saveToDriveBtn) {
+    saveToDriveBtn.addEventListener('click', async () => {
+      if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
+        const authBtn = document.getElementById('authGoogleDrive');
+        if (authBtn) authBtn.click(); // Try to trigger auth automatically
+        alert('🔒 You must authenticate with Google first. Trying now...');
+        return;
+      }
+      saveSessionToDrive();
+    });
+  }
+
   if (loadFromDriveBtn) {
-    loadFromDriveBtn.addEventListener('click', loadSessionFromDrive);
+    loadFromDriveBtn.addEventListener('click', async () => {
+      if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
+        const authBtn = document.getElementById('authGoogleDrive');
+        if (authBtn) authBtn.click(); // Try to trigger auth automatically
+        alert('🔒 You must authenticate with Google first. Trying now...');
+        return;
+      }
+      loadSessionFromDrive();
+    });
   }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
