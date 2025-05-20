@@ -1,3 +1,35 @@
+  // --- Backup All Data Button ---
+  // At the end of DOMContentLoaded block, add a button to export all localStorage session and mapping data
+  const backupBtn = document.createElement('button');
+  backupBtn.textContent = '📦 Backup All Data';
+  backupBtn.style.marginTop = '15px';
+  backupBtn.onclick = () => {
+    const backup = {
+      liveCounts,
+      upcToItem,
+      locationMap,
+      weeklyCounts: JSON.parse(localStorage.getItem('weeklyCounts')) || {},
+      rotationData: JSON.parse(localStorage.getItem('auditRotation')) || {},
+      sessions: Object.fromEntries(
+        Object.entries(localStorage).filter(([k]) => k.startsWith('inventorySession_'))
+      )
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventory-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Add it to the first settings group
+  const settingsTarget = document.querySelector('#tools .settings-group');
+  if (settingsTarget) {
+    settingsTarget.appendChild(backupBtn);
+  }
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
 }
@@ -2065,25 +2097,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (diffDays >= 6) { // Show reminder if due tomorrow or overdue
         const toast = document.createElement('div');
-        toast.textContent = `⏳ Reminder: "${category}" needs auditing soon!`;
+        toast.textContent = `⏰ Audit Reminder: "${category}" is due for audit!`;
         toast.style.position = 'fixed';
         toast.style.bottom = '20px';
         toast.style.left = '50%';
         toast.style.transform = 'translateX(-50%)';
-        toast.style.backgroundColor = '#550000';
+        toast.style.backgroundColor = '#ff9800';
         toast.style.color = '#fff';
         toast.style.padding = '10px 18px';
         toast.style.borderRadius = '8px';
         toast.style.fontSize = '14px';
         toast.style.zIndex = '9999';
-        toast.style.boxShadow = '0 0 10px #aa0000';
         document.body.appendChild(toast);
         setTimeout(() => {
           document.body.removeChild(toast);
-        }, 5000);
+        }, 4000);
       }
     });
   }
-
   showAuditReminderToasts();
-});
+
+  // --- Clear All UPC Mappings Button ---
+  // Add a button to the settings panel to clear upcToItemMap from localStorage
+  const clearMappingsBtn = document.createElement('button');
+  clearMappingsBtn.textContent = '🧹 Clear All UPC Mappings';
+  clearMappingsBtn.style.marginTop = '15px';
+  clearMappingsBtn.onclick = () => {
+    if (confirm('Are you sure you want to delete all saved UPC → Item mappings?')) {
+      localStorage.removeItem('upcToItemMap');
+      alert('✅ All UPC mappings cleared. You will be prompted again for unknown scans.');
+      location.reload(); // Refresh the app to clear in-memory map
+    }
+  };
+  // Add the button to the settings group
+  const settingsPanel = document.querySelector('#tools .settings-group');
+  if (settingsPanel) {
+    settingsPanel.appendChild(clearMappingsBtn);
+  }
