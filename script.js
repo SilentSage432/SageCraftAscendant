@@ -1985,7 +1985,18 @@ document.addEventListener('DOMContentLoaded', () => {
               category: row[categoryIndex] || '',
               location: row[locationIndex] || ''
             };
+            // Save UPC/product mappings if not already in upcToItem
+            if (!upcToItem[item]) {
+              upcToItem[item] = item;
+            }
+            // Save location mappings if not already in locationMap
+            const loc = row[locationIndex];
+            if (loc && !Object.values(locationMap).includes(loc)) {
+              locationMap[item] = loc;
+            }
           }
+          saveUPCMap();
+          saveLocationMap();
           updateLiveTable();
           alert('📥 Excel session imported!');
         };
