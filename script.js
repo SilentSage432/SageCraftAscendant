@@ -892,11 +892,259 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateLiveTable() {
     if (!liveTableBody) return;
     liveTableBody.innerHTML = '';
-    Object.entries(liveCounts).forEach(([item, count]) => {
+    // --- Category color map ---
+    const categoryColors = {
+      'Laundry': '#8ecae6',
+      'Fridges & Freezers': '#219ebc',
+      'Ranges': '#ffb703',
+      'Dishwashers': '#fb8500',
+      'Wall Ovens': '#ff6b6b',
+      'Cooktops': '#ffd166',
+      'OTR Microwaves': '#9b5de5',
+      'Microwaves (Countertop)': '#3a86ff',
+      'Vent Hoods': '#8338ec',
+      'Beverage & Wine Coolers': '#ff006e',
+      'Cabinets': '#8d99ae',
+      'Countertops': '#b5ead7',
+      'Interior Doors': '#ffdac1',
+      'Exterior Doors': '#e0aaff',
+      'Storm Doors': '#bc6c25',
+      'Windows': '#588157',
+      'Commodity Moulding': '#adb5bd',
+      'Other / Misc': '#f4a261'
+    };
+    const searchTerm = document.getElementById('liveSearchInput')?.value.toLowerCase().trim() || '';
+    const headerRow = document.querySelector('#liveCountTable thead tr');
+    if (!headerRow.querySelector('.category-header')) {
+      const catTh = document.createElement('th');
+      catTh.textContent = 'Category';
+      catTh.className = 'category-header';
+      headerRow.appendChild(catTh);
+    }
+    if (!headerRow.querySelector('.location-header')) {
+      const locTh = document.createElement('th');
+      locTh.textContent = 'Location';
+      locTh.className = 'location-header';
+      headerRow.appendChild(locTh);
+    }
+    if (!headerRow.querySelector('.previous-header')) {
+      ['Previous', 'Δ from Last Week'].forEach(label => {
+        const th = document.createElement('th');
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+    }
+    // Add Edit column header if not present
+    if (!headerRow.querySelector('.edit-header')) {
+      const editTh = document.createElement('th');
+      editTh.textContent = 'Edit';
+      editTh.className = 'edit-header';
+      headerRow.appendChild(editTh);
+    }
+    const onHandText = document.getElementById('onHandInput').value;
+    const onHandLines = onHandText.trim().split(/\n+/);
+    const onHandMap = {};
+    onHandLines.forEach(line => {
+      const [item, count] = line.split(':');
+      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
+    });
+
+    const previousDates = Object.keys(weeklyCounts).sort().reverse();
+    // Get selected week from dropdown, or fallback to most recent previous week
+    const selectedWeek = document.getElementById('compareWeek')?.value;
+    const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
+
+    Object.entries(liveCounts).forEach(([item, obj]) => {
+      // --- Live search filter ---
+      if (searchTerm &&
+          !item.toLowerCase().includes(searchTerm) &&
+          !(obj.category || '').toLowerCase().includes(searchTerm) &&
+          !(obj.location || '').toLowerCase().includes(searchTerm)) {
+        return;
+      }
+      const count = obj.count;
+      const expected = onHandMap[item] || 0;
+      const diff = count - expected;
+      const previous = lastWeek ? lastWeek[item] || 0 : '';
+      const weekDiff = lastWeek ? count - previous : '';
+      const category = obj.category || '';
+      const location = obj.location || '';
+
+      // --- Smart discrepancy/trend icons ---
+      let icon = '';
+      // Down arrow if counts are decreasing for 2+ weeks
+      if (previous !== '' && weekDiff < 0) {
+        // Check for 2+ week decreasing trend
+        let decreasing = false;
+        if (previousDates.length >= 3) {
+          // Get counts for this item for last 3 weeks (including this)
+          const idx = previousDates.indexOf(selectedWeek || previousDates[0]);
+          const w0 = liveCounts[item]?.count || 0;
+          const w1 = weeklyCounts[previousDates[idx + 1]] ? (weeklyCounts[previousDates[idx + 1]][item] || 0) : null;
+          const w2 = weeklyCounts[previousDates[idx + 2]] ? (weeklyCounts[previousDates[idx + 2]][item] || 0) : null;
+          if (w1 !== null && w2 !== null && w0 < w1 && w1 < w2) {
+            decreasing = true;
+          }
+        }
+        if (decreasing || previousDates.length < 3) icon = '📉';
+      }
+      // Up arrow for sharp increase from last week
+      else if (previous !== '' && weekDiff > 5) {
+        icon = '📈';
+      }
+      // Red flag if no expected on-hand count
+      if (!onHandMap[item]) icon += ' ❌';
+
+      // --- Create row with editable cells and Edit button ---
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${item}</td><td>${count}</td>`;
+      tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
+      // Set background color by category if defined
+      if (categoryColors[obj.category]) {
+        tr.style.backgroundColor = categoryColors[obj.category];
+      }
+      tr.innerHTML = `
+        <td>
+          ${item} ${icon}
+          ${category ? `<span class="category-badge">${category}</span>` : ''}
+        </td>
+        <td>${expected}</td>
+        <td class="editable" data-field="count" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${count}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
+        <td>${diff > 0 ? '+' + diff : diff}</td>
+        <td>${previous !== '' ? previous : '-'}</td>
+        <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
+        <td class="editable" data-field="category" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${category}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
+        <td class="editable" data-field="location" data-id="${item}">
+          <span contenteditable="true" spellcheck="false">${location}</span>
+          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
+        </td>
+        <td><button class="editRow" data-id="${item}">✏️</button></td>
+      `;
       liveTableBody.appendChild(tr);
     });
+
+    // Add edit/delete row logic with custom modal prompt
+    document.querySelectorAll('.editRow').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.dataset.id;
+        // Custom modal-style prompt for Edit/Delete
+        const overlay = document.createElement('div');
+        overlay.id = 'editDeletePrompt';
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        overlay.innerHTML = `
+          <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
+            <p>What would you like to do with "<strong>${item}</strong>"?</p>
+            <button id="editBtn">✏️ Edit</button>
+            <button id="deleteBtn">🗑️ Delete</button>
+            <button id="cancelBtn">❌ Cancel</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        document.getElementById('editBtn').onclick = () => {
+          document.body.removeChild(overlay);
+          const current = liveCounts[item];
+          const newItem = prompt('Edit Item #:', item);
+          if (!newItem) return;
+          const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
+          const newCategory = prompt('Edit Category:', current.category || '') || '';
+          const newLocation = prompt('Edit Location:', current.location || '') || '';
+          delete liveCounts[item];
+          liveCounts[newItem] = {
+            count: newCount,
+            category: newCategory,
+            location: newLocation
+          };
+          updateLiveTable();
+        };
+
+        document.getElementById('deleteBtn').onclick = () => {
+          if (confirm(`Are you sure you want to delete "${item}"?`)) {
+            delete liveCounts[item];
+            updateLiveTable();
+          }
+          document.body.removeChild(overlay);
+        };
+
+        document.getElementById('cancelBtn').onclick = () => {
+          document.body.removeChild(overlay);
+        };
+      });
+    });
+
+    // Add inline editable logic for Found, Category, and Location cells
+    document.querySelectorAll('.editable').forEach(cell => {
+      // Only allow one edit at a time per cell
+      const span = cell.querySelector('span[contenteditable]');
+      const saveBtn = cell.querySelector('button.saveEdit');
+      let originalValue = span ? span.textContent : '';
+      // Save on button click
+      if (saveBtn && span) {
+        saveBtn.onclick = (e) => {
+          e.stopPropagation();
+          const field = cell.dataset.field;
+          const id = cell.dataset.id;
+          const newValue = span.textContent.trim();
+          if (field === 'count') {
+            liveCounts[id].count = parseInt(newValue) || 0;
+          } else {
+            liveCounts[id][field] = newValue;
+          }
+          updateLiveTable();
+        };
+      }
+      // Save on Enter, cancel on Esc
+      if (span) {
+        span.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (saveBtn) saveBtn.click();
+          } else if (e.key === 'Escape') {
+            span.textContent = originalValue;
+            span.blur();
+          }
+        });
+        span.addEventListener('focus', () => {
+          originalValue = span.textContent;
+        });
+        span.addEventListener('blur', () => {
+          // When losing focus, don't auto-save (require save button or Enter)
+        });
+      }
+    });
+    // (END updateLiveTable)
+
+    // Update the summary bar
+    let totalItems = 0;
+    let totalUnits = 0;
+    let matches = 0;
+    let overs = 0;
+    let unders = 0;
+
+    Object.entries(liveCounts).forEach(([item, obj]) => {
+      totalItems += 1;
+      totalUnits += obj.count;
+      const expected = onHandMap[item] || 0;
+      const diff = obj.count - expected;
+      if (diff === 0) matches++;
+      else if (diff > 0) overs++;
+      else unders++;
+    });
+
+    summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
   }
 
   function resetScanInput() {
