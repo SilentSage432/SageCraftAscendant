@@ -792,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetScanInput() {
     if (liveEntryInput) {
       liveEntryInput.value = '';
-      setTimeout(() => liveEntryInput.focus(), 10); // ensure it grabs focus after DOM events
+      requestAnimationFrame(() => liveEntryInput.focus());
     }
   }
 
