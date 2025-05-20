@@ -1,6 +1,34 @@
+function saveUPCMap() {
+  localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
+}
+
+function saveLocationMap() {
+  localStorage.setItem('locationMap', JSON.stringify(locationMap));
+}
 // Wrap all logic in DOMContentLoaded, and move everything inside
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("✅ DOMContentLoaded has fired");
+  // --- Audit critical buttons presence and listener hookup ---
+  const criticalButtonIds = [
+    'addLiveItem',
+    'clearLiveTable',
+    'uploadOnHandFile',
+    'saveToDrive',
+    'loadFromDrive',
+    'clearHistoryBtn',
+    'saveSession',
+    'loadSession',
+    'downloadExcel',
+    'authGoogleDrive',
+    'mergeReport'
+  ];
+  criticalButtonIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      console.log(`✅ Button "${id}" found and ready`);
+    } else {
+      console.warn(`❌ Button "${id}" not found in DOM`);
+    }
+  });
   // --- Ensure global variables are declared at the top ---
   // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
   // --- New item sound and glow trigger ---
@@ -220,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
       datalist.appendChild(opt);
     });
   }
-  updateSuggestions();
 
   // --- Voice-Friendly Helper and Parser for On-Hand Input ---
   const onHandInput = document.getElementById('onHandInput');
@@ -663,6 +690,20 @@ document.addEventListener('DOMContentLoaded', () => {
   compareWeekSelect.addEventListener('change', updateLiveTable);
 
 
+  // --- Batch Paste Mode Section ---
+  // Ensure #settings section exists in DOM for batch controls
+  let settingsSection = document.getElementById('settings');
+  if (!settingsSection) {
+    // If not present, inject a hidden section at end of <main>
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      settingsSection = document.createElement('section');
+      settingsSection.id = 'settings';
+      settingsSection.className = 'tab-section panel-glow';
+      settingsSection.style.display = 'none';
+      mainEl.appendChild(settingsSection);
+    }
+  }
   const batchSection = document.createElement('section');
   batchSection.innerHTML = `
     <h2>Batch Paste Mode</h2>
@@ -673,7 +714,11 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div id="batchPreview" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;"></div>
   `;
-  document.getElementById('settings').appendChild(batchSection);
+  if (settingsSection) {
+    settingsSection.appendChild(batchSection);
+  } else {
+    console.warn('⚠️ #settings container not found — batch section not inserted');
+  }
 
   const processBatchBtn = document.getElementById('processBatch');
   const batchInput = document.getElementById('batchInput');
@@ -764,34 +809,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Live preview for batch input
-  batchInput.addEventListener('input', () => {
-    const lines = batchInput.value.trim().split(/\r?\n/);
-    const counts = {};
-    lines.forEach(line => {
-      const item = line.trim();
-      if (!item) return;
-      counts[item] = (counts[item] || 0) + 1;
-    });
+  if (batchInput) {
+    batchInput.addEventListener('input', () => {
+      const lines = batchInput.value.trim().split(/\r?\n/);
+      const counts = {};
+      lines.forEach(line => {
+        const item = line.trim();
+        if (!item) return;
+        counts[item] = (counts[item] || 0) + 1;
+      });
 
-    const previewDiv = document.getElementById('batchPreview');
-    if (Object.keys(counts).length === 0) {
-      previewDiv.innerHTML = '';
-      return;
-    }
+      const previewDiv = document.getElementById('batchPreview');
+      if (Object.keys(counts).length === 0) {
+        previewDiv.innerHTML = '';
+        return;
+      }
 
-    let previewHTML = '<h3>Preview</h3><table style="width:100%; border-collapse: collapse;"><thead><tr><th>Item #</th><th>Qty</th></tr></thead><tbody>';
-    Object.entries(counts).forEach(([item, qty]) => {
-      previewHTML += `<tr><td>${item}</td><td>${qty}</td></tr>`;
+      let previewHTML = '<h3>Preview</h3><table style="width:100%; border-collapse: collapse;"><thead><tr><th>Item #</th><th>Qty</th></tr></thead><tbody>';
+      Object.entries(counts).forEach(([item, qty]) => {
+        previewHTML += `<tr><td>${item}</td><td>${qty}</td></tr>`;
+      });
+      previewHTML += '</tbody></table>';
+      previewDiv.innerHTML = previewHTML;
     });
-    previewHTML += '</tbody></table>';
-    previewDiv.innerHTML = previewHTML;
-  });
+  }
 
 
   // --- Restored clean scanning logic ---
   // const liveEntry = document.getElementById('liveEntry');
   const liveQty = document.getElementById('liveQty');
   const liveCounts = window.liveCounts || {}; // fallback if not global
+  updateSuggestions();
 
   function updateLiveTable() {
     if (!liveTableBody) return;
@@ -1148,15 +1196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
-  }
-
-  function saveUPCMap() {
-    localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
-  }
-
-  function saveLocationMap() {
-    localStorage.setItem('locationMap', JSON.stringify(locationMap));
-  }
 
   // --- Ensure critical buttons are assigned after DOMContentLoaded ---
   // Manual toggle, import/export, and mapping buttons are now static in HTML. Only add event listeners.
@@ -1164,6 +1203,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearBtn = document.getElementById('clearLiveTable');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
+      console.log("🧹 Clear button clicked");
+      alert("🧼 Clear button is working!");
       Object.keys(liveCounts).forEach(key => delete liveCounts[key]);
       liveEntryInput.value = '';
       liveQtyInput.value = '1';
@@ -1695,5 +1736,5 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('auditRotation', JSON.stringify(rotationData));
     renderRotationTable();
   }
-
-  renderRotationTable();
+  // renderRotationTable();
+});
