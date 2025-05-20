@@ -6,10 +6,10 @@
   <title>Inventory Auditor</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon/icon-192x192.png" type="image/png" />
-  <meta name="theme-color" content="#1e1e2f" />
+  <link rel="icon" href="icon/icon-192.png" type="image/png" />
+  <!-- <meta name="theme-color" content="#1e1e2f" /> -->
   <!-- iOS PWA Splash and Icon Support -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Inventory Auditor">
   <link rel="apple-touch-icon" href="icon/icon-192.png">
@@ -260,33 +260,6 @@
     });
   </script>
 
-  <script>
-    document.getElementById("hamburgerMenu").addEventListener("click", function () {
-      const menu = document.getElementById("menuDropdown");
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
-    });
-
-    const tabLinks = document.querySelectorAll(".tablink");
-    const tabSections = document.querySelectorAll(".tab-section");
-
-    tabLinks.forEach(link => {
-      link.addEventListener("click", function () {
-        const target = link.getAttribute("data-tab");
-        tabSections.forEach(section => section.classList.toggle("active", section.id === target));
-        document.getElementById("menuDropdown").style.display = "none";
-      });
-    });
-
-    document.getElementById("toggleImportExport").addEventListener("click", function () {
-      const controls = document.getElementById("importExportControls");
-      controls.classList.toggle("hidden");
-    });
-
-    document.getElementById("toggleAdvancedControls").addEventListener("click", function () {
-      const adv = document.getElementById("advancedControls");
-      adv.classList.toggle("hidden");
-    });
-  </script>
 
   <script>
     // Dynamically generate and display saved session options when the "View Saved Sessions" button is clicked

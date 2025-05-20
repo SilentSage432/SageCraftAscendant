@@ -1,4 +1,7 @@
+// Wrap all logic in DOMContentLoaded, and move everything inside
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Ensure global variables are declared at the top ---
+  // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
   // --- New item sound and glow trigger ---
   const newItemSound = new Audio('sounds/mystic-ping.mp3');
   function playNewItemSound() {
@@ -175,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(log);
     setTimeout(() => document.body.removeChild(log), 3000);
   }
-  const liveCounts = {};
+  // const liveCounts = {}; // Remove duplicate declaration; already declared at the top
   const weeklyCounts = JSON.parse(localStorage.getItem('weeklyCounts')) || {};
   const liveEntryInput = document.getElementById('liveEntry');
   function restoreFocusToEntry() {
@@ -769,12 +772,51 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  // --- Unified handler for scan input (manual or barcode scan) ---
-  function handleScannedInput(item) {
+  // --- Scanning input logic: seamless, robust version ---
+  // Debounce timeout for scan input
+  let scanTimeout = null;
+
+  // Helper to clear and refocus the scan input
+  function resetScanInput() {
+    liveEntryInput.value = '';
+    liveEntryInput.focus();
+    liveQtyInput.value = '1';
+  }
+
+  // Debounced input event: triggers scan if manual toggle is on
+  liveEntryInput.addEventListener('input', () => {
+    if (scanTimeout) clearTimeout(scanTimeout);
+    scanTimeout = setTimeout(() => {
+      const manualToggle = document.getElementById('manualToggle');
+      if (manualToggle && manualToggle.checked) {
+        autoTriggerScan();
+      }
+    }, 200);
+  });
+
+  // Enter key: triggers scan immediately
+  liveEntryInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      autoTriggerScan();
+    }
+  });
+
+  // Main scan handler: triggered by input or enter
+  function autoTriggerScan() {
+    const item = liveEntryInput.value.trim();
+    if (!item) return;
+    handleScannedInput(item);
+  }
+
+  // Async scan processing logic
+  async function handleScannedInput(item) {
     if (!item) return;
 
+    // If unknown code, prompt user to identify
     if (!upcToItem[item] && !locationMap[item]) {
-      showCustomPrompt(item).then(response => {
+      try {
+        const response = await showCustomPrompt(item);
         if (response === 'location') {
           const name = prompt(`🗂 Please enter a name for location "${item}":`);
           if (name) {
@@ -787,14 +829,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (response === 'product') {
           processProduct(item);
         }
-        // Always clear and reset after processing
-        liveEntryInput.value = '';
-        liveQtyInput.value = '1';
-        restoreFocusToEntry();
-      });
+      } catch (e) {
+        console.error('Error handling custom prompt:', e);
+      }
+      resetScanInput();
       return;
     }
 
+    // Handle location tag scans
     if (locationMap[item]) {
       if (currentLocation === locationMap[item]) {
         const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
@@ -808,21 +850,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLocationStatus();
         alert(`📍 Current location set to: ${currentLocation}`);
       }
-      liveEntryInput.value = '';
-      liveQtyInput.value = '1';
-      restoreFocusToEntry();
+      resetScanInput();
       return;
     }
 
+    // Process known product scans
     processProduct(item);
-    liveEntryInput.value = '';
-    liveQtyInput.value = '1';
-    restoreFocusToEntry();
+    resetScanInput();
   }
 
-  // --- Helper to process product scan ---
+  // Process scanned product item
   function processProduct(item) {
     let mappedItem = upcToItem[item] || item;
+
     if (!upcToItem[item]) {
       const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
       if (userDefined) {
@@ -834,11 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!liveCounts[mappedItem]) {
       liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
-    }
-    // --- Sound and glow trigger for new items ---
-    if (!liveCounts[mappedItem]) {
       playNewItemSound();
-      // Delay to let DOM update before flashing the row
       setTimeout(() => {
         const tableRows = document.querySelectorAll("#liveCountTable tbody tr");
         const lastRow = tableRows[tableRows.length - 1];
@@ -848,48 +884,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }, 150);
     }
-    // --- Red shake animation for unrecognized UPC ---
+
     if (!upcToItem[item]) {
       liveEntryInput.classList.add("scan-error");
       setTimeout(() => {
         liveEntryInput.classList.remove("scan-error");
       }, 400);
     }
+
     const qty = parseInt(liveQtyInput.value) || 1;
     liveCounts[mappedItem].count += qty;
     liveCounts[mappedItem].location = currentLocation;
+
     updateLiveTable();
     updateSuggestions();
     showScanMappingLog(item, mappedItem);
   }
-
-  // --- Barcode scanner/autoprocess input field logic ---
-  let scanTimeout = null;
-
-  function autoTriggerScan() {
-    const item = liveEntryInput.value.trim();
-    if (item) {
-      handleScannedInput(item);
-    }
-  }
-
-  // Add event listeners for scan input
-  liveEntryInput.addEventListener('input', () => {
-    if (scanTimeout) clearTimeout(scanTimeout);
-    scanTimeout = setTimeout(() => {
-      const manualToggle = document.getElementById('manualToggle');
-      if (manualToggle?.checked) {
-        autoTriggerScan();
-      }
-    }, 100);
-  });
-
-  liveEntryInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      autoTriggerScan();
-    }
-  });
 
   function updateLiveTable() {
     // --- Category color map ---
@@ -1714,21 +1724,22 @@ document.addEventListener('DOMContentLoaded', () => {
   renderRotationTable();
 });
 
-// --- Attach live search event ---
-const searchBox = document.getElementById('liveSearchInput');
-if (searchBox) {
-  searchBox.addEventListener('input', updateLiveTable);
-}
-// Update location status on load
-// (Moved inside DOMContentLoaded, so this will already be called)
-// On window load, attempt to load session from Drive if enabled and not already loaded
-window.addEventListener('load', () => {
-  if (localStorage.getItem('driveSyncEnabled') === 'true') {
-    // attempt to load from Drive if not already loaded
-    if (Object.keys(liveCounts).length === 0) {
-      if (typeof loadSessionFromDrive === 'function') {
-        loadSessionFromDrive();
+  // --- Attach live search event ---
+  const searchBox = document.getElementById('liveSearchInput');
+  if (searchBox) {
+    searchBox.addEventListener('input', updateLiveTable);
+  }
+  // Update location status on load
+  // (Moved inside DOMContentLoaded, so this will already be called)
+  // On window load, attempt to load session from Drive if enabled and not already loaded
+  window.addEventListener('load', () => {
+    if (localStorage.getItem('driveSyncEnabled') === 'true') {
+      // attempt to load from Drive if not already loaded
+      if (Object.keys(liveCounts).length === 0) {
+        if (typeof loadSessionFromDrive === 'function') {
+          loadSessionFromDrive();
+        }
       }
     }
-  }
+  });
 });

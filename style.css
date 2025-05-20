@@ -722,20 +722,6 @@ body::before {
   margin-right: 8px;
   margin-bottom: 6px;
 }
-.category-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(144, 62, 255, 0.15);
-  color: #d6bbff;
-  border: 1px solid #8b5cf6;
-  box-shadow: 0 0 8px rgba(160, 82, 255, 0.3);
-  text-shadow: 0 0 3px #9b59b6;
-  margin-right: 8px;
-  margin-bottom: 6px;
-}
 
 /* --- Audit Rotation Fancy Table Enhancements --- */
 #audit table {
@@ -789,14 +775,6 @@ body::before {
 }
 # Glow animation for newly scanned items
 
-@keyframes flash-glow {
-  0% {
-    background-color: #6a0dad33;
-  }
-  100% {
-    background-color: transparent;
-  }
-}
 
 .new-item-flash {
   animation: flash-glow 1.2s ease-out;
@@ -890,14 +868,9 @@ tbody tr:hover {
 }
 
 /* --- Scan Feedback Animation Styles --- */
-@keyframes flash-glow {
-  0% {
-    background-color: #6a0dad33;
-  }
-  100% {
-    background-color: transparent;
-  }
-}
+/* --- Dark Fantasy Theme Styles --- */
+/* --- Button Styles --- */
+/* --- Table Styles --- */
 
 .new-item-flash {
   animation: flash-glow 1.2s ease-out;
@@ -948,3 +921,4 @@ tbody tr:hover {
   flex-wrap: wrap;
   justify-content: center;
 }
+/* --- Animations --- */
