@@ -55,12 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   // --- Sound toggle in settings panel ---
-  // Insert sound toggle checkbox into settings panel (Settings tab)
+  // Insert sound toggle checkbox into the first settings-group under #tools
   const soundToggleLabel = document.createElement('label');
   soundToggleLabel.innerHTML = `<input type="checkbox" id="soundToggle" /> Enable Scan Sound`;
-  const settingsGroup = document.querySelector('#tools .settings-group');
-  if (settingsGroup) {
-    settingsGroup.appendChild(soundToggleLabel);
+
+  // Try to insert it into the first settings-group block under #tools
+  const soundSettingsTarget = document.querySelector('#tools .settings-group');
+  if (soundSettingsTarget) {
+    soundSettingsTarget.appendChild(soundToggleLabel);
     const soundToggle = document.getElementById('soundToggle');
     soundToggle.checked = soundEnabled;
     soundToggle.addEventListener('change', (e) => {
