@@ -790,9 +790,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resetScanInput() {
-    if (liveEntry) {
-      liveEntry.value = '';
-      liveEntry.focus();
+    if (liveEntryInput) {
+      liveEntryInput.value = '';
+      setTimeout(() => liveEntryInput.focus(), 10); // ensure it grabs focus after DOM events
     }
   }
 
