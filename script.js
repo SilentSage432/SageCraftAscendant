@@ -1215,6 +1215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Always register a quantity of 1 per scan, do not reference liveQtyInput
     const qty = 1;
     liveCounts[item] += qty;
+    updateRotationDate(liveCounts[item].category);
     updateLiveTable();
     resetScanInput();
   }
@@ -2032,5 +2033,5 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('auditRotation', JSON.stringify(rotationData));
     renderRotationTable();
   }
-  // renderRotationTable();
+  renderRotationTable();
 });
