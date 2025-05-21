@@ -198,153 +198,71 @@ document.addEventListener('DOMContentLoaded', () => {
   if (settingsTarget) {
     settingsTarget.appendChild(backupBtn);
   }
-  // --- Google Drive Integration ---
-  const CLIENT_ID = '1009062770217-i80a4rigia3vbsvmqbnngli08ojanhmd.apps.googleusercontent.com';
-  const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+  // --- Dropbox Integration for Save/Load Session ---
+  const DROPBOX_ACCESS_TOKEN = 'sl.u.AFu6TbjrZJyKzxMBPuDFUqyApxwEWujrz0UXwyYp1ttOOsmShgZMsFQlKli8R2U5rMfOCMLm0e11NbenqsalksM4im7Ss2C9V5mMLERlRuHa5Uxwmb7bWNACLG7Hy05az3mYxqpkehlob0NEC2xcLOcNmvS_bgPRhyJkqdovWVhzZfp_wkJw2Fvl96vD6oxSUVaQ022ZozO6YpsE76fwvU6LKOTUxUNFwpZ1cNqft7ufhpgLb248DipmzAgAkH8WSr94XMVyBS_CDwecizqijYbEQ6-NN999p8Nh0NRdTyPzYjes1H1-No1K2AqUGoA-2W8RnHK-qEBoa-kQZi8rWtbWaeCyOxEXjLwD5NWMIpvYURCoTw32-QlsdW7GHDf3pWSGjiT7BNOIXBema7UoNUexvWkcRzf1ysTU_crXzQGNSMgvcsPHA4-MCqXRNbzZWBsacF6OnWPoMfh0VX8EVkvjkeFKbeCmIRYdWspjHO5MqU22gihK9Q2dmG6Y95CtuHc0CRCzkd20-hJ5_wuGIZJmk_abvtIphBI3UeM3npSBBVmPreZyX-n5Q1Rjg-IbTtclNEW5tHCnLtapDTYCj8hd9JFOPt6LlnkuSoDOsqTc8g7MyonOM9Z128Sb6qDeuxqXxT9LfDbHEf4FXTpqbBFSQtTkbCV3j8OtfDdZuAqpyqfnGM7iM0-gO_9OaeJ_DBJ5X3r6LsDvJMCfW11UMtzXJJUmmCNSDecz4ii1ufmwaViVbs5IjqqKmD4fnpjibA0JHyOMLJj9Sztx_weoreV-w2Ju8VwGEjcKlEHw8Ny85I6fjwfssJHAnsuDkF_r-LP8IbsnJyay6263gJyZzE85EDmJ-zPtyexGWJDAgujgGlhAphLgiu91STmVgHnlMaJF27hQ7Wy_5VqQw8CG5AdsgzGtZW5j6AEMemNUi6narSsBwmWdZ29u26gZsfy2xXtHpjKYSYve2TWBmabqjQwPv3dBADUdoQooqAXY9RXGXoTNtx6a0fcsV4ujscqa_GerXXhIuzqfhYD2FzK7diU2DAq-eLSjyDBX0zO_SUhZtnhWUslEJ2FIyVxYDRvuFttqfgaPTniyYw3jD04EPzh0GuBNZAtJukaOxTzT-AlkCac-ItvbzOSdL2O-yyRqzZYC6s30Qbrhy5-2fsuu5QDfSPxVfxIFu9RicZ0VGVjOcCGVO16ALvbP8K9fmXgOUSt8HVO3bASoSRqG73upzAAJ3I_ihXPo7YjX16KC0D4B308XBPrBRlzHIXp_Mkz4BWo';
 
-  function gapiInit() {
-    gapi.load('client:auth2', async () => {
-      await gapi.client.init({
-        apiKey: '', // Optional: only needed for other APIs
-        clientId: CLIENT_ID,
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
-        scope: SCOPES
-      });
-    });
-  }
-
-  function handleAuthClick() {
-    gapi.auth2.getAuthInstance().signIn().then(() => {
-      alert('🔓 Authenticated with Google Drive');
-    }).catch(err => {
-      console.error('❌ Authentication failed:', err);
-      alert('❌ Authentication failed. Please try again or check the console for more details.');
-    });
-  }
-
-  function uploadExcelToDrive(fileBlob) {
-    const metadata = {
-      name: 'inventory_report.xlsx',
-      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    };
-
-    const accessToken = gapi.auth.getToken().access_token;
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', fileBlob);
-
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
-      body: form
-    }).then(res => res.json())
-      .then(val => alert('✅ Uploaded to Google Drive!'))
-      .catch(err => alert('❌ Upload failed: ' + err.message));
-  }
-
-  // --- Google Drive: Save/Load Session as JSON file ---
-  function saveSessionToDrive() {
+  async function saveSessionToDropbox() {
     const session = {
       liveCounts: JSON.parse(JSON.stringify(liveCounts)),
       onHandText: document.getElementById('onHandInput').value
     };
     const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
-    const metadata = {
-      name: 'active_session.json',
-      mimeType: 'application/json'
-    };
 
-    const accessToken = gapi.auth.getToken().access_token;
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', blob);
-
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
       method: 'POST',
-      headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
-      body: form
-    }).then(res => res.json())
-      .then(val => alert('✅ Session saved to Google Drive!'))
-      .catch(err => alert('❌ Save failed: ' + err.message));
+      headers: {
+        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/active_session.json',
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+
+    if (response.ok) {
+      alert('✅ Session saved to Dropbox!');
+    } else {
+      const err = await response.text();
+      alert(`❌ Failed to save: ${err}`);
+    }
   }
 
-  function loadSessionFromDrive() {
-    const tokenObj = gapi.auth.getToken();
-    if (!tokenObj || !tokenObj.access_token) {
-      alert('❌ No valid Google access token found.');
+  async function loadSessionFromDropbox() {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: '/active_session.json' })
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      alert(`❌ Failed to load: ${err}`);
       return;
     }
 
-    const accessToken = tokenObj.access_token;
-    console.log("🔑 Google API Token:", accessToken);
-
-    fetch("https://www.googleapis.com/drive/v3/files?q=name='active_session.json' and trashed=false", {
-      headers: new Headers({ Authorization: 'Bearer ' + accessToken })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error(`Drive list failed: ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        console.log('📁 Files found:', data.files?.length);
-        if (!data.files || data.files.length === 0) {
-          alert('❌ No session file named "active_session.json" found in Google Drive.');
-          return;
-        }
-
-        const fileId = data.files[0].id;
-        console.log('📁 Loading file with ID:', fileId);
-
-        return fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-          headers: new Headers({ Authorization: 'Bearer ' + accessToken })
-        });
-      })
-      .then(res => {
-        if (!res) return;
-        if (!res.ok) throw new Error(`Failed to download session file: ${res.status}`);
-        return res.json();
-      })
-      .then(session => {
-        if (!session || !session.liveCounts) {
-          alert('❌ Invalid session format.');
-          return;
-        }
-
-        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-        Object.entries(session.liveCounts).forEach(([k, v]) => {
-          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-        });
-
-        document.getElementById('onHandInput').value = session.onHandText || '';
-        updateLiveTable();
-        alert('📥 Session loaded from Google Drive!');
-      })
-      .catch(err => {
-        console.error('❌ Drive Load Error:', err);
-        alert(`❌ Failed to load from Google Drive:\n${err.message}`);
-      });
-  }
-  // --- Google Drive Save/Load Session Button Listeners ---
-  if (saveToDriveBtn) {
-    saveToDriveBtn.addEventListener('click', async () => {
-      if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
-        alert('🔒 You must authenticate with Google first.');
-        handleAuthClick(); // 🔐 This will open the sign-in popup
-        return;
-      }
-      saveSessionToDrive();
+    const session = await response.json();
+    if (!session.liveCounts) return alert('❌ Invalid session format.');
+    Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+    Object.entries(session.liveCounts).forEach(([k, v]) => {
+      liveCounts[k] = { count: v.count, category: v.category, location: v.location };
     });
+    document.getElementById('onHandInput').value = session.onHandText || '';
+    updateLiveTable();
+    alert('📥 Session loaded from Dropbox!');
+  }
+
+  if (saveToDriveBtn) {
+    saveToDriveBtn.addEventListener('click', saveSessionToDropbox);
   }
 
   if (loadFromDriveBtn) {
-    loadFromDriveBtn.addEventListener('click', async () => {
-      if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
-        alert('🔒 You must authenticate with Google first.');
-        handleAuthClick(); // 🔐 This will open the sign-in popup
-        return;
-      }
-      loadSessionFromDrive();
-    });
+    loadFromDriveBtn.addEventListener('click', loadSessionFromDropbox);
   }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
@@ -640,54 +558,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const keepSnapshotsToggle = document.getElementById('keepSnapshotsToggle');
   if (keepSnapshotsToggle) keepSnapshotsToggle.checked = localStorage.getItem('keepSnapshots') !== 'false';
 
-  // --- Drive Sync Toggle ---
+  // --- Drive Sync Toggle (removed Google Drive sync logic) ---
   const driveSyncToggle = document.getElementById('driveSyncToggle');
   if (driveSyncToggle) driveSyncToggle.checked = localStorage.getItem('driveSyncEnabled') === 'true';
-  if (driveSyncToggle) {
-    driveSyncToggle.addEventListener('change', (e) => {
-      localStorage.setItem('driveSyncEnabled', e.target.checked);
-      if (e.target.checked) startAutoDriveSync();
-      else stopAutoDriveSync();
-    });
-  }
-  // --- Auto Drive Sync Logic ---
-  let driveSyncTimer = null;
-
-  function startAutoDriveSync() {
-    if (driveSyncTimer) clearInterval(driveSyncTimer);
-    const enabled = document.getElementById('driveSyncToggle')?.checked;
-    if (!enabled) return;
-
-    driveSyncTimer = setInterval(() => {
-      const session = {
-        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
-        onHandText: document.getElementById('onHandInput').value
-      };
-      const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
-      const metadata = {
-        name: 'active_session.json',
-        mimeType: 'application/json'
-      };
-      const accessToken = gapi.auth.getToken().access_token;
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', blob);
-
-      fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: new Headers({ Authorization: 'Bearer ' + accessToken }),
-        body: form
-      })
-        .then(res => res.json())
-        .then(val => console.log('🔄 Auto-synced session to Drive'))
-        .catch(err => console.log('❌ Drive sync failed: ' + err.message));
-    }, 5 * 60 * 1000); // every 5 minutes
-  }
-
-  function stopAutoDriveSync() {
-    if (driveSyncTimer) clearInterval(driveSyncTimer);
-    driveSyncTimer = null;
-  }
+  // No longer supporting Google Drive auto sync; Dropbox integration only for manual save/load.
 
   // --- SETTINGS: Event listeners for preference changes ---
   // Dark mode toggle
@@ -1496,10 +1370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     autosaveToggle.addEventListener('change', setupAutosaveLoop);
   }
 
-  // At end of DOMContentLoaded, start auto Drive sync if enabled
-  if (localStorage.getItem('driveSyncEnabled') === 'true') {
-    startAutoDriveSync();
-  }
+  // (No auto Drive sync; Dropbox only supports manual save/load in this integration.)
 
   // --- Auto-generate Excel file every 10 minutes ---
   function pad(n) {
@@ -1766,11 +1637,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
   // Focus the liveEntry input on load
   restoreFocusToEntry();
-  // Dynamically load the Google API script
-  const gapiScript = document.createElement('script');
-  gapiScript.src = 'https://apis.google.com/js/api.js';
-  gapiScript.onload = () => {
-    gapiInit();
-  };
-  document.body.appendChild(gapiScript);
+  // (Google API script loading removed; no longer required.)
 });
