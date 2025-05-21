@@ -203,11 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function gapiInit() {
     gapi.load('client:auth2', async () => {
       await gapi.client.init({
+        apiKey: '', // Optional: only needed for other APIs
         clientId: CLIENT_ID,
-        scope: SCOPES,
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+        scope: SCOPES
       });
-      // console.log('✅ Google API initialized');
+
+      gapi.auth2.init({
+        client_id: CLIENT_ID,
+        scope: SCOPES
+      });
     });
   }
 
