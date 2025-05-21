@@ -1556,6 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
           const header = rows[0];
+          const upcIndex = header.findIndex(h => /upc/i.test(h));
           const itemIndex = header.findIndex(h => /item/i.test(h));
           const countIndex = header.findIndex(h => /found/i.test(h));
           const categoryIndex = header.findIndex(h => /category/i.test(h));
@@ -1564,18 +1565,24 @@ document.addEventListener('DOMContentLoaded', () => {
           Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
           for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
+            const upc = upcIndex !== -1 ? row[upcIndex] : null;
             const item = row[itemIndex];
             if (!item) continue;
+
+            const key = upc || item;
+
             liveCounts[item] = {
               count: parseInt(row[countIndex]) || 0,
               category: row[categoryIndex] || '',
               location: row[locationIndex] || ''
             };
-            // Save UPC/product mappings if not already in upcToItem
-            if (!upcToItem[item]) {
+
+            if (upc) {
+              upcToItem[upc] = item;
+            } else {
               upcToItem[item] = item;
             }
-            // Save location mappings if not already in locationMap
+
             const loc = row[locationIndex];
             if (loc && !Object.values(locationMap).includes(loc)) {
               locationMap[item] = loc;
