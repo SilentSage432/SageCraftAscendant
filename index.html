@@ -1,1 +1,276 @@
-const DROPBOX_ACCESS_TOKEN = 'sl.u.AFsI44zzqKr7_pQWkuRm_NCpwZXFCw0b3T5PBP22vUOJpnNERZ8R4tAEFtBX9_hOGXiaz9Vb-AOaVLF_A-o4BUEsNN7ODwLjn7TPRM5BqMTAd4OOD8XWcgxlODxZ_ceP-gzY9VWxzRR8cQICcVgjNO2bmkusCjGYVL2lKJWev_CdYoPxTPCrzMk75SMPD1Kc6vjZfaeRXW3WWmQVtsVuBhCqRkqbrrdBYAKu6OobQyucu94_CL-jtiAmgut6JjjFznNkLICbhANrU8DZeeUwYDFlK7EPj10D4rpAbN6sFWr1G1V4ZZsAq_JU4d1suJv523KsAeQWgDQCI44SxJjyGruydcbZBOWYQNF10m88W5xLkLmK_0y52PypIg60AUOwMqEigJHdXpvCJqYJ6ZZG9S86fG0lk6n3tm8x3qjTXymy4bMqUy-hlpMNXthooVIyYO6n-gGde5hzRqoB6OQmwW7dpJWXSSio8l42Fk7gfDmDHne-an2q34HHhXmGO98EO5Lw-PB539HFVLBUAmPvSAMabdj5yEItz3uRIkmGiIVsQoFJsU5YFPtvfTPg5X83o_eWRtZuGkvXay1et2ho7MwTCLoFt1gBQl7tcJ4FscfZZ1lebKAYhkpxME3f-pHdNTOf0f90PWV_iMauNz88iUiFKZ2Jz7lBwTIEOB569hrwanGbCGdW3N_9ORKwLQw2hTa1X-Ll4GLMA5i9Mxh6XnXOjW1DuSd77K6NqN8B-XkP9WNUlfbuAKCZuk3DS4AyrMXfNNWmTWg92qTCdKxYChZ2ES86VXZ9jG_pResIgI3gQZLRvYbzgyyHF4yR1M58e7i1uYgIh8euwoiui4U8yoj23gAvgHJghq2IbkmWx8uTuZIv9rnhfxIW2YGrajDx6J18T5B49_7-Srtdo5pjOQolIdGYh4YzBT597bU5zJDsrvu7AWrWnUSI7T2kJ881O7Pt7qY3Tu2tkzT-Lp-eFa6G8hkXR3yp_iojpiVoADymtD5BU1IdSzvECnZHpGlQVBtah7bKOsblbpOOGrRyPTbuUrBJWwc2MaCLuwzNEbtvpaHUPOik11U0enTq0DFbo2gaDsHHTFBnkKOWgHIsh-rs8ZkplDflqUXIEpitwSeuFd3UqfhdxUtAMLtzwJQENaOisg3gfRFqknahSGFdw1pDiHtFTA6ltOjLu3U8EcjSQaInSjeR_Z5--4EJwJpuGTKEnPkAZ_SqcjXj19RoPIXmwAyc2v-orj6t4X6kGE6BHWNs-ok0ui5G55DLeDC5SmE';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Auditor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon/icon-192.png" type="image/png" />
+  <!-- <meta name="theme-color" content="#1e1e2f" /> -->
+  <!-- iOS PWA Splash and Icon Support -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Inventory Auditor">
+  <link rel="apple-touch-icon" href="icon/icon-192.png">
+
+  <!-- iOS Splash Screen (Portrait) -->
+  <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#2a003f" />
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body class="dark-theme electric-fantasy">
+  <!-- Floating navigation for main tabs -->
+  <div class="floating-nav" role="navigation" aria-label="Main tabs">
+    <button class="nav-icon" data-tab="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
+    <button class="nav-icon" data-tab="vault" title="Session Vault" aria-label="Session Vault">📂</button>
+    <button class="nav-icon" data-tab="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
+    <button class="nav-icon" data-tab="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
+  </div>
+
+  <header class="topbar mystic-header" role="banner">
+    <div class="logo-banner">
+      <img src="icon/auditor-logo.png" alt="Inventory Auditor Logo" class="logo-icon" />
+      <h1 class="logo-title">Inventory Auditor</h1>
+    </div>
+  </header>
+
+  <main class="container neon-container" role="main">
+    <div class="fantasy-wrapper electric-vibe">
+      <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
+        <h2>Live Counts</h2>
+
+        <!-- Live count table -->
+        <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
+          <table id="liveCountTable" aria-describedby="liveCountsDesc">
+            <caption id="liveCountsDesc" class="sr-only">Table showing live counts of scanned items</caption>
+            <thead>
+              <tr>
+                <th scope="col">Item #</th>
+                <th scope="col">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Example row -->
+              <tr>
+                <td>1002178967 <span class="category-badge">Laundry</span></td>
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Scan entry capsule -->
+        <div id="entryControls" class="scan-capsule" role="region" aria-label="Scan Entry Controls">
+          <h3>📲 Scan Entry</h3>
+          <div class="scan-fields">
+            <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
+            <input type="number" id="liveQty" value="1" min="1" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
+            <select id="liveCategory" class="category-select" aria-label="Select item category">
+              <option value="Laundry">Laundry</option>
+              <option value="Fridges & Freezers">Fridges & Freezers</option>
+              <option value="Ranges">Ranges</option>
+              <option value="Dishwashers">Dishwashers</option>
+              <option value="Wall Ovens">Wall Ovens</option>
+              <option value="Cooktops">Cooktops</option>
+              <option value="OTR Microwaves">OTR Microwaves</option>
+              <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
+              <option value="Vent Hoods">Vent Hoods</option>
+              <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
+              <option value="Cabinets">Cabinets</option>
+              <option value="Countertops">Countertops</option>
+              <option value="Interior Doors">Interior Doors</option>
+              <option value="Exterior Doors">Exterior Doors</option>
+              <option value="Storm Doors">Storm Doors</option>
+              <option value="Windows">Windows</option>
+              <option value="Commodity Moulding">Commodity Moulding</option>
+              <option value="Other / Misc">Other / Misc</option>
+            </select>
+          </div>
+
+          <div class="scan-buttons">
+            <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
+            <button id="toggleAdvancedControls" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
+          </div>
+
+          <div id="advancedControls" class="hidden" aria-hidden="true">
+            <label id="manualModeToggle">
+              <input type="checkbox" id="manualToggle" checked />
+              Auto-Scan Mode
+            </label>
+            <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">📂 Import/Export Options</button>
+            <div id="importExportControls" class="hidden" aria-hidden="true">
+              <button id="exportBtn">📤 Export Bay Locations</button>
+              <button id="importBtn">📥 Import Bay Locations</button>
+              <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+              <button id="importUPCBtn">📥 Import UPC Mappings</button>
+            </div>
+            <button id="clearHistoryBtn">🧹 Clear History</button>
+            <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
+            <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
+            <button id="viewTrends">📈 View Trends</button>
+          </div>
+        </div>
+
+        <h2>On-Hand Counts</h2>
+        <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
+        <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
+          <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:
+1002178967: 3
+1002101223: 5"></textarea>
+          <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
+          </div>
+        </div>
+      </section>
+
+      <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
+        <h2>Export Tools</h2>
+        <button id="authGoogleDrive">🔐 Connect Google Drive</button>
+        <button id="downloadExcel">⬇️ Download Excel</button>
+        <button id="mergeReport">🧬 Merge Master Report</button>
+      </section>
+
+      <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
+        <h2>Session Controls</h2>
+        <button id="clearLiveTable">🗑️ Clear Live Table</button>
+        <button id="saveSession">💾 Save Session</button>
+        <button id="loadSession">📥 Load Session</button>
+        <input type="file" id="importExcelSession" accept=".xlsx,.xls" style="display:none;" />
+        <button id="triggerImportExcelSession">📂 Import Excel Session</button>
+      </section>
+
+      <section id="mappings" class="tab-section panel-glow" role="tabpanel" aria-label="Mapping Manager">
+        <h2>🧠 Mapping Manager</h2>
+        <div style="margin-bottom: 10px;">
+          <button id="exportMappings">📤 Export Mappings</button>
+          <button id="importMappings">📥 Import Mappings</button>
+        </div>
+        <table id="mappingsTable" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr><th>Scanned Code</th><th>Mapped Item #</th><th>Type</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section id="tools" class="tab-section panel-glow" role="tabpanel" aria-label="Settings">
+        <h2>Settings</h2>
+        <div class="settings-group">
+          <h3>🖼 Appearance</h3>
+          <label><input type="checkbox" id="darkModeToggle" /> Enable Dark Mode</label>
+          <label>Font Size:
+            <select id="fontSizeSelect">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="settings-group">
+          <h3>📦 Scan Behavior</h3>
+          <label><input type="checkbox" id="batchScanToggle" /> Enable Batch Scan Mode</label>
+          <label><input type="checkbox" id="numericKeypadToggle" /> Use Numeric Keypad for Manual Entry</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>⏱ Autosave</h3>
+          <label>Autosave Every:
+            <select id="autosaveIntervalSelect">
+              <option value="1">1 min</option>
+              <option value="3" selected>3 min</option>
+              <option value="5">5 min</option>
+              <option value="10">10 min</option>
+              <option value="20">20 min</option>
+            </select>
+          </label>
+          <label><input type="checkbox" id="autosaveToggle" checked /> Enable Autosave</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>🧹 Data Management</h3>
+          <button id="downloadBackupBtn">Download Backup</button>
+          <button id="clearSessionsBtn">Clear All Sessions</button>
+          <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>☁️ Cloud Sync</h3>
+          <button id="saveToDrive">💾 Save Session to Dropbox</button>
+          <button id="loadFromDrive">📥 Load Session from Dropbox</button>
+          <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
+        </div>
+
+        <div class="settings-group">
+          <h3>📚 Session Manager</h3>
+          <button id="viewSavedSessions">📂 View Saved Sessions</button>
+          <button id="mergeReport">🧬 Merge Master Report</button>
+          <button id="clearAllSessions">🗑️ Clear All Saved Sessions</button>
+          <div id="savedSessionsList" style="margin-top: 10px;"></div>
+        </div>
+      </section>
+
+      <section id="audit" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Rotation Schedule">
+        <h2>🕒 Audit Rotation Schedule</h2>
+        <p>This tool helps you track which categories need to be audited based on their rotation schedule.</p>
+        <table id="rotationTable" style="width:100%; border-collapse:collapse; margin-top: 15px;">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Last Audited</th>
+              <th>Next Due</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal for unknown item prompt -->
+  <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
+      <h3 id="modalPromptText"></h3>
+      <div style="margin-top:15px;">
+        <button id="modalBtnLocation" style="margin:5px;">📍 Bay Location</button>
+        <button id="modalBtnProduct" style="margin:5px;">📦 Product</button>
+        <button id="modalBtnCancel" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <footer style="text-align:center; margin-top:30px; font-size:12px; color:#a366ff; font-family:'Share Tech Mono', monospace;">
+    Inventory Auditor — v2.0.0 ⚡
+  </footer>
+
+  <!-- External libraries -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- Main script -->
+  <script>
+function showCustomPrompt(item) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('customModal');
+    document.getElementById('modalPromptText').textContent = `What type of code is "${item}"?`;
+
+    overlay.style.display = 'flex';
+
+    const cleanup = (result) => {
+      overlay.style.display = 'none';
+      resolve(result);
+    };
+
+    document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
+    document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
+    document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
+  });
+}
+  </script>
+  <script src="script.js" defer></script>
+</body>
+</html>
