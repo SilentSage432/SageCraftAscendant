@@ -219,6 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleAuthClick() {
     gapi.auth2.getAuthInstance().signIn().then(() => {
       alert('🔓 Authenticated with Google Drive');
+    }).catch(err => {
+      console.error('❌ Authentication failed:', err);
+      alert('❌ Authentication failed. Please try again or check the console for more details.');
     });
   }
 
@@ -269,36 +272,60 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadSessionFromDrive() {
-    const accessToken = gapi.auth.getToken().access_token;
+    const tokenObj = gapi.auth.getToken();
+    if (!tokenObj || !tokenObj.access_token) {
+      alert('❌ No valid Google access token found.');
+      return;
+    }
+
+    const accessToken = tokenObj.access_token;
+    console.log("🔑 Google API Token:", accessToken);
+
     fetch("https://www.googleapis.com/drive/v3/files?q=name='active_session.json' and trashed=false", {
       headers: new Headers({ Authorization: 'Bearer ' + accessToken })
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Drive list failed: ${res.status}`);
+        return res.json();
+      })
       .then(data => {
+        console.log('📁 Files found:', data.files?.length);
         if (!data.files || data.files.length === 0) {
-          alert('❌ No session file found in Drive.');
+          alert('❌ No session file named "active_session.json" found in Google Drive.');
           return;
         }
+
         const fileId = data.files[0].id;
+        console.log('📁 Loading file with ID:', fileId);
+
         return fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
           headers: new Headers({ Authorization: 'Bearer ' + accessToken })
         });
       })
-      .then(res => res && res.json ? res.json() : Promise.reject(new Error('No file response')))
+      .then(res => {
+        if (!res) return;
+        if (!res.ok) throw new Error(`Failed to download session file: ${res.status}`);
+        return res.json();
+      })
       .then(session => {
         if (!session || !session.liveCounts) {
           alert('❌ Invalid session format.');
           return;
         }
+
         Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
         Object.entries(session.liveCounts).forEach(([k, v]) => {
           liveCounts[k] = { count: v.count, category: v.category, location: v.location };
         });
+
         document.getElementById('onHandInput').value = session.onHandText || '';
         updateLiveTable();
-        alert('📥 Session loaded from Drive!');
+        alert('📥 Session loaded from Google Drive!');
       })
-      .catch(err => alert('❌ Load failed: ' + err.message));
+      .catch(err => {
+        console.error('❌ Drive Load Error:', err);
+        alert(`❌ Failed to load from Google Drive:\n${err.message}`);
+      });
   }
   // --- Google Drive Save/Load Session Button Listeners ---
   if (saveToDriveBtn) {
