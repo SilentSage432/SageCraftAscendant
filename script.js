@@ -8,6 +8,8 @@ function saveLocationMap() {
 // --- Ensure all critical global variables are declared ONCE at the top ---
 let liveCounts = window.liveCounts || {};
 let autosaveTimer = null;
+const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
+const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded fired and script.js is active");
@@ -208,11 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
         scope: SCOPES
       });
-
-      gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES
-      });
     });
   }
 
@@ -408,8 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   let currentLocation = '';
-  const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
-  const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 
   // --- Scan Logic Setup ---
   const liveEntryInput = document.getElementById('liveEntry');
