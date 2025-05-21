@@ -299,9 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (saveToDriveBtn) {
     saveToDriveBtn.addEventListener('click', async () => {
       if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
-        const authBtn = document.getElementById('authGoogleDrive');
-        if (authBtn) authBtn.click(); // Try to trigger auth automatically
-        alert('🔒 You must authenticate with Google first. Trying now...');
+        alert('🔒 You must authenticate with Google first.');
+        handleAuthClick(); // 🔐 This will open the sign-in popup
         return;
       }
       saveSessionToDrive();
@@ -311,9 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loadFromDriveBtn) {
     loadFromDriveBtn.addEventListener('click', async () => {
       if (!gapi.auth || !gapi.auth.getToken || !gapi.auth.getToken()) {
-        const authBtn = document.getElementById('authGoogleDrive');
-        if (authBtn) authBtn.click(); // Try to trigger auth automatically
-        alert('🔒 You must authenticate with Google first. Trying now...');
+        alert('🔒 You must authenticate with Google first.');
+        handleAuthClick(); // 🔐 This will open the sign-in popup
         return;
       }
       loadSessionFromDrive();
