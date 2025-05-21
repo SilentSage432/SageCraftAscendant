@@ -1,35 +1,3 @@
-// --- Backup All Data Button ---
-  // At the end of DOMContentLoaded block, add a button to export all localStorage session and mapping data
-  const backupBtn = document.createElement('button');
-  backupBtn.textContent = '📦 Backup All Data';
-  backupBtn.style.marginTop = '15px';
-  backupBtn.onclick = () => {
-    const backup = {
-      liveCounts,
-      upcToItem,
-      locationMap,
-      weeklyCounts: JSON.parse(localStorage.getItem('weeklyCounts')) || {},
-      rotationData: JSON.parse(localStorage.getItem('auditRotation')) || {},
-      sessions: Object.fromEntries(
-        Object.entries(localStorage).filter(([k]) => k.startsWith('inventorySession_'))
-      )
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `inventory-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  // Add it to the first settings group
-  const settingsTarget = document.querySelector('#tools .settings-group');
-  if (settingsTarget) {
-    settingsTarget.appendChild(backupBtn);
-  }
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
 }
@@ -37,7 +5,10 @@ function saveUPCMap() {
 function saveLocationMap() {
   localStorage.setItem('locationMap', JSON.stringify(locationMap));
 }
-// Wrap all logic in DOMContentLoaded, and move everything inside
+// --- Ensure all critical global variables are declared ONCE at the top ---
+let liveCounts = window.liveCounts || {};
+let autosaveTimer = null;
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded fired and script.js is active");
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
@@ -192,6 +163,38 @@ document.addEventListener('DOMContentLoaded', () => {
     soundToggle.addEventListener('change', (e) => {
       localStorage.setItem('soundEnabled', e.target.checked);
     });
+  }
+
+  // --- Backup All Data Button ---
+  // Add a button to export all localStorage session and mapping data
+  const backupBtn = document.createElement('button');
+  backupBtn.textContent = '📦 Backup All Data';
+  backupBtn.style.marginTop = '15px';
+  backupBtn.onclick = () => {
+    const backup = {
+      liveCounts,
+      upcToItem,
+      locationMap,
+      weeklyCounts: JSON.parse(localStorage.getItem('weeklyCounts')) || {},
+      rotationData: JSON.parse(localStorage.getItem('auditRotation')) || {},
+      sessions: Object.fromEntries(
+        Object.entries(localStorage).filter(([k]) => k.startsWith('inventorySession_'))
+      )
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventory-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  // Add it to the first settings group
+  const settingsTarget = document.querySelector('#tools .settings-group');
+  if (settingsTarget) {
+    settingsTarget.appendChild(backupBtn);
   }
   // --- Google Drive Integration ---
   const CLIENT_ID = '1009062770217-i80a4rigia3vbsvmqbnngli08ojanhmd.apps.googleusercontent.com';
@@ -407,13 +410,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveQtyInput = document.getElementById('liveQty');
   const liveTableBody = document.querySelector('#liveCountTable tbody');
   const categoryInput = document.getElementById('liveCategory');
-  const locationStatus = document.createElement('div');
-  locationStatus.id = 'locationStatus';
-  locationStatus.style.marginTop = '10px';
-  locationStatus.style.fontWeight = 'bold';
-  locationStatus.textContent = '📍 No Active Bay';
-  locationStatus.style.color = 'red';
-  categoryInput.insertAdjacentElement('afterend', locationStatus);
+  // Only insert locationStatus if not already present
+  let locationStatus = document.getElementById('locationStatus');
+  if (!locationStatus) {
+    locationStatus = document.createElement('div');
+    locationStatus.id = 'locationStatus';
+    locationStatus.style.marginTop = '10px';
+    locationStatus.style.fontWeight = 'bold';
+    locationStatus.textContent = '📍 No Active Bay';
+    locationStatus.style.color = 'red';
+    categoryInput.insertAdjacentElement('afterend', locationStatus);
+  }
 
   // --- Visual scan mapping log for mapped codes ---
   function showScanMappingLog(scannedCode, mappedItem) {
@@ -485,6 +492,10 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', (e) => {
           console.log("File input triggered", e.target.files);
           const file = e.target.files[0];
+          if (!file) {
+            alert('❌ No file selected.');
+            return;
+          }
           if (!file) return;
           const reader = new FileReader();
           reader.onload = () => {
@@ -1049,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Restored clean scanning logic ---
   // const liveEntry = document.getElementById('liveEntry');
   const liveQty = document.getElementById('liveQty');
-  const liveCounts = window.liveCounts || {}; // fallback if not global
+  // const liveCounts = window.liveCounts || {}; // fallback if not global
   updateSuggestions();
 
   function updateLiveTable() {
@@ -1317,47 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function processScan(item) {
-    console.log("🔍 processScan triggered with:", item);
-    if (!item) return;
-
-    // Handle unknown codes - always prompt for clarification, prevent auto-add
-    if (!upcToItem[item] && !locationMap[item]) {
-      console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
-      const response = await showCustomPrompt(item);
-      updateSuggestions();
-      updateLiveTable();
-
-      if (response === 'location') {
-        const name = prompt(`🗂 Please enter a name for location "${item}":`);
-        if (name) {
-          locationMap[item] = name;
-          saveLocationMap();
-          currentLocation = name;
-          updateLocationStatus();
-          alert(`📍 Current location set to: ${name}`);
-        }
-        resetScanInput();
-        return;
-      } else if (response === 'product') {
-        const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
-        if (userDefined) {
-          upcToItem[item] = userDefined;
-          saveUPCMap();
-          item = userDefined;
-        } else {
-          resetScanInput();
-          return;
-        }
-        resetScanInput();
-        return;
-      } else {
-        resetScanInput();
-        return;
-      }
-    }
-
-    // Handle known location codes
+  function proceedWithKnownScan(item) {
     if (locationMap[item]) {
       if (currentLocation === locationMap[item]) {
         const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
@@ -1375,7 +1346,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Handle known product codes
     if (!liveCounts[item]) {
       liveCounts[item] = {
         count: 0,
@@ -1384,456 +1354,72 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       playNewItemSound();
     }
-    // Always register a quantity of 1 per scan, do not reference liveQtyInput
-    const qty = 1;
-    if (typeof liveCounts[item] === 'object') {
-      liveCounts[item].count += qty;
-      liveCounts[item].category = liveCounts[item].category || categoryInput.value;
-      liveCounts[item].location = currentLocation;
-    } else {
-      // Backward compatibility: upgrade to object
-      liveCounts[item] = {
-        count: (liveCounts[item] || 0) + qty,
-        category: categoryInput.value,
-        location: currentLocation
-      };
-    }
+
+    liveCounts[item].count += 1;
+    liveCounts[item].category = liveCounts[item].category || categoryInput.value;
+    liveCounts[item].location = currentLocation;
+
     updateRotationDate(liveCounts[item].category);
     updateLiveTable();
     resetScanInput();
   }
 
-  if (liveEntryInput) {
-    liveEntryInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // prevent accidental focus shifts
-        const val = liveEntryInput.value.trim();
-        if (val) {
-          processScan(val);
-        }
+  async function processScan(item) {
+    console.log("🔍 processScan triggered with:", item);
+    if (!item) return;
+
+    // Handle known codes
+    if (upcToItem[item] || locationMap[item]) {
+      proceedWithKnownScan(item);
+      return;
+    }
+
+    // Unknown code, prompt user
+    console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
+    const response = await showCustomPrompt(item);
+    updateSuggestions();
+    updateLiveTable();
+
+    if (response === 'location') {
+      const name = prompt(`🗂 Please enter a name for location "${item}":`);
+      if (name) {
+        locationMap[item] = name;
+        saveLocationMap();
+        currentLocation = name;
+        updateLocationStatus();
+        alert(`📍 Current location set to: ${name}`);
       }
-    });
-  }
-
-    // --- Category color map ---
-    const categoryColors = {
-      'Laundry': '#8ecae6',
-      'Fridges & Freezers': '#219ebc',
-      'Ranges': '#ffb703',
-      'Dishwashers': '#fb8500',
-      'Wall Ovens': '#ff6b6b',
-      'Cooktops': '#ffd166',
-      'OTR Microwaves': '#9b5de5',
-      'Microwaves (Countertop)': '#3a86ff',
-      'Vent Hoods': '#8338ec',
-      'Beverage & Wine Coolers': '#ff006e',
-      'Cabinets': '#8d99ae',
-      'Countertops': '#b5ead7',
-      'Interior Doors': '#ffdac1',
-      'Exterior Doors': '#e0aaff',
-      'Storm Doors': '#bc6c25',
-      'Windows': '#588157',
-      'Commodity Moulding': '#adb5bd',
-      'Other / Misc': '#f4a261'
-    };
-    liveTableBody.innerHTML = '';
-    const searchTerm = document.getElementById('liveSearchInput')?.value.toLowerCase().trim() || '';
-    const headerRow = document.querySelector('#liveCountTable thead tr');
-    if (!headerRow.querySelector('.category-header')) {
-      const catTh = document.createElement('th');
-      catTh.textContent = 'Category';
-      catTh.className = 'category-header';
-      headerRow.appendChild(catTh);
-    }
-    if (!headerRow.querySelector('.location-header')) {
-      const locTh = document.createElement('th');
-      locTh.textContent = 'Location';
-      locTh.className = 'location-header';
-      headerRow.appendChild(locTh);
-    }
-    if (!headerRow.querySelector('.previous-header')) {
-      ['Previous', 'Δ from Last Week'].forEach(label => {
-        const th = document.createElement('th');
-        th.textContent = label;
-        headerRow.appendChild(th);
-      });
-    }
-    // Add Edit column header if not present
-    if (!headerRow.querySelector('.edit-header')) {
-      const editTh = document.createElement('th');
-      editTh.textContent = 'Edit';
-      editTh.className = 'edit-header';
-      headerRow.appendChild(editTh);
-    }
-    const onHandText = document.getElementById('onHandInput').value;
-    const onHandLines = onHandText.trim().split(/\n+/);
-    const onHandMap = {};
-    onHandLines.forEach(line => {
-      const [item, count] = line.split(':');
-      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
-    });
-
-    const previousDates = Object.keys(weeklyCounts).sort().reverse();
-    // Get selected week from dropdown, or fallback to most recent previous week
-    const selectedWeek = document.getElementById('compareWeek')?.value;
-    const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
-
-    Object.entries(liveCounts).forEach(([item, obj]) => {
-      // --- Live search filter ---
-      if (searchTerm &&
-          !item.toLowerCase().includes(searchTerm) &&
-          !(obj.category || '').toLowerCase().includes(searchTerm) &&
-          !(obj.location || '').toLowerCase().includes(searchTerm)) {
+      resetScanInput();
+      return;
+    } else if (response === 'product') {
+      const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+      if (userDefined) {
+        upcToItem[item] = userDefined;
+        saveUPCMap();
+        item = userDefined;
+      } else {
+        resetScanInput();
         return;
       }
-      const count = obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = count - expected;
-      const previous = lastWeek ? lastWeek[item] || 0 : '';
-      const weekDiff = lastWeek ? count - previous : '';
-      const category = obj.category || '';
-      const location = obj.location || '';
+      resetScanInput();
+      return;
+    } else {
+      resetScanInput();
+      return;
+    }
+  }
 
-      // --- Smart discrepancy/trend icons ---
-      let icon = '';
-      // Down arrow if counts are decreasing for 2+ weeks
-      if (previous !== '' && weekDiff < 0) {
-        // Check for 2+ week decreasing trend
-        let decreasing = false;
-        if (previousDates.length >= 3) {
-          // Get counts for this item for last 3 weeks (including this)
-          const idx = previousDates.indexOf(selectedWeek || previousDates[0]);
-          const w0 = liveCounts[item]?.count || 0;
-          const w1 = weeklyCounts[previousDates[idx + 1]] ? (weeklyCounts[previousDates[idx + 1]][item] || 0) : null;
-          const w2 = weeklyCounts[previousDates[idx + 2]] ? (weeklyCounts[previousDates[idx + 2]][item] || 0) : null;
-          if (w1 !== null && w2 !== null && w0 < w1 && w1 < w2) {
-            decreasing = true;
-          }
-        }
-        if (decreasing || previousDates.length < 3) icon = '📉';
-      }
-      // Up arrow for sharp increase from last week
-      else if (previous !== '' && weekDiff > 5) {
-        icon = '📈';
-      }
-      // Red flag if no expected on-hand count
-      if (!onHandMap[item]) icon += ' ❌';
 
-      // --- Create row with editable cells and Edit button ---
-      const tr = document.createElement('tr');
-      tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
-      // Set background color by category if defined
-      if (categoryColors[obj.category]) {
-        tr.style.backgroundColor = categoryColors[obj.category];
-      }
-      tr.innerHTML = `
-        <td>
-          ${item} ${icon}
-          ${category ? `<span class="category-badge">${category}</span>` : ''}
-        </td>
-        <td>${expected}</td>
-        <td class="editable" data-field="count" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${count}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td>${diff > 0 ? '+' + diff : diff}</td>
-        <td>${previous !== '' ? previous : '-'}</td>
-        <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
-        <td class="editable" data-field="category" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${category}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td class="editable" data-field="location" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${location}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td><button class="editRow" data-id="${item}">✏️</button></td>
-      `;
-      liveTableBody.appendChild(tr);
-    });
-
-    // Add edit/delete row logic with custom modal prompt
-    document.querySelectorAll('.editRow').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const item = btn.dataset.id;
-        // Custom modal-style prompt for Edit/Delete
-        const overlay = document.createElement('div');
-        overlay.id = 'editDeletePrompt';
-        overlay.style.position = 'fixed';
-        overlay.style.top = 0;
-        overlay.style.left = 0;
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
-        overlay.innerHTML = `
-          <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
-            <p>What would you like to do with "<strong>${item}</strong>"?</p>
-            <button id="editBtn">✏️ Edit</button>
-            <button id="deleteBtn">🗑️ Delete</button>
-            <button id="cancelBtn">❌ Cancel</button>
-          </div>
-        `;
-        document.body.appendChild(overlay);
-
-        document.getElementById('editBtn').onclick = () => {
-          document.body.removeChild(overlay);
-          const current = liveCounts[item];
-          const newItem = prompt('Edit Item #:', item);
-          if (!newItem) return;
-          const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
-          const newCategory = prompt('Edit Category:', current.category || '') || '';
-          const newLocation = prompt('Edit Location:', current.location || '') || '';
-          delete liveCounts[item];
-          liveCounts[newItem] = {
-            count: newCount,
-            category: newCategory,
-            location: newLocation
-          };
-          updateLiveTable();
-        };
-
-        document.getElementById('deleteBtn').onclick = () => {
-          if (confirm(`Are you sure you want to delete "${item}"?`)) {
-            delete liveCounts[item];
-            updateLiveTable();
-          }
-          document.body.removeChild(overlay);
-        };
-
-        document.getElementById('cancelBtn').onclick = () => {
-          document.body.removeChild(overlay);
-        };
-      });
-    });
-
-    // Add inline editable logic for Found, Category, and Location cells
-    document.querySelectorAll('.editable').forEach(cell => {
-      // Only allow one edit at a time per cell
-      const span = cell.querySelector('span[contenteditable]');
-      const saveBtn = cell.querySelector('button.saveEdit');
-      let originalValue = span ? span.textContent : '';
-      // Save on button click
-      if (saveBtn && span) {
-        saveBtn.onclick = (e) => {
-          e.stopPropagation();
-          const field = cell.dataset.field;
-          const id = cell.dataset.id;
-          const newValue = span.textContent.trim();
-          if (field === 'count') {
-            liveCounts[id].count = parseInt(newValue) || 0;
-          } else {
-            liveCounts[id][field] = newValue;
-          }
-          updateLiveTable();
-        };
-      }
-      // Save on Enter, cancel on Esc
-      if (span) {
-        span.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (saveBtn) saveBtn.click();
-          } else if (e.key === 'Escape') {
-            span.textContent = originalValue;
-            span.blur();
-          }
-        });
-        span.addEventListener('focus', () => {
-          originalValue = span.textContent;
-        });
-        span.addEventListener('blur', () => {
-          // When losing focus, don't auto-save (require save button or Enter)
-        });
-      }
-    });
-    // (END updateLiveTable)
-
-    // Update the summary bar
-    let totalItems = 0;
-    let totalUnits = 0;
-    let matches = 0;
-    let overs = 0;
-    let unders = 0;
-
-    Object.entries(liveCounts).forEach(([item, obj]) => {
-      totalItems += 1;
-      totalUnits += obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = obj.count - expected;
-      if (diff === 0) matches++;
-      else if (diff > 0) overs++;
-      else unders++;
-    });
-
-    summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
 
   // --- Ensure critical buttons are assigned after DOMContentLoaded ---
   // (No duplicate clearLiveTable logic outside DOMContentLoaded; only the main one above with console.log.)
 
-  // Clear history button
-  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-  if (clearHistoryBtn) {
-    clearHistoryBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear all historical weekly data? This will not affect your current session or saved Excel reports.')) {
-        const today = new Date().toISOString().split('T')[0];
-        localStorage.setItem(`archivedWeeklyCounts_${today}`, JSON.stringify(weeklyCounts));
-        localStorage.removeItem('weeklyCounts');
-        alert('Weekly history cleared! A snapshot has been saved.');
-        updateLiveTable();
-        updateSuggestions();
-        summaryBar.innerHTML = '';
-      }
-    });
-  }
-  // Save/Load Session buttons
-  const saveSessionBtn = document.getElementById('saveSession');
-  if (saveSessionBtn) {
-    saveSessionBtn.addEventListener('click', () => {
-      const name = prompt("Enter a custom name for this session (e.g., 'Bay 18 PM'):");
-      if (!name) {
-        alert('Session name is required.');
-        return;
-      }
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const sessionKey = `inventorySession_${timestamp}_${name.replace(/\s+/g, '_')}`;
-      const session = {
-        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
-        onHandText: document.getElementById('onHandInput').value
-      };
-      localStorage.setItem(sessionKey, JSON.stringify(session));
-      alert(`Session "${name}" saved!`);
-    });
-  }
-  const loadSessionBtn = document.getElementById('loadSession');
-  if (loadSessionBtn) {
-    loadSessionBtn.addEventListener('click', () => {
-      const session = JSON.parse(localStorage.getItem('inventorySession'));
-      if (session) {
-        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-        Object.entries(session.liveCounts || {}).forEach(([k, v]) => {
-          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-        });
-        document.getElementById('onHandInput').value = session.onHandText;
-        updateLiveTable();
-        alert('Session loaded!');
-      } else {
-        alert('No saved session found.');
-      }
-    });
-  }
-  const excelBtn = document.getElementById('downloadExcel');
-  if (excelBtn) {
-    excelBtn.addEventListener('click', () => {
-      // Ensure header includes 'Location'
-      const wb = XLSX.utils.book_new();
-      const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
-      const onHandText = document.getElementById('onHandInput').value;
-      const onHandLines = onHandText.trim().split(/\n+/);
-      const onHandMap = {};
-      onHandLines.forEach(line => {
-        const [item, count] = line.split(':');
-        if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
-      });
-      const previousDates = Object.keys(weeklyCounts).sort().reverse();
-      const lastWeek = previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null;
-      Object.entries(liveCounts).forEach(([item, obj]) => {
-        const count = obj.count;
-        const expected = onHandMap[item] || 0;
-        const diff = count - expected;
-        const previous = lastWeek ? lastWeek[item] || 0 : '';
-        const weekDiff = lastWeek ? count - previous : '';
-        // Ensure location is included as a dedicated column
-        ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      const range = XLSX.utils.decode_range(ws['!ref']);
-      for (let row = 1; row <= range.e.r; row++) {
-        const diffCellRef = XLSX.utils.encode_cell({ c: 3, r: row });
-        const diffValue = ws[diffCellRef].v;
-        let fillColor = null;
-        if (diffValue > 0) fillColor = 'C6EFCE';
-        else if (diffValue < 0) fillColor = 'FFC7CE';
-        if (fillColor) {
-          ws[diffCellRef].s = {
-            fill: {
-              patternType: 'solid',
-              fgColor: { rgb: fillColor }
-            }
-          };
-        }
-      }
-      wb.Sheets['Inventory'] = ws;
-      XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-      // --- Google Drive upload ---
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      uploadExcelToDrive(blob);
-      XLSX.writeFile(wb, 'inventory_report.xlsx');
-    });
-    // --- Attach event listener to "Merge Master Report" button in HTML ---
-  // --- Google Drive Auth Button Listener ---
-  const authBtn = document.getElementById('authGoogleDrive');
-  if (authBtn) {
-    authBtn.addEventListener('click', () => {
-      if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-              gapi.client.setToken({ access_token: tokenResponse.access_token });
-              alert('🔓 Authenticated with Google Drive');
-            } else {
-              alert('❌ Token generation failed');
-            }
-          }
-        });
-        tokenClient.requestAccessToken();
-      } else {
-        alert('Google Identity Services not available.');
-      }
-    });
-  }
-    const mergeReportBtn = document.getElementById('mergeReport');
-    if (mergeReportBtn) {
-      mergeReportBtn.addEventListener('click', () => {
-        const savedKeys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
-        if (savedKeys.length === 0) {
-          alert('No saved sessions found to merge.');
-          return;
-        }
-        const wb = XLSX.utils.book_new();
-        savedKeys.forEach(key => {
-          const session = JSON.parse(localStorage.getItem(key));
-          if (!session || !session.liveCounts) return;
-          const ws_data = [['Item #', 'Found', 'Category', 'Location']];
-          Object.entries(session.liveCounts).forEach(([item, obj]) => {
-            ws_data.push([item, obj.count, obj.category || '', obj.location || '']);
-          });
-          const sheetName = key.replace('inventorySession_', '');
-          const ws = XLSX.utils.aoa_to_sheet(ws_data);
-          XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        });
-        XLSX.writeFile(wb, 'merged_inventory_report.xlsx');
-      });
-    }
-  }
-
   // --- Auto-save session at configured interval (default 30 seconds) ---
   function getAutosaveIntervalMs() {
-    const intervalElem = document.getElementById('autosaveIntervalSelect');
-    let mins = 0.5;
-    if (intervalElem) {
-      const val = parseFloat(intervalElem.value);
-      if (!isNaN(val)) mins = val;
-    }
-    return mins * 60 * 1000;
+    const autosaveIntervalSelect = document.getElementById('autosaveIntervalSelect');
+    const val = autosaveIntervalSelect ? parseInt(autosaveIntervalSelect.value) : 3;
+    return Math.max(5, val) * 1000;
   }
-
-  let autosaveTimer = null;
   function setupAutosaveLoop() {
     if (autosaveTimer) clearInterval(autosaveTimer);
     // Only run autosave if enabled
