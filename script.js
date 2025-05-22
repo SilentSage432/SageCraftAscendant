@@ -231,6 +231,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // --- Auto-backup to Dropbox every X minutes ---
+  function setupDropboxAutoBackup(intervalMinutes = 10) {
+    if (!intervalMinutes || isNaN(intervalMinutes) || intervalMinutes < 1) intervalMinutes = 10;
+    setInterval(() => {
+      const session = {
+        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+        onHandText: document.getElementById('onHandInput').value
+      };
+      const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
+
+      fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Content-Type': 'application/octet-stream',
+          'Dropbox-API-Arg': JSON.stringify({
+            path: `/auto_backup_session_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+            mode: 'add',
+            autorename: true,
+            mute: true
+          })
+        },
+        body: blob
+      }).then(response => {
+        if (response.ok) {
+          console.log(`📦 Auto-backup to Dropbox completed`);
+        } else {
+          response.text().then(err => {
+            console.warn('❌ Auto-backup failed:', err);
+          });
+        }
+      });
+    }, intervalMinutes * 60 * 1000);
+  }
+
   async function loadSessionFromDropbox() {
     const response = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
@@ -1372,6 +1407,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Start autosave on load if enabled
   setupAutosaveLoop();
+
+  // Start Dropbox auto-backup every 15 minutes (customizable)
+  setupDropboxAutoBackup(15);
 
   // Auto-restore session on load if available
   const existingSession = localStorage.getItem('inventorySession');
