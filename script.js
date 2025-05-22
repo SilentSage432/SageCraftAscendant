@@ -298,6 +298,165 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loadFromDriveBtn) {
     loadFromDriveBtn.addEventListener('click', loadSessionFromDropbox);
   }
+
+  // Add Dropbox Load Options Selector
+  const loadOptionsBtn = document.createElement('button');
+  loadOptionsBtn.textContent = '📂 Load Dropbox Session...';
+  loadOptionsBtn.style.marginTop = '8px';
+  loadOptionsBtn.onclick = async () => {
+    const choice = prompt("Choose load option:\n1 - Load active_session.json\n2 - Load most recent auto-backup");
+    if (choice === '2') {
+      const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ path: '' })
+      });
+
+      const listData = await listResponse.json();
+      const backups = listData.entries
+        .filter(f => f.name.startsWith('auto_backup_session_') && f.name.endsWith('.json'))
+        .sort((a, b) => new Date(b.client_modified) - new Date(a.client_modified));
+
+      if (backups.length === 0) {
+        alert('❌ No auto-backup files found.');
+        return;
+      }
+
+      const newestFile = backups[0].path_lower;
+
+      const dlResponse = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Dropbox-API-Arg': JSON.stringify({ path: newestFile })
+        }
+      });
+
+      if (!dlResponse.ok) {
+        const err = await dlResponse.text();
+        alert(`❌ Failed to load auto-backup: ${err}`);
+        return;
+      }
+
+      const session = await dlResponse.json();
+      if (!session.liveCounts) return alert('❌ Invalid backup format.');
+      Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+      Object.entries(session.liveCounts).forEach(([k, v]) => {
+        liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+      });
+      document.getElementById('onHandInput').value = session.onHandText || '';
+      updateLiveTable();
+      alert('📥 Auto-backup session loaded!');
+    } else {
+      loadSessionFromDropbox();
+    }
+  };
+
+  const settingsTarget = document.querySelector('#tools .settings-group');
+  if (settingsTarget) settingsTarget.appendChild(loadOptionsBtn);
+
+  // --- Dropbox Backup Browser Modal Button ---
+  const browseBackupsBtn = document.createElement('button');
+  browseBackupsBtn.textContent = '📁 Browse Dropbox Backups';
+  browseBackupsBtn.style.marginTop = '8px';
+  browseBackupsBtn.onclick = async () => {
+    const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ path: '' })
+    });
+
+    const listData = await listResponse.json();
+    const backups = listData.entries
+      .filter(f => f.name.endsWith('.json'))
+      .sort((a, b) => new Date(b.client_modified) - new Date(a.client_modified));
+
+    if (backups.length === 0) {
+      alert('❌ No backup files found.');
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = 0;
+    modal.style.left = 0;
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = 9999;
+
+    const content = document.createElement('div');
+    content.style.background = '#fff';
+    content.style.padding = '20px';
+    content.style.borderRadius = '8px';
+    content.style.maxHeight = '80vh';
+    content.style.overflowY = 'auto';
+
+    const title = document.createElement('h3');
+    title.textContent = '📁 Select a Backup File';
+    content.appendChild(title);
+
+    const ul = document.createElement('ul');
+    ul.style.listStyle = 'none';
+    ul.style.padding = 0;
+
+    backups.forEach(file => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.textContent = `${file.name}`;
+      btn.style.display = 'block';
+      btn.style.margin = '4px 0';
+      btn.onclick = async () => {
+        const dlResponse = await fetch('https://content.dropboxapi.com/2/files/download', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+            'Dropbox-API-Arg': JSON.stringify({ path: file.path_lower })
+          }
+        });
+
+        if (!dlResponse.ok) {
+          const err = await dlResponse.text();
+          alert(`❌ Failed to load backup: ${err}`);
+          return;
+        }
+
+        const session = await dlResponse.json();
+        if (!session.liveCounts) return alert('❌ Invalid backup format.');
+        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+        Object.entries(session.liveCounts).forEach(([k, v]) => {
+          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+        });
+        document.getElementById('onHandInput').value = session.onHandText || '';
+        updateLiveTable();
+        document.body.removeChild(modal);
+        alert(`📥 Backup "${file.name}" loaded!`);
+      };
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+
+    content.appendChild(ul);
+    modal.appendChild(content);
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    };
+
+    document.body.appendChild(modal);
+  };
+
+  if (settingsTarget) settingsTarget.appendChild(browseBackupsBtn);
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
     if (/^\d{15}$/.test(code)) {
