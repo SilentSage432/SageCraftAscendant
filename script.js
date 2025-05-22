@@ -1622,14 +1622,26 @@ document.addEventListener('DOMContentLoaded', () => {
         `UPC ${item} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
       );
       if (userDefined) {
-        upcToItem[item] = userDefined;
+        const trimmedItem = userDefined.trim();
+        if (!trimmedItem) {
+          alert("❌ Invalid item number.");
+          resetScanInput();
+          return;
+        }
+
+        upcToItem[item] = trimmedItem;
         saveUPCMap();
-        item = userDefined;
-        liveCounts[item] = {
+        liveCounts[trimmedItem] = {
           count: 1,
           category: inferredCategory || categoryInput.value || '',
           location: currentLocation
         };
+
+        console.log("✅ Stored item:", trimmedItem, "for UPC:", item);
+        console.log("📦 liveCounts entry:", liveCounts[trimmedItem]);
+
+        updateRotationDate(liveCounts[trimmedItem].category);
+        updateLiveTable();
       } else {
         resetScanInput();
         return;
