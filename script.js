@@ -113,12 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('refresh_token', data.refresh_token);
           console.log("✅ refresh_token saved:", data.refresh_token);
         } else if (!localStorage.getItem('refresh_token')) {
-          alert("⚠️ Dropbox connected, but no refresh token returned. You may need to reconnect later.");
+          console.warn("⚠️ No refresh token returned.");
         }
 
-        // Clean the URL to remove the code
-        window.history.replaceState({}, document.title, redirectUri);
-        alert("✅ Dropbox connected!");
+        alert("✅ Dropbox connected! Redirecting...");
+        setTimeout(() => {
+          window.location.href = redirectUri;
+        }, 1000);
         return;
       }
 
