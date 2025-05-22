@@ -1369,29 +1369,56 @@ document.addEventListener('DOMContentLoaded', () => {
       if (categoryColors[obj.category]) {
         tr.style.backgroundColor = categoryColors[obj.category];
       }
-      tr.innerHTML = `
-        <td>
-          ${item} ${icon}
-          ${category ? `<span class="category-badge">${category}</span>` : ''}
-        </td>
-        <td>${expected}</td>
-        <td class="editable" data-field="count" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${count}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td style="color:${diffColor}">${diff > 0 ? '+' + diff : diff}</td>
-        <td>${previous !== '' ? previous : '-'}</td>
-        <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
-        <td class="editable" data-field="category" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${category}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td class="editable" data-field="location" data-id="${item}">
-          <span contenteditable="true" spellcheck="false">${location}</span>
-          <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
-        </td>
-        <td><button class="editRow" data-id="${item}">✏️</button></td>
-      `;
+      // Build table row using explicit cell creation for safety and alignment
+      const cells = [];
+
+      const itemCell = document.createElement('td');
+      itemCell.innerHTML = `${item} ${icon} ${category ? `<span class="category-badge">${category}</span>` : ''}`;
+      cells.push(itemCell);
+
+      const expectedCell = document.createElement('td');
+      expectedCell.textContent = expected;
+      cells.push(expectedCell);
+
+      const countCell = document.createElement('td');
+      countCell.className = 'editable';
+      countCell.dataset.field = 'count';
+      countCell.dataset.id = item;
+      countCell.innerHTML = `<span contenteditable="true" spellcheck="false">${count}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
+      cells.push(countCell);
+
+      const diffCell = document.createElement('td');
+      diffCell.textContent = diff > 0 ? `+${diff}` : `${diff}`;
+      diffCell.style.color = diffColor;
+      cells.push(diffCell);
+
+      const prevCell = document.createElement('td');
+      prevCell.textContent = previous !== '' ? previous : '-';
+      cells.push(prevCell);
+
+      const weekDiffCell = document.createElement('td');
+      weekDiffCell.textContent = weekDiff !== '' ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) : '-';
+      cells.push(weekDiffCell);
+
+      const categoryCell = document.createElement('td');
+      categoryCell.className = 'editable';
+      categoryCell.dataset.field = 'category';
+      categoryCell.dataset.id = item;
+      categoryCell.innerHTML = `<span contenteditable="true" spellcheck="false">${category}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
+      cells.push(categoryCell);
+
+      const locationCell = document.createElement('td');
+      locationCell.className = 'editable';
+      locationCell.dataset.field = 'location';
+      locationCell.dataset.id = item;
+      locationCell.innerHTML = `<span contenteditable="true" spellcheck="false">${location}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
+      cells.push(locationCell);
+
+      const editCell = document.createElement('td');
+      editCell.innerHTML = `<button class="editRow" data-id="${item}">✏️</button>`;
+      cells.push(editCell);
+
+      cells.forEach(cell => tr.appendChild(cell));
       liveTableBody.appendChild(tr);
     });
 
