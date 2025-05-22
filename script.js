@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded fired and script.js is active");
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
   const addLiveItemBtn = document.getElementById('addLiveItem');
+  // Add event listener for Add Live Item button immediately after declaration
+  if (addLiveItemBtn) {
+    addLiveItemBtn.addEventListener('click', () => {
+      console.log("📦 Add Item button clicked (manual)");
+      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
+      if (val) processScan(val);
+    });
+  }
   const saveToDriveBtn = document.getElementById('saveToDrive');
   const loadFromDriveBtn = document.getElementById('loadFromDrive');
 
@@ -538,13 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', () => {
-      console.log("📦 Add Item button clicked");
-      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (val) processScan(val);
-    });
-  }
+  // (Redundant Add Live Item button click listener removed above to avoid duplicate event handlers.)
   const liveQtyInput = document.getElementById('liveQty');
   const liveTableBody = document.querySelector('#liveCountTable tbody');
   const categoryInput = document.getElementById('liveCategory');
