@@ -1277,32 +1277,30 @@ document.addEventListener('DOMContentLoaded', () => {
       'Other / Misc': '#f4a261'
     };
     const searchTerm = document.getElementById('liveSearchInput')?.value.toLowerCase().trim() || '';
+    // Ensure headers are in correct order and match the specified columns
     const headerRow = document.querySelector('#liveCountTable thead tr');
-    if (!headerRow.querySelector('.category-header')) {
-      const catTh = document.createElement('th');
-      catTh.textContent = 'Category';
-      catTh.className = 'category-header';
-      headerRow.appendChild(catTh);
-    }
-    if (!headerRow.querySelector('.location-header')) {
-      const locTh = document.createElement('th');
-      locTh.textContent = 'Location';
-      locTh.className = 'location-header';
-      headerRow.appendChild(locTh);
-    }
-    if (!headerRow.querySelector('.previous-header')) {
-      ['Previous', 'Δ from Last Week'].forEach(label => {
+    if (headerRow) {
+      // Clear all existing headers
+      while (headerRow.firstChild) headerRow.removeChild(headerRow.firstChild);
+      [
+        'Item #',
+        'Expected',
+        'Found',
+        'Difference',
+        'Prev Week',
+        'Δ vs Last Week',
+        'Category',
+        'Location',
+        'Edit'
+      ].forEach((label, idx) => {
         const th = document.createElement('th');
         th.textContent = label;
+        // Optionally add classes for easy lookup
+        if (label === 'Category') th.className = 'category-header';
+        if (label === 'Location') th.className = 'location-header';
+        if (label === 'Edit') th.className = 'edit-header';
         headerRow.appendChild(th);
       });
-    }
-    // Add Edit column header if not present
-    if (!headerRow.querySelector('.edit-header')) {
-      const editTh = document.createElement('th');
-      editTh.textContent = 'Edit';
-      editTh.className = 'edit-header';
-      headerRow.appendChild(editTh);
     }
     const onHandText = document.getElementById('onHandInput').value;
     const onHandLines = onHandText.trim().split(/\n+/);
@@ -1364,7 +1362,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Red flag if no expected on-hand count
       if (!onHandMap[item]) icon += ' ❌';
 
-      // --- Create row with editable cells and Edit button ---
+      // --- Create row with editable cells and Edit button in correct column order ---
       const tr = document.createElement('tr');
       tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
       // Set background color by category if defined
