@@ -1343,6 +1343,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   }
 
+  // Infer user category pattern from recent entries
+  function inferUserCategoryPattern(upc) {
+    const prefix = upc.slice(0, 5);
+    const recentCategories = Object.values(liveCounts)
+      .slice(-10)
+      .map(entry => entry.category)
+      .filter(Boolean);
+    if (!recentCategories.length) return null;
+    const freq = {};
+    recentCategories.forEach(cat => freq[cat] = (freq[cat] || 0) + 1);
+    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+    return sorted.length ? sorted[0][0] : null;
+  }
+
   async function processScan(item) {
     console.log("🔍 processScan triggered with:", item);
     if (!item) return;
@@ -1371,17 +1385,17 @@ document.addEventListener('DOMContentLoaded', () => {
       resetScanInput();
       return;
     } else if (response === 'product') {
-      const suggestedCategory = suggestCategoryFromUPC(item);
+      const inferredCategory = inferUserCategoryPattern(item) || suggestCategoryFromUPC(item);
       const userDefined = prompt(
-        `UPC ${item} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${suggestedCategory || 'Unknown'}")`
+        `UPC ${item} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
       );
       if (userDefined) {
         upcToItem[item] = userDefined;
         saveUPCMap();
         item = userDefined;
-        if (suggestedCategory) {
-          liveCounts[item] = liveCounts[item] || {};
-          liveCounts[item].category = suggestedCategory;
+        liveCounts[item] = liveCounts[item] || {};
+        if (inferredCategory) {
+          liveCounts[item].category = inferredCategory;
         }
       } else {
         resetScanInput();
