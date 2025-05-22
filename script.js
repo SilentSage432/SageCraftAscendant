@@ -87,34 +87,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
     const clientId = '0s592qf9o6g9cwx';
 
-    const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        grant_type: 'authorization_code',
-        client_id: clientId,
-        code_verifier: verifier,
-        redirect_uri: redirectUri
-      })
-    });
-    // Logging block before parsing token response as JSON
-    const text = await res.text();
-    console.log("🔁 Dropbox Token HTTP Status:", res.status);
-    console.log("📦 Raw response:", text);
-    const data = JSON.parse(text);
-    if (data.access_token) {
-      localStorage.setItem('access_token', data.access_token);
-      if (data.refresh_token) {
-        localStorage.setItem('refresh_token', data.refresh_token);
-      } else if (!localStorage.getItem('refresh_token')) {
-        alert("⚠️ Dropbox connected, but no refresh token returned. You may need to reconnect later.");
+    try {
+      const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          grant_type: 'authorization_code',
+          client_id: clientId,
+          code_verifier: verifier,
+          redirect_uri: redirectUri
+        })
+      });
+
+      const text = await res.text();
+      console.log("🔁 Dropbox Token HTTP Status:", res.status);
+      console.log("📦 Raw response:", text);
+
+      const data = JSON.parse(text);
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        console.log("✅ access_token saved:", data.access_token);
+
+        if (data.refresh_token) {
+          localStorage.setItem('refresh_token', data.refresh_token);
+          console.log("✅ refresh_token saved:", data.refresh_token);
+        } else {
+          console.warn("⚠️ No refresh_token returned from Dropbox.");
+          if (!localStorage.getItem('refresh_token')) {
+            alert("⚠️ Dropbox connected, but no refresh token returned. You may need to reconnect later.");
+          }
+        }
+
+        // Clean the URL to remove the code
+        window.history.replaceState({}, document.title, redirectUri);
+        alert("✅ Dropbox connected!");
+        return; // ✅ Important: stop here if success
       }
-      window.history.replaceState({}, document.title, redirectUri);
-      alert("✅ Dropbox connected!");
-    } else {
+
+      console.warn("❌ Dropbox returned error:", data);
       alert("❌ Dropbox login failed.");
-      console.warn(data);
+    } catch (err) {
+      console.error("❌ Dropbox callback error:", err);
+      alert("❌ Dropbox login failed due to network or parsing error.");
     }
   }
   console.log("✅ DOMContentLoaded fired and script.js is active");
