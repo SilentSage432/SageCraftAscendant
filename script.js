@@ -1584,6 +1584,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function proceedWithKnownScan(item) {
+    if (upcToItem[item]) {
+      item = upcToItem[item];
+    }
     if (locationMap[item]) {
       if (currentLocation === locationMap[item]) {
         const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
@@ -1687,10 +1690,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         upcToItem[item] = trimmedItem;
         saveUPCMap();
-        // Remove any lingering raw UPC or item lines before adding the correct mapping
-        if (liveCounts[item]) delete liveCounts[item];
-        if (liveCounts[trimmedItem]) delete liveCounts[trimmedItem];
-        // Only assign the trimmed item number in the count table
+        if (item !== trimmedItem) delete liveCounts[item];
+        delete liveCounts[trimmedItem];
         liveCounts[trimmedItem] = {
           count: 1,
           category: inferredCategory || categoryInput.value || '',
