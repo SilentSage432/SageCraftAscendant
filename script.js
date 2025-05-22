@@ -311,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
       const session = {
         liveCounts: JSON.parse(JSON.stringify(liveCounts)),
+        upcToItem: JSON.parse(JSON.stringify(upcToItem)),
         onHandText: document.getElementById('onHandInput').value
       };
       const blob = new Blob([JSON.stringify(session)], { type: 'application/json' });
