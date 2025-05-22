@@ -631,6 +631,18 @@ document.addEventListener('DOMContentLoaded', () => {
   loginBtn.onclick = beginDropboxLogin;
   settingsTarget?.appendChild(loginBtn);
 
+  // --- Reset Dropbox Connection Button ---
+  const resetDropboxBtn = document.createElement('button');
+  resetDropboxBtn.textContent = '🧹 Reset Dropbox Connection';
+  resetDropboxBtn.style.marginTop = '8px';
+  resetDropboxBtn.onclick = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('pkce_verifier');
+    alert('🧹 Dropbox tokens cleared. Please reconnect.');
+  };
+  settingsTarget?.appendChild(resetDropboxBtn);
+
   // --- Restore UPC Map from Dropbox Button ---
   const restoreUPCBtn = document.createElement('button');
   restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
