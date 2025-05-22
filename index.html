@@ -23,6 +23,22 @@
   <meta name="theme-color" content="#2a003f" />
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
+  <style>
+  .onhand-button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+
+  .onhand-button-wrapper button {
+    min-width: 220px;
+    max-width: 300px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  </style>
 </head>
 <body class="dark-theme electric-fantasy">
   <!-- Floating navigation for main tabs -->
@@ -118,8 +134,10 @@
         </div>
 
         <h2>On-Hand Counts</h2>
-        <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
-        <button id="uploadDropboxFile">📤 Load from Dropbox</button>
+        <div class="onhand-button-wrapper">
+          <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
+          <button id="uploadDropboxFile">📤 Load from Dropbox</button>
+        </div>
         <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
           <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:
@@ -139,11 +157,13 @@
 
       <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
         <h2>Session Controls</h2>
-        <button id="clearLiveTable">🗑️ Clear Live Table</button>
-        <button id="saveSession">💾 Save Session</button>
-        <button id="loadSession">📥 Load Session</button>
+        <div class="session-button-wrapper">
+          <button id="clearLiveTable">🗑️ Clear Live Table</button>
+          <button id="saveSession">💾 Save Session</button>
+          <button id="loadSession">📥 Load Session</button>
+          <button id="triggerImportExcelSession">📂 Import Excel Session</button>
+        </div>
         <input type="file" id="importExcelSession" accept=".xlsx,.xls" style="display:none;" />
-        <button id="triggerImportExcelSession">📂 Import Excel Session</button>
       </section>
 
       <section id="mappings" class="tab-section panel-glow" role="tabpanel" aria-label="Mapping Manager">
@@ -194,26 +214,24 @@
           <label><input type="checkbox" id="autosaveToggle" checked /> Enable Autosave</label>
         </div>
 
-        <div class="settings-group">
-          <h3>🧹 Data Management</h3>
+        <h3>🧹 Data Management</h3>
+        <div class="button-cluster">
           <button id="downloadBackupBtn">Download Backup</button>
           <button id="clearSessionsBtn">Clear All Sessions</button>
-          <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
         </div>
+        <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
 
-        <div class="settings-group">
-          <h3>☁️ Cloud Sync</h3>
+        <h3>☁️ Cloud Sync</h3>
+        <div class="button-cluster">
           <button id="saveToDrive">💾 Save Session to Dropbox</button>
           <button id="loadFromDrive">📥 Load Session from Dropbox</button>
-          <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
         </div>
-
-        <div class="settings-group">
-          <h3>📚 Session Manager</h3>
+        <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
+        <h3>📚 Session Manager</h3>
+        <div class="button-cluster">
           <button id="viewSavedSessions">📂 View Saved Sessions</button>
           <button id="mergeReport">🧬 Merge Master Report</button>
           <button id="clearAllSessions">🗑️ Clear All Saved Sessions</button>
-          <div id="savedSessionsList" style="margin-top: 10px;"></div>
         </div>
       </section>
 
