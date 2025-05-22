@@ -108,24 +108,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.access_token) {
         console.log("✅ Dropbox token received:", data.access_token);
         localStorage.setItem('access_token', data.access_token);
-        window.location.href = redirectUri;
-        return;
-        console.log("✅ access_token saved:", data.access_token);
 
         if (data.refresh_token) {
           localStorage.setItem('refresh_token', data.refresh_token);
           console.log("✅ refresh_token saved:", data.refresh_token);
-        } else {
-          console.warn("⚠️ No refresh_token returned from Dropbox.");
-          if (!localStorage.getItem('refresh_token')) {
-            alert("⚠️ Dropbox connected, but no refresh token returned. You may need to reconnect later.");
-          }
+        } else if (!localStorage.getItem('refresh_token')) {
+          alert("⚠️ Dropbox connected, but no refresh token returned. You may need to reconnect later.");
         }
 
         // Clean the URL to remove the code
         window.history.replaceState({}, document.title, redirectUri);
         alert("✅ Dropbox connected!");
-        return; // ✅ Important: stop here if success
+        return;
       }
 
       console.warn("❌ Dropbox returned error:", data);
