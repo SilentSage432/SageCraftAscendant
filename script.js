@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clientId = '0s592qf9o6g9cwx';
     const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
 
-    const authUrl = `https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge_method=S256&code_challenge=${challenge}`;
+    const authUrl = `https://www.dropbox.com/oauth2/authorize?response_type=code&token_access_type=offline&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge_method=S256&code_challenge=${challenge}`;
     window.location.href = authUrl;
   }
 
