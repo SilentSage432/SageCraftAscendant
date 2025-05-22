@@ -471,6 +471,40 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // --- Upload On-Hand File from Dropbox ---
+    const uploadDropboxFileBtn = document.getElementById('uploadDropboxFile');
+    if (uploadDropboxFileBtn) {
+      uploadDropboxFileBtn.addEventListener('click', () => {
+        if (!window.Dropbox) {
+          return alert('Dropbox Chooser is not loaded.');
+        }
+        Dropbox.choose({
+          success: function(files) {
+            const file = files[0];
+            fetch(file.link)
+              .then(res => res.text())
+              .then(content => {
+                const onHandInput = document.getElementById('onHandInput');
+                if (onHandInput) {
+                  onHandInput.value = content;
+                  localStorage.setItem('onHandBackup', content);
+                  const now = new Date();
+                  const formatted = now.toLocaleTimeString();
+                  const statusDiv = document.getElementById('onHandLastSaved');
+                  if (statusDiv) {
+                    statusDiv.textContent = `📥 Loaded from Dropbox: ${formatted}`;
+                  }
+                }
+              })
+              .catch(err => alert(`Failed to load file: ${err.message}`));
+          },
+          linkType: 'direct',
+          multiselect: false,
+          extensions: ['.txt', '.csv']
+        });
+      });
+    }
+
     // --- Auto-Save On Hand Input ---
     let lastOnHandSaveTime = '';
     const saveOnHandToLocal = () => {

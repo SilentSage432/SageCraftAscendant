@@ -21,7 +21,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#2a003f" />
+</head>
   <script src="https://apis.google.com/js/api.js"></script>
+  <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
+</head>
 </head>
 <body class="dark-theme electric-fantasy">
   <!-- Floating navigation for main tabs -->
@@ -118,6 +121,8 @@
 
         <h2>On-Hand Counts</h2>
         <button id="uploadOnHandFile">📄 Upload On-Hand File</button>
+        <button id="dropboxChooserBtn">📂 Choose On-Hand File from Dropbox</button>
+        <button id="uploadDropboxFile">📤 Load from Dropbox</button>
         <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
           <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example:
