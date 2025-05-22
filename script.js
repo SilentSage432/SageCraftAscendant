@@ -1687,9 +1687,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         upcToItem[item] = trimmedItem;
         saveUPCMap();
-        // Remove the raw UPC from liveCounts if present
+        // Remove any lingering raw UPC or item lines before adding the correct mapping
         if (liveCounts[item]) delete liveCounts[item];
-        // Remove any prior entry for trimmedItem to avoid duplicate count
+        if (liveCounts[trimmedItem]) delete liveCounts[trimmedItem];
+        // Only assign the trimmed item number in the count table
         liveCounts[trimmedItem] = {
           count: 1,
           category: inferredCategory || categoryInput.value || '',
