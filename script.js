@@ -194,7 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
     URL.revokeObjectURL(url);
   };
   // Add it to the first settings group
-  const settingsTarget = document.querySelector('#tools .settings-group');
+  let settingsTarget = document.querySelector('#tools .settings-group');
+  if (!settingsTarget) {
+    settingsTarget = document.createElement('div');
+    settingsTarget.className = 'settings-group';
+    document.getElementById('tools')?.appendChild(settingsTarget);
+  }
   if (settingsTarget) {
     settingsTarget.appendChild(backupBtn);
   }
@@ -354,9 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
       loadSessionFromDropbox();
     }
   };
-
-  const settingsTarget = document.querySelector('#tools .settings-group');
-  if (settingsTarget) settingsTarget.appendChild(loadOptionsBtn);
 
   // --- Dropbox Backup Browser Modal Button ---
   const browseBackupsBtn = document.createElement('button');
