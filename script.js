@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const code = new URLSearchParams(window.location.search).get('code');
     const verifier = localStorage.getItem('pkce_verifier');
     const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
-    const clientId = 'YOUR_APP_KEY'; // Replace with actual Dropbox app key
+    const clientId = '0s592qf9o6g9cwx';
 
     const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
       method: 'POST',
