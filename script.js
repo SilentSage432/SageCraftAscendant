@@ -98,13 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         redirect_uri: redirectUri
       })
     });
-    console.log("Dropbox Token Response:", await res.clone().text());
-    const status = res.status;
+    // Logging block before parsing token response as JSON
     const text = await res.text();
-    console.log("🔁 Dropbox Token HTTP Status:", status);
+    console.log("🔁 Dropbox Token HTTP Status:", res.status);
     console.log("📦 Raw response:", text);
-
-    const data = await res.json();
+    const data = JSON.parse(text);
     if (data.access_token && data.refresh_token) {
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
