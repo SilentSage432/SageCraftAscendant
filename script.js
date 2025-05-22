@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         redirect_uri: redirectUri
       })
     });
+    console.log("Dropbox Token Response:", await res.clone().text());
 
     const data = await res.json();
     if (data.access_token && data.refresh_token) {
