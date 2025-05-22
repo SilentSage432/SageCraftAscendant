@@ -81,7 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleDropboxCallback() {
     const code = new URLSearchParams(window.location.search).get('code');
+    console.log("Code from URL:", code);
     const verifier = localStorage.getItem('pkce_verifier');
+    console.log("Verifier from localStorage:", verifier);
     const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
     const clientId = '0s592qf9o6g9cwx';
 
