@@ -1331,6 +1331,18 @@ document.addEventListener('DOMContentLoaded', () => {
     resetScanInput();
   }
 
+  // Suggest category helper based on UPC prefix
+  function suggestCategoryFromUPC(upc) {
+    for (const knownUPC in upcToItem) {
+      if (knownUPC.slice(0, 5) === upc.slice(0, 5)) {
+        const item = upcToItem[knownUPC];
+        const category = liveCounts[item]?.category;
+        if (category) return category;
+      }
+    }
+    return null;
+  }
+
   async function processScan(item) {
     console.log("🔍 processScan triggered with:", item);
     if (!item) return;
@@ -1359,11 +1371,18 @@ document.addEventListener('DOMContentLoaded', () => {
       resetScanInput();
       return;
     } else if (response === 'product') {
-      const userDefined = prompt(`UPC ${item} is not linked to a Lowe's item #. Please enter it now:`);
+      const suggestedCategory = suggestCategoryFromUPC(item);
+      const userDefined = prompt(
+        `UPC ${item} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${suggestedCategory || 'Unknown'}")`
+      );
       if (userDefined) {
         upcToItem[item] = userDefined;
         saveUPCMap();
         item = userDefined;
+        if (suggestedCategory) {
+          liveCounts[item] = liveCounts[item] || {};
+          liveCounts[item].category = suggestedCategory;
+        }
       } else {
         resetScanInput();
         return;
