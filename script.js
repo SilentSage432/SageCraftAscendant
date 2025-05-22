@@ -106,7 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = JSON.parse(text);
       if (data.access_token) {
+        console.log("✅ Dropbox token received:", data.access_token);
         localStorage.setItem('access_token', data.access_token);
+        window.location.href = redirectUri;
+        return;
         console.log("✅ access_token saved:", data.access_token);
 
         if (data.refresh_token) {
@@ -126,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       console.warn("❌ Dropbox returned error:", data);
+      console.warn("Full Dropbox callback response:", text);
       alert("❌ Dropbox login failed.");
     } catch (err) {
       console.error("❌ Dropbox callback error:", err);
