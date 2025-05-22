@@ -1,4 +1,3 @@
-/* Animated gradient-glow for headings */
 h1, h2, h3 {
   background: linear-gradient(90deg, #d6bbff, #9b59b6, #d6bbff);
   -webkit-background-clip: text;
@@ -18,23 +17,6 @@ textarea {
   resize: vertical;
 }
 
-button {
-  display: block;
-  width: 100%;
-  background: #555;
-  color: white;
-  font-size: 16px;
-  padding: 12px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-button:hover {
-  background: #333;
-}
 
 #resultsTable {
   width: 100%;
@@ -121,53 +103,14 @@ button:hover {
     font-size: 14px;
   }
 }
-section button {
-  width: 100%;
-  padding: 12px;
-  margin: 5px 0;
-  font-size: 16px;
-  border: none;
-  background-color: #555;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
 
-section button:hover {
-  background-color: #333;
-}
-
-input[type="text"],
-input[type="number"],
-select {
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
 /* --- Dark Mode Overrides --- */
 body {
   background: linear-gradient(to bottom, #0e0a1a, #1c0c2b);
   color: #eae6f9;
 }
 
-.container {
-  background-color: #1e1e1e;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
 
-input[type="text"],
-input[type="number"],
-select,
-textarea {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  border: 1px solid #444;
-}
 
 table {
   background-color: #1e1e1e;
@@ -185,29 +128,7 @@ section {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-button {
-  background: linear-gradient(to right, #7f00ff, #e100ff);
-  border: 1px solid #b57eff;
-  box-shadow: 0 0 12px #b57eff55;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 6px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-button:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 18px #e100ffaa;
-}
 
-#summaryBar {
-  background-color: #1e1e1e;
-  border: 1px solid #444;
-  color: #e0e0e0;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px;
-  border-radius: 6px;
-}
 
 #summaryBar span,
 #summaryBar .match-icon,
@@ -223,10 +144,6 @@ button:hover {
   font-size: 15px;
 }
 
-/* Dark mode enhancements */
-.container, section {
-  background-color: #1e1e1e !important;
-}
 
 #resultsTable th,
 #liveCountTable th {
@@ -235,13 +152,6 @@ button:hover {
   border-color: #555;
 }
 
-button {
-  background-color: #3a7bd5;
-}
-
-button:hover {
-  background-color: #2f64a3;
-}
 
 section {
   margin-bottom: 40px;
@@ -404,11 +314,52 @@ body {
   overflow-x: hidden;
 }
 
-.container, section, .tab-section {
-  background-color: rgba(30, 30, 60, 0.9);
-  border: 1px solid #4e2a84;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(114, 66, 255, 0.3);
+
+/* --- Indigo Glow Enhancements --- */
+
+button,
+section button,
+.import-export-group button,
+.tablink,
+.nav-icon {
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+button:hover,
+section button:hover,
+.import-export-group button:hover,
+.tablink:hover,
+.nav-icon:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  transform: scale(1.05);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #5f8fff;
+  box-shadow: 0 0 5px #00bfff88;
+  outline: none;
+}
+
+.container,
+.tab-section,
+.scan-capsule,
+.table-wrapper table {
+  box-shadow: 0 0 15px rgba(75, 0, 130, 0.3);
+}
+
+.category-badge {
+  border: 1px solid #5f8fff;
+  box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+}
+
+#summaryBar {
+  text-shadow: 0 0 4px #4b0082;
 }
 
 /* The above h1, h2, h3 style is now updated above for animated gradient */
@@ -422,21 +373,21 @@ button {
   border-radius: 6px;
   cursor: pointer;
   /* Glowing effect for main action buttons */
-  box-shadow: 0 0 10px #a97ff3, 0 0 20px #a97ff366;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
   transition: all 0.3s ease;
 }
 
 button:hover {
-  background: linear-gradient(to right, #2575fc, #6a11cb);
+  background: linear-gradient(to right, #2575fc, #4b0082);
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(160, 82, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
 
 #summaryBar {
   background-color: #1b1131;
   border: 1px solid #4e2a84;
   color: #dcd2ff;
-  text-shadow: 0 0 4px #6a0dad;
+  text-shadow: 0 0 4px #4b0082;
 }
 
 input, textarea, select {
@@ -535,8 +486,8 @@ footer{
 }
 
 input:focus, textarea:focus {
-  border-color: #c084fc;
-  box-shadow: 0 0 5px #c084fc88;
+  border-color: #5f8fff;
+  box-shadow: 0 0 5px #00bfff88;
   outline: none;
 }
 
@@ -614,47 +565,10 @@ footer {
   box-shadow: 0 0 18px #a97ff3, inset 0 0 8px #8f3aff66;
   color: #ffffff;
 }
-.tab-section {
-  padding: 20px;
-}
 
-button,
-section button,
-.import-export-group button {
-  max-width: 100%;
-  text-align: center;
-}
 
-input[type="file"] {
-  color: #dcd2ff;
-  background-color: #1b1131;
-  border: 1px solid #6a0dad;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 6px;
-  box-shadow: inset 0 0 5px #6a0dad;
-}
-
-input[type="file"]::file-selector-button {
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(160, 82, 255, 0.6);
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-input[type="file"]::file-selector-button:hover {
-  background: linear-gradient(145deg, #8f3aff, #6c2fd1);
-  transform: scale(1.05);
-}
 
 /* Smooth section transitions */
-.tab-section {
-  animation: fadeIn 0.4s ease-in-out;
-}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -716,8 +630,8 @@ body::before {
   font-weight: 600;
   background: rgba(144, 62, 255, 0.15);
   color: #d6bbff;
-  border: 1px solid #8b5cf6;
-  box-shadow: 0 0 8px rgba(160, 82, 255, 0.3);
+  border: 1px solid #5f8fff;
+  box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
   text-shadow: 0 0 3px #9b59b6;
   margin-right: 8px;
   margin-bottom: 6px;
@@ -773,7 +687,7 @@ body::before {
   background-color: #e74c3c;
   box-shadow: 0 0 5px #e74c3caa;
 }
- # Glow animation for newly scanned items
+ /* Glow animation for newly scanned items */
 
 
 .new-item-flash {
