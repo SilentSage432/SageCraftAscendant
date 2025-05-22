@@ -61,16 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userDefined) {
           upcToItem[val] = userDefined;
           saveUPCMap();
-          const item = userDefined;
+          const item = userDefined.trim();
+          if (!item) return alert("❌ Invalid item number.");
 
-          // Overwrite the entire object to prevent field misalignment
+          const qty = parseInt(liveQtyInput?.value.trim()) || 1;
+          const category = categoryInput?.value?.trim() || inferredCategory || '';
+          const location = currentLocation;
+
+          if (!item) return alert("❌ Invalid item number.");
+
+          // Remove conflicting key if present
+          if (liveCounts[val]) delete liveCounts[val];
+
           liveCounts[item] = {
-            count: parseInt(liveQtyInput.value.trim()) || 1,
-            category: inferredCategory || categoryInput.value || '',
-            location: currentLocation
+            count: qty,
+            category,
+            location
           };
 
-          updateRotationDate(liveCounts[item].category);
+          updateRotationDate(category);
           updateLiveTable();
         }
         resetScanInput();
@@ -1312,7 +1321,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedWeek = document.getElementById('compareWeek')?.value;
     const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
 
-    Object.entries(liveCounts).forEach(([item, obj]) => {
+    Object.entries(liveCounts).forEach(([rawItem, obj]) => {
+      const item = (rawItem || '').trim();
+      if (!item) return;
       // --- Live search filter ---
       if (searchTerm &&
           !item.toLowerCase().includes(searchTerm) &&
@@ -1823,7 +1834,7 @@ document.addEventListener('DOMContentLoaded', () => {
           for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             const upc = upcIndex !== -1 ? row[upcIndex] : null;
-            const item = row[itemIndex];
+            const item = (row[itemIndex] || '').toString().trim();
             if (!item) continue;
 
             const key = upc || item;
