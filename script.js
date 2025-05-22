@@ -11,6 +11,44 @@ let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 
+import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
+
+// --- Dropbox Access Token Refresh/Getter ---
+async function refreshAccessToken() {
+  const refreshToken = localStorage.getItem('refresh_token');
+  if (!refreshToken) {
+    alert("❌ No refresh token available. Please reconnect Dropbox.");
+    return null;
+  }
+
+  const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: '0s592qf9o6g9cwx'
+    })
+  });
+
+  const data = await res.json();
+  if (data.access_token) {
+    localStorage.setItem('access_token', data.access_token);
+    return data.access_token;
+  } else {
+    console.warn("❌ Failed to refresh Dropbox token:", data);
+    return null;
+  }
+}
+
+async function getDropboxAccessToken() {
+  let token = localStorage.getItem('access_token');
+  if (!token) {
+    token = await refreshAccessToken();
+  }
+  return token;
+}
+
 // --- updateRotationDate helper ---
 function updateRotationDate(category) {
   const now = new Date().toISOString();
@@ -21,6 +59,55 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Dropbox OAuth2 PKCE Integration ---
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    handleDropboxCallback(); // Handle redirect after Dropbox login
+  }
+
+  async function beginDropboxLogin() {
+    const verifier = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier);
+
+    localStorage.setItem('pkce_verifier', verifier);
+
+    const clientId = '0s592qf9o6g9cwx';
+    const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
+
+    const authUrl = `https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge_method=S256&code_challenge=${challenge}`;
+    window.location.href = authUrl;
+  }
+
+  async function handleDropboxCallback() {
+    const code = new URLSearchParams(window.location.search).get('code');
+    const verifier = localStorage.getItem('pkce_verifier');
+    const redirectUri = 'https://silentsage432.github.io/inventory-tool/';
+    const clientId = 'YOUR_APP_KEY'; // Replace with actual Dropbox app key
+
+    const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        code_verifier: verifier,
+        redirect_uri: redirectUri
+      })
+    });
+
+    const data = await res.json();
+    if (data.access_token && data.refresh_token) {
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('refresh_token', data.refresh_token);
+      window.history.replaceState({}, document.title, redirectUri);
+      alert("✅ Dropbox connected!");
+    } else {
+      alert("❌ Dropbox login failed.");
+      console.warn(data);
+    }
+  }
   console.log("✅ DOMContentLoaded fired and script.js is active");
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
   const addLiveItemBtn = document.getElementById('addLiveItem');
@@ -275,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsTarget.appendChild(backupBtn);
   }
   // --- Dropbox Integration for Save/Load Session ---
-  const DROPBOX_ACCESS_TOKEN = 'sl.u.AFuzFjeq4VFxDnoRq0NHwVzaADjR1O3-QgSBtL2lwFYdTWRsU2swRTJvjxJ2BgQFu2RBWJ1sri2oI-OcX6CTNAXWq08cUIUoT7FwAn2HoYpnF_W1T0UhAez7sEoN4T_ZWB8IfYHuqErRjJ6nq38e8WfjDNSCJzZjpYS73UBh1XmX5aQuSxEXXN5cw0l9qLPONsICRyPNMGmsuEdUolEDPF86yXbJSbdeoN3EiELrQmx4Aj9Ll9OkkPdcV8l5_vY70d02giZnRM7JyjZU_bYVERBxlLiuIP6mFXkBCrzmQtuXLD67AUveEkfaGEPbrBlTBwEj1DJDztKfN-Gd8up2_ZW9-f4vfm_jbKYBM6kvcJtefesmKjZDHeb4fOZ12scs_VfjeCfZ0bIpmrY4xt0HoC0AyIW8VWDLZlLrB45ig2RXZPvn1aLA9QkNsyMHGoB4aIYwFYhHkcm2CpgJ4DJ1MFdIRBNk0g2gVP9TlQ1EWDk0o6m1EtAlIecevZzlRvbcEa1w_YH5Rp1i_tXItCB-qmruMEvQvBVWmrC4pWQ_9pepNoLBJuYjQsIuTLmO4fiN69rIoDYLjC9eF7Jpm43uE4AhtBTdmiZ01_1T3zwMJ3c-R5GFybkCk0wBizNJ1qyRwkIs4KHGzXFjPzEabjEVL6xboiKzr3NgcmFUhLeAKx01fpljtM_Zk3xWXt6QSJDOnQYahyR95J8WNcY_SxQca6wirA_3yGvj-3i-BZVZoh62GglGz00FHtX5Tr47zSoEFAL4i5soxCf7eN0zA-sXNl03qJqQyMNQQQFVgd7Y8fTA51tLvdDSW6n9tGT73IIFR8vJVzR1NjFn2RRJ3ojkwwr8HJrazOgZ7VkEeBXPMu_ulKVMtv9N4Avp5gcNsaHhMTIN6L0QFzGcvLTderUug6K1pHz5sKKLgGSPRSlm5sClvd3mNvfAj7Mp3P51iUWYzC59pnIjwmk_lFVNcJmSguNxdk1M4fwFtOlCtwkaBHbQwCojHXOkKwRqtUKuhZw_zcDP1aK8R5rA9z7r36Il87KpXs4iuWps7XAbmkn00yHIWm0gYKh0MgpjYj74BmmuM9XsYYIYcFpw7AVNCfMCoTBCylkGqPcfDNgcsq5pYhoTkljsPXIwd8PUlEoRuIyJRmbV0IMrnJ9HevmU39xObJtTP9eGmBnM0nslgnrV7DwFo1SLJmQr7Bk0TqAOgla64tkn4WFTSG7Wft7eG4Js8FzuzeMloNW8GU_UFHELO2ztk0VyxXP7X1DyaleAZX3N340';
 
   async function saveSessionToDropbox() {
     const session = {
@@ -287,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
           path: '/active_session.json',
@@ -312,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Auto-backup to Dropbox every X minutes ---
   function setupDropboxAutoBackup(intervalMinutes = 10) {
     if (!intervalMinutes || isNaN(intervalMinutes) || intervalMinutes < 1) intervalMinutes = 10;
-    setInterval(() => {
+    setInterval(async () => {
       const session = {
         liveCounts: JSON.parse(JSON.stringify(liveCounts)),
         upcToItem: JSON.parse(JSON.stringify(upcToItem)),
@@ -323,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch('https://content.dropboxapi.com/2/files/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
           'Content-Type': 'application/octet-stream',
           'Dropbox-API-Arg': JSON.stringify({
             path: `/auto_backup_session_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
@@ -349,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const response = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Dropbox-API-Arg': JSON.stringify({ path: '/active_session.json' })
       }
     });
@@ -388,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ path: '' })
@@ -409,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const dlResponse = await fetch('https://content.dropboxapi.com/2/files/download', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
           'Dropbox-API-Arg': JSON.stringify({ path: newestFile })
         }
       });
@@ -442,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ path: '' })
@@ -495,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dlResponse = await fetch('https://content.dropboxapi.com/2/files/download', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+            'Authorization': `Bearer ${await getDropboxAccessToken()}`,
             'Dropbox-API-Arg': JSON.stringify({ path: file.path_lower })
           }
         });
@@ -534,6 +620,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (settingsTarget) settingsTarget.appendChild(browseBackupsBtn);
 
+  // --- Dropbox OAuth2 PKCE Login Button ---
+  const loginBtn = document.createElement('button');
+  loginBtn.textContent = '🔐 Connect Dropbox';
+  loginBtn.onclick = beginDropboxLogin;
+  settingsTarget?.appendChild(loginBtn);
+
   // --- Restore UPC Map from Dropbox Button ---
   const restoreUPCBtn = document.createElement('button');
   restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
@@ -542,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const response = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Dropbox-API-Arg': JSON.stringify({ path: '/upc_map_backup.json' })
       }
     });
