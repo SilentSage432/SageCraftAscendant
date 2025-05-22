@@ -69,13 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
           upcToItem[val] = item;
           saveUPCMap();
 
-          const count = parseInt(liveQtyInput?.value?.trim()) || 1;
-          const category = categoryInput?.value?.trim() || inferredCategory || '';
-          const location = currentLocation;
+          liveCounts[item] = {
+            count: parseInt(liveQtyInput?.value?.trim()) || 1,
+            location: currentLocation,
+            category: categoryInput?.value?.trim() || inferredCategory || ''
+          };
 
-          liveCounts[item] = { count, category, location };
-
-          updateRotationDate(category);
+          updateRotationDate(liveCounts[item].category);
           updateLiveTable();
         }
         resetScanInput();
