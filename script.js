@@ -11,16 +11,72 @@ let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 
+// --- updateRotationDate helper ---
+function updateRotationDate(category) {
+  const now = new Date().toISOString();
+  const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
+  rotationData[category] = now;
+  localStorage.setItem('auditRotation', JSON.stringify(rotationData));
+  console.log(`🔁 Updated rotation date for "${category}"`);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded fired and script.js is active");
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
   const addLiveItemBtn = document.getElementById('addLiveItem');
-  // Add event listener for Add Live Item button immediately after declaration
+  // Add event listener for Add Live Item button with updated logic (delayed prompt)
   if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', () => {
+    addLiveItemBtn.addEventListener('click', async () => {
       console.log("📦 Add Item button clicked (manual)");
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (val) processScan(val);
+      if (!val) return;
+
+      // If known code, proceed as normal
+      if (upcToItem[val] || locationMap[val]) {
+        processScan(val);
+        return;
+      }
+
+      // For manually entered unknown codes, delay prompt until user confirms
+      console.warn("⚠️ Manual entry of unrecognized code:", val);
+      const response = await showCustomPrompt(val);
+      updateSuggestions();
+      updateLiveTable();
+
+      if (response === 'location') {
+        const name = prompt(`🗂 Please enter a name for location "${val}":`);
+        if (name) {
+          locationMap[val] = name;
+          saveLocationMap();
+          currentLocation = name;
+          updateLocationStatus();
+          alert(`📍 Current location set to: ${name}`);
+        }
+        resetScanInput();
+      } else if (response === 'product') {
+        const inferredCategory = inferUserCategoryPattern(val) || suggestCategoryFromUPC(val);
+        const userDefined = prompt(
+          `UPC ${val} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
+        );
+        if (userDefined) {
+          upcToItem[val] = userDefined;
+          saveUPCMap();
+          const item = userDefined;
+
+          // Overwrite the entire object to prevent field misalignment
+          liveCounts[item] = {
+            count: parseInt(liveQtyInput.value.trim()) || 1,
+            category: inferredCategory || categoryInput.value || '',
+            location: currentLocation
+          };
+
+          updateRotationDate(liveCounts[item].category);
+          updateLiveTable();
+        }
+        resetScanInput();
+      } else {
+        resetScanInput();
+      }
     });
   }
   const saveToDriveBtn = document.getElementById('saveToDrive');
@@ -535,14 +591,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter') {
         e.preventDefault(); // prevent accidental form submits or focus shifts
         const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-        if (val) processScan(val);
+        const isScannerInput = val.length >= 10 && !isNaN(val);
+        if (val && isScannerInput) {
+          processScan(val);
+        }
       }
     });
-    // Add input event handler for mobile/soft-keyboard scanners
+    // Add input event handler for mobile/soft-keyboard scanners (barcode-only detection)
     liveEntryInput.addEventListener('input', () => {
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (val.length >= 5) { // Adjust length threshold if needed
-        processScan(val);
+      if (val.length >= 5) {
+        // Only auto-scan if input is coming from a scanner (e.g., input event is too fast for typing)
+        const isScannerInput = val.length >= 10 && !isNaN(val);
+        if (isScannerInput) {
+          processScan(val);
+        }
       }
     });
   }
@@ -816,6 +879,48 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
+  }
+
+  // --- Export Excel Template Button ---
+  // Place near other export buttons
+  const exportTemplateBtn = document.createElement('button');
+  exportTemplateBtn.textContent = '📤 Export Excel Template';
+  exportTemplateBtn.style.marginTop = '8px';
+  exportTemplateBtn.onclick = () => {
+    const wb = XLSX.utils.book_new();
+    const ws_data = [
+      ['Item #', 'Found', 'Category', 'Location'],
+      ['670009', 1, 'Laundry', 'Bay A12'],
+      ['123456', 2, 'Ranges', 'Bay B04']
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    // Apply basic cell styling
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "4F81BD" } }
+    };
+    ['A1', 'B1', 'C1', 'D1'].forEach(cell => {
+      if (ws[cell]) ws[cell].s = headerStyle;
+    });
+
+    // Apply color-coded category samples
+    const categoryStyles = {
+      'Laundry': { fill: { fgColor: { rgb: '8ECAE6' } } },
+      'Ranges': { fill: { fgColor: { rgb: 'FFB703' } } }
+    };
+    ['C2', 'C3'].forEach((cell, i) => {
+      const category = ws_data[i + 1][2];
+      if (ws[cell] && categoryStyles[category]) {
+        ws[cell].s = categoryStyles[category];
+      }
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Template');
+    XLSX.writeFile(wb, 'inventory-import-template.xlsx');
+  };
+  if (settingsTarget) {
+    settingsTarget.appendChild(exportTemplateBtn);
   }
 
   // --- Import locationMap from file ---
@@ -1218,6 +1323,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const count = obj.count;
       const expected = onHandMap[item] || 0;
       const diff = count - expected;
+      // --- Add diff color logic ---
+      let diffColor = 'black';
+      if (diff > 0) diffColor = 'green';
+      else if (diff < 0) diffColor = 'red';
       const previous = lastWeek ? lastWeek[item] || 0 : '';
       const weekDiff = lastWeek ? count - previous : '';
       const category = obj.category || '';
@@ -1265,7 +1374,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span contenteditable="true" spellcheck="false">${count}</span>
           <button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>
         </td>
-        <td>${diff > 0 ? '+' + diff : diff}</td>
+        <td style="color:${diffColor}">${diff > 0 ? '+' + diff : diff}</td>
         <td>${previous !== '' ? previous : '-'}</td>
         <td>${weekDiff !== '' ? (weekDiff > 0 ? '+' + weekDiff : weekDiff) : '-'}</td>
         <td class="editable" data-field="category" data-id="${item}">
@@ -1505,10 +1614,11 @@ document.addEventListener('DOMContentLoaded', () => {
         upcToItem[item] = userDefined;
         saveUPCMap();
         item = userDefined;
-        liveCounts[item] = liveCounts[item] || {};
-        if (inferredCategory) {
-          liveCounts[item].category = inferredCategory;
-        }
+        liveCounts[item] = {
+          count: 1,
+          category: inferredCategory || categoryInput.value || '',
+          location: currentLocation
+        };
       } else {
         resetScanInput();
         return;
@@ -1622,6 +1732,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    // --- Conditional formatting: color-code "Difference" column (D) ---
+    // Apply conditional styling to "Difference" column (D)
+    for (let i = 1; i < ws_data.length; i++) {
+      const diff = ws_data[i][3]; // Column D: Difference
+      const cellRef = `D${i + 1}`;
+      if (!ws[cellRef]) continue;
+      if (diff > 0) {
+        ws[cellRef].s = { font: { color: { rgb: "008000" } } }; // green
+      } else if (diff < 0) {
+        ws[cellRef].s = { font: { color: { rgb: "FF0000" } } }; // red
+      } else {
+        ws[cellRef].s = { font: { color: { rgb: "000000" } } }; // black
+      }
+    }
     wb.Sheets['Inventory'] = ws;
     XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
 
@@ -1673,6 +1797,27 @@ document.addEventListener('DOMContentLoaded', () => {
           const countIndex = header.findIndex(h => /found/i.test(h));
           const categoryIndex = header.findIndex(h => /category/i.test(h));
           const locationIndex = header.findIndex(h => /location/i.test(h));
+
+          // --- Validation logic for required columns ---
+          console.log('🧭 Excel Header Map:', {
+            upcIndex,
+            itemIndex,
+            countIndex,
+            categoryIndex,
+            locationIndex
+          });
+
+          const requiredFields = [
+            { name: 'Item', index: itemIndex },
+            { name: 'Count (Found)', index: countIndex },
+            { name: 'Category', index: categoryIndex },
+            { name: 'Location', index: locationIndex }
+          ];
+          const missing = requiredFields.filter(f => f.index === -1).map(f => f.name);
+          if (missing.length > 0) {
+            alert(`❌ Missing required column(s): ${missing.join(', ')}\nPlease check your Excel file and try again.`);
+            return;
+          }
 
           Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
           for (let i = 1; i < rows.length; i++) {
