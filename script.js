@@ -59,25 +59,21 @@ document.addEventListener('DOMContentLoaded', () => {
           `UPC ${val} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
         );
         if (userDefined) {
-          upcToItem[val] = userDefined;
-          saveUPCMap();
           const item = userDefined.trim();
-          if (!item) return alert("❌ Invalid item number.");
+          if (!item) {
+            alert("❌ Invalid item number.");
+            resetScanInput();
+            return;
+          }
 
-          const qty = parseInt(liveQtyInput?.value.trim()) || 1;
+          upcToItem[val] = item;
+          saveUPCMap();
+
+          const count = parseInt(liveQtyInput?.value?.trim()) || 1;
           const category = categoryInput?.value?.trim() || inferredCategory || '';
           const location = currentLocation;
 
-          if (!item) return alert("❌ Invalid item number.");
-
-          // Remove conflicting key if present
-          if (liveCounts[val]) delete liveCounts[val];
-
-          liveCounts[item] = {
-            count: qty,
-            category,
-            location
-          };
+          liveCounts[item] = { count, category, location };
 
           updateRotationDate(category);
           updateLiveTable();
