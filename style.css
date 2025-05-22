@@ -605,10 +605,11 @@ body::before {
 }
 
 .logo-icon {
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   filter: drop-shadow(0 0 8px #a97ff3);
   margin-bottom: 5px;
+  object-fit: contain;
 }
 
 .logo-title {
