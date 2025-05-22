@@ -455,57 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
     voiceHint.style.color = 'gray';
     onHandInput.insertAdjacentElement('afterend', voiceHint);
 
-    // --- Upload On-Hand File (.txt or .csv) ---
-    const uploadOnHandFileBtn = document.getElementById('uploadOnHandFile');
-    if (uploadOnHandFileBtn) {
-      console.log("Upload button found:", uploadOnHandFileBtn);
-      uploadOnHandFileBtn.addEventListener('click', () => {
-        console.log("Upload button clicked");
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.txt,.csv';
-        input.style.display = 'none';
-        document.body.appendChild(input);
-        input.addEventListener('change', (e) => {
-          console.log("File input triggered", e.target.files);
-          const file = e.target.files[0];
-          if (!file) {
-            alert('❌ No file selected.');
-            return;
-          }
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            console.log("File read complete", reader.result.slice(0, 100));
-            const content = reader.result.trim();
-            const onHandInput = document.getElementById('onHandInput');
-            if (onHandInput) {
-              onHandInput.value = content;
-              localStorage.setItem('onHandBackup', content);
-              const now = new Date();
-              const formatted = now.toLocaleTimeString();
-              const statusDiv = document.getElementById('onHandLastSaved');
-              if (statusDiv) {
-                statusDiv.textContent = `📥 Loaded: ${formatted}`;
-              }
-            }
-          };
-          reader.readAsText(file);
-        });
-        input.click();
-      });
-      // --- Add upload logic for on-hand data (after file parsing logic) ---
-      uploadOnHandFileBtn.addEventListener('click', () => {
-        const onHandText = document.getElementById('onHandInput').value;
-        if (!onHandText.trim()) {
-          alert('No on-hand data found to upload.');
-          return;
-        }
-        localStorage.setItem('onHandBackup', onHandText);
-        alert('✅ On-hand counts uploaded and saved to local backup!');
-      });
-    }
-
     // --- Upload On-Hand File from Dropbox ---
     const uploadDropboxFileBtn = document.getElementById('uploadDropboxFile');
     if (uploadDropboxFileBtn) {
