@@ -68,6 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           upcToItem[val] = item;
           saveUPCMap();
+          // Remove the raw UPC from liveCounts if present
+          if (liveCounts[val]) delete liveCounts[val];
 
           liveCounts[item] = {
             count: parseInt(liveQtyInput?.value?.trim()) || 1,
@@ -529,6 +531,38 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (settingsTarget) settingsTarget.appendChild(browseBackupsBtn);
+
+  // --- Restore UPC Map from Dropbox Button ---
+  const restoreUPCBtn = document.createElement('button');
+  restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
+  restoreUPCBtn.style.marginTop = '8px';
+  restoreUPCBtn.onclick = async () => {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: '/upc_map_backup.json' })
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      alert(`❌ Failed to restore UPC map: ${err}`);
+      return;
+    }
+
+    const map = await response.json();
+    if (!map || typeof map !== 'object') {
+      alert('❌ Invalid UPC map format.');
+      return;
+    }
+
+    Object.assign(upcToItem, map);
+    saveUPCMap();
+    alert('✅ UPC mappings restored from Dropbox!');
+  };
+
+  if (settingsTarget) settingsTarget.appendChild(restoreUPCBtn);
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
     if (/^\d{15}$/.test(code)) {
@@ -1653,6 +1687,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         upcToItem[item] = trimmedItem;
         saveUPCMap();
+        // Remove the raw UPC from liveCounts if present
+        if (liveCounts[item]) delete liveCounts[item];
         liveCounts[trimmedItem] = {
           count: 1,
           category: inferredCategory || categoryInput.value || '',
