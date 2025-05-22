@@ -103,9 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("🔁 Dropbox Token HTTP Status:", res.status);
     console.log("📦 Raw response:", text);
     const data = JSON.parse(text);
-    if (data.access_token && data.refresh_token) {
+    if (data.access_token && (data.refresh_token || localStorage.getItem('refresh_token'))) {
       localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
+      if (data.refresh_token) {
+        localStorage.setItem('refresh_token', data.refresh_token);
+      }
       window.history.replaceState({}, document.title, redirectUri);
       alert("✅ Dropbox connected!");
     } else {
