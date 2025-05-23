@@ -1793,7 +1793,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
-    item = item.replace(/^0+/, ''); // Remove leading zeros
+    // item = item.replace(/^0+/, ''); // Remove leading zeros
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
     if (upcToItem[item]) {
@@ -1801,10 +1801,23 @@ document.addEventListener('DOMContentLoaded', () => {
       item = upcToItem[item];
     }
 
-    const isRecognized = !!liveCounts[item] || !!locationMap[item] || Object.values(upcToItem).includes(originalItem);
-    if (isRecognized) {
+    // --- Use originalItem for recognition checks ---
+    const isMappedUPC = upcToItem[originalItem] !== undefined;
+    const isKnownLocation = locationMap[originalItem] !== undefined;
+    const resolvedItem = upcToItem[originalItem] || originalItem;
+    const isLiveCounted = liveCounts[resolvedItem] !== undefined;
+
+    if (isMappedUPC || isKnownLocation || isLiveCounted) {
       console.log("✅ Recognized code. Skipping prompt.");
-      proceedWithKnownScan(item);
+      const mappedItem = upcToItem[originalItem] || originalItem;
+      proceedWithKnownScan(mappedItem);
+      return;
+    }
+
+    // Additional short-circuit: skip prompt if already in liveCounts (use resolvedItem)
+    if (liveCounts[resolvedItem]) {
+      console.log("✅ Already in liveCounts (resolved), skipping prompt.");
+      proceedWithKnownScan(resolvedItem);
       return;
     }
 
