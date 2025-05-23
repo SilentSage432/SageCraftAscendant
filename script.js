@@ -761,11 +761,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const liveEntryInput = document.getElementById('liveEntry');
   // Add Enter key handler for liveEntryInput
   if (liveEntryInput) {
+    // Enhanced Enter key detection with log for scan source
     liveEntryInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault(); // prevent accidental form submits or focus shifts
         const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
         const isScannerInput = val.length >= 10 && !isNaN(val);
+        console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
         if (val && isScannerInput) {
           if (upcToItem[val]) {
             const itemNum = upcToItem[val];
@@ -776,19 +778,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    // Add input event handler for mobile/soft-keyboard scanners (barcode-only detection)
+    // Stricter input event detection for scanner input
     liveEntryInput.addEventListener('input', () => {
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (val.length >= 5) {
-        // Only auto-scan if input is coming from a scanner (e.g., input event is too fast for typing)
-        const isScannerInput = val.length >= 10 && !isNaN(val);
-        if (isScannerInput) {
-          if (upcToItem[val]) {
-            const itemNum = upcToItem[val];
-            processScan(itemNum);
-          } else {
-            processScan(val);
-          }
+      if (val.length >= 12 && !isNaN(val)) {
+        // Only auto-scan if value hasn't already triggered prompt
+        console.log("🔍 Scanner input detected:", val);
+        if (upcToItem[val]) {
+          const itemNum = upcToItem[val];
+          processScan(itemNum);
+        } else {
+          processScan(val);
         }
       }
     });
@@ -1795,6 +1795,9 @@ document.addEventListener('DOMContentLoaded', () => {
   async function processScan(item) {
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
+    // Log scanned input and its mapping
+    console.log("🔍 Scanned input:", originalItem);
+    console.log("📦 Maps to item:", upcToItem[originalItem]);
 
     const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
     const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
@@ -1806,10 +1809,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
     console.log("📊 [SCAN] Already in liveCounts?", isLiveCounted);
 
-    // If code is already known in any way, skip prompt
-    if (isMappedUPC || isKnownLocation || isLiveCounted) {
+    // New: Recognize any scanned value that maps directly or indirectly to a known item/location/liveCount
+    if (
+      upcToItem[originalItem] ||
+      locationMap[originalItem] ||
+      liveCounts[originalItem] ||
+      liveCounts[upcToItem[originalItem]]
+    ) {
       console.log("✅ Recognized code — skipping prompt.");
-      proceedWithKnownScan(resolvedItem);
+      proceedWithKnownScan(upcToItem[originalItem] || originalItem);
       return;
     }
 
