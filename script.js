@@ -1988,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        upcToItem[originalItem] = trimmedItem;
+        upcToItem[item] = trimmedItem;
         saveUPCMap();
         if (originalItem !== trimmedItem) delete liveCounts[originalItem];
         delete liveCounts[trimmedItem];
@@ -1998,7 +1998,7 @@ document.addEventListener('DOMContentLoaded', () => {
           location: currentLocation
         };
 
-        console.log("✅ Stored item:", trimmedItem, "for UPC:", originalItem);
+        console.log("✅ Stored item:", trimmedItem, "for UPC:", item);
         updateRotationDate(liveCounts[trimmedItem].category);
         updateLiveTable();
       }
