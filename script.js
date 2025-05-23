@@ -802,16 +802,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    // Debounced input event detection for scanner input
+    // Debounced scanner-like input detection for liveEntryInput
     let scanDebounceTimer = null;
     liveEntryInput.addEventListener('input', () => {
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (val.length >= 12 && !isNaN(val)) {
+      // Only trigger scan logic if the value looks like a full scan (14+ digits, all numeric)
+      if (val.length >= 14 && !isNaN(val)) {
         if (scanDebounceTimer) clearTimeout(scanDebounceTimer);
         scanDebounceTimer = setTimeout(() => {
-          console.log("🔍 Scanner input detected (debounced):", val);
-          processScan(val);
-        }, 200); // Adjust delay as needed
+          // If Enter key wasn't manually pressed (input lost focus), assume scan
+          if (document.activeElement !== liveEntryInput) {
+            console.log("🔍 Scanner input detected (debounced):", val);
+            processScan(val);
+          }
+        }, 200); // Adjust delay if needed
       }
     });
   }
