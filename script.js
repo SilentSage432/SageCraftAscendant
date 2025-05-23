@@ -773,13 +773,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    // Stricter input event detection for scanner input
+    // Debounced input event detection for scanner input
+    let scanDebounceTimer = null;
     liveEntryInput.addEventListener('input', () => {
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
       if (val.length >= 12 && !isNaN(val)) {
-        // Only auto-scan if value hasn't already triggered prompt
-        console.log("🔍 Scanner input detected:", val);
-        processScan(val);
+        if (scanDebounceTimer) clearTimeout(scanDebounceTimer);
+        scanDebounceTimer = setTimeout(() => {
+          console.log("🔍 Scanner input detected (debounced):", val);
+          processScan(val);
+        }, 200); // Adjust delay as needed
       }
     });
   }
@@ -1783,6 +1786,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    // --- Scan lock/cooldown at top ---
+    if (window.scanLock) {
+      console.warn("🔒 Scan in progress — skipping duplicate call.");
+      return;
+    }
+    window.scanLock = true;
+
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
 
@@ -1794,9 +1804,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
 
     // --- Guard: If upcToItem[item] or locationMap[item] are known, skip prompt as well ---
-    if (upcToItem[item] || locationMap[item]) {
+    if (
+      Object.prototype.hasOwnProperty.call(upcToItem, item) ||
+      Object.prototype.hasOwnProperty.call(locationMap, item)
+    ) {
       console.log("✅ Known mapping or location — skipping prompt.");
       proceedWithKnownScan(resolvedItem);
+      // Cooldown unlock at end
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500); // Cooldown before accepting another scan
       return;
     }
 
@@ -1804,6 +1821,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (liveCounts[resolvedItem]) {
       console.log("🧼 Already in liveCounts — skipping prompt.");
       proceedWithKnownScan(resolvedItem);
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500); // Cooldown before accepting another scan
       return;
     }
 
@@ -1821,6 +1841,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`📍 Current location set to: ${name}`);
       }
       resetScanInput();
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500); // Cooldown before accepting another scan
       return;
     } else if (response === 'product') {
       const inferredCategory = inferUserCategoryPattern(originalItem) || suggestCategoryFromUPC(originalItem);
@@ -1830,6 +1853,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!trimmedItem) {
           alert("❌ Invalid item number.");
           resetScanInput();
+          setTimeout(() => {
+            window.scanLock = false;
+          }, 500);
           return;
         }
 
@@ -1848,11 +1874,21 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLiveTable();
       }
       resetScanInput();
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500); // Cooldown before accepting another scan
       return;
     } else {
       resetScanInput();
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500); // Cooldown before accepting another scan
       return;
     }
+    // At the very end, unlock scanLock (should not reach here, but as fallback)
+    setTimeout(() => {
+      window.scanLock = false;
+    }, 500); // Cooldown before accepting another scan
   }
 
 
