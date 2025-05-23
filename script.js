@@ -769,12 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isScannerInput = val.length >= 10 && !isNaN(val);
         console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
         if (val && isScannerInput) {
-          if (upcToItem[val]) {
-            const itemNum = upcToItem[val];
-            processScan(itemNum);
-          } else {
-            processScan(val);
-          }
+          processScan(val);
         }
       }
     });
@@ -784,12 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (val.length >= 12 && !isNaN(val)) {
         // Only auto-scan if value hasn't already triggered prompt
         console.log("🔍 Scanner input detected:", val);
-        if (upcToItem[val]) {
-          const itemNum = upcToItem[val];
-          processScan(itemNum);
-        } else {
-          processScan(val);
-        }
+        processScan(val);
       }
     });
   }
@@ -1799,28 +1789,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
     const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
     const resolvedItem = upcToItem[originalItem] || originalItem;
-    const isLiveCounted = Object.prototype.hasOwnProperty.call(liveCounts, resolvedItem);
 
     console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
-    console.log("📊 [SCAN] Already in liveCounts?", isLiveCounted);
 
-    // --- Early exit if mapped or known location and already in liveCounts ---
-    if ((isMappedUPC || isKnownLocation) && isLiveCounted) {
-      console.log("✅ Mapped and already in liveCounts — skipping prompt.");
+    // --- Guard: If upcToItem[item] or locationMap[item] are known, skip prompt as well ---
+    if (upcToItem[item] || locationMap[item]) {
+      console.log("✅ Known mapping or location — skipping prompt.");
       proceedWithKnownScan(resolvedItem);
       return;
     }
 
-    // Additional condition to catch UPCs mapped in upcToItem that are not yet in liveCounts
-    if (isMappedUPC && !isLiveCounted) {
-      console.log("✅ Mapped UPC but not yet counted — proceeding without prompt.");
-      proceedWithKnownScan(resolvedItem);
-      return;
-    }
-
-    if (isKnownLocation && !isLiveCounted) {
-      console.log("✅ Known location but not yet counted — proceeding without prompt.");
+    // --- If already in liveCounts, skip prompt and proceed directly ---
+    if (liveCounts[resolvedItem]) {
+      console.log("🧼 Already in liveCounts — skipping prompt.");
       proceedWithKnownScan(resolvedItem);
       return;
     }
