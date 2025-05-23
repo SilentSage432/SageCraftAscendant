@@ -1793,53 +1793,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
-    // item = item.replace(/^0+/, ''); // Remove leading zeros
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
-    if (upcToItem[item]) {
-      console.log("🔁 [SCAN] UPC recognized! Mapping to item #:", upcToItem[item]);
-      item = upcToItem[item];
-    }
 
-    // --- Use originalItem for recognition checks ---
-    const isMappedUPC = upcToItem[originalItem] !== undefined;
-    const isKnownLocation = locationMap[originalItem] !== undefined;
+    const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
+    const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
     const resolvedItem = upcToItem[originalItem] || originalItem;
-    const isLiveCounted = liveCounts[resolvedItem] !== undefined;
+    const isLiveCounted = Object.prototype.hasOwnProperty.call(liveCounts, resolvedItem);
 
+    // Log recognition checks
+    console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
+    console.log("📍 [SCAN] Known Location?", isKnownLocation);
+    console.log("📊 [SCAN] Already in liveCounts?", isLiveCounted);
+
+    // If code is already known in any way, skip prompt
     if (isMappedUPC || isKnownLocation || isLiveCounted) {
-      console.log("✅ Recognized code. Skipping prompt.");
-      const mappedItem = upcToItem[originalItem] || originalItem;
-      proceedWithKnownScan(mappedItem);
-      return;
-    }
-
-    // Additional short-circuit: skip prompt if already in liveCounts (use resolvedItem)
-    if (liveCounts[resolvedItem]) {
-      console.log("✅ Already in liveCounts (resolved), skipping prompt.");
+      console.log("✅ Recognized code — skipping prompt.");
       proceedWithKnownScan(resolvedItem);
       return;
     }
 
-    console.log("🧠 [SCAN] Using item #:", item);
-    console.log("📦 [SCAN] Is item in liveCounts?", !!liveCounts[item]);
-    console.log("📍 [SCAN] Is item in locationMap?", !!locationMap[item]);
-    // Immediately handle known liveCounts
-    if (liveCounts[item]) {
-      proceedWithKnownScan(item);
-      return;
-    }
-    // --- SHORT-CIRCUIT for recognized codes (upcToItem or locationMap) ---
-    if (upcToItem[item] || locationMap[item]) {
-      // (Already handled above)
-      return;
-    }
-    console.log("🔍 processScan triggered with:", item);
-    if (!item) return;
-
     // The following prompt logic is now only for truly unrecognized codes
-    // Unknown code, prompt user
-    // console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
     const response = await showCustomPrompt(item);
     updateSuggestions();
     updateLiveTable();
