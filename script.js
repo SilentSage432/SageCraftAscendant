@@ -805,6 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Debounced scanner-like input detection for liveEntryInput
     let scanDebounceTimer = null;
     liveEntryInput.addEventListener('input', () => {
+      liveEntryInput.value = liveEntryInput.value.replace(/\s+/g, '');
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
       // Only trigger scan logic if the value looks like a full scan (14+ digits, all numeric)
       if (val.length >= 14 && !isNaN(val)) {
