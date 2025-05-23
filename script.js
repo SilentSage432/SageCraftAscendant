@@ -1796,6 +1796,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (upcToItem[item]) {
       item = upcToItem[item];
     }
+    // Immediately handle known liveCounts
+    if (liveCounts[item]) {
+      proceedWithKnownScan(item);
+      return;
+    }
     console.log("🔍 processScan triggered with:", item);
     if (!item) return;
 
