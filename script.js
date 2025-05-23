@@ -802,6 +802,46 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (settingsTarget) settingsTarget.appendChild(restoreUPCBtn);
+
+  // --- Sync & Backup Clean UPC Map to Dropbox Button ---
+  const syncCleanUPCBtn = document.createElement('button');
+  syncCleanUPCBtn.textContent = '🧼 Sync & Backup Clean UPC Map to Dropbox';
+  syncCleanUPCBtn.style.marginTop = '8px';
+  syncCleanUPCBtn.onclick = async () => {
+    const cleaned = {};
+    for (const key in upcToItem) {
+      const cleanedKey = key.trim();
+      const value = upcToItem[key].trim();
+      if (cleanedKey && value) {
+        cleaned[cleanedKey] = value;
+      }
+    }
+    const blob = new Blob([JSON.stringify(cleaned, null, 2)], { type: 'application/json' });
+
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/upc_map_backup.json',
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+
+    if (response.ok) {
+      alert('✅ Clean UPC map saved to Dropbox!');
+    } else {
+      const err = await response.text();
+      alert(`❌ Failed to save clean UPC map: ${err}`);
+    }
+  };
+
+  if (settingsTarget) settingsTarget.appendChild(syncCleanUPCBtn);
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
     if (/^\d{15}$/.test(code)) {
