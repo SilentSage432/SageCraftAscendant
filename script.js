@@ -1793,9 +1793,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    console.log("🔍 [SCAN] Initial item received:", item);
     if (upcToItem[item]) {
+      console.log("🔁 [SCAN] UPC recognized! Mapping to item #:", upcToItem[item]);
       item = upcToItem[item];
     }
+    console.log("🧠 [SCAN] Using item #:", item);
+    console.log("📦 [SCAN] Is item in liveCounts?", !!liveCounts[item]);
+    console.log("📍 [SCAN] Is item in locationMap?", !!locationMap[item]);
     // Immediately handle known liveCounts
     if (liveCounts[item]) {
       proceedWithKnownScan(item);
