@@ -1896,6 +1896,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    // --- Diagnostic logging at the very beginning ---
+    const originalItem = item;
+    console.log("🧪 processScan diagnostics:");
+    console.log("Original item:", item);
+    console.log("liveCounts keys:", Object.keys(liveCounts));
+    console.log("upcToItem keys:", Object.keys(upcToItem));
+    console.log("Mapped value (if any):", upcToItem[item]);
+    console.log("Item exists in liveCounts?", item in liveCounts);
+    console.log("OriginalItem exists in upcToItem?", originalItem in upcToItem);
+    console.log("OriginalItem exists in locationMap?", originalItem in locationMap);
+    console.log("Cleaned item exists in upcToItem?", item in upcToItem);
+    console.log("Cleaned item exists in locationMap?", item in locationMap);
+
     // --- Scan lock/cooldown at top ---
     if (window.scanLock) {
       console.warn("🔒 Scan in progress — skipping duplicate call.");
@@ -1904,11 +1917,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scanLock = true;
 
     console.log("🔍 [SCAN] Initial item received:", item);
-    const originalItem = item;
+    // const originalItem = item; // already declared above
     // --- Attempt to extract clean UPC from beam tag or prefixed barcode ---
-    const upcMatch = originalItem.match(/(?:^0+|^900|^04)?(\d{12})$/);
+    const upcMatch = originalItem.match(/(?:^0+|^900|^04)?(\d{10,14})$/);
     if (upcMatch) {
-      item = upcMatch[1]; // Extracted clean 12-digit UPC
+      item = upcMatch[1]; // Extracted clean 10-14 digit UPC
       console.log("🔎 Cleaned UPC from prefix:", item);
     }
 
