@@ -142,7 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!val) return;
 
       // If known code, proceed as normal
-      if (upcToItem[val] || locationMap[val]) {
+      if (upcToItem[val]) {
+        const itemNum = upcToItem[val];
+        processScan(itemNum);
+        return;
+      }
+      if (locationMap[val]) {
         processScan(val);
         return;
       }
