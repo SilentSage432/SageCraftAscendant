@@ -1795,16 +1795,19 @@ document.addEventListener('DOMContentLoaded', () => {
   async function processScan(item) {
     item = item.replace(/^0+/, ''); // Remove leading zeros
     console.log("🔍 [SCAN] Initial item received:", item);
+    const originalItem = item;
     if (upcToItem[item]) {
       console.log("🔁 [SCAN] UPC recognized! Mapping to item #:", upcToItem[item]);
       item = upcToItem[item];
     }
-    // Inserted: Check for recognized code and short-circuit prompt if found
-    if (liveCounts[item] || locationMap[item]) {
+
+    const isRecognized = !!liveCounts[item] || !!locationMap[item] || Object.values(upcToItem).includes(originalItem);
+    if (isRecognized) {
       console.log("✅ Recognized code. Skipping prompt.");
       proceedWithKnownScan(item);
       return;
     }
+
     console.log("🧠 [SCAN] Using item #:", item);
     console.log("📦 [SCAN] Is item in liveCounts?", !!liveCounts[item]);
     console.log("📍 [SCAN] Is item in locationMap?", !!locationMap[item]);
