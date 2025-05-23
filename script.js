@@ -2027,6 +2027,18 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        const existing = upcToItem[item];
+        if (existing && existing !== trimmedItem) {
+          const choice = confirm(`⚠️ This UPC is already mapped to item #${existing}.\nDo you want to overwrite it with #${trimmedItem}?`);
+          if (!choice) {
+            resetScanInput();
+            setTimeout(() => {
+              window.scanLock = false;
+            }, 500);
+            return;
+          }
+        }
+
         upcToItem[item] = trimmedItem;
         saveUPCMap();
         if (originalItem !== trimmedItem) delete liveCounts[originalItem];
