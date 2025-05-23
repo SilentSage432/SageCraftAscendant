@@ -1799,6 +1799,12 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("🔁 [SCAN] UPC recognized! Mapping to item #:", upcToItem[item]);
       item = upcToItem[item];
     }
+    // Inserted: Check for recognized code and short-circuit prompt if found
+    if (liveCounts[item] || locationMap[item]) {
+      console.log("✅ Recognized code. Skipping prompt.");
+      proceedWithKnownScan(item);
+      return;
+    }
     console.log("🧠 [SCAN] Using item #:", item);
     console.log("📦 [SCAN] Is item in liveCounts?", !!liveCounts[item]);
     console.log("📍 [SCAN] Is item in locationMap?", !!locationMap[item]);
@@ -1807,17 +1813,17 @@ document.addEventListener('DOMContentLoaded', () => {
       proceedWithKnownScan(item);
       return;
     }
+    // --- SHORT-CIRCUIT for recognized codes (upcToItem or locationMap) ---
+    if (upcToItem[item] || locationMap[item]) {
+      // (Already handled above)
+      return;
+    }
     console.log("🔍 processScan triggered with:", item);
     if (!item) return;
 
-    // Handle known codes
-    if (upcToItem[item] || locationMap[item]) {
-      proceedWithKnownScan(item);
-      return;
-    }
-
+    // The following prompt logic is now only for truly unrecognized codes
     // Unknown code, prompt user
-    console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
+    // console.warn("⚠️ Unrecognized code — should trigger prompt:", item);
     const response = await showCustomPrompt(item);
     updateSuggestions();
     updateLiveTable();
