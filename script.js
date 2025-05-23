@@ -1905,6 +1905,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
+    // --- Attempt to extract clean UPC from beam tag or prefixed barcode ---
+    const upcMatch = originalItem.match(/(?:^0+|^900|^04)?(\d{12})$/);
+    if (upcMatch) {
+      item = upcMatch[1]; // Extracted clean 12-digit UPC
+      console.log("🔎 Cleaned UPC from prefix:", item);
+    }
 
     const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
     const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
@@ -1919,7 +1925,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.prototype.hasOwnProperty.call(locationMap, item)
     ) {
       console.log("✅ Known mapping or location — skipping prompt.");
-      proceedWithKnownScan(resolvedItem);
+      proceedWithKnownScan(upcToItem[item] || item);
       // Cooldown unlock at end
       setTimeout(() => {
         window.scanLock = false;
@@ -1928,9 +1934,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- If already in liveCounts, skip prompt and proceed directly ---
-    if (liveCounts[resolvedItem]) {
+    if (liveCounts[upcToItem[item] || item]) {
       console.log("🧼 Already in liveCounts — skipping prompt.");
-      proceedWithKnownScan(resolvedItem);
+      proceedWithKnownScan(upcToItem[item] || item);
       setTimeout(() => {
         window.scanLock = false;
       }, 500); // Cooldown before accepting another scan
