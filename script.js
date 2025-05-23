@@ -1793,6 +1793,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    if (upcToItem[item]) {
+      item = upcToItem[item];
+    }
     console.log("🔍 processScan triggered with:", item);
     if (!item) return;
 
