@@ -1795,41 +1795,44 @@ document.addEventListener('DOMContentLoaded', () => {
   async function processScan(item) {
     console.log("🔍 [SCAN] Initial item received:", item);
     const originalItem = item;
-    // Log scanned input and its mapping
-    console.log("🔍 Scanned input:", originalItem);
-    console.log("📦 Maps to item:", upcToItem[originalItem]);
 
     const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
     const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
     const resolvedItem = upcToItem[originalItem] || originalItem;
     const isLiveCounted = Object.prototype.hasOwnProperty.call(liveCounts, resolvedItem);
 
-    // Log recognition checks
     console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
     console.log("📊 [SCAN] Already in liveCounts?", isLiveCounted);
 
-    // New: Recognize any scanned value that maps directly or indirectly to a known item/location/liveCount
-    if (
-      upcToItem[originalItem] ||
-      locationMap[originalItem] ||
-      liveCounts[originalItem] ||
-      liveCounts[upcToItem[originalItem]]
-    ) {
-      console.log("✅ Recognized code — skipping prompt.");
-      proceedWithKnownScan(upcToItem[originalItem] || originalItem);
+    // --- Early exit if mapped or known location and already in liveCounts ---
+    if ((isMappedUPC || isKnownLocation) && isLiveCounted) {
+      console.log("✅ Mapped and already in liveCounts — skipping prompt.");
+      proceedWithKnownScan(resolvedItem);
       return;
     }
 
-    // The following prompt logic is now only for truly unrecognized codes
-    const response = await showCustomPrompt(item);
+    // Additional condition to catch UPCs mapped in upcToItem that are not yet in liveCounts
+    if (isMappedUPC && !isLiveCounted) {
+      console.log("✅ Mapped UPC but not yet counted — proceeding without prompt.");
+      proceedWithKnownScan(resolvedItem);
+      return;
+    }
+
+    if (isKnownLocation && !isLiveCounted) {
+      console.log("✅ Known location but not yet counted — proceeding without prompt.");
+      proceedWithKnownScan(resolvedItem);
+      return;
+    }
+
+    const response = await showCustomPrompt(originalItem);
     updateSuggestions();
     updateLiveTable();
 
     if (response === 'location') {
-      const name = prompt(`🗂 Please enter a name for location "${item}":`);
+      const name = prompt(`🗂 Please enter a name for location "${originalItem}":`);
       if (name) {
-        locationMap[item] = name;
+        locationMap[originalItem] = name;
         saveLocationMap();
         currentLocation = name;
         updateLocationStatus();
@@ -1838,10 +1841,8 @@ document.addEventListener('DOMContentLoaded', () => {
       resetScanInput();
       return;
     } else if (response === 'product') {
-      const inferredCategory = inferUserCategoryPattern(item) || suggestCategoryFromUPC(item);
-      const userDefined = prompt(
-        `UPC ${item} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
-      );
+      const inferredCategory = inferUserCategoryPattern(originalItem) || suggestCategoryFromUPC(originalItem);
+      const userDefined = prompt(`UPC ${originalItem} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`);
       if (userDefined) {
         const trimmedItem = userDefined.trim();
         if (!trimmedItem) {
@@ -1850,9 +1851,9 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        upcToItem[item] = trimmedItem;
+        upcToItem[originalItem] = trimmedItem;
         saveUPCMap();
-        if (item !== trimmedItem) delete liveCounts[item];
+        if (originalItem !== trimmedItem) delete liveCounts[originalItem];
         delete liveCounts[trimmedItem];
         liveCounts[trimmedItem] = {
           count: 1,
@@ -1860,14 +1861,9 @@ document.addEventListener('DOMContentLoaded', () => {
           location: currentLocation
         };
 
-        console.log("✅ Stored item:", trimmedItem, "for UPC:", item);
-        console.log("📦 liveCounts entry:", liveCounts[trimmedItem]);
-
+        console.log("✅ Stored item:", trimmedItem, "for UPC:", originalItem);
         updateRotationDate(liveCounts[trimmedItem].category);
         updateLiveTable();
-      } else {
-        resetScanInput();
-        return;
       }
       resetScanInput();
       return;
