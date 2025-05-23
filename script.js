@@ -1793,6 +1793,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function processScan(item) {
+    item = item.replace(/^0+/, ''); // Remove leading zeros
     console.log("🔍 [SCAN] Initial item received:", item);
     if (upcToItem[item]) {
       console.log("🔁 [SCAN] UPC recognized! Mapping to item #:", upcToItem[item]);
