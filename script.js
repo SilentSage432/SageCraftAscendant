@@ -767,7 +767,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
         const isScannerInput = val.length >= 10 && !isNaN(val);
         if (val && isScannerInput) {
-          processScan(val);
+          if (upcToItem[val]) {
+            const itemNum = upcToItem[val];
+            processScan(itemNum);
+          } else {
+            processScan(val);
+          }
         }
       }
     });
@@ -778,7 +783,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only auto-scan if input is coming from a scanner (e.g., input event is too fast for typing)
         const isScannerInput = val.length >= 10 && !isNaN(val);
         if (isScannerInput) {
-          processScan(val);
+          if (upcToItem[val]) {
+            const itemNum = upcToItem[val];
+            processScan(itemNum);
+          } else {
+            processScan(val);
+          }
         }
       }
     });
