@@ -51,11 +51,19 @@ async function getDropboxAccessToken() {
 
 // --- updateRotationDate helper ---
 function updateRotationDate(category) {
-  const now = new Date().toISOString();
+  const now = new Date();
   const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
-  rotationData[category] = now;
+
+  const extendedCategories = ['Fridges & Freezers', 'Wall Ovens', 'Cooktops'];
+  const intervalDays = extendedCategories.includes(category) ? 30 : 14;
+
+  rotationData[category] = {
+    date: now.toISOString(),
+    interval: intervalDays
+  };
+
   localStorage.setItem('auditRotation', JSON.stringify(rotationData));
-  console.log(`🔁 Updated rotation date for "${category}"`);
+  console.log(`🔁 Updated rotation date for "${category}" (Interval: ${intervalDays} days)`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -417,6 +425,74 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (settingsTarget) {
     settingsTarget.appendChild(backupBtn);
+  }
+  // --- Display Audit Rotation Table on #audit page/tab or on audit page load ---
+  // Check for audit section: show table if #audit hash, or if pathname contains 'audit'
+  if (
+    (window.location.hash === '#audit' && settingsTarget) ||
+    (window.location.pathname.includes('audit') && settingsTarget)
+  ) {
+    // If settingsTarget is not in the audit page, ensure one exists at the top of #audit section
+    let auditSettingsTarget = settingsTarget;
+    // Try to find #audit section
+    let auditSection = document.getElementById('audit');
+    if (window.location.pathname.includes('audit')) {
+      // If not already under #audit, ensure settings group is present
+      if (auditSection) {
+        auditSettingsTarget = auditSection.querySelector('.settings-group');
+        if (!auditSettingsTarget) {
+          auditSettingsTarget = document.createElement('div');
+          auditSettingsTarget.className = 'settings-group';
+          // Insert at top of #audit section
+          auditSection.insertBefore(auditSettingsTarget, auditSection.firstChild);
+        }
+      }
+    }
+    // Fallback to global settingsTarget if audit page not found
+    if (!auditSettingsTarget) auditSettingsTarget = settingsTarget;
+
+    const rotationTableTitle = document.createElement('h3');
+    rotationTableTitle.textContent = '📅 Audit Rotation Log';
+    rotationTableTitle.style.marginTop = '20px';
+
+    const rotationTable = document.createElement('table');
+    rotationTable.style.borderCollapse = 'collapse';
+    rotationTable.style.width = '100%';
+    rotationTable.style.marginTop = '8px';
+    rotationTable.style.fontSize = '14px';
+
+    const thead = rotationTable.createTHead();
+    const headerRow = thead.insertRow();
+    ['Category', 'Last Audited', 'Days Ago'].forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      th.style.border = '1px solid #ccc';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f0f0f0';
+      headerRow.appendChild(th);
+    });
+
+    const tbody = rotationTable.createTBody();
+    const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
+
+    Object.entries(rotationData).forEach(([category, info]) => {
+      const lastDate = new Date(info.date);
+      const interval = info.interval || 30;
+      const now = new Date();
+      const daysAgo = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+
+      const row = tbody.insertRow();
+      [category, lastDate.toLocaleString(), daysAgo + ' days ago'].forEach((text, i) => {
+        const td = row.insertCell();
+        td.textContent = text;
+        td.style.border = '1px solid #ccc';
+        td.style.padding = '6px';
+        td.style.color = (i === 2 && daysAgo >= interval) ? 'red' : '';
+      });
+    });
+
+    auditSettingsTarget.appendChild(rotationTableTitle);
+    auditSettingsTarget.appendChild(rotationTable);
   }
   // --- Dropbox Integration for Save/Load Session ---
 
