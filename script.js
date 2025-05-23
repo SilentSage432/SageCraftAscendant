@@ -320,7 +320,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const mergeReportBtnCheck = document.getElementById('mergeReport');
   if (mergeReportBtnCheck && !mergeReportBtnCheck.onclick && mergeReportBtnCheck.getAttribute('listener-attached') !== 'true') {
     mergeReportBtnCheck.addEventListener('click', () => {
-      console.log('mergeReport clicked!');
+      const sessions = Object.entries(localStorage)
+        .filter(([k]) => k.startsWith('inventorySession_'))
+        .map(([k, v]) => ({ timestamp: k.replace('inventorySession_', ''), data: JSON.parse(v) }))
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      if (sessions.length < 2) {
+        alert("❌ Not enough past sessions to merge.");
+        return;
+      }
+
+      const merged = {};
+      sessions.forEach(session => {
+        Object.entries(session.data.liveCounts || {}).forEach(([item, obj]) => {
+          if (!merged[item]) {
+            merged[item] = { count: 0, category: obj.category, location: obj.location };
+          }
+          merged[item].count += obj.count;
+        });
+      });
+
+      const blob = new Blob([JSON.stringify(merged, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `merged-session-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert("📦 Merged session downloaded.");
     });
     mergeReportBtnCheck.setAttribute('listener-attached', 'true');
   }
