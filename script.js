@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // 11. mergeReport
   const mergeReportBtnCheck = document.getElementById('mergeReport');
-  if (mergeReportBtnCheck && !mergeReportBtnCheck.onclick && mergeReportBtnCheck.getAttribute('listener-attached') !== 'true') {
+  if (mergeReportBtnCheck) {
     mergeReportBtnCheck.addEventListener('click', () => {
       const sessions = Object.entries(localStorage)
         .filter(([k]) => k.startsWith('inventorySession_'))
@@ -359,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
       URL.revokeObjectURL(url);
       alert("📦 Merged session downloaded.");
     });
-    mergeReportBtnCheck.setAttribute('listener-attached', 'true');
   }
   // --- Ensure global variables are declared at the top ---
   // (Other globals already declared inside block, e.g. weeklyCounts, upcToItem, locationMap)
