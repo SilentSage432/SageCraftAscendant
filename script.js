@@ -68,6 +68,30 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Attach event listeners for Local Session Tools, Mapping Management, and Advanced Tools buttons ---
+  const localSessionTools = [
+    { id: 'saveSession', action: () => console.log('💾 Save Session button clicked') },
+    { id: 'loadSession', action: () => console.log('📥 Load Session button clicked') }
+  ];
+
+  const mappingManagementTools = [
+    { id: 'exportUPCBtn', action: () => console.log('📤 Export UPC Mappings button clicked') },
+    { id: 'importUPCBtn', action: () => console.log('📥 Import UPC Mappings button clicked') },
+    { id: 'exportBtn', action: () => console.log('📤 Export Bay Locations button clicked') },
+    { id: 'importBtn', action: () => console.log('📥 Import Bay Locations button clicked') }
+  ];
+
+  const advancedTools = [
+    { id: 'mergeReport', action: () => console.log('🧩 Merge Master Report button clicked') }
+  ];
+
+  [...localSessionTools, ...mappingManagementTools, ...advancedTools].forEach(({ id, action }) => {
+    const btn = document.getElementById(id);
+    if (btn && !btn.onclick && btn.getAttribute('listener-attached') !== 'true') {
+      btn.addEventListener('click', action);
+      btn.setAttribute('listener-attached', 'true');
+    }
+  });
   // --- Collapsible dropdown logic ---
   document.querySelectorAll('.collapsible-toggle').forEach(toggle => {
     toggle.addEventListener('click', () => {
@@ -337,39 +361,102 @@ document.addEventListener('DOMContentLoaded', () => {
     authGoogleDriveBtn.setAttribute('listener-attached', 'true');
   }
   // 11. mergeReport
-  const mergeReportBtnCheck = document.getElementById('mergeReport');
-  if (mergeReportBtnCheck) {
-    mergeReportBtnCheck.addEventListener('click', () => {
-      const sessions = Object.entries(localStorage)
-        .filter(([k]) => k.startsWith('inventorySession_'))
-        .map(([k, v]) => ({ timestamp: k.replace('inventorySession_', ''), data: JSON.parse(v) }))
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const mergeReportBtn = document.getElementById('mergeReport');
+  if (mergeReportBtn) {
+    mergeReportBtn.addEventListener('click', () => {
+      console.log("🧩 Merge Master Report button clicked (FINAL MERGE LOGIC)");
 
-      if (sessions.length < 2) {
-        alert("❌ Not enough past sessions to merge.");
-        return;
-      }
+      // 1. Get current session data
+      const mergedReport = {
+        timestamp: new Date().toISOString(),
+        sessionCounts: { ...liveCounts },
+        mappings: { ...upcToItem },
+        locations: { ...locationMap },
+        auditLog: JSON.parse(localStorage.getItem('auditRotation')) || {},
+        weekly: JSON.parse(localStorage.getItem('weeklyCounts')) || {}
+      };
 
-      const merged = {};
-      sessions.forEach(session => {
-        Object.entries(session.data.liveCounts || {}).forEach(([item, obj]) => {
-          if (!merged[item]) {
-            merged[item] = { count: 0, category: obj.category, location: obj.location };
-          }
-          merged[item].count += obj.count;
+      // 2. Prepare data for Excel sheet
+      const summarySheet = [
+        ['Timestamp', mergedReport.timestamp],
+        [],
+        ['Item #', 'Count', 'Category', 'Location']
+      ];
+
+      Object.entries(mergedReport.sessionCounts).forEach(([item, data]) => {
+        summarySheet.push([item, data.count, data.category, data.location]);
+      });
+
+      const mappingSheet = [['UPC', 'Item #']];
+      Object.entries(mergedReport.mappings).forEach(([upc, item]) => {
+        mappingSheet.push([upc, item]);
+      });
+
+      const locationSheet = [['Code', 'Bay Name']];
+      Object.entries(mergedReport.locations).forEach(([code, name]) => {
+        locationSheet.push([code, name]);
+      });
+
+      const auditSheet = [['Category', 'Last Audited', 'Interval (days)']];
+      Object.entries(mergedReport.auditLog).forEach(([category, info]) => {
+        auditSheet.push([category, info.date, info.interval]);
+      });
+
+      const weeklySheet = [['Date', 'Item #', 'Count']];
+      Object.entries(mergedReport.weekly).forEach(([date, items]) => {
+        Object.entries(items).forEach(([item, count]) => {
+          weeklySheet.push([date, item, count]);
         });
       });
 
-      const blob = new Blob([JSON.stringify(merged, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `merged-session-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      alert("📦 Merged session downloaded.");
+      // 3. Create Excel file
+      const wb = XLSX.utils.book_new();
+      const wsSummary = XLSX.utils.aoa_to_sheet(summarySheet);
+      const wsMap = XLSX.utils.aoa_to_sheet(mappingSheet);
+      const wsLocations = XLSX.utils.aoa_to_sheet(locationSheet);
+      const wsAudit = XLSX.utils.aoa_to_sheet(auditSheet);
+      const wsWeekly = XLSX.utils.aoa_to_sheet(weeklySheet);
+
+      // --- Header styling for Excel report ---
+      const headerStyle = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "4F81BD" } },
+        border: {
+          top: { style: "thin", color: { auto: 1 } },
+          bottom: { style: "thin", color: { auto: 1 } },
+          left: { style: "thin", color: { auto: 1 } },
+          right: { style: "thin", color: { auto: 1 } }
+        }
+      };
+      // Helper to apply header style and timestamp to a worksheet
+      function styleSheetHeaders(worksheet) {
+        // Apply header style to first row (A1, B1, C1, D1)
+        Object.keys(worksheet).forEach(cell => {
+          if (cell.startsWith('A1') || cell.startsWith('B1') || cell.startsWith('C1') || cell.startsWith('D1')) {
+            worksheet[cell].s = headerStyle;
+          }
+        });
+        // Optional: Add timestamp to A1 if present
+        if (worksheet['A1']) {
+          worksheet['A1'].v = "Generated: " + new Date().toLocaleString();
+        }
+      }
+      styleSheetHeaders(wsSummary);
+      styleSheetHeaders(wsMap);
+      styleSheetHeaders(wsLocations);
+      styleSheetHeaders(wsAudit);
+      styleSheetHeaders(wsWeekly);
+
+      XLSX.utils.book_append_sheet(wb, wsSummary, 'Session Summary');
+      XLSX.utils.book_append_sheet(wb, wsMap, 'UPC Mappings');
+      XLSX.utils.book_append_sheet(wb, wsLocations, 'Bay Locations');
+      XLSX.utils.book_append_sheet(wb, wsAudit, 'Audit Rotation');
+      XLSX.utils.book_append_sheet(wb, wsWeekly, 'Weekly Counts');
+
+      const filename = `merged-inventory-report-${new Date().toISOString().replace(/[:.]/g, '-')}.xlsx`;
+      XLSX.writeFile(wb, filename);
+
+      alert("🧩 Master Excel Report successfully generated and downloaded.");
     });
   }
   // --- Ensure global variables are declared at the top ---
