@@ -1971,7 +1971,29 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
 
-    // --- Enhanced location tag logic: prompt to close bay if scanned again ---
+    // --- Enhanced location tag logic: handle both cleaned and original scanned code ---
+    // First check if the original scanned code is a location tag
+    if (Object.prototype.hasOwnProperty.call(locationMap, originalItem)) {
+      const mappedLocation = locationMap[originalItem];
+      if (currentLocation === mappedLocation) {
+        const close = confirm(`You scanned the current location tag (${originalItem}) again.\nWould you like to CLOSE this bay?`);
+        if (close) {
+          currentLocation = '';
+          updateLocationStatus();
+          alert('📦 Current location cleared.');
+        }
+      } else {
+        currentLocation = mappedLocation;
+        updateLocationStatus();
+        alert(`📍 Current location set to: ${mappedLocation}`);
+      }
+      resetScanInput();
+      setTimeout(() => {
+        window.scanLock = false;
+      }, 500);
+      return;
+    }
+    // If not, check if the cleaned item is a location tag
     if (Object.prototype.hasOwnProperty.call(locationMap, item)) {
       const mappedLocation = locationMap[item];
       if (currentLocation === mappedLocation) {
