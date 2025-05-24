@@ -68,6 +68,46 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Render Audit Rotation Table ---
+  function renderAuditRotationTable() {
+    const table = document.querySelector('#audit table');
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
+    const now = new Date();
+
+    Object.entries(rotationData).forEach(([category, info]) => {
+      const row = document.createElement('tr');
+      const interval = info.interval || 30;
+      // --- Updated date/next due logic ---
+      const lastDate = new Date(info.date);
+      const isValid = !isNaN(lastDate.getTime());
+      const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
+      const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+      const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+      let status = '🟢 Good';
+      if (isValid) {
+        const daysAgo = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+        if (daysAgo >= interval) status = '🔴 Overdue';
+        else if (daysAgo >= interval * 0.75) status = '🟡 Soon';
+      } else {
+        status = '❓ Unknown';
+      }
+
+      // --- Updated row cell logic ---
+      [category, lastAuditedText, nextDueText, status].forEach(val => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        row.appendChild(td);
+      });
+
+      tbody.appendChild(row);
+    });
+  }
   // --- Attach event listeners for Local Session Tools, Mapping Management, and Advanced Tools buttons ---
   const localSessionTools = [
     { id: 'saveSession', action: () => console.log('💾 Save Session button clicked') },
@@ -176,6 +216,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   console.log("✅ DOMContentLoaded fired and script.js is active");
+  renderAuditRotationTable();
+
+  // --- Refresh Audit Log Button ---
+  const refreshAuditLogBtn = document.getElementById('refreshAuditLog');
+  if (refreshAuditLogBtn) {
+    refreshAuditLogBtn.addEventListener('click', () => {
+      renderAuditRotationTable();
+
+      const toast = document.createElement('div');
+      toast.textContent = '✅ Audit Log Refreshed';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = '#222';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 18px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '14px';
+      toast.style.zIndex = '9999';
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 3000);
+    });
+  }
+  // --- Update Audit Rotation Table on tab navigation ---
+  document.querySelectorAll('.nav-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+      const targetId = icon.getAttribute('data-target');
+      if (targetId === 'audit') {
+        renderAuditRotationTable();
+      }
+    });
+  });
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
   const addLiveItemBtn = document.getElementById('addLiveItem');
   // Add event listener for Add Live Item button with updated logic (delayed prompt)
@@ -606,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const thead = rotationTable.createTHead();
     const headerRow = thead.insertRow();
-    ['Category', 'Last Audited', 'Days Ago'].forEach(text => {
+    ['Category', 'Last Audited', 'Days Ago', 'Next Due'].forEach(text => {
       const th = document.createElement('th');
       th.textContent = text;
       th.style.border = '1px solid #ccc';
@@ -624,14 +699,32 @@ document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       const daysAgo = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
 
+      // Add icon based on status
+      let statusIcon = '';
+      if (daysAgo >= interval) statusIcon = '🔴';
+      else if (daysAgo >= interval * 0.75) statusIcon = '🟡';
+      else statusIcon = '🟢';
+
       const row = tbody.insertRow();
       [category, lastDate.toLocaleString(), daysAgo + ' days ago'].forEach((text, i) => {
         const td = row.insertCell();
-        td.textContent = text;
+        td.textContent = `${text} ${i === 2 ? statusIcon : ''}`;
         td.style.border = '1px solid #ccc';
         td.style.padding = '6px';
         td.style.color = (i === 2 && daysAgo >= interval) ? 'red' : '';
       });
+      // Add Next Due cell (4th column)
+      const dueCell = row.insertCell();
+      const nextDue = new Date(lastDate.getTime() + interval * 86400000);
+      dueCell.textContent = nextDue.toLocaleDateString();
+      dueCell.style.border = '1px solid #ccc';
+      dueCell.style.padding = '6px';
+
+      // Optional: Add a red background to overdue rows
+      if (daysAgo >= interval) {
+        row.style.backgroundColor = '#ffe6e6'; // light red
+        row.style.fontWeight = 'bold';
+      }
     });
 
     auditSettingsTarget.appendChild(rotationTableTitle);
