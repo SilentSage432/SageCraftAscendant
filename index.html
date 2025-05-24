@@ -23,6 +23,7 @@
   <meta name="theme-color" content="#2a003f" />
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
   .onhand-button-wrapper {
     display: flex;
@@ -126,23 +127,35 @@
           </div>
 
           <div id="advancedControls" class="hidden" aria-hidden="true">
+            <!-- Auto Scan Mode -->
             <label id="manualModeToggle">
               <input type="checkbox" id="manualToggle" checked />
               Auto-Scan Mode
             </label>
-            <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">📂 Import/Export Options</button>
-            <div id="importExportControls" class="hidden" aria-hidden="true">
+          
+            <!-- Group 1: Import / Export (collapsible stays intact) -->
+            <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">
+              📂 Import/Export Options
+            </button>
+            <div id="importExportControls" class="hidden button-grid" aria-hidden="true">
               <button id="exportBtn">📤 Export Bay Locations</button>
               <button id="importBtn">📥 Import Bay Locations</button>
               <button id="exportUPCBtn">📤 Export UPC Mappings</button>
               <button id="importUPCBtn">📥 Import UPC Mappings</button>
             </div>
-            <button id="clearHistoryBtn">🧹 Clear History</button>
-            <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
-            <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
-            <button id="viewTrends">📈 View Trends</button>
+          
+            <!-- Group 2: Maintenance Tools -->
+            <div class="grouped-buttons">
+              <button id="clearHistoryBtn">🧹 Clear History</button>
+              <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
+            </div>
+          
+            <!-- Group 3: Data Views -->
+            <div class="grouped-buttons">
+              <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
+              <button id="viewTrends">📈 View Trends</button>
+            </div>
           </div>
-        </div>
 
         <h2>On-Hand Counts</h2>
         <div class="onhand-button-wrapper">
@@ -270,7 +283,7 @@
     </div>
   </main>
 
-  <!-- Modal for unknown item prompt -->
+<!-- Modal for unknown item prompt -->
   <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
       <h3 id="modalPromptText"></h3>
@@ -278,6 +291,17 @@
         <button id="modalBtnLocation" style="margin:5px;">📍 Bay Location</button>
         <button id="modalBtnProduct" style="margin:5px;">📦 Product</button>
         <button id="modalBtnCancel" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trend Modal -->
+  <div id="trendsModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:90%; max-height:80%; overflow:auto;">
+      <h3 style="text-align:center;">📈 Inventory Trends</h3>
+      <canvas id="trendChart" width="400" height="250"></canvas>
+      <div style="text-align:center; margin-top:15px;">
+        <button onclick="document.getElementById('trendsModal').style.display='none'">❌ Close</button>
       </div>
     </div>
   </div>
@@ -307,6 +331,21 @@ function showCustomPrompt(item) {
     document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
   });
 }
+  </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const trendBtn = document.getElementById('viewTrends');
+    const trendModal = document.getElementById('trendsModal');
+
+    if (trendBtn && trendModal) {
+      trendBtn.addEventListener('click', () => {
+        console.log("Trend button clicked");
+        trendModal.style.display = 'flex';
+      });
+    } else {
+      console.warn('Trend button or modal not found in DOM');
+    }
+  });
   </script>
 <!-- ✅ New -->
 <script type="module" src="script.js"></script>

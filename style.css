@@ -315,6 +315,30 @@ section {
   box-sizing: border-box;
 }
 
+#advancedControls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.grouped-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.grouped-buttons button {
+  flex: 1 1 180px;
+  max-width: 220px;
+  padding: 10px 14px;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+}
+
 /* --- Misc --- */
 footer {
   margin-top: 40px;

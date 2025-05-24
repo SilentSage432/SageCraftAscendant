@@ -5,6 +5,18 @@ function saveUPCMap() {
 function saveLocationMap() {
   localStorage.setItem('locationMap', JSON.stringify(locationMap));
 }
+// --- Chart.js (Trends) integration: ensure Chart.js is available ---
+// If Chart.js is not included via HTML, add it here for completeness (for developer reference):
+// <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+// If this is not in your HTML, add it to your HTML <head> or before your script.js is loaded.
+// Or, if you want to dynamically inject it, you could do:
+if (typeof window.Chart === 'undefined') {
+  const chartScript = document.createElement('script');
+  chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+  chartScript.onload = () => console.log("Chart.js loaded");
+  document.head.appendChild(chartScript);
+}
+
 // --- Ensure all critical global variables are declared ONCE at the top ---
 let liveCounts = window.liveCounts || {};
 let autosaveTimer = null;
@@ -133,6 +145,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   // --- Collapsible dropdown logic ---
+
+  // --- Trends Modal Button Logic ---
+  const viewTrendsBtn = document.getElementById('viewTrends');
+  if (viewTrendsBtn) {
+    viewTrendsBtn.addEventListener('click', () => {
+      console.log("📈 View Trends button clicked");
+      const modal = document.getElementById('trendsModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+
+        const container = document.getElementById('trendChartContainer');
+        if (container) {
+          container.innerHTML = '<canvas id="trendChart"></canvas>';
+          renderTrendChart();
+        }
+      } else {
+        console.warn("❌ trendsModal not found in DOM");
+      }
+    });
+  }
   document.querySelectorAll('.collapsible-toggle').forEach(toggle => {
     toggle.addEventListener('click', () => {
       const content = toggle.nextElementSibling;
@@ -586,13 +618,20 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       // Helper to apply header style and timestamp to a worksheet
       function styleSheetHeaders(worksheet) {
-        // Apply header style to first row (A1, B1, C1, D1)
-        Object.keys(worksheet).forEach(cell => {
-          if (cell.startsWith('A1') || cell.startsWith('B1') || cell.startsWith('C1') || cell.startsWith('D1')) {
-            worksheet[cell].s = headerStyle;
-          }
+        const firstRow = Object.keys(worksheet)
+          .filter(cell => /^[A-Z]+1$/.test(cell)); // Match all cells in first row
+        firstRow.forEach(cell => {
+          worksheet[cell].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "4F81BD" } },
+            border: {
+              top: { style: "thin", color: { auto: 1 } },
+              bottom: { style: "thin", color: { auto: 1 } },
+              left: { style: "thin", color: { auto: 1 } },
+              right: { style: "thin", color: { auto: 1 } }
+            }
+          };
         });
-        // Optional: Add timestamp to A1 if present
         if (worksheet['A1']) {
           worksheet['A1'].v = "Generated: " + new Date().toLocaleString();
         }
@@ -635,6 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
       styleSheetHeaders(wsMap);
       styleSheetHeaders(wsLocations);
       styleSheetHeaders(wsAudit);
+      // Style "Weekly Counts" worksheet headers before appending
       styleSheetHeaders(wsWeekly);
 
       XLSX.utils.book_append_sheet(wb, wsSummary, 'Session Summary');
@@ -961,6 +1001,62 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Dropbox Backup Browser Modal Button ---
+  // (injected after restoreUPCBtn below)
+
+  // --- Dropbox OAuth2 PKCE Login Button ---
+  const loginBtn = document.createElement('button');
+  loginBtn.className = 'settings-button';
+  loginBtn.textContent = '🔐 Connect Dropbox';
+  loginBtn.onclick = beginDropboxLogin;
+  settingsTarget?.appendChild(loginBtn);
+
+  // --- Reset Dropbox Connection Button ---
+  const resetDropboxBtn = document.createElement('button');
+  resetDropboxBtn.className = 'settings-button';
+  resetDropboxBtn.textContent = '🧹 Reset Dropbox Connection';
+  resetDropboxBtn.style.marginTop = '8px';
+  resetDropboxBtn.onclick = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('pkce_verifier');
+    alert('🧹 Dropbox tokens cleared. Please reconnect.');
+  };
+  settingsTarget?.appendChild(resetDropboxBtn);
+
+  // --- Restore UPC Map from Dropbox Button ---
+  const restoreUPCBtn = document.createElement('button');
+  restoreUPCBtn.className = 'settings-button';
+  restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
+  restoreUPCBtn.style.marginTop = '8px';
+  restoreUPCBtn.onclick = async () => {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: '/upc_map_backup.json' })
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      alert(`❌ Failed to restore UPC map: ${err}`);
+      return;
+    }
+
+    const map = await response.json();
+    if (!map || typeof map !== 'object') {
+      alert('❌ Invalid UPC map format.');
+      return;
+    }
+
+    Object.assign(upcToItem, map);
+    saveUPCMap();
+    alert('✅ UPC mappings restored from Dropbox!');
+  };
+
+  if (settingsTarget) settingsTarget.appendChild(restoreUPCBtn);
+
+  // --- Dropbox Backup Browser Modal Button ---
   const browseBackupsBtn = document.createElement('button');
   browseBackupsBtn.className = 'settings-button';
   browseBackupsBtn.textContent = '📁 Browse Dropbox Backups';
@@ -1060,59 +1156,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (settingsTarget) settingsTarget.appendChild(browseBackupsBtn);
-
-  // --- Dropbox OAuth2 PKCE Login Button ---
-  const loginBtn = document.createElement('button');
-  loginBtn.className = 'settings-button';
-  loginBtn.textContent = '🔐 Connect Dropbox';
-  loginBtn.onclick = beginDropboxLogin;
-  settingsTarget?.appendChild(loginBtn);
-
-  // --- Reset Dropbox Connection Button ---
-  const resetDropboxBtn = document.createElement('button');
-  resetDropboxBtn.className = 'settings-button';
-  resetDropboxBtn.textContent = '🧹 Reset Dropbox Connection';
-  resetDropboxBtn.style.marginTop = '8px';
-  resetDropboxBtn.onclick = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('pkce_verifier');
-    alert('🧹 Dropbox tokens cleared. Please reconnect.');
-  };
-  settingsTarget?.appendChild(resetDropboxBtn);
-
-  // --- Restore UPC Map from Dropbox Button ---
-  const restoreUPCBtn = document.createElement('button');
-  restoreUPCBtn.className = 'settings-button';
-  restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
-  restoreUPCBtn.style.marginTop = '8px';
-  restoreUPCBtn.onclick = async () => {
-    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: '/upc_map_backup.json' })
-      }
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      alert(`❌ Failed to restore UPC map: ${err}`);
-      return;
-    }
-
-    const map = await response.json();
-    if (!map || typeof map !== 'object') {
-      alert('❌ Invalid UPC map format.');
-      return;
-    }
-
-    Object.assign(upcToItem, map);
-    saveUPCMap();
-    alert('✅ UPC mappings restored from Dropbox!');
-  };
-
-  if (settingsTarget) settingsTarget.appendChild(restoreUPCBtn);
 
   // --- Sync & Backup Clean UPC Map to Dropbox Button ---
   const syncCleanUPCBtn = document.createElement('button');
@@ -1632,6 +1675,58 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Import UPC Mappings from file ---
+  // --- Close Trends Modal
+  const closeTrendsBtn = document.getElementById('closeTrendsModal');
+  if (closeTrendsBtn) {
+    closeTrendsBtn.addEventListener('click', () => {
+      document.getElementById('trendsModal').classList.add('hidden');
+    });
+  }
+
+  function renderTrendChart() {
+    const canvas = document.getElementById('trendChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const dates = Object.keys(weeklyCounts).sort();
+    const labels = dates;
+    const datasets = [];
+
+    const items = new Set();
+    dates.forEach(date => {
+      Object.keys(weeklyCounts[date] || {}).forEach(item => items.add(item));
+    });
+
+    items.forEach((item, index) => {
+      const data = dates.map(date => weeklyCounts[date]?.[item] || 0);
+      const color = `hsl(${(index * 60) % 360}, 70%, 60%)`;
+
+      datasets.push({
+        label: item,
+        data,
+        fill: false,
+        borderColor: color,
+        tension: 0.1
+      });
+    });
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
   const importUPCBtn = document.getElementById('importUPCBtn');
   if (importUPCBtn) {
     importUPCBtn.addEventListener('click', () => {
@@ -2813,6 +2908,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Activate the default tab on load
   document.getElementById('count').classList.add('active');
   document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
+  const today = new Date().toISOString().split('T')[0];
+if (!weeklyCounts[today]) weeklyCounts[today] = {};
+Object.entries(liveCounts).forEach(([item, obj]) => {
+  weeklyCounts[today][item] = obj.count;
+});
+localStorage.setItem('weeklyCounts', JSON.stringify(weeklyCounts));
   // Focus the liveEntry input on load
   restoreFocusToEntry();
   // (Google API script loading removed; no longer required.)
