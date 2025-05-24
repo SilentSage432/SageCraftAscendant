@@ -1971,17 +1971,25 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
 
-    // --- Guard: If upcToItem[item] or locationMap[item] are known, skip prompt as well ---
-    if (
-      Object.prototype.hasOwnProperty.call(upcToItem, item) ||
-      Object.prototype.hasOwnProperty.call(locationMap, item)
-    ) {
-      console.log("✅ Known mapping or location — skipping prompt.");
-      proceedWithKnownScan(upcToItem[item] || item);
-      // Cooldown unlock at end
+    // --- Enhanced location tag logic: prompt to close bay if scanned again ---
+    if (Object.prototype.hasOwnProperty.call(locationMap, item)) {
+      const mappedLocation = locationMap[item];
+      if (currentLocation === mappedLocation) {
+        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
+        if (close) {
+          currentLocation = '';
+          updateLocationStatus();
+          alert('📦 Current location cleared.');
+        }
+      } else {
+        currentLocation = mappedLocation;
+        updateLocationStatus();
+        alert(`📍 Current location set to: ${mappedLocation}`);
+      }
+      resetScanInput();
       setTimeout(() => {
         window.scanLock = false;
-      }, 500); // Cooldown before accepting another scan
+      }, 500);
       return;
     }
 
