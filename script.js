@@ -10,6 +10,7 @@ let liveCounts = window.liveCounts || {};
 let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
+let lastScannedLocationCode = '';
 
 import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
 
@@ -1972,8 +1973,11 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("📍 [SCAN] Known Location?", isKnownLocation);
 
     // --- Enhanced location tag logic: handle both cleaned and original scanned code ---
-    // First check if the original scanned code is a location tag
-    if (Object.prototype.hasOwnProperty.call(locationMap, originalItem)) {
+    // First check if the original scanned code is a location tag or a repeat scan of the last bay
+    if (
+      Object.prototype.hasOwnProperty.call(locationMap, originalItem) ||
+      originalItem === lastScannedLocationCode
+    ) {
       const mappedLocation = locationMap[originalItem];
       if (currentLocation === mappedLocation) {
         const close = confirm(`You scanned the current location tag (${originalItem}) again.\nWould you like to CLOSE this bay?`);
@@ -1982,19 +1986,23 @@ document.addEventListener('DOMContentLoaded', () => {
           updateLocationStatus();
           alert('📦 Current location cleared.');
         }
-      } else {
+      } else if (mappedLocation) {
         currentLocation = mappedLocation;
         updateLocationStatus();
         alert(`📍 Current location set to: ${mappedLocation}`);
       }
+      lastScannedLocationCode = originalItem;
       resetScanInput();
       setTimeout(() => {
         window.scanLock = false;
       }, 500);
       return;
     }
-    // If not, check if the cleaned item is a location tag
-    if (Object.prototype.hasOwnProperty.call(locationMap, item)) {
+    // If not, check if the cleaned item is a location tag or a repeat scan of the last bay (cleaned)
+    if (
+      Object.prototype.hasOwnProperty.call(locationMap, item) ||
+      item === lastScannedLocationCode
+    ) {
       const mappedLocation = locationMap[item];
       if (currentLocation === mappedLocation) {
         const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
@@ -2003,11 +2011,12 @@ document.addEventListener('DOMContentLoaded', () => {
           updateLocationStatus();
           alert('📦 Current location cleared.');
         }
-      } else {
+      } else if (mappedLocation) {
         currentLocation = mappedLocation;
         updateLocationStatus();
         alert(`📍 Current location set to: ${mappedLocation}`);
       }
+      lastScannedLocationCode = item;
       resetScanInput();
       setTimeout(() => {
         window.scanLock = false;
@@ -2038,6 +2047,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLocationStatus();
         alert(`📍 Current location set to: ${name}`);
       }
+      lastScannedLocationCode = originalItem;
       resetScanInput();
       setTimeout(() => {
         window.scanLock = false;
@@ -2079,6 +2089,7 @@ document.addEventListener('DOMContentLoaded', () => {
           location: currentLocation
         };
 
+        lastScannedLocationCode = item;
         console.log("✅ Stored item:", trimmedItem, "for UPC:", item);
         updateRotationDate(liveCounts[trimmedItem].category);
         updateLiveTable();
