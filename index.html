@@ -38,6 +38,12 @@
     width: 100%;
     margin: 0 auto;
   }
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
   </style>
 </head>
 <body class="dark-theme electric-fantasy">
@@ -218,20 +224,19 @@
           <label><input type="checkbox" id="autosaveToggle" checked /> Enable Autosave</label>
         </div>
 
-        <h3>🧹 Data Management</h3>
-        <div class="button-cluster">
-          <button id="downloadBackupBtn">Download Backup</button>
-          <button id="clearSessionsBtn">Clear All Sessions</button>
-        </div>
-        <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
-
         <h3>☁️ Dropbox Cloud Sync</h3>
-        <div class="button-cluster">
+        <div class="button-grid">
           <button id="saveToDrive">💾 Save Session to Dropbox</button>
           <button id="loadFromDrive">📥 Load Session from Dropbox</button>
           <button id="restoreUPCMap">🔄 Restore UPC Map from Dropbox</button>
           <button id="syncCleanUPCBtn">🧼 Sync & Backup Clean UPC Map to Dropbox</button>
+          <button id="exportExcelBtn">📤 Export Excel Template</button>
+          <button id="downloadBackupBtn">📦 Backup All Data</button>
+          <button id="browseDropboxBtn">📁 Browse Dropbox Backups</button>
+          <button id="connectDropboxBtn">🔐 Connect Dropbox</button>
+          <button id="resetDropboxBtn">🧹 Reset Dropbox Connection</button>
         </div>
+        <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
         <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
         <h3>💾 Local Session Tools</h3>
         <div class="button-cluster">

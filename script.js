@@ -393,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Backup All Data Button ---
   // Add a button to export all localStorage session and mapping data
   const backupBtn = document.createElement('button');
+  backupBtn.className = 'settings-button';
   backupBtn.textContent = '📦 Backup All Data';
   backupBtn.style.marginTop = '15px';
   backupBtn.onclick = () => {
@@ -655,6 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Dropbox Backup Browser Modal Button ---
   const browseBackupsBtn = document.createElement('button');
+  browseBackupsBtn.className = 'settings-button';
   browseBackupsBtn.textContent = '📁 Browse Dropbox Backups';
   browseBackupsBtn.style.marginTop = '8px';
   browseBackupsBtn.onclick = async () => {
@@ -755,12 +757,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Dropbox OAuth2 PKCE Login Button ---
   const loginBtn = document.createElement('button');
+  loginBtn.className = 'settings-button';
   loginBtn.textContent = '🔐 Connect Dropbox';
   loginBtn.onclick = beginDropboxLogin;
   settingsTarget?.appendChild(loginBtn);
 
   // --- Reset Dropbox Connection Button ---
   const resetDropboxBtn = document.createElement('button');
+  resetDropboxBtn.className = 'settings-button';
   resetDropboxBtn.textContent = '🧹 Reset Dropbox Connection';
   resetDropboxBtn.style.marginTop = '8px';
   resetDropboxBtn.onclick = () => {
@@ -773,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Restore UPC Map from Dropbox Button ---
   const restoreUPCBtn = document.createElement('button');
+  restoreUPCBtn.className = 'settings-button';
   restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
   restoreUPCBtn.style.marginTop = '8px';
   restoreUPCBtn.onclick = async () => {
@@ -805,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Sync & Backup Clean UPC Map to Dropbox Button ---
   const syncCleanUPCBtn = document.createElement('button');
+  syncCleanUPCBtn.className = 'settings-button';
   syncCleanUPCBtn.textContent = '🧼 Sync & Backup Clean UPC Map to Dropbox';
   syncCleanUPCBtn.style.marginTop = '8px';
   syncCleanUPCBtn.onclick = async () => {
@@ -1232,6 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Export Excel Template Button ---
   // Place near other export buttons
   const exportTemplateBtn = document.createElement('button');
+  exportTemplateBtn.className = 'settings-button';
   exportTemplateBtn.textContent = '📤 Export Excel Template';
   exportTemplateBtn.style.marginTop = '8px';
   exportTemplateBtn.onclick = () => {

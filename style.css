@@ -424,6 +424,35 @@ button:hover {
   margin-top: 10px;
 }
 
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.button-grid button {
+  width: 100%;
+  max-width: 300px;
+  margin: 6px auto !important;
+  display: block !important;
+  text-align: center !important;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  color: white;
+  border: 1px solid #8a2be2;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  transition: all 0.3s ease;
+}
+
+.button-grid button:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+}
+
 #summaryBar {
   background-color: #1b1131;
   border: 1px solid #4e2a84;
@@ -950,4 +979,26 @@ tbody tr:hover {
   background: linear-gradient(to right, #2575fc, #4b0082);
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(0, 191, 255, 0.4);
+}
+/* --- Settings Button Glow Style --- */
+.settings-button {
+  width: 100%;
+  max-width: 300px;
+  margin: 6px auto;
+  display: block;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  color: white;
+  border: 1px solid #8a2be2;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  transition: all 0.3s ease;
+}
+
+.settings-button:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
