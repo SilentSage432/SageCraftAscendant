@@ -950,6 +950,27 @@ document.addEventListener('DOMContentLoaded', () => {
     locationStatus.textContent = '📍 No Active Bay';
     locationStatus.style.color = 'red';
     categoryInput.insertAdjacentElement('afterend', locationStatus);
+
+    // --- Close Bay Button ---
+    const closeBayBtn = document.createElement('button');
+    closeBayBtn.id = 'closeBayBtn';
+    closeBayBtn.textContent = '📦 Close Current Bay';
+    closeBayBtn.style.marginTop = '8px';
+    closeBayBtn.style.display = 'block';
+    closeBayBtn.style.padding = '6px 12px';
+    closeBayBtn.style.fontSize = '14px';
+    closeBayBtn.style.borderRadius = '6px';
+    closeBayBtn.style.border = '1px solid #ccc';
+    closeBayBtn.onclick = () => {
+      if (currentLocation) {
+        currentLocation = '';
+        updateLocationStatus();
+        alert('📦 Current bay closed.');
+      } else {
+        alert('ℹ️ No active bay to close.');
+      }
+    };
+    locationStatus.insertAdjacentElement('afterend', closeBayBtn);
   }
 
   // --- Visual scan mapping log for mapped codes ---
@@ -1976,7 +1997,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // First check if the original scanned code is a location tag or a repeat scan of the last bay
     if (
       Object.prototype.hasOwnProperty.call(locationMap, originalItem) ||
-      originalItem === lastScannedLocationCode
+      originalItem === lastScannedLocationCode ||
+      locationMap[originalItem] === currentLocation
     ) {
       const mappedLocation = locationMap[originalItem];
       if (currentLocation === mappedLocation) {
@@ -2001,7 +2023,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // If not, check if the cleaned item is a location tag or a repeat scan of the last bay (cleaned)
     if (
       Object.prototype.hasOwnProperty.call(locationMap, item) ||
-      item === lastScannedLocationCode
+      item === lastScannedLocationCode ||
+      locationMap[item] === currentLocation
     ) {
       const mappedLocation = locationMap[item];
       if (currentLocation === mappedLocation) {
