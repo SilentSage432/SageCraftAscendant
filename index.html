@@ -225,17 +225,34 @@
         </div>
         <label><input type="checkbox" id="keepSnapshotsToggle" checked /> Keep Snapshots After Excel Export</label>
 
-        <h3>☁️ Cloud Sync</h3>
+        <h3>☁️ Dropbox Cloud Sync</h3>
         <div class="button-cluster">
           <button id="saveToDrive">💾 Save Session to Dropbox</button>
           <button id="loadFromDrive">📥 Load Session from Dropbox</button>
+          <button id="restoreUPCMap">🔄 Restore UPC Map from Dropbox</button>
+          <button id="syncCleanUPCBtn">🧼 Sync & Backup Clean UPC Map to Dropbox</button>
         </div>
         <label><input type="checkbox" id="driveSyncToggle" /> Enable Auto Drive Sync (every 5 min)</label>
-        <h3>📚 Session Manager</h3>
+        <h3>💾 Local Session Tools</h3>
         <div class="button-cluster">
-          <button id="viewSavedSessions">📂 View Saved Sessions</button>
+          <button id="saveSession">💾 Save Session Locally</button>
+          <button id="loadSession">📥 Load Session Locally</button>
+          <button id="clearHistoryBtn">🧹 Clear Session History</button>
+        </div>
+
+        <h3>📤 Mapping Management</h3>
+        <div class="button-cluster">
+          <button id="exportBtn">📤 Export Bay Locations</button>
+          <button id="importBtn">📥 Import Bay Locations</button>
+          <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+          <button id="importUPCBtn">📥 Import UPC Mappings</button>
+        </div>
+
+        <h3>🧬 Advanced Tools</h3>
+        <div class="button-cluster">
           <button id="mergeReport">🧬 Merge Master Report</button>
-          <button id="clearAllSessions">🗑️ Clear All Saved Sessions</button>
+          <button id="downloadBackupBtn">⬇️ Download Backup</button>
+          <button id="clearSessionsBtn">🗑️ Clear All Sessions</button>
         </div>
       </section>
 
