@@ -22,6 +22,10 @@ let liveCounts = window.liveCounts || {};
 let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
+const eslToUPC = JSON.parse(localStorage.getItem('eslToUPCMap')) || {};
+function saveESLMap() {
+  localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+}
 let lastScannedLocationCode = '';
 
 import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
@@ -373,7 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
         processScan(val);
         return;
       }
-
+      // ESL-to-UPC mapping support
+      if (!upcToItem[val] && eslToUPC[val]) {
+        console.log(`🔄 ESL ${val} resolved to mapped item ${eslToUPC[val]}`);
+        processScan(eslToUPC[val]);
+        return;
+      }
       // For manually entered unknown codes, delay prompt until user confirms
       console.warn("⚠️ Manual entry of unrecognized code:", val);
       const response = await showCustomPrompt(val);
@@ -402,18 +411,22 @@ document.addEventListener('DOMContentLoaded', () => {
             resetScanInput();
             return;
           }
-
-          upcToItem[val] = item;
-          saveUPCMap();
+          if (/^\d{6}$/.test(val)) {
+            // Assume this is an ESL tag being manually linked
+            eslToUPC[val] = item;
+            saveESLMap();
+            console.log(`📎 ESL ${val} now maps to Lowe’s #${item}`);
+          } else {
+            upcToItem[val] = item;
+            saveUPCMap();
+          }
           // Remove the raw UPC from liveCounts if present
           if (liveCounts[val]) delete liveCounts[val];
-
           liveCounts[item] = {
             count: parseInt(liveQtyInput?.value?.trim()) || 1,
             location: currentLocation,
             category: categoryInput?.value?.trim() || inferredCategory || ''
           };
-
           updateRotationDate(liveCounts[item].category);
           updateLiveTable();
         }
@@ -1935,13 +1948,28 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
         }
-        let mappedItem = upcToItem[trimmed] || trimmed;
+        // ESL-to-UPC mapping support in batch mode
+        let mappedItem = upcToItem[trimmed] || (eslToUPC[trimmed] ? eslToUPC[trimmed] : trimmed);
         if (!upcToItem[trimmed]) {
-          const userDefined = prompt(`UPC ${trimmed} is not linked to a Lowe's item #. Please enter it now:`);
-          if (userDefined) {
-            upcToItem[trimmed] = userDefined;
-            saveUPCMap();
-            mappedItem = userDefined;
+          if (eslToUPC[trimmed]) {
+            console.log(`🔄 ESL ${trimmed} resolved to mapped item ${eslToUPC[trimmed]}`);
+            mappedItem = eslToUPC[trimmed];
+          } else {
+            const userDefined = prompt(`UPC ${trimmed} is not linked to a Lowe's item #. Please enter it now:`);
+            if (userDefined) {
+              const item = userDefined.trim();
+              if (/^\d{6}$/.test(trimmed)) {
+                // ESL tag being manually linked
+                eslToUPC[trimmed] = item;
+                saveESLMap();
+                console.log(`📎 ESL ${trimmed} now maps to Lowe’s #${item}`);
+                mappedItem = item;
+              } else {
+                upcToItem[trimmed] = item;
+                saveUPCMap();
+                mappedItem = item;
+              }
+            }
           }
         }
         if (!liveCounts[mappedItem]) {
