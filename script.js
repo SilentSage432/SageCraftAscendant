@@ -68,6 +68,17 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Collapsible dropdown logic ---
+  document.querySelectorAll('.collapsible-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const content = toggle.nextElementSibling;
+      if (content && content.classList.contains('collapsible-content')) {
+        const isHidden = content.classList.toggle('hidden');
+        toggle.setAttribute('aria-expanded', String(!isHidden));
+        content.setAttribute('aria-hidden', String(isHidden));
+      }
+    });
+  });
   // --- Dropbox OAuth2 PKCE Integration ---
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
