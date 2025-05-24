@@ -218,6 +218,77 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded fired and script.js is active");
   renderAuditRotationTable();
 
+  // --- Audit Reminder Toast on App Load (once per session) ---
+  const rotationDataToasted = sessionStorage.getItem('rotationReminderShown');
+  if (!rotationDataToasted) {
+    const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
+    const now = new Date();
+    const dueSoon = [];
+
+    Object.entries(rotationData).forEach(([category, info]) => {
+      const lastDate = new Date(info.date);
+      const interval = info.interval || 30;
+      const daysAgo = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+
+      if (daysAgo >= interval) {
+        dueSoon.push(`🔴 ${category} is overdue`);
+      } else if (daysAgo >= interval * 0.75) {
+        dueSoon.push(`🟡 ${category} due soon`);
+      }
+    });
+
+    if (dueSoon.length > 0) {
+      const toast = document.createElement('div');
+      toast.innerHTML = dueSoon.join('<br>') + `<br><em>Click for details</em>`;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = '#222';
+      toast.style.color = '#fff';
+      toast.style.padding = '10px 18px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '14px';
+      toast.style.zIndex = '9999';
+      toast.style.textAlign = 'center';
+      toast.style.cursor = 'pointer';
+      document.body.appendChild(toast);
+
+      toast.addEventListener('click', () => {
+        const modal = document.createElement('div');
+        modal.style = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background-color: rgba(0,0,0,0.7); display: flex;
+          justify-content: center; align-items: center; z-index: 10000;
+        `;
+        modal.innerHTML = `
+          <div style="background: #fff; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center;">
+            <h3>📋 Audit Due</h3>
+            <p>${dueSoon.join('<br>')}</p>
+            <button id="goAuditBtn">🔍 Go to Audit</button>
+          </div>
+        `;
+        modal.onclick = e => {
+          if (e.target === modal) document.body.removeChild(modal);
+        };
+        document.body.appendChild(modal);
+        document.getElementById('goAuditBtn').onclick = () => {
+          document.body.removeChild(modal);
+          window.location.hash = '#audit';
+          renderAuditRotationTable();
+        };
+      });
+
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 8000);
+    }
+
+    sessionStorage.setItem('rotationReminderShown', 'true');
+  }
+
   // --- Refresh Audit Log Button ---
   const refreshAuditLogBtn = document.getElementById('refreshAuditLog');
   if (refreshAuditLogBtn) {
