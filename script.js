@@ -386,6 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
       Object.entries(mergedReport.sessionCounts).forEach(([item, data]) => {
         summarySheet.push([item, data.count, data.category, data.location]);
       });
+      // Add logo-like title row
+      summarySheet.unshift([], ['📦 Silent Sage Inventory Report']);
 
       const mappingSheet = [['UPC', 'Item #']];
       Object.entries(mergedReport.mappings).forEach(([upc, item]) => {
@@ -412,6 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // 3. Create Excel file
       const wb = XLSX.utils.book_new();
       const wsSummary = XLSX.utils.aoa_to_sheet(summarySheet);
+      // Add styling for header row
+      wsSummary['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+      if (wsSummary['A1']) {
+        wsSummary['A1'].s = {
+          font: { bold: true, sz: 18 },
+          alignment: { horizontal: 'center' }
+        };
+      }
       const wsMap = XLSX.utils.aoa_to_sheet(mappingSheet);
       const wsLocations = XLSX.utils.aoa_to_sheet(locationSheet);
       const wsAudit = XLSX.utils.aoa_to_sheet(auditSheet);
@@ -442,6 +452,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       styleSheetHeaders(wsSummary);
+      // Apply color coding to Difference column (D5+)
+      Object.keys(wsSummary).forEach(cell => {
+        const col = cell.replace(/[0-9]/g, '');
+        const row = parseInt(cell.replace(/[A-Z]/g, ''));
+        if (col === 'D' && row >= 5) {
+          const value = wsSummary[cell].v;
+          if (typeof value === 'number') {
+            if (value > 0) {
+              wsSummary[cell].s = { fill: { fgColor: { rgb: "C6EFCE" } } }; // green
+            } else if (value < 0) {
+              wsSummary[cell].s = { fill: { fgColor: { rgb: "FFC7CE" } } }; // red
+            } else {
+              wsSummary[cell].s = { fill: { fgColor: { rgb: "D9D9D9" } } }; // gray
+            }
+          }
+        }
+      });
+      // Apply category-based highlight (F5+)
+      const categoryColors = {
+        'Laundry': '8ECAE6',
+        'Ranges': 'FFB703',
+        'Fridges & Freezers': '219EBC',
+        'Wall Ovens': 'FF6B6B'
+      };
+      Object.keys(wsSummary).forEach(cell => {
+        const col = cell.replace(/[0-9]/g, '');
+        const row = parseInt(cell.replace(/[A-Z]/g, ''));
+        if (col === 'F' && row >= 5) {
+          const cat = wsSummary[cell].v;
+          if (categoryColors[cat]) {
+            wsSummary[cell].s = { fill: { fgColor: { rgb: categoryColors[cat] } } };
+          }
+        }
+      });
       styleSheetHeaders(wsMap);
       styleSheetHeaders(wsLocations);
       styleSheetHeaders(wsAudit);
