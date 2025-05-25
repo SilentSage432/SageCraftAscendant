@@ -1,3 +1,30 @@
+  // --- Clean Empty Sessions Button ---
+  const cleanStaleSessionsBtn = document.getElementById('cleanStaleSessions');
+  if (cleanStaleSessionsBtn) {
+    cleanStaleSessionsBtn.addEventListener('click', () => {
+      let deletedCount = 0;
+      for (let key in localStorage) {
+        if (key.startsWith('inventorySession_')) {
+          try {
+            const session = JSON.parse(localStorage.getItem(key));
+            const isEmpty =
+              session &&
+              typeof session === 'object' &&
+              Object.keys(session.liveCounts || {}).length === 0 &&
+              (!session.onHandText || session.onHandText.trim() === "");
+
+            if (isEmpty) {
+              localStorage.removeItem(key);
+              deletedCount++;
+            }
+          } catch (e) {
+            console.warn(`⚠️ Skipped corrupt session: ${key}`);
+          }
+        }
+      }
+      alert(`🧼 Removed ${deletedCount} empty session(s) from local storage.`);
+    });
+  }
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
 }
