@@ -1400,6 +1400,8 @@ syncBothBtn.onclick = (async function (silent = false) {
       } else {
         alert('❌ Failed to sync one or more maps.');
       }
+    } else {
+      console.log('🔄 Maps synced silently (no toast)');
     }
   });
 
