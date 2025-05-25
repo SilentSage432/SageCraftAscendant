@@ -30,7 +30,7 @@ function saveUPCMap() {
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
     if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick();
+      syncBothBtn.onclick(true);
     }
   }
 }
@@ -40,7 +40,7 @@ function saveLocationMap() {
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
     if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick();
+      syncBothBtn.onclick(true);
     }
   }
 }
@@ -77,7 +77,7 @@ function saveESLMap() {
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
     if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick();
+      syncBothBtn.onclick(true);
     }
   }
 }
@@ -1353,7 +1353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   syncBothBtn.className = 'settings-button';
   syncBothBtn.textContent = '🔄 Sync All Maps to Dropbox';
   syncBothBtn.style.marginTop = '8px';
-  syncBothBtn.onclick = async () => {
+syncBothBtn.onclick = (async function (silent = false) {
     const cleanedUPC = {};
     for (const key in upcToItem) {
       const cleanedKey = key.trim();
@@ -1394,12 +1394,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const upcOk = await upload('/upc_map_backup.json', upcBlob);
     const locOk = await upload('/bay_location_backup.json', locBlob);
 
-    if (upcOk && locOk) {
-      alert('✅ Both maps synced to Dropbox!');
-    } else {
-      alert('❌ Failed to sync one or more maps.');
+    if (!silent) {
+      if (upcOk && locOk) {
+        alert('✅ Both maps synced to Dropbox!');
+      } else {
+        alert('❌ Failed to sync one or more maps.');
+      }
     }
-  };
+  });
 
   // --- Restore Both Maps from Dropbox Button ---
   const restoreBothBtn = document.createElement('button');
