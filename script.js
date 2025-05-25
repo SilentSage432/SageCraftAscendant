@@ -19,13 +19,23 @@ if (typeof window.Chart === 'undefined') {
 
 // --- Ensure all critical global variables are declared ONCE at the top ---
 let liveCounts = window.liveCounts || {};
+
+function normalizeUPC(code) {
+  code = code.replace(/\D/g, '');
+  if (code.length === 13 && code.startsWith('0')) {
+    return code.slice(1);
+  }
+  return code;
+}
 let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 const eslToUPC = JSON.parse(localStorage.getItem('eslToUPCMap')) || {};
+window.eslToUPC = eslToUPC;
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
 }
+window.saveESLMap = saveESLMap;
 let lastScannedLocationCode = '';
 
 import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
@@ -1271,6 +1281,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentLocation = '';
 
   // --- Scan Logic Setup ---
+  window.processScan = processScan;
   const liveEntryInput = document.getElementById('liveEntry');
   // Add Enter key handler for liveEntryInput
   if (liveEntryInput) {
@@ -1282,7 +1293,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isScannerInput = val.length >= 10 && !isNaN(val);
         console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
         if (val && isScannerInput) {
-          processScan(val);
+          const normalizedVal = normalizeUPC(val);
+          processScan(normalizedVal);
         }
       }
     });
@@ -1902,14 +1914,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const lines = batchInput.value.trim().split(/\r?\n/);
       lines.forEach(item => {
         const trimmed = item.trim();
+        const normalized = normalizeUPC(trimmed);
         if (!trimmed) return;
         // Unified location/product detection and handling
-        if (!upcToItem[trimmed] && !locationMap[trimmed]) {
-          showCustomPrompt(trimmed).then(response => {
+        if (!upcToItem[normalized] && !locationMap[normalized]) {
+          showCustomPrompt(normalized).then(response => {
             if (response === 'location') {
-              const name = prompt(`🗂 Please enter a name for location "${trimmed}":`);
+              const name = prompt(`🗂 Please enter a name for location "${normalized}":`);
               if (name) {
-                locationMap[trimmed] = name;
+                locationMap[normalized] = name;
                 saveLocationMap();
                 currentLocation = name;
                 updateLocationStatus();
@@ -1919,7 +1932,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
               }
             } else if (response === 'product') {
-              processProduct(trimmed);
+              processProduct(normalized);
               restoreFocusToEntry();
             } else {
               liveEntryInput.value = '';
@@ -1928,9 +1941,9 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           return;
         }
-        if (locationMap[trimmed]) {
-          if (currentLocation === locationMap[trimmed]) {
-            const close = confirm(`You scanned the current location tag (${trimmed}) again.\nWould you like to CLOSE this bay?`);
+        if (locationMap[normalized]) {
+          if (currentLocation === locationMap[normalized]) {
+            const close = confirm(`You scanned the current location tag (${normalized}) again.\nWould you like to CLOSE this bay?`);
             if (close) {
               currentLocation = '';
               updateLocationStatus();
@@ -1940,7 +1953,7 @@ document.addEventListener('DOMContentLoaded', () => {
             restoreFocusToEntry();
             return;
           } else {
-            currentLocation = locationMap[trimmed];
+            currentLocation = locationMap[normalized];
             updateLocationStatus();
             alert(`📍 Current location set to: ${currentLocation}`);
             liveEntryInput.value = '';
@@ -1949,23 +1962,23 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         // ESL-to-UPC mapping support in batch mode
-        let mappedItem = upcToItem[trimmed] || (eslToUPC[trimmed] ? eslToUPC[trimmed] : trimmed);
-        if (!upcToItem[trimmed]) {
-          if (eslToUPC[trimmed]) {
-            console.log(`🔄 ESL ${trimmed} resolved to mapped item ${eslToUPC[trimmed]}`);
-            mappedItem = eslToUPC[trimmed];
+        let mappedItem = upcToItem[normalized] || (eslToUPC[normalized] ? eslToUPC[normalized] : normalized);
+        if (!upcToItem[normalized]) {
+          if (eslToUPC[normalized]) {
+            console.log(`🔄 ESL ${normalized} resolved to mapped item ${eslToUPC[normalized]}`);
+            mappedItem = eslToUPC[normalized];
           } else {
-            const userDefined = prompt(`UPC ${trimmed} is not linked to a Lowe's item #. Please enter it now:`);
+            const userDefined = prompt(`UPC ${normalized} is not linked to a Lowe's item #. Please enter it now:`);
             if (userDefined) {
               const item = userDefined.trim();
-              if (/^\d{6}$/.test(trimmed)) {
+              if (/^\d{6}$/.test(normalized)) {
                 // ESL tag being manually linked
-                eslToUPC[trimmed] = item;
+                eslToUPC[normalized] = item;
                 saveESLMap();
-                console.log(`📎 ESL ${trimmed} now maps to Lowe’s #${item}`);
+                console.log(`📎 ESL ${normalized} now maps to Lowe’s #${item}`);
                 mappedItem = item;
               } else {
-                upcToItem[trimmed] = item;
+                upcToItem[normalized] = item;
                 saveUPCMap();
                 mappedItem = item;
               }
