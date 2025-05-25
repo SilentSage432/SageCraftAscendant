@@ -29,12 +29,20 @@ function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
-    syncBothBtn?.click();
+    if (typeof syncBothBtn?.onclick === 'function') {
+      syncBothBtn.onclick();
+    }
   }
 }
 
 function saveLocationMap() {
   localStorage.setItem('locationMap', JSON.stringify(locationMap));
+  // Auto-sync if enabled
+  if (document.getElementById('autosyncMapToggle')?.checked) {
+    if (typeof syncBothBtn?.onclick === 'function') {
+      syncBothBtn.onclick();
+    }
+  }
 }
 // --- Chart.js (Trends) integration: ensure Chart.js is available ---
 // If Chart.js is not included via HTML, add it here for completeness (for developer reference):
@@ -68,10 +76,87 @@ function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
-    syncBothBtn?.click();
+    if (typeof syncBothBtn?.onclick === 'function') {
+      syncBothBtn.onclick();
+    }
   }
 }
 window.saveESLMap = saveESLMap;
+  // --- Sync/Restore ESL Map to Dropbox Buttons ---
+  // Ensure settingsTarget is defined and present
+  let settingsTarget = document.querySelector('#tools .settings-group');
+  if (!settingsTarget) {
+    settingsTarget = document.createElement('div');
+    settingsTarget.className = 'settings-group';
+    const toolsSection = document.getElementById('tools');
+    if (toolsSection) {
+      toolsSection.appendChild(settingsTarget);
+    } else {
+      console.warn("⚠️ #tools section not found in DOM. Cannot append settings group.");
+    }
+  }
+
+  // Add Sync ESL Map to Dropbox button
+  const syncESLBtn = document.createElement('button');
+  syncESLBtn.className = 'settings-button';
+  syncESLBtn.textContent = '🔄 Sync ESL Map to Dropbox';
+  syncESLBtn.style.marginTop = '8px';
+  syncESLBtn.onclick = async () => {
+    const blob = new Blob([JSON.stringify(eslToUPC, null, 2)], { type: 'application/json' });
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path: '/esl_map_backup.json',
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+    if (response.ok) {
+      alert('✅ ESL map synced to Dropbox!');
+    } else {
+      const err = await response.text();
+      alert(`❌ Failed to sync ESL map: ${err}`);
+    }
+  };
+  settingsTarget.appendChild(syncESLBtn);
+
+  // Add Restore ESL Map from Dropbox button
+  const restoreESLBtn = document.createElement('button');
+  restoreESLBtn.className = 'settings-button';
+  restoreESLBtn.textContent = '📥 Restore ESL Map from Dropbox';
+  restoreESLBtn.style.marginTop = '8px';
+  restoreESLBtn.onclick = async () => {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: '/esl_map_backup.json' })
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      alert(`❌ Failed to restore ESL map: ${err}`);
+      return;
+    }
+
+    const map = await response.json();
+    if (!map || typeof map !== 'object') {
+      alert('❌ Invalid ESL map format.');
+      return;
+    }
+
+    Object.assign(eslToUPC, map);
+    saveESLMap();
+    alert('✅ ESL map restored from Dropbox!');
+  };
+  settingsTarget.appendChild(restoreESLBtn);
 let lastScannedLocationCode = '';
 
 import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
@@ -1364,6 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const restoredUPC = await restore('/upc_map_backup.json');
     const restoredLoc = await restore('/bay_location_backup.json');
+    const restoredESL = await restore('/esl_map_backup.json');
 
     if (restoredUPC && typeof restoredUPC === 'object') {
       Object.assign(upcToItem, restoredUPC);
@@ -1375,19 +1461,24 @@ document.addEventListener('DOMContentLoaded', () => {
       saveLocationMap();
     }
 
+    if (restoredESL && typeof restoredESL === 'object') {
+      Object.assign(eslToUPC, restoredESL);
+      saveESLMap();
+    }
+
     // Remove loading toast and show result
     setTimeout(() => {
       if (document.body.contains(toast)) document.body.removeChild(toast);
       const finalToast = document.createElement('div');
-      finalToast.textContent = (restoredUPC && restoredLoc)
-        ? '✅ Both maps restored from Dropbox!'
+      finalToast.textContent = (restoredUPC && restoredLoc && restoredESL)
+        ? '✅ All maps restored from Dropbox!'
         : '❌ Failed to restore one or more maps.';
       Object.assign(finalToast.style, {
         position: 'fixed',
         bottom: '20px',
         left: '50%',
         transform: 'translateX(-50%)',
-        backgroundColor: (restoredUPC && restoredLoc) ? 'green' : 'darkred',
+        backgroundColor: (restoredUPC && restoredLoc && restoredESL) ? 'green' : 'darkred',
         color: '#fff',
         padding: '10px 18px',
         borderRadius: '8px',
