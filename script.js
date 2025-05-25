@@ -27,6 +27,10 @@
   }
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
+  // Auto-sync if enabled
+  if (document.getElementById('autosyncMapToggle')?.checked) {
+    syncBothBtn?.click();
+  }
 }
 
 function saveLocationMap() {
@@ -61,6 +65,10 @@ const eslToUPC = JSON.parse(localStorage.getItem('eslToUPCMap')) || {};
 window.eslToUPC = eslToUPC;
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+  // Auto-sync if enabled
+  if (document.getElementById('autosyncMapToggle')?.checked) {
+    syncBothBtn?.click();
+  }
 }
 window.saveESLMap = saveESLMap;
 let lastScannedLocationCode = '';
@@ -477,11 +485,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadFromDriveBtn = document.getElementById('loadFromDrive');
 
 
-  // Clear Live Table button
+  // Clear Live Table button (Safe Clear logic)
   const clearLiveTableBtn = document.getElementById('clearLiveTable');
   if (clearLiveTableBtn) {
     clearLiveTableBtn.addEventListener('click', () => {
-      console.log("🧹 Clear Live Table button clicked");
+      const upcCount = Object.keys(upcToItem).length;
+      const locCount = Object.keys(locationMap).length;
+
+      if (upcCount === 0 || locCount === 0) {
+        const proceed = confirm("⚠️ It looks like one or more maps haven't been restored from Dropbox.\nAre you sure you want to clear the current session?");
+        if (!proceed) return;
+      }
+
+      console.log("🧹 Safe Clear: Live Table button clicked");
       Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
       liveEntryInput.value = '';
       updateLiveTable();
@@ -1500,6 +1516,21 @@ document.addEventListener('DOMContentLoaded', () => {
     //   liveEntryInput.focus();
     // }, 50);
   }
+
+  // --- Auto-Sync Map to Dropbox Toggle ---
+  const autoSyncToggle = document.createElement('label');
+  autoSyncToggle.innerHTML = `<input type="checkbox" id="autosyncMapToggle" /> 🔄 Auto-Sync Map to Dropbox`;
+  autoSyncToggle.style.display = 'block';
+  autoSyncToggle.style.marginTop = '10px';
+  autoSyncToggle.style.fontSize = '14px';
+  settingsTarget?.appendChild(autoSyncToggle);
+
+  const autosyncStored = localStorage.getItem('autosyncMapEnabled');
+  document.getElementById('autosyncMapToggle').checked = autosyncStored !== 'false';
+
+  document.getElementById('autosyncMapToggle').addEventListener('change', (e) => {
+    localStorage.setItem('autosyncMapEnabled', e.target.checked);
+  });
   // --- Datalist for liveEntryInput suggestions ---
   const datalist = document.createElement('datalist');
   datalist.id = 'itemSuggestions';
