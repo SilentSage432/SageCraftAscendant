@@ -123,6 +123,7 @@ textarea {
 }
 
 /* --- Dark Mode Overrides --- */
+
 body {
   background: linear-gradient(to bottom, #0e0a1a, #1c0c2b);
   color: #eae6f9;
@@ -187,6 +188,7 @@ section {
 }
 
 /* --- Layout for Top Nav Tabs --- */
+
 .topbar {
   background-color: #1e1e1e;
   padding: 15px 20px;
@@ -226,6 +228,7 @@ section {
 }
 
 /* Added fantasy style overrides for topbar and tabs */
+
 .topbar {
   background: linear-gradient(to right, #2a0845, #6441a5);
   border-bottom: 2px solid #9b59b6;
@@ -244,6 +247,7 @@ section {
 }
 
 /* --- Tab Sections --- */
+
 .tab-section {
   display: none;
   margin-top: 20px;
@@ -254,6 +258,7 @@ section {
 }
 
 /* --- Input Row Layout --- */
+
 #importExportControls {
   display: flex;
   flex-wrap: wrap;
@@ -282,12 +287,14 @@ section {
 }
 
 /* --- Align Add Item under Input --- */
+
 #addLiveItem {
   margin-top: 10px;
   width: 100%;
 }
 
 /* --- Entry Field Layout --- */
+
 #entryControls {
   display: flex;
   flex-wrap: wrap;
@@ -340,11 +347,13 @@ section {
 }
 
 /* --- Hidden Import/Export Section --- */
+
 .hidden {
   display: none !important;
 }
 
 /* --- Dark Fantasy Vibe Enhancements --- */
+
 body {
   margin: 0;
   background: linear-gradient(to right, #0f0f2c, #1a0b2e);
@@ -413,7 +422,9 @@ button {
   padding: 10px 15px;
   border-radius: 6px;
   cursor: pointer;
+  
   /* Glowing effect for main action buttons */
+  
   box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
   transition: all 0.3s ease;
 }
@@ -605,6 +616,7 @@ footer {
   color: #8066b7;
 }
 /* --- Fantasy Purple Topbar & Tabs --- */
+
 .logo-area {
   display: flex;
   align-items: center;
@@ -664,6 +676,7 @@ footer {
 }
 
 /* Magical overlay background effect */
+
 body::before {
   content: "";
   position: fixed;
@@ -674,6 +687,7 @@ body::before {
   z-index: -1;
 }
 /* --- Logo Banner Styles --- */
+
 .logo-banner {
   display: flex;
   flex-direction: column;
@@ -721,6 +735,7 @@ body::before {
 }
 
 /* --- Audit Rotation Fancy Table Enhancements --- */
+
 #audit table {
   background: rgba(40, 20, 60, 0.3);
   border: 1px solid #7d3cff;
@@ -778,6 +793,7 @@ body::before {
 }
 
 /* --- Floating Nav --- */
+
 .floating-nav {
   position: fixed;
   top: 50%;
@@ -838,6 +854,7 @@ body::before {
 
 
 /* --- Enhanced Magical Table Styling --- */
+
 table {
   border-collapse: separate;
   border-spacing: 0;
@@ -883,6 +900,7 @@ tbody tr:hover {
 }
 
 /* --- Scan Capsule Styling --- */
+
 .scan-capsule {
   background: rgba(40, 20, 60, 0.6);
   border: 1px solid #7d3cff;
@@ -918,6 +936,7 @@ tbody tr:hover {
 
 
 /* --- Mystic Modal Fantasy Styles --- */
+
 .mystic-modal-overlay {
   position: fixed;
   top: 0;
@@ -989,6 +1008,7 @@ tbody tr:hover {
   box-shadow: 0 0 12px rgba(0, 191, 255, 0.4);
 }
 /* --- Settings Button Glow Style --- */
+
 .settings-button {
   width: 100%;
   max-width: 300px;
