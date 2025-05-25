@@ -1246,7 +1246,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  if (settingsTarget) settingsTarget.appendChild(syncCleanUPCBtn);
+  // --- Sync Both Maps to Dropbox Button ---
+  const syncBothBtn = document.createElement('button');
+  syncBothBtn.className = 'settings-button';
+  syncBothBtn.textContent = '🔄 Sync All Maps to Dropbox';
+  syncBothBtn.style.marginTop = '8px';
+  syncBothBtn.onclick = async () => {
+    const cleanedUPC = {};
+    for (const key in upcToItem) {
+      const cleanedKey = key.trim();
+      const value = upcToItem[key].trim();
+      if (cleanedKey && value) {
+        cleanedUPC[cleanedKey] = value;
+      }
+    }
+    const cleanedLoc = {};
+    for (const code in locationMap) {
+      const name = locationMap[code].trim();
+      if (code && name) {
+        cleanedLoc[code.trim()] = name;
+      }
+    }
+
+    const upcBlob = new Blob([JSON.stringify(cleanedUPC, null, 2)], { type: 'application/json' });
+    const locBlob = new Blob([JSON.stringify(cleanedLoc, null, 2)], { type: 'application/json' });
+
+    const upload = async (path, blob) => {
+      const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+          'Content-Type': 'application/octet-stream',
+          'Dropbox-API-Arg': JSON.stringify({
+            path,
+            mode: 'overwrite',
+            autorename: false,
+            mute: true
+          })
+        },
+        body: blob
+      });
+      return response.ok;
+    };
+
+    const upcOk = await upload('/upc_map_backup.json', upcBlob);
+    const locOk = await upload('/bay_location_backup.json', locBlob);
+
+    if (upcOk && locOk) {
+      alert('✅ Both maps synced to Dropbox!');
+    } else {
+      alert('❌ Failed to sync one or more maps.');
+    }
+  };
+
+  // --- Restore Both Maps from Dropbox Button ---
+  const restoreBothBtn = document.createElement('button');
+  restoreBothBtn.className = 'settings-button';
+  restoreBothBtn.textContent = '📥 Restore All Maps from Dropbox';
+  restoreBothBtn.style.marginTop = '8px';
+  restoreBothBtn.onclick = async () => {
+    const restore = async (path) => {
+      const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+          'Dropbox-API-Arg': JSON.stringify({ path })
+        }
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    };
+
+    const restoredUPC = await restore('/upc_map_backup.json');
+    const restoredLoc = await restore('/bay_location_backup.json');
+
+    if (restoredUPC && typeof restoredUPC === 'object') {
+      Object.assign(upcToItem, restoredUPC);
+      saveUPCMap();
+    }
+
+    if (restoredLoc && typeof restoredLoc === 'object') {
+      Object.assign(locationMap, restoredLoc);
+      saveLocationMap();
+    }
+
+    if (restoredUPC && restoredLoc) {
+      alert('✅ Both maps restored from Dropbox!');
+    } else {
+      alert('❌ Failed to restore one or more maps.');
+    }
+  };
+
+  if (settingsTarget) {
+    settingsTarget.appendChild(syncCleanUPCBtn);
+    settingsTarget.appendChild(syncBothBtn);
+    settingsTarget.appendChild(restoreBothBtn);
+  }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
     if (/^\d{15}$/.test(code)) {
