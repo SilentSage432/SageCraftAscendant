@@ -48,7 +48,8 @@ if (typeof window.Chart === 'undefined') {
   document.head.appendChild(chartScript);
 }
 
-// --- Ensure all critical global variables are declared ONCE at the top ---
+  // --- Ensure all critical global variables are declared ONCE at the top ---
+  let syncBothBtn = null;
 let liveCounts = window.liveCounts || {};
 
 function normalizeUPC(code) {
@@ -1263,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Sync Both Maps to Dropbox Button ---
-  const syncBothBtn = document.createElement('button');
+  syncBothBtn = document.createElement('button');
   syncBothBtn.className = 'settings-button';
   syncBothBtn.textContent = '🔄 Sync All Maps to Dropbox';
   syncBothBtn.style.marginTop = '8px';
