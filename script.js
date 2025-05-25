@@ -1323,19 +1323,22 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreBothBtn.onclick = async () => {
     console.log('📥 Restore All Maps button clicked');
 
+    // Show toast indicator for start of restore
     const toast = document.createElement('div');
     toast.textContent = '⏳ Restoring maps from Dropbox...';
-    toast.style.position = 'fixed';
-    toast.style.bottom = '20px';
-    toast.style.left = '50%';
-    toast.style.transform = 'translateX(-50%)';
-    toast.style.backgroundColor = '#444';
-    toast.style.color = '#fff';
-    toast.style.padding = '10px 18px';
-    toast.style.borderRadius = '8px';
-    toast.style.fontSize = '14px';
-    toast.style.zIndex = '9999';
-    toast.style.textAlign = 'center';
+    Object.assign(toast.style, {
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      backgroundColor: '#444',
+      color: '#fff',
+      padding: '10px 18px',
+      borderRadius: '8px',
+      fontSize: '14px',
+      zIndex: '9999',
+      textAlign: 'center'
+    });
     document.body.appendChild(toast);
 
     const restore = async (path) => {
@@ -1346,8 +1349,16 @@ document.addEventListener('DOMContentLoaded', () => {
           'Dropbox-API-Arg': JSON.stringify({ path })
         }
       });
-      if (!response.ok) return null;
-      return await response.json();
+      if (!response.ok) {
+        console.warn(`❌ Failed to fetch ${path}:`, response.status);
+        return null;
+      }
+      try {
+        return await response.json();
+      } catch (err) {
+        console.warn(`❌ Failed to parse JSON from ${path}:`, err);
+        return null;
+      }
     };
 
     const restoredUPC = await restore('/upc_map_backup.json');
@@ -1363,14 +1374,26 @@ document.addEventListener('DOMContentLoaded', () => {
       saveLocationMap();
     }
 
+    // Remove loading toast and show result
     setTimeout(() => {
       if (document.body.contains(toast)) document.body.removeChild(toast);
       const finalToast = document.createElement('div');
       finalToast.textContent = (restoredUPC && restoredLoc)
         ? '✅ Both maps restored from Dropbox!'
         : '❌ Failed to restore one or more maps.';
-      finalToast.style = toast.style;
-      finalToast.style.backgroundColor = (restoredUPC && restoredLoc) ? 'green' : 'darkred';
+      Object.assign(finalToast.style, {
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: (restoredUPC && restoredLoc) ? 'green' : 'darkred',
+        color: '#fff',
+        padding: '10px 18px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        zIndex: '9999',
+        textAlign: 'center'
+      });
       document.body.appendChild(finalToast);
       setTimeout(() => document.body.removeChild(finalToast), 4000);
     }, 1000);
