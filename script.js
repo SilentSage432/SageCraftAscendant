@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // --- Attach event listeners for Local Session Tools, Mapping Management, and Advanced Tools buttons ---
   const localSessionTools = [
-    { id: 'saveSession', action: () => console.log('💾 Save Session button clicked') },
+    { id: 'saveSessionVault', action: () => console.log('💾 Save Session button clicked') },
     { id: 'loadSession', action: () => console.log('📥 Load Session button clicked') }
   ];
 
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'saveToDrive',
     'loadFromDrive',
     'clearHistoryBtn',
-    'saveSession',
+    'saveSessionVault',
     'loadSession',
     'downloadExcel',
     'authGoogleDrive',
@@ -529,11 +529,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   // 6. clearHistoryBtn (already handled above)
-  // 7. saveSession
-  const saveSessionBtnCheck = document.getElementById('saveSession');
+  // 7. saveSessionVault
+  const saveSessionBtnCheck = document.getElementById('saveSessionVault');
   if (saveSessionBtnCheck && !saveSessionBtnCheck.onclick && saveSessionBtnCheck.getAttribute('listener-attached') !== 'true') {
     saveSessionBtnCheck.addEventListener('click', () => {
-      console.log('saveSession clicked!');
+      console.log('saveSessionVault clicked!');
     });
     saveSessionBtnCheck.setAttribute('listener-attached', 'true');
   }

@@ -339,14 +339,6 @@ section {
   white-space: nowrap;
 }
 
-/* --- Misc --- */
-footer {
-  margin-top: 40px;
-  font-size: 13px;
-  color: #999;
-  text-align: center;
-}
-
 /* --- Hidden Import/Export Section --- */
 .hidden {
   display: none !important;
@@ -572,13 +564,6 @@ th, td {
   display: none;
 }
 
-footer{
-  text-align: center;
-  margin-top: 40px;
-  font-size: 12px;
-  color: #8b8ba7;
-}
-
 input:focus, textarea:focus {
   border-color: #5f8fff;
   box-shadow: 0 0 5px #00bfff88;
@@ -588,7 +573,7 @@ input:focus, textarea:focus {
 #liveCountTable th,
 #resultsTable th {
   background-color: #2c1b4f;
-  color: #e0dfff;
+  color: #cab3ff;
   border-color: #4e2a84;
 }
 
@@ -596,7 +581,7 @@ input:focus, textarea:focus {
 #resultsTable td {
   background-color: rgba(33, 29, 59, 0.95);
   border-color: #4e2a84;
-  color: #e0dfff;
+  color: #cab3ff;
 }
 
 .match td {
@@ -614,6 +599,9 @@ input:focus, textarea:focus {
 }
 
 footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 13px;
   color: #8066b7;
 }
 /* --- Fantasy Purple Topbar & Tabs --- */
@@ -640,7 +628,7 @@ footer {
   border-radius: 30px;
   border: 2px solid #8f3aff;
   background: rgba(60, 20, 100, 0.3);
-  color: #dcd2ff;
+  color: #cab3ff;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -861,7 +849,7 @@ table {
 
 thead th {
   background: linear-gradient(145deg, #4e2a84, #6a0dad);
-  color: #e0dfff;
+  color: #cab3ff;
   text-shadow: 0 0 4px #8f3aff;
   font-size: 15px;
   padding: 12px;
@@ -880,10 +868,6 @@ tbody tr:hover {
 /* --- Dark Fantasy Theme Styles --- */
 /* --- Button Styles --- */
 /* --- Table Styles --- */
-
-.new-item-flash {
-  animation: flash-glow 1.2s ease-out;
-}
 
 @keyframes shake-error {
   0% { transform: translateX(0); }
