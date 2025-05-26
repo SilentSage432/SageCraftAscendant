@@ -1031,6 +1031,20 @@ tbody tr:hover {
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
 
+/* Special margin for the "Reset All Maps" button to visually separate it in advanced controls */
+.settings-button.reset-maps-btn {
+  margin-top: 18px;
+  margin-bottom: 6px;
+  background: linear-gradient(145deg, #a83279, #8f3aff);
+  border: 1.5px solid #e05cff;
+  box-shadow: 0 0 16px #ffb3fa99, 0 0 30px #a8327944;
+}
+
+.settings-button.reset-maps-btn:hover {
+  background: linear-gradient(to right, #ff4b2b, #8f3aff);
+  box-shadow: 0 0 22px #ffb3fa, 0 0 30px #a83279;
+}
+
 .esl-badge {
   background-color: #ff9f1c;
   color: #1e1e1e;
