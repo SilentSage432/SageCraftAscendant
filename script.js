@@ -1757,6 +1757,30 @@ Bay Codes → ${Object.keys(locationMap).length}`;
             setTimeout(() => document.body.removeChild(toast), 3000);
             return;
           }
+          // Check reverse mapping: is this a known Lowe's item number?
+          const matchingUPC = Object.entries(upcToItem).find(([k, v]) => v === normalizedVal)?.[0];
+          if (matchingUPC) {
+            console.log(`🔁 Scanned Lowe’s #${normalizedVal} matched to UPC ${matchingUPC}`);
+            processScan(normalizedVal);
+            const toast = document.createElement('div');
+            toast.textContent = `✅ Lowe’s #${normalizedVal} recognized`;
+            Object.assign(toast.style, {
+              position: 'fixed',
+              bottom: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#2e7d32',
+              color: '#fff',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              zIndex: '9999',
+              textAlign: 'center'
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => document.body.removeChild(toast), 3000);
+            return;
+          }
           processScan(normalizedVal);
         }
       }
