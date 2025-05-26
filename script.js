@@ -288,6 +288,7 @@ async function getDropboxAccessToken() {
   if (!token) {
     token = await refreshAccessToken();
   }
+  console.log("🔐 Access token being used:", token);
   return token;
 }
 
@@ -1531,7 +1532,10 @@ syncBothBtn = document.createElement('button');
 syncBothBtn.className = 'settings-button';
 syncBothBtn.textContent = '🔄 Sync All Maps to Dropbox';
 syncBothBtn.style.marginTop = '8px';
-syncBothBtn.addEventListener('click', () => syncAllMapsToDropbox(false));
+syncBothBtn.addEventListener('click', () => {
+  console.log('🔄 Sync All Maps button clicked');
+  syncAllMapsToDropbox(false);
+});
 
   // --- Restore Both Maps from Dropbox Button ---
   const restoreBothBtn = document.createElement('button');
