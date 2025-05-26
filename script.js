@@ -609,13 +609,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       // ESL-to-UPC mapping support
-      if (!upcToItem[val] && eslToUPC[val]) {
-        console.log(`🔄 ESL ${val} resolved to mapped item ${eslToUPC[val]}`);
-        processScan(eslToUPC[val]);
+      if (!upcToItem[val] && (eslToUPC[val] || eslToUPC[normalizeUPC(val)])) {
+        const mappedItem = eslToUPC[val] || eslToUPC[normalizeUPC(val)];
+        console.log(`🔄 ESL ${val} resolved to mapped item ${mappedItem}`);
+        processScan(mappedItem);
         return;
       }
       // For manually entered unknown codes, delay prompt until user confirms
       console.warn("⚠️ Manual entry of unrecognized code:", val);
+      // --- Insert ESL duplicate check logic here ---
+      const rawESL = val;
+      const normalizedESL = normalizeUPC(val);
+
+      if (eslToUPC[rawESL] || eslToUPC[normalizedESL]) {
+        const item = eslToUPC[rawESL] || eslToUPC[normalizedESL];
+        console.log(`🔁 ESL ${val} already mapped to Lowe’s #${item}`);
+        const toast = document.createElement('div');
+        toast.textContent = `🔁 ESL ${val} → Lowe’s #${item}`;
+        Object.assign(toast.style, {
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#444',
+          color: '#fff',
+          padding: '8px 16px',
+          borderRadius: '8px',
+          fontSize: '14px',
+          zIndex: '9999',
+          textAlign: 'center'
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => document.body.removeChild(toast), 3000);
+
+        processScan(item);
+        resetScanInput();
+        return;
+      }
+
       const response = await showCustomPrompt(val);
       updateSuggestions();
       updateLiveTable();
@@ -642,13 +673,13 @@ document.addEventListener('DOMContentLoaded', () => {
             resetScanInput();
             return;
           }
-          if (/^\d{6}$/.test(val)) {
-            // Assume this is an ESL tag being manually linked
-            eslToUPC[val] = item;
+          const originalCode = val;
+          if (/^\d{6}$/.test(originalCode)) {
+            eslToUPC[originalCode] = item;
             saveESLMap();
-            console.log(`📎 ESL ${val} now maps to Lowe’s #${item}`);
+            console.log(`📎 ESL ${originalCode} now maps to Lowe’s #${item}`);
           } else {
-            upcToItem[val] = item;
+            upcToItem[originalCode] = item;
             saveUPCMap();
           }
           // Remove the raw UPC from liveCounts if present
