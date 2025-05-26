@@ -1674,7 +1674,6 @@ syncBothBtn.addEventListener('click', () => {
     settingsTarget.appendChild(restoreBothBtn);
 
     // --- RESET ALL MAPS BUTTON ---
-    // Ensures only one instance appears, positioned directly after restoreBothBtn
     const resetMapsBtn = document.createElement('button');
     resetMapsBtn.className = 'settings-button';
     resetMapsBtn.textContent = '🧹 Reset All Maps (Fresh Start)';
@@ -1695,16 +1694,11 @@ syncBothBtn.addEventListener('click', () => {
       saveLocationMap();
       saveESLMap();
     };
-    // Insert resetMapsBtn directly after restoreBothBtn, ensuring only one instance
-    if (!settingsTarget.contains(resetMapsBtn)) {
-      // Find the current restoreBothBtn in settingsTarget
-      if (restoreBothBtn && restoreBothBtn.parentNode === settingsTarget) {
-        // Insert after restoreBothBtn
-        settingsTarget.insertBefore(resetMapsBtn, restoreBothBtn.nextSibling);
-      } else {
-        // Fallback: append at end
-        settingsTarget.appendChild(resetMapsBtn);
-      }
+    // Always append resetMapsBtn after restoreBothBtn, or fallback to appending at end
+    if (restoreBothBtn && restoreBothBtn.parentNode === settingsTarget) {
+      settingsTarget.insertBefore(resetMapsBtn, restoreBothBtn.nextSibling);
+    } else {
+      settingsTarget.appendChild(resetMapsBtn);
     }
   }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
