@@ -26,59 +26,6 @@
     });
   }
 
-// --- Sync Both Maps to Dropbox Button ---
-// Move function definition to the very top after global variables
-async function syncAllMapsToDropbox(silent = false) {
-  const cleanedUPC = {};
-  for (const key in upcToItem) {
-    const cleanedKey = key.trim();
-    const value = upcToItem[key].trim();
-    if (cleanedKey && value) {
-      cleanedUPC[cleanedKey] = value;
-    }
-  }
-  const cleanedLoc = {};
-  for (const code in locationMap) {
-    const name = locationMap[code].trim();
-    if (code && name) {
-      cleanedLoc[code.trim()] = name;
-    }
-  }
-
-  const upcBlob = new Blob([JSON.stringify(cleanedUPC, null, 2)], { type: 'application/json' });
-  const locBlob = new Blob([JSON.stringify(cleanedLoc, null, 2)], { type: 'application/json' });
-
-  const upload = async (path, blob) => {
-    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Content-Type': 'application/octet-stream',
-        'Dropbox-API-Arg': JSON.stringify({
-          path,
-          mode: 'overwrite',
-          autorename: false,
-          mute: true
-        })
-      },
-      body: blob
-    });
-    return response.ok;
-  };
-
-  const upcOk = await upload('/upc_map_backup.json', upcBlob);
-  const locOk = await upload('/bay_location_backup.json', locBlob);
-
-  if (!silent) {
-    if (upcOk && locOk) {
-      alert('✅ Both maps synced to Dropbox!');
-    } else {
-      alert('❌ Failed to sync one or more maps.');
-    }
-  } else {
-    console.log('🔄 Maps synced silently (no toast)');
-  }
-}
 
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
@@ -145,6 +92,59 @@ if (typeof window.Chart === 'undefined') {
 
   // --- Ensure all critical global variables are declared ONCE at the top ---
   let syncBothBtn = null;
+// --- Sync Both Maps to Dropbox Button ---
+// Move function definition to the very top after global variables
+async function syncAllMapsToDropbox(silent = false) {
+  const cleanedUPC = {};
+  for (const key in upcToItem) {
+    const cleanedKey = key.trim();
+    const value = upcToItem[key].trim();
+    if (cleanedKey && value) {
+      cleanedUPC[cleanedKey] = value;
+    }
+  }
+  const cleanedLoc = {};
+  for (const code in locationMap) {
+    const name = locationMap[code].trim();
+    if (code && name) {
+      cleanedLoc[code.trim()] = name;
+    }
+  }
+
+  const upcBlob = new Blob([JSON.stringify(cleanedUPC, null, 2)], { type: 'application/json' });
+  const locBlob = new Blob([JSON.stringify(cleanedLoc, null, 2)], { type: 'application/json' });
+
+  const upload = async (path, blob) => {
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path,
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+    return response.ok;
+  };
+
+  const upcOk = await upload('/upc_map_backup.json', upcBlob);
+  const locOk = await upload('/bay_location_backup.json', locBlob);
+
+  if (!silent) {
+    if (upcOk && locOk) {
+      alert('✅ Both maps synced to Dropbox!');
+    } else {
+      alert('❌ Failed to sync one or more maps.');
+    }
+  } else {
+    console.log('🔄 Maps synced silently (no toast)');
+  }
+}
 let liveCounts = window.liveCounts || {};
 
 function normalizeUPC(code) {
@@ -1549,6 +1549,7 @@ syncBothBtn.addEventListener('click', () => {
   restoreBothBtn.style.marginTop = '8px';
   restoreBothBtn.onclick = async () => {
     console.log('📥 Restore All Maps button clicked');
+    console.log('🧪 Checking syncAllMapsToDropbox reference:', typeof syncAllMapsToDropbox);
 
     // Show toast indicator for start of restore
     const toast = document.createElement('div');
@@ -1613,6 +1614,9 @@ syncBothBtn.addEventListener('click', () => {
       saveESLMap();
       eslOK = true;
     }
+
+    // Debug log after restore attempts
+    console.log('✅ Restore attempt complete:', { upcOK, locOK, eslOK });
 
     // Remove loading toast and show result
     setTimeout(() => {
