@@ -132,8 +132,8 @@ async function syncAllMapsToDropbox(silent = false) {
     return response.ok;
   };
 
-  const upcOk = await upload('/upc_map_backup.json', upcBlob);
-  const locOk = await upload('/bay_location_backup.json', locBlob);
+  const upcOk = await upload('/beta-test-1/upc_map_backup.json', upcBlob);
+  const locOk = await upload('/beta-test-1/bay_location_backup.json', locBlob);
 
   if (!silent) {
     if (upcOk && locOk) {
@@ -253,6 +253,23 @@ window.saveESLMap = saveESLMap;
     }
   }
 
+  // --- FOLDER SELECT DROPDOWN FOR DROPBOX MAP RESTORE ---
+  // Insert above Dropbox restore buttons
+  const folderSelect = document.createElement('select');
+  folderSelect.id = 'dropboxFolderSelect';
+  folderSelect.style.marginTop = '10px';
+  folderSelect.style.padding = '6px';
+  folderSelect.style.fontSize = '14px';
+  ['/beta-test-1', '/beta-archive-legacy'].forEach(folder => {
+    const option = document.createElement('option');
+    option.value = folder;
+    option.textContent = folder;
+    folderSelect.appendChild(option);
+  });
+  // Insert before Dropbox restore buttons if possible, else at end of settingsTarget
+  // Try to insert before restoreBothBtn if it exists later, else just append now
+  settingsTarget.appendChild(folderSelect);
+
   // Add Sync ESL Map to Dropbox button
   const syncESLBtn = document.createElement('button');
   syncESLBtn.className = 'settings-button';
@@ -266,7 +283,7 @@ window.saveESLMap = saveESLMap;
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
-          path: '/esl_map_backup.json',
+          path: '/beta-test-1/esl_map_backup.json',
           mode: 'overwrite',
           autorename: false,
           mute: true
@@ -1218,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
-          path: '/active_session.json',
+          path: '/beta-test-1/active_session.json',
           mode: 'overwrite',
           autorename: false,
           mute: true
@@ -1254,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Authorization': `Bearer ${await getDropboxAccessToken()}`,
           'Content-Type': 'application/octet-stream',
           'Dropbox-API-Arg': JSON.stringify({
-            path: `/auto_backup_session_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+            path: `/beta-test-1/auto_backup_session_${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
             mode: 'add',
             autorename: true,
             mute: true
@@ -1391,11 +1408,12 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreUPCBtn.textContent = '🔄 Restore UPC Map from Dropbox';
   restoreUPCBtn.style.marginTop = '8px';
   restoreUPCBtn.onclick = async () => {
+    const folder = document.getElementById('dropboxFolderSelect')?.value || '';
     const response = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: '/upc_map_backup.json' })
+        'Dropbox-API-Arg': JSON.stringify({ path: `${folder}/upc_map_backup.json` })
       }
     });
 
@@ -1615,10 +1633,13 @@ syncBothBtn.addEventListener('click', () => {
       }
     };
 
+    // Use selected folder from dropdown
+    const folder = document.getElementById('dropboxFolderSelect')?.value || '';
+
     // Fetch all three maps
-    const restoredUPC = await restore('/upc_map_backup.json');
-    const restoredLoc = await restore('/bay_location_backup.json');
-    const restoredESL = await restore('/esl_map_backup.json');
+    const restoredUPC = await restore(`${folder}/upc_map_backup.json`);
+    const restoredLoc = await restore(`${folder}/bay_location_backup.json`);
+    const restoredESL = await restore(`${folder}/esl_map_backup.json`);
 
     // Correctly assign and save each map if valid
     let upcOK = false, locOK = false, eslOK = false;
