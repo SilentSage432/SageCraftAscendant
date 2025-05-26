@@ -468,6 +468,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (overlay) overlay.style.display = 'none';
     };
   }
+  // --- ESL Tag Modal Button Handler ---
+  const modalBtnESLTag = document.getElementById('modalBtnESLTag');
+  if (modalBtnESLTag) {
+    modalBtnESLTag.onclick = () => {
+      const item = currentESLItem;
+      const itemNum = prompt(`Enter the Lowe’s item number for ESL: ${item}`);
+      if (item && itemNum) {
+        const trimmed = itemNum.trim();
+        if (trimmed) {
+          eslToUPC[item] = trimmed;
+          saveESLMap();
+        }
+      }
+      const overlay = document.getElementById('customModal');
+      if (overlay) overlay.style.display = 'none';
+    };
+  }
   // --- Render Audit Rotation Table ---
   function renderAuditRotationTable() {
     const table = document.querySelector('#audit table');
@@ -1934,6 +1951,11 @@ syncBothBtn.addEventListener('click', () => {
       document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
       document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
       document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
+      // Add ESL Tag button handler for modal prompt
+      const eslTagBtn = document.getElementById('modalBtnESLTag');
+      if (eslTagBtn) {
+        eslTagBtn.onclick = () => cleanup('esl');
+      }
     });
   }
   let currentLocation = '';
