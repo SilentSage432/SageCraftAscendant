@@ -1713,6 +1713,71 @@ syncBothBtn.addEventListener('click', () => {
     settingsTarget.appendChild(syncBothBtn);
     settingsTarget.appendChild(restoreBothBtn);
 
+    // --- 🔒 Save Locked Bay Location Map Button ---
+    // 🔒 Save Locked Bay Location Map
+    const lockBayMapBtn = document.createElement('button');
+    lockBayMapBtn.className = 'settings-button';
+    lockBayMapBtn.textContent = '🔒 Save Locked Bay Location Map';
+    lockBayMapBtn.style.marginTop = '8px';
+    lockBayMapBtn.onclick = async () => {
+      const blob = new Blob([JSON.stringify(locationMap, null, 2)], { type: 'application/json' });
+      const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+          'Content-Type': 'application/octet-stream',
+          'Dropbox-API-Arg': JSON.stringify({
+            path: '/protected/bay_location_locked.json',
+            mode: 'overwrite',
+            autorename: false,
+            mute: true
+          })
+        },
+        body: blob
+      });
+
+      if (response.ok) {
+        alert('✅ Locked bay location map saved to Dropbox!');
+      } else {
+        const err = await response.text();
+        alert(`❌ Failed to save locked map: ${err}`);
+      }
+    };
+    settingsTarget.appendChild(lockBayMapBtn);
+
+    // --- 📥 Restore Locked Bay Location Map Button ---
+    // 📥 Restore Locked Bay Location Map
+    const restoreLockedBayBtn = document.createElement('button');
+    restoreLockedBayBtn.className = 'settings-button';
+    restoreLockedBayBtn.textContent = '📥 Restore Locked Bay Location Map';
+    restoreLockedBayBtn.style.marginTop = '8px';
+    restoreLockedBayBtn.onclick = async () => {
+      const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+          'Dropbox-API-Arg': JSON.stringify({ path: '/protected/bay_location_locked.json' })
+        }
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        alert(`❌ Failed to restore locked map: ${err}`);
+        return;
+      }
+
+      const map = await response.json();
+      if (!map || typeof map !== 'object') {
+        alert('❌ Invalid bay map format.');
+        return;
+      }
+
+      Object.assign(locationMap, map);
+      saveLocationMap();
+      alert('📥 Locked bay location map restored successfully!');
+    };
+    settingsTarget.appendChild(restoreLockedBayBtn);
+
     // --- RESET ALL MAPS BUTTON ---
     const resetMapsBtn = document.createElement('button');
     resetMapsBtn.className = 'settings-button';
