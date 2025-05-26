@@ -439,6 +439,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (trimmed) {
           eslToUPC[item] = trimmed;
           saveESLMap();
+          // Clear the liveEntryInput after mapping and saving
+          if (liveEntryInput) {
+            liveEntryInput.value = '';
+          }
         }
       }
       const overlay = document.getElementById('customModal');
