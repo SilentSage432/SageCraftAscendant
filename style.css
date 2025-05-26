@@ -1030,3 +1030,19 @@ tbody tr:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
+
+.esl-badge {
+  background-color: #ff9f1c;
+  color: #1e1e1e;
+  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: bold;
+  box-shadow: 0 0 4px #ffbe55aa;
+}
+
+tr[data-type="esl"] {
+  background-color: rgba(255, 223, 100, 0.12);
+  border-left: 3px solid #ff9f1c;
+}

@@ -165,6 +165,27 @@ console.log('✅ UPC Map:', upcToItem);
 console.log('✅ ESL Map:', eslToUPC);
 console.log('✅ Location Map:', locationMap);
 console.log("🧾 Confirmed localStorage UPC Mappings:", window.upcToItem);
+
+// --- Universal scan code resolution utility ---
+function resolveScanCode(code) {
+  const normalized = normalizeUPC(code);
+  if (upcToItem[normalized]) {
+    console.log(`🔍 UPC match: ${normalized} → ${upcToItem[normalized]}`);
+    return upcToItem[normalized];
+  }
+  const reverseMatch = Object.entries(upcToItem).find(([k, v]) => v === normalized);
+  if (reverseMatch) {
+    console.log(`🔁 Reverse match: Item #${normalized} found via UPC ${reverseMatch[0]}`);
+    return normalized;
+  }
+  const eslMatch = eslToUPC[normalized];
+  if (eslMatch) {
+    console.log(`🔁 ESL match: ESL ${normalized} → ${eslMatch}`);
+    return eslMatch;
+  }
+  console.warn(`❌ Unrecognized code: ${code}`);
+  return null;
+}
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
   // Show last mapping in console and toast
@@ -377,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rotationData = JSON.parse(localStorage.getItem('auditRotation')) || {};
     const now = new Date();
 
-    Object.entries(rotationData).forEach(([category, info]) => {
+   Object.entries(rotationData).forEach(([category, info]) => {
       const row = document.createElement('tr');
       const interval = info.interval || 30;
       // --- Updated date/next due logic ---
@@ -386,6 +407,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
       const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
       const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+      // --- Insert badge based on audit status ---
+      let badge = '';
+      if (!isValid) {
+        badge = '❓';
+      } else {
+        const daysAgo = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+        if (daysAgo >= interval) badge = '🔴';
+        else if (daysAgo >= interval * 0.75) badge = '🟡';
+        else badge = '🟢';
+      }
 
       let status = '🟢 Good';
       if (isValid) {
@@ -396,8 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
         status = '❓ Unknown';
       }
 
-      // --- Updated row cell logic ---
-      [category, lastAuditedText, nextDueText, status].forEach(val => {
+      // --- Updated row cell logic with badge in Last Audited column ---
+      [category, `${lastAuditedText} ${badge}`, nextDueText, status].forEach(val => {
         const td = document.createElement('td');
         td.textContent = val;
         row.appendChild(td);
@@ -649,26 +681,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
       if (!val) return;
 
-      // If known code, proceed as normal
-      if (upcToItem[val]) {
-        const itemNum = upcToItem[val];
-        processScan(itemNum);
+      // --- Use universal scan code resolution ---
+      const resolved = resolveScanCode(val);
+      if (resolved) {
+        processScan(resolved);
+        resetScanInput();
         return;
       }
-      // Prevent fallback logic if code is found in upcToItem
-      // (the above return ensures this)
 
       if (locationMap[val]) {
         processScan(val);
         return;
       }
-      // ESL-to-UPC mapping support
-      if (!upcToItem[val] && (eslToUPC[val] || eslToUPC[normalizeUPC(val)])) {
-        const mappedItem = eslToUPC[val] || eslToUPC[normalizeUPC(val)];
-        console.log(`🔄 ESL ${val} resolved to mapped item ${mappedItem}`);
-        processScan(mappedItem);
-        return;
-      }
+
       // For manually entered unknown codes, delay prompt until user confirms
       console.warn("⚠️ Manual entry of unrecognized code:", val);
       // --- Insert ESL duplicate check logic here ---
@@ -1656,6 +1681,9 @@ syncBothBtn.addEventListener('click', () => {
         return 'location';
       }
     }
+    if (/^0\d{12}$/.test(code)) {
+      return 'esl';
+    }
     if (/^\d{12}$/.test(code)) {
       return 'product';
     }
@@ -1672,6 +1700,8 @@ syncBothBtn.addEventListener('click', () => {
         message = `This looks like a Location Tag (15-digit starting with ${item.slice(0, 3)}). Confirm?`;
       } else if (guess === 'product') {
         message = `This looks like a Product UPC (12-digit code). Confirm?`;
+      } else if (guess === 'esl') {
+        message = `This looks like an ESL Tag (13-digit starting with 0). Confirm?`;
       }
 
       document.getElementById('modalPromptText').textContent = message;
@@ -1684,6 +1714,7 @@ syncBothBtn.addEventListener('click', () => {
         const toast = document.createElement('div');
         toast.textContent = result === 'location' ? '📍 Bay Location tag confirmed' :
                             result === 'product' ? '📦 Product UPC confirmed' :
+                            result === 'esl' ? '🏷️ ESL Tag confirmed' :
                             '❌ Scan canceled';
         toast.style.position = 'fixed';
         toast.style.bottom = '20px';
@@ -1703,6 +1734,11 @@ syncBothBtn.addEventListener('click', () => {
 
       document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
       document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
+      // ESL button handler
+      const eslBtn = document.getElementById('modalBtnESL');
+      if (eslBtn) {
+        eslBtn.onclick = () => cleanup('esl');
+      }
       document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
     });
   }
@@ -1733,37 +1769,12 @@ Bay Codes → ${Object.keys(locationMap).length}`;
         console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
         if (val && isScannerInput) {
           const normalizedVal = normalizeUPC(val);
-          // If known code, proceed as normal and prevent fallback
-          if (upcToItem[normalizedVal]) {
-            const itemNum = upcToItem[normalizedVal];
-            processScan(itemNum);
-            // Show toast for recognized UPC
+          // --- Use universal scan code resolution ---
+          const resolved = resolveScanCode(normalizedVal);
+          if (resolved) {
+            processScan(resolved);
             const toast = document.createElement('div');
-            toast.textContent = `✅ Known UPC ${normalizedVal} recognized and scanned`;
-            Object.assign(toast.style, {
-              position: 'fixed',
-              bottom: '20px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#222',
-              color: '#fff',
-              padding: '8px 14px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              zIndex: '9999',
-              textAlign: 'center'
-            });
-            document.body.appendChild(toast);
-            setTimeout(() => document.body.removeChild(toast), 3000);
-            return;
-          }
-          // Check reverse mapping: is this a known Lowe's item number?
-          const matchingUPC = Object.entries(upcToItem).find(([k, v]) => v === normalizedVal)?.[0];
-          if (matchingUPC) {
-            console.log(`🔁 Scanned Lowe’s #${normalizedVal} matched to UPC ${matchingUPC}`);
-            processScan(normalizedVal);
-            const toast = document.createElement('div');
-            toast.textContent = `✅ Lowe’s #${normalizedVal} recognized`;
+            toast.textContent = `✅ Code ${normalizedVal} resolved to Lowe’s #${resolved}`;
             Object.assign(toast.style, {
               position: 'fixed',
               bottom: '20px',
