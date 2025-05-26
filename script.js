@@ -1442,13 +1442,14 @@ document.addEventListener('DOMContentLoaded', () => {
   browseBackupsBtn.textContent = '📁 Browse Dropbox Backups';
   browseBackupsBtn.style.marginTop = '8px';
   browseBackupsBtn.onclick = async () => {
+    const folder = document.getElementById('dropboxFolderSelect')?.value || '';
     const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ path: '' })
+      body: JSON.stringify({ path: folder })
     });
 
     const listData = await listResponse.json();
@@ -1457,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .sort((a, b) => new Date(b.client_modified) - new Date(a.client_modified));
 
     if (backups.length === 0) {
-      alert('❌ No backup files found.');
+      alert('❌ No backup files found in selected folder.');
       return;
     }
 
@@ -1481,7 +1482,7 @@ document.addEventListener('DOMContentLoaded', () => {
     content.style.overflowY = 'auto';
 
     const title = document.createElement('h3');
-    title.textContent = '📁 Select a Backup File';
+    title.textContent = `📁 Select a Backup File from ${folder}`;
     content.appendChild(title);
 
     const ul = document.createElement('ul');
@@ -1518,7 +1519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('onHandInput').value = session.onHandText || '';
         updateLiveTable();
         document.body.removeChild(modal);
-        alert(`📥 Backup "${file.name}" loaded!`);
+        alert(`📥 Backup "${file.name}" loaded from ${folder}!`);
       };
       li.appendChild(btn);
       ul.appendChild(li);
