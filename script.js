@@ -479,6 +479,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (trimmed) {
           eslToUPC[item] = trimmed;
           saveESLMap();
+          processScan(trimmed); // ensure ESL scan gets counted
+          if (liveEntryInput) liveEntryInput.value = '';
         }
       }
       const overlay = document.getElementById('customModal');
