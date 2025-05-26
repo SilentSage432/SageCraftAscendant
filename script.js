@@ -1672,6 +1672,29 @@ syncBothBtn.addEventListener('click', () => {
     settingsTarget.appendChild(syncCleanUPCBtn);
     settingsTarget.appendChild(syncBothBtn);
     settingsTarget.appendChild(restoreBothBtn);
+
+    // --- Reset All Maps (Fresh Start) Button ---
+    const resetMapsBtn = document.createElement('button');
+    resetMapsBtn.className = 'settings-button';
+    resetMapsBtn.textContent = '🧹 Reset All Maps (Fresh Start)';
+    resetMapsBtn.style.marginTop = '8px';
+    resetMapsBtn.onclick = async () => {
+      const confirmReset = confirm("This will back up your current maps and then clear everything. Continue?");
+      if (!confirmReset) return;
+
+      await syncAllMapsToDropbox(true); // silent backup first
+      localStorage.removeItem('upcToItemMap');
+      localStorage.removeItem('locationMap');
+      localStorage.removeItem('eslToUPCMap');
+      Object.keys(upcToItem).forEach(k => delete upcToItem[k]);
+      Object.keys(locationMap).forEach(k => delete locationMap[k]);
+      Object.keys(eslToUPC).forEach(k => delete eslToUPC[k]);
+      alert('🧹 All maps reset. You are now starting fresh.');
+      saveUPCMap();
+      saveLocationMap();
+      saveESLMap();
+    };
+    settingsTarget.appendChild(resetMapsBtn);
   }
   // --- Custom modal prompt for unrecognized code type with smart guess ---
   function guessCodeType(code) {
