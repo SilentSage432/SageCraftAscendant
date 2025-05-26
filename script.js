@@ -1737,6 +1737,24 @@ Bay Codes → ${Object.keys(locationMap).length}`;
           if (upcToItem[normalizedVal]) {
             const itemNum = upcToItem[normalizedVal];
             processScan(itemNum);
+            // Show toast for recognized UPC
+            const toast = document.createElement('div');
+            toast.textContent = `✅ Known UPC ${normalizedVal} recognized and scanned`;
+            Object.assign(toast.style, {
+              position: 'fixed',
+              bottom: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#222',
+              color: '#fff',
+              padding: '8px 14px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              zIndex: '9999',
+              textAlign: 'center'
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => document.body.removeChild(toast), 3000);
             return;
           }
           processScan(normalizedVal);
