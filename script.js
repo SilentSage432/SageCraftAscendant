@@ -25,6 +25,60 @@
       alert(`🧼 Removed ${deletedCount} empty session(s) from local storage.`);
     });
   }
+// --- Sync Both Maps to Dropbox Button ---
+// Define function above button setup and before any use
+async function syncAllMapsToDropbox(silent = false) {
+  const cleanedUPC = {};
+  for (const key in upcToItem) {
+    const cleanedKey = key.trim();
+    const value = upcToItem[key].trim();
+    if (cleanedKey && value) {
+      cleanedUPC[cleanedKey] = value;
+    }
+  }
+  const cleanedLoc = {};
+  for (const code in locationMap) {
+    const name = locationMap[code].trim();
+    if (code && name) {
+      cleanedLoc[code.trim()] = name;
+    }
+  }
+
+  const upcBlob = new Blob([JSON.stringify(cleanedUPC, null, 2)], { type: 'application/json' });
+  const locBlob = new Blob([JSON.stringify(cleanedLoc, null, 2)], { type: 'application/json' });
+
+  const upload = async (path, blob) => {
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path,
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+    return response.ok;
+  };
+
+  const upcOk = await upload('/upc_map_backup.json', upcBlob);
+  const locOk = await upload('/bay_location_backup.json', locBlob);
+
+  if (!silent) {
+    if (upcOk && locOk) {
+      alert('✅ Both maps synced to Dropbox!');
+    } else {
+      alert('❌ Failed to sync one or more maps.');
+    }
+  } else {
+    console.log('🔄 Maps synced silently (no toast)');
+  }
+}
+
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
   // Update mapping stats display
@@ -1477,60 +1531,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(`❌ Failed to save clean UPC map: ${err}`);
     }
   };
-
-// --- Sync Both Maps to Dropbox Button ---
-// Define function above button setup
-async function syncAllMapsToDropbox(silent = false) {
-  const cleanedUPC = {};
-  for (const key in upcToItem) {
-    const cleanedKey = key.trim();
-    const value = upcToItem[key].trim();
-    if (cleanedKey && value) {
-      cleanedUPC[cleanedKey] = value;
-    }
-  }
-  const cleanedLoc = {};
-  for (const code in locationMap) {
-    const name = locationMap[code].trim();
-    if (code && name) {
-      cleanedLoc[code.trim()] = name;
-    }
-  }
-
-  const upcBlob = new Blob([JSON.stringify(cleanedUPC, null, 2)], { type: 'application/json' });
-  const locBlob = new Blob([JSON.stringify(cleanedLoc, null, 2)], { type: 'application/json' });
-
-  const upload = async (path, blob) => {
-    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Content-Type': 'application/octet-stream',
-        'Dropbox-API-Arg': JSON.stringify({
-          path,
-          mode: 'overwrite',
-          autorename: false,
-          mute: true
-        })
-      },
-      body: blob
-    });
-    return response.ok;
-  };
-
-  const upcOk = await upload('/upc_map_backup.json', upcBlob);
-  const locOk = await upload('/bay_location_backup.json', locBlob);
-
-  if (!silent) {
-    if (upcOk && locOk) {
-      alert('✅ Both maps synced to Dropbox!');
-    } else {
-      alert('❌ Failed to sync one or more maps.');
-    }
-  } else {
-    console.log('🔄 Maps synced silently (no toast)');
-  }
-}
 
 syncBothBtn = document.createElement('button');
 syncBothBtn.className = 'settings-button';
