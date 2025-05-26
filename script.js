@@ -427,6 +427,41 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- ESL Modal Handler Setup ---
+  let currentESLItem = null;
+  const modalBtnESL = document.getElementById('modalBtnESL');
+  if (modalBtnESL) {
+    modalBtnESL.onclick = () => {
+      const item = currentESLItem;
+      const itemNum = prompt(`Enter the item number this ESL tag maps to:`);
+      if (item && itemNum) {
+        const trimmed = itemNum.trim();
+        if (trimmed) {
+          eslToUPC[item] = trimmed;
+          saveESLMap();
+        }
+      }
+      const overlay = document.getElementById('customModal');
+      if (overlay) overlay.style.display = 'none';
+      const toast = document.createElement('div');
+      toast.textContent = '🏷️ ESL Tag mapped successfully';
+      Object.assign(toast.style, {
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#222',
+        color: '#fff',
+        padding: '10px 18px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        zIndex: '9999',
+        textAlign: 'center'
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => document.body.removeChild(toast), 3000);
+    };
+  }
   // --- Render Audit Rotation Table ---
   function renderAuditRotationTable() {
     const table = document.querySelector('#audit table');
@@ -1861,6 +1896,8 @@ syncBothBtn.addEventListener('click', () => {
       }
 
       document.getElementById('modalPromptText').textContent = message;
+      // Set the current ESL item for the handler
+      currentESLItem = item;
       overlay.style.display = 'flex';
 
       const cleanup = (result) => {
@@ -1890,39 +1927,6 @@ syncBothBtn.addEventListener('click', () => {
 
       document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
       document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
-      // ESL button handler
-      const modalBtnESL = document.getElementById('modalBtnESL');
-      if (modalBtnESL) {
-        modalBtnESL.onclick = () => {
-          overlay.style.display = 'none';
-          const itemNum = prompt(`Enter the item number this ESL tag maps to:`);
-          if (itemNum) {
-            const trimmed = itemNum.trim();
-            if (trimmed) {
-              eslToUPC[item] = trimmed;
-              saveESLMap();
-            }
-          }
-          resolve('esl');
-          const toast = document.createElement('div');
-          toast.textContent = '🏷️ ESL Tag mapped successfully';
-          Object.assign(toast.style, {
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: '#222',
-            color: '#fff',
-            padding: '10px 18px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            zIndex: '9999',
-            textAlign: 'center'
-          });
-          document.body.appendChild(toast);
-          setTimeout(() => document.body.removeChild(toast), 3000);
-        };
-      }
       document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
     });
   }
