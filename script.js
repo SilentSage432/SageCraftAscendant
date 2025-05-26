@@ -1891,9 +1891,35 @@ syncBothBtn.addEventListener('click', () => {
       document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
       document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
       // ESL button handler
-      const eslBtn = document.getElementById('modalBtnESL');
-      if (eslBtn) {
-        eslBtn.onclick = () => cleanup('esl');
+      const modalBtnESL = document.getElementById('modalBtnESL');
+      if (modalBtnESL) {
+        modalBtnESL.onclick = () => {
+          overlay.style.display = 'none';
+          const itemNum = prompt(`Enter the item number this ESL tag maps to:`);
+          if (itemNum) {
+            const trimmed = itemNum.trim();
+            if (trimmed) {
+              eslToUPC[item] = trimmed;
+              saveESLMap();
+            }
+          }
+          resolve('esl');
+          // ESL toast
+          const toast = document.createElement('div');
+          toast.textContent = '🏷️ ESL Tag mapped successfully';
+          toast.style.position = 'fixed';
+          toast.style.bottom = '20px';
+          toast.style.left = '50%';
+          toast.style.transform = 'translateX(-50%)';
+          toast.style.backgroundColor = '#222';
+          toast.style.color = '#fff';
+          toast.style.padding = '10px 18px';
+          toast.style.borderRadius = '8px';
+          toast.style.fontSize = '14px';
+          toast.style.zIndex = '9999';
+          document.body.appendChild(toast);
+          setTimeout(() => document.body.removeChild(toast), 3000);
+        };
       }
       document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
     });
