@@ -1578,7 +1578,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
         'Content-Type': 'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
-          path: '/upc_map_backup.json',
+          path: '/beta-test-1/upc_map_backup.json',
           mode: 'overwrite',
           autorename: false,
           mute: true
