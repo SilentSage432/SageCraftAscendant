@@ -438,7 +438,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const trimmed = itemNum.trim();
         if (trimmed) {
           eslToUPC[item] = trimmed;
-          saveESLMap();
+          // Save to localStorage immediately after mapping
+          localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+          // Show toast only after saving
+          const toast = document.createElement('div');
+          toast.textContent = '🏷️ ESL Tag mapped successfully';
+          Object.assign(toast.style, {
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: '#222',
+            color: '#fff',
+            padding: '10px 18px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            zIndex: '9999',
+            textAlign: 'center'
+          });
+          document.body.appendChild(toast);
+          setTimeout(() => document.body.removeChild(toast), 3000);
           // Clear the liveEntryInput after mapping and saving
           if (liveEntryInput) {
             liveEntryInput.value = '';
@@ -447,23 +466,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       const overlay = document.getElementById('customModal');
       if (overlay) overlay.style.display = 'none';
-      const toast = document.createElement('div');
-      toast.textContent = '🏷️ ESL Tag mapped successfully';
-      Object.assign(toast.style, {
-        position: 'fixed',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: '#222',
-        color: '#fff',
-        padding: '10px 18px',
-        borderRadius: '8px',
-        fontSize: '14px',
-        zIndex: '9999',
-        textAlign: 'center'
-      });
-      document.body.appendChild(toast);
-      setTimeout(() => document.body.removeChild(toast), 3000);
     };
   }
   // --- Render Audit Rotation Table ---
