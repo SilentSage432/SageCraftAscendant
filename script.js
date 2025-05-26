@@ -1567,6 +1567,7 @@ syncBothBtn.addEventListener('click', () => {
     });
     document.body.appendChild(toast);
 
+    // Helper for fetching and parsing JSON from Dropbox
     const restore = async (path) => {
       const response = await fetch('https://content.dropboxapi.com/2/files/download', {
         method: 'POST',
@@ -1587,30 +1588,36 @@ syncBothBtn.addEventListener('click', () => {
       }
     };
 
+    // Fetch all three maps
     const restoredUPC = await restore('/upc_map_backup.json');
     const restoredLoc = await restore('/bay_location_backup.json');
     const restoredESL = await restore('/esl_map_backup.json');
 
+    // Correctly assign and save each map if valid
+    let upcOK = false, locOK = false, eslOK = false;
     if (restoredUPC && typeof restoredUPC === 'object') {
       Object.assign(upcToItem, restoredUPC);
       saveUPCMap();
+      upcOK = true;
     }
 
     if (restoredLoc && typeof restoredLoc === 'object') {
       Object.assign(locationMap, restoredLoc);
       saveLocationMap();
+      locOK = true;
     }
 
     if (restoredESL && typeof restoredESL === 'object') {
       Object.assign(eslToUPC, restoredESL);
       saveESLMap();
+      eslOK = true;
     }
 
     // Remove loading toast and show result
     setTimeout(() => {
       if (document.body.contains(toast)) document.body.removeChild(toast);
       const finalToast = document.createElement('div');
-      finalToast.textContent = (restoredUPC && restoredLoc && restoredESL)
+      finalToast.textContent = (upcOK && locOK && eslOK)
         ? '✅ All maps restored from Dropbox!'
         : '❌ Failed to restore one or more maps.';
       Object.assign(finalToast.style, {
@@ -1618,7 +1625,7 @@ syncBothBtn.addEventListener('click', () => {
         bottom: '20px',
         left: '50%',
         transform: 'translateX(-50%)',
-        backgroundColor: (restoredUPC && restoredLoc && restoredESL) ? 'green' : 'darkred',
+        backgroundColor: (upcOK && locOK && eslOK) ? 'green' : 'darkred',
         color: '#fff',
         padding: '10px 18px',
         borderRadius: '8px',
