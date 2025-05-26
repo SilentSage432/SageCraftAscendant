@@ -25,8 +25,9 @@
       alert(`🧼 Removed ${deletedCount} empty session(s) from local storage.`);
     });
   }
+
 // --- Sync Both Maps to Dropbox Button ---
-// Define function above button setup and before any use
+// Move function definition to the very top after global variables
 async function syncAllMapsToDropbox(silent = false) {
   const cleanedUPC = {};
   for (const key in upcToItem) {
