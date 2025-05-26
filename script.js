@@ -27,21 +27,59 @@
   }
 function saveUPCMap() {
   localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
+  // Update mapping stats display
+  const stats = document.getElementById('mappingStatsDisplay');
+  if (stats) {
+    stats.innerHTML = `
+      <strong>Mapping Overview:</strong><br>
+      UPC → Item #: ${Object.keys(upcToItem).length}<br>
+      ESL → UPC: ${Object.keys(eslToUPC).length}<br>
+      Location Codes: ${Object.keys(locationMap).length}
+    `;
+  }
+  // Also update the live mapping overview if present
+  const liveStats = document.getElementById('liveMappingOverview');
+  if (liveStats) {
+    liveStats.textContent = `📊 Mappings:
+UPC → ${Object.keys(upcToItem).length}
+ESL → ${Object.keys(eslToUPC).length}
+Bay Codes → ${Object.keys(locationMap).length}`;
+  }
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
-    if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick(true);
-    }
+    // Temporarily disabled to reduce noise
+    // if (typeof syncBothBtn?.onclick === 'function') {
+    //   syncBothBtn.onclick(true);
+    // }
   }
 }
 
 function saveLocationMap() {
   localStorage.setItem('locationMap', JSON.stringify(locationMap));
+  // Update mapping stats display
+  const stats = document.getElementById('mappingStatsDisplay');
+  if (stats) {
+    stats.innerHTML = `
+      <strong>Mapping Overview:</strong><br>
+      UPC → Item #: ${Object.keys(upcToItem).length}<br>
+      ESL → UPC: ${Object.keys(eslToUPC).length}<br>
+      Location Codes: ${Object.keys(locationMap).length}
+    `;
+  }
+  // Also update the live mapping overview if present
+  const liveStats = document.getElementById('liveMappingOverview');
+  if (liveStats) {
+    liveStats.textContent = `📊 Mappings:
+UPC → ${Object.keys(upcToItem).length}
+ESL → ${Object.keys(eslToUPC).length}
+Bay Codes → ${Object.keys(locationMap).length}`;
+  }
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
-    if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick(true);
-    }
+    // Temporarily disabled to reduce noise
+    // if (typeof syncBothBtn?.onclick === 'function') {
+    //   syncBothBtn.onclick(true);
+    // }
   }
 }
 // --- Chart.js (Trends) integration: ensure Chart.js is available ---
@@ -71,14 +109,38 @@ let autosaveTimer = null;
 const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
 const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
 const eslToUPC = JSON.parse(localStorage.getItem('eslToUPCMap')) || {};
+window.upcToItem = upcToItem;
+window.locationMap = locationMap;
 window.eslToUPC = eslToUPC;
+console.log('✅ UPC Map:', upcToItem);
+console.log('✅ ESL Map:', eslToUPC);
+console.log('✅ Location Map:', locationMap);
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+  // Update mapping stats display
+  const stats = document.getElementById('mappingStatsDisplay');
+  if (stats) {
+    stats.innerHTML = `
+      <strong>Mapping Overview:</strong><br>
+      UPC → Item #: ${Object.keys(upcToItem).length}<br>
+      ESL → UPC: ${Object.keys(eslToUPC).length}<br>
+      Location Codes: ${Object.keys(locationMap).length}
+    `;
+  }
+  // Also update the live mapping overview if present
+  const liveStats = document.getElementById('liveMappingOverview');
+  if (liveStats) {
+    liveStats.textContent = `📊 Mappings:
+UPC → ${Object.keys(upcToItem).length}
+ESL → ${Object.keys(eslToUPC).length}
+Bay Codes → ${Object.keys(locationMap).length}`;
+  }
   // Auto-sync if enabled
   if (document.getElementById('autosyncMapToggle')?.checked) {
-    if (typeof syncBothBtn?.onclick === 'function') {
-      syncBothBtn.onclick(true);
-    }
+    // Temporarily disabled to reduce noise
+    // if (typeof syncBothBtn?.onclick === 'function') {
+    //   syncBothBtn.onclick(true);
+    // }
   }
 }
 window.saveESLMap = saveESLMap;
@@ -125,6 +187,20 @@ window.saveESLMap = saveESLMap;
     }
   };
   settingsTarget.appendChild(syncESLBtn);
+
+  // --- Mapping Stats Display ---
+  const mappingStats = document.createElement('div');
+  mappingStats.id = 'mappingStatsDisplay';
+  mappingStats.style.marginTop = '10px';
+  mappingStats.style.fontSize = '13px';
+  mappingStats.style.color = '#aaa';
+  mappingStats.innerHTML = `
+    <strong>Mapping Overview:</strong><br>
+    UPC → Item #: ${Object.keys(upcToItem).length}<br>
+    ESL → UPC: ${Object.keys(eslToUPC).length}<br>
+    Location Codes: ${Object.keys(locationMap).length}
+  `;
+  settingsTarget.appendChild(mappingStats);
 
   // Add Restore ESL Map from Dropbox button
   const restoreESLBtn = document.createElement('button');
@@ -1565,6 +1641,17 @@ syncBothBtn.onclick = (async function (silent = false) {
   const liveEntryInput = document.getElementById('liveEntry');
   // Add Enter key handler for liveEntryInput
   if (liveEntryInput) {
+    // --- Insert Live Mapping Overview just after scan input ---
+    const liveMappingOverview = document.createElement('div');
+    liveMappingOverview.id = 'liveMappingOverview';
+    liveMappingOverview.style.marginTop = '8px';
+    liveMappingOverview.style.fontSize = '13px';
+    liveMappingOverview.style.color = '#aaa';
+    liveMappingOverview.textContent = `📊 Mappings:
+UPC → ${Object.keys(upcToItem).length}
+ESL → ${Object.keys(eslToUPC).length}
+Bay Codes → ${Object.keys(locationMap).length}`;
+    liveEntryInput.insertAdjacentElement('afterend', liveMappingOverview);
     // Enhanced Enter key detection with log for scan source
     liveEntryInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
