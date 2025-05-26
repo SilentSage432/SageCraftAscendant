@@ -109,6 +109,7 @@ window.eslToUPC = eslToUPC;
 console.log('✅ UPC Map:', upcToItem);
 console.log('✅ ESL Map:', eslToUPC);
 console.log('✅ Location Map:', locationMap);
+console.log("🧾 Confirmed localStorage UPC Mappings:", window.upcToItem);
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
   // Show last mapping in console and toast
@@ -599,6 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
         processScan(itemNum);
         return;
       }
+      // Prevent fallback logic if code is found in upcToItem
+      // (the above return ensures this)
+
       if (locationMap[val]) {
         processScan(val);
         return;
@@ -1717,6 +1721,12 @@ Bay Codes → ${Object.keys(locationMap).length}`;
         console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
         if (val && isScannerInput) {
           const normalizedVal = normalizeUPC(val);
+          // If known code, proceed as normal and prevent fallback
+          if (upcToItem[normalizedVal]) {
+            const itemNum = upcToItem[normalizedVal];
+            processScan(itemNum);
+            return;
+          }
           processScan(normalizedVal);
         }
       }
@@ -1733,6 +1743,12 @@ Bay Codes → ${Object.keys(locationMap).length}`;
           // If Enter key wasn't manually pressed (input lost focus), assume scan
           if (document.activeElement !== liveEntryInput) {
             console.log("🔍 Scanner input detected (debounced):", val);
+            // If known code, proceed as normal and prevent fallback
+            if (upcToItem[val]) {
+              const itemNum = upcToItem[val];
+              processScan(itemNum);
+              return;
+            }
             processScan(val);
           }
         }, 200); // Adjust delay if needed
