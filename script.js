@@ -51,6 +51,7 @@ Bay Codes → ${Object.keys(locationMap).length}`;
   if (document.getElementById('autosyncMapToggle')?.checked) {
     syncAllMapsToDropbox(true);
   }
+  updateMapStatusDisplay();
 }
 
 function saveLocationMap() {
@@ -77,6 +78,7 @@ Bay Codes → ${Object.keys(locationMap).length}`;
   if (document.getElementById('autosyncMapToggle')?.checked) {
     syncAllMapsToDropbox(true);
   }
+  updateMapStatusDisplay();
 }
 // --- Chart.js (Trends) integration: ensure Chart.js is available ---
 // If Chart.js is not included via HTML, add it here for completeness (for developer reference):
@@ -162,6 +164,17 @@ window.upcToItem = upcToItem;
 window.locationMap = locationMap;
 window.eslToUPC = eslToUPC;
 console.log('✅ UPC Map:', upcToItem);
+// --- Map Status Display Function ---
+function updateMapStatusDisplay() {
+  const mapStatus = document.getElementById('mapStatusDisplay');
+  if (!mapStatus) return;
+
+  const upcCount = Object.keys(upcToItem || {}).length;
+  const eslCount = Object.keys(eslToUPC || {}).length;
+  const bayCount = Object.keys(locationMap || {}).length;
+
+  mapStatus.textContent = `🧠 Map Status: UPC → ${upcCount} | ESL → ${eslCount} | Bay Codes → ${bayCount}`;
+}
 console.log('✅ ESL Map:', eslToUPC);
 console.log('✅ Location Map:', locationMap);
 console.log("🧾 Confirmed localStorage UPC Mappings:", window.upcToItem);
@@ -237,6 +250,7 @@ Bay Codes → ${Object.keys(locationMap).length}`;
     //   syncBothBtn.onclick(true);
     // }
   }
+  updateMapStatusDisplay();
 }
 window.saveESLMap = saveESLMap;
   // --- Sync/Restore ESL Map to Dropbox Buttons ---
@@ -313,6 +327,15 @@ window.saveESLMap = saveESLMap;
     Location Codes: ${Object.keys(locationMap).length}
   `;
   settingsTarget.appendChild(mappingStats);
+  // --- Insert Map Status Display ---
+  const mapStatusDisplay = document.createElement('div');
+  mapStatusDisplay.id = 'mapStatusDisplay';
+  mapStatusDisplay.style.marginTop = '8px';
+  mapStatusDisplay.style.fontSize = '13px';
+  mapStatusDisplay.style.color = '#aaf';
+  mapStatusDisplay.textContent = '🧠 Map Status: Loading...';
+  settingsTarget?.appendChild(mapStatusDisplay);
+  updateMapStatusDisplay();
 
   // Add Restore ESL Map from Dropbox button
   const restoreESLBtn = document.createElement('button');
