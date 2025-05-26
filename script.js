@@ -1510,16 +1510,34 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        const session = await dlResponse.json();
-        if (!session.liveCounts) return alert('❌ Invalid backup format.');
-        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-        Object.entries(session.liveCounts).forEach(([k, v]) => {
-          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-        });
-        document.getElementById('onHandInput').value = session.onHandText || '';
-        updateLiveTable();
+        const data = await dlResponse.json();
+
+        if (file.name.includes('session') && data.liveCounts) {
+          Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+          Object.entries(data.liveCounts).forEach(([k, v]) => {
+            liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+          });
+          document.getElementById('onHandInput').value = data.onHandText || '';
+          updateLiveTable();
+          alert(`📥 Session "${file.name}" loaded successfully!`);
+        } else if (file.name.includes('upc_map') && typeof data === 'object') {
+          Object.assign(upcToItem, data);
+          saveUPCMap();
+          alert(`📥 Restored UPC Map (${Object.keys(data).length} entries)`);
+        } else if (file.name.includes('bay_location') && typeof data === 'object') {
+          Object.assign(locationMap, data);
+          saveLocationMap();
+          alert(`📥 Restored Bay Location Map (${Object.keys(data).length} entries)`);
+        } else if (file.name.includes('esl_map') && typeof data === 'object') {
+          Object.assign(eslToUPC, data);
+          saveESLMap();
+          alert(`📥 Restored ESL Map (${Object.keys(data).length} entries)`);
+        } else {
+          alert(`❌ File "${file.name}" is not a recognized backup format.`);
+          return;
+        }
+
         document.body.removeChild(modal);
-        alert(`📥 Backup "${file.name}" loaded from ${folder}!`);
       };
       li.appendChild(btn);
       ul.appendChild(li);
