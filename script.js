@@ -117,6 +117,30 @@ console.log('✅ ESL Map:', eslToUPC);
 console.log('✅ Location Map:', locationMap);
 function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+  // Show last mapping in console and toast
+  const lastKey = Object.keys(eslToUPC).slice(-1)[0];
+  const lastValue = eslToUPC[lastKey];
+  console.log(`📎 ESL ${lastKey} mapped to Lowe’s #${lastValue}`);
+  // Optionally, display a small toast for each new ESL mapping
+  if (lastKey && lastValue) {
+    const toast = document.createElement('div');
+    toast.textContent = `📎 ESL ${lastKey} → Lowe’s #${lastValue}`;
+    Object.assign(toast.style, {
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      backgroundColor: '#333',
+      color: '#fff',
+      padding: '8px 16px',
+      borderRadius: '8px',
+      fontSize: '14px',
+      zIndex: '9999',
+      textAlign: 'center'
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => document.body.removeChild(toast), 3000);
+  }
   // Update mapping stats display
   const stats = document.getElementById('mappingStatsDisplay');
   if (stats) {
