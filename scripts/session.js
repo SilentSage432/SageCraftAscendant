@@ -1,5 +1,7 @@
 // session.js
 
+import { updateMapStatusDisplay } from './ui.js';
+
 export function initSessionTools() {
   console.log('📦 Session module initialized');
 
@@ -9,10 +11,13 @@ export function initSessionTools() {
   // Optional: log how many session entries are stored
   const keys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
   console.log(`🗂️ Found ${keys.length} stored session${keys.length !== 1 ? 's' : ''}`);
+
+  updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
 }
 
 export function saveESLMap() {
   localStorage.setItem('eslToUPCMap', JSON.stringify(window.eslToUPC));
+  updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
 }
 
 export function cleanEmptySessions() {

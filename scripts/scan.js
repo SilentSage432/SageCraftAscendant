@@ -1,3 +1,5 @@
+import { updateMapStatusDisplay } from './ui.js';
+
 function resolveScanCode(code) {
   const trimmed = code.trim();
   if (trimmed.length === 13 && trimmed.startsWith('0')) {
@@ -23,11 +25,13 @@ async function handleScanInput(val) {
     if (typeof resolved === 'object' && resolved.type === 'esl') {
       console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
       if (resolved.item) upcToItem[resolved.upc] = resolved.item;
+      updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       processScan(resolved.item || resolved.upc);
       resetScanInput();
       return;
     }
     processScan(resolved);
+    updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
     resetScanInput();
     return;
   }

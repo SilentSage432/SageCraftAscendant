@@ -1,3 +1,4 @@
+import { updateMapStatusDisplay } from './ui.js';
 export async function syncAllMapsToDropbox() {
   const upcToItem = window.upcToItem || {};
   const locationMap = window.locationMap || {};
@@ -69,6 +70,9 @@ export async function restoreAllMapsFromDropbox() {
       console.error(`❌ Failed to parse ${file}:`, e);
     }
   }
+
+  // Update map status display after restoring maps
+  updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
 
   alert('📂 Maps restored from Dropbox!');
 }
