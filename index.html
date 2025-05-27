@@ -24,44 +24,6 @@
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-  .onhand-button-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
-  }
-
-  .onhand-button-wrapper button {
-    min-width: 220px;
-    max-width: 300px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .button-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  /* ESL-specific styles */
-  .esl-badge {
-    background-color: #ff9f1c;
-    color: black;
-    font-size: 0.7em;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 6px;
-    font-weight: bold;
-  }
-
-  tr[data-type="esl"] {
-    background-color: rgba(255, 223, 100, 0.1);
-    border-left: 3px solid #ff9f1c;
-  }
-  </style>
 </head>
 <body class="dark-theme electric-fantasy">
   <!-- Floating navigation for main tabs -->
@@ -80,7 +42,8 @@
   </header>
 
   <main class="container neon-container" role="main">
-    <div class="fantasy-wrapper electric-vibe">
+    <div class="mobile-wrapper">
+      <div class="fantasy-wrapper electric-vibe">
       <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
 
@@ -143,8 +106,9 @@
 
           <div class="scan-buttons">
             <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
-            <button id="toggleAdvancedControls" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
+            <button id="moreOptionsBtn" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
           </div>
+
 
           <div id="advancedControls" class="hidden" aria-hidden="true">
             <!-- Auto Scan Mode -->
@@ -177,16 +141,17 @@
             </div>
           </div>
 
-        <h2>On-Hand Counts</h2>
-        <div class="onhand-button-wrapper">
-          <button id="uploadDropboxFile">📤 Load from Dropbox</button>
-        </div>
-        <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
-        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
-          <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example: 10021789: 5"></textarea>
-          <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
+          <!-- Place On-Hand Counts UI block here -->
+          <h2>On-Hand Counts</h2>
+          <div class="onhand-button-wrapper">
+            <button id="uploadDropboxFile">📤 Load from Dropbox</button>
           </div>
-        </div>
+          <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
+          <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
+            <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example: 10021789: 5"></textarea>
+            <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
+            </div>
+          </div>
       </section>
 
       <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
@@ -304,6 +269,7 @@
           <tbody></tbody>
         </table>
       </section>
+      </div>
     </div>
   </main>
 

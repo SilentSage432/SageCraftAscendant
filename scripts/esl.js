@@ -85,6 +85,15 @@ import { saveESLMap } from './session.js';
         if (overlay) overlay.style.display = 'none';
       };
     }
+
+    const overlay = document.querySelector('.mystic-modal-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', (e) => {
+        if (e.target.classList.contains('mystic-modal-overlay')) {
+          overlay.style.display = 'none';
+        }
+      });
+    }
   }
 
   export function initESL() {

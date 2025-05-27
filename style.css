@@ -1,3 +1,29 @@
+/* --- Zebra Striping for Better Row Readability --- */
+tbody tr:nth-child(even):not(.match):not(.over):not(.under) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Scan Highlight Animation on Success --- */
+@keyframes scanSuccessPulse {
+  0% { background-color: rgba(144, 238, 144, 0.2); }
+  100% { background-color: transparent; }
+}
+
+.new-scan-row {
+  animation: scanSuccessPulse 1.5s ease-out;
+}
+
+/* --- Color Palette Root Variables --- */
+:root {
+  --bg-dark: #0f0f1a;
+  --accent-primary: #8a2be2;      /* Electric purple */
+  --accent-secondary: #20c997;    /* Arcane teal/green */
+  --highlight-esl: #ffb347;       /* Soft golden orange */
+  --text-main: #f8f8ff;           /* Ghost white */
+  --text-muted: #bbbbd1;
+  --danger-red: #ff4d4d;
+}
+
 #importExportControls,
 .import-export-group {
   display: flex !important;
@@ -67,19 +93,21 @@ textarea {
   table-layout: auto;
 }
 
+.match td {
+  background-color: rgba(114, 84, 173, 0.4); /* soft amethyst */
+  color: #e0d4ff;
+}
+
 .over td {
-  background-color: #d4edda; /* green */
-  color: #1a1a1a;
+  background-color: rgba(46, 135, 75, 0.25); /* soft emerald glow */
+  color: #dfffea;
+  font-weight: bold;
 }
 
 .under td {
-  background-color: #f8d7da; /* red */
-  color: #1a1a1a;
-}
-
-.match td {
-  background-color: #e0e0e0; /* light gray for dark mode */
-  color: #121212;
+  background-color: rgba(215, 80, 110, 0.3); /* enchanted crimson */
+  color: #fff0f3;
+  font-weight: bold;
 }
 
 @media (max-width: 600px) {
@@ -125,8 +153,11 @@ textarea {
 /* --- Dark Mode Overrides --- */
 
 body {
-  background: linear-gradient(to bottom, #0e0a1a, #1c0c2b);
-  color: #eae6f9;
+  background-color: var(--bg-dark);
+  font-family: 'Cinzel', serif;
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -296,13 +327,16 @@ section {
 /* --- Entry Field Layout --- */
 
 /* Entry field layout for controls section */
+/* Improved entry controls layout for all screen sizes */
 #entryControls {
   display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 #entryControls input,
@@ -366,24 +400,21 @@ body {
 
 /* --- Indigo Glow Enhancements --- */
 
-button,
-section button,
-.import-export-group button,
-.tablink,
-.nav-icon {
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
-  color: #fff;
+button {
+  background: var(--accent-primary);
+  color: var(--text-main);
+  font-weight: bold;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--accent-primary), 0 0 20px #4b00b066;
   transition: all 0.3s ease;
 }
 
-button:hover,
-section button:hover,
-.import-export-group button:hover,
-.tablink:hover,
-.nav-icon:hover {
-  background: linear-gradient(to right, #2575fc, #4b0082);
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+button:hover {
+  background: var(--accent-secondary);
+  box-shadow: 0 0 15px var(--accent-secondary);
   transform: scale(1.05);
 }
 
@@ -400,6 +431,19 @@ select:focus {
 .scan-capsule,
 .table-wrapper table {
   box-shadow: 0 0 15px rgba(75, 0, 130, 0.3);
+}
+
+.scan-capsule {
+  animation: pulseContainer 4s ease-in-out infinite;
+}
+
+@keyframes pulseContainer {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(160, 82, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(160, 82, 255, 0.4);
+  }
 }
 
 .category-badge {
@@ -487,13 +531,11 @@ button:hover {
 }
 
 input, textarea, select {
-  background: #2e1f4f;
-  border: 1px solid #5c3cc6;
-  color: #f036ff;
+  background: #1a1a2f;
+  border: 1px solid var(--accent-primary);
+  color: var(--text-main);
   border-radius: 4px;
   padding: 8px;
-  border-radius: 4px;
-  margin: 5px 0;
   width: 100%;
 }
 
@@ -509,16 +551,17 @@ textarea {
 }
 
 .tab-section {
-  display: none;
-  margin-top: 20px;
-  padding: 20px;
   background: rgba(40, 20, 80, 0.7);
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  padding: 20px;
+  margin-top: 20px;
+  display: none;
 }
 
 .tab-section.active {
   display: block;
+  animation: fadeIn 0.5s ease-out;
 }
 
 header.topbar {
@@ -594,19 +637,7 @@ input:focus, textarea:focus {
   color: #cab3ff;
 }
 
-.match td {
-  background-color: #3a295b;
-}
-
-.over td {
-  background-color: #2e874b;
-  color: #dfffea;
-}
-
-.under td {
-  background-color: #a03445;
-  color: #fff0f3;
-}
+/* .match td, .over td, .under td styles replaced above */
 
 footer {
   text-align: center;
@@ -857,7 +888,7 @@ body::before {
 table {
   border-collapse: separate;
   border-spacing: 0;
-  border: 2px solid rgba(147, 51, 234, 0.4);
+  border: 1px solid rgba(147, 51, 234, 0.25);
   box-shadow: 0 0 12px rgba(147, 51, 234, 0.1);
   border-radius: 12px;
   overflow: hidden;
@@ -868,16 +899,33 @@ thead th {
   color: #cab3ff;
   text-shadow: 0 0 4px #8f3aff;
   font-size: 15px;
-  padding: 12px;
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+thead th:first-child {
+  border-top-left-radius: 8px;
+}
+thead th:last-child {
+  border-top-right-radius: 8px;
 }
 
 tbody tr {
   transition: background 0.3s ease, box-shadow 0.3s ease;
+  min-height: 44px;
 }
 
 tbody tr:hover {
-  background-color: rgba(147, 112, 219, 0.1);
-  box-shadow: 0 0 10px rgba(160, 82, 255, 0.2);
+  background-color: rgba(155, 119, 240, 0.08);
+  box-shadow: 0 0 8px rgba(155, 119, 240, 0.3);
+}
+
+thead th,
+tbody td {
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 /* --- Scan Feedback Animation Styles --- */
@@ -917,19 +965,20 @@ tbody tr:hover {
   text-shadow: 0 0 4px #8f3aff;
 }
 
-.scan-fields {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
+.scan-fields,
 .scan-buttons {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: 100%;
+  max-width: 720px;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.scan-buttons button {
+  width: 100%;
+  max-width: 320px;
 }
 
 /* --- On-Hand Counts Section --- */
@@ -983,6 +1032,9 @@ tbody tr:hover {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
+  transform: scale(0.95);
+  opacity: 0;
+  animation: modalPopIn 0.5s ease-out forwards;
 }
 
 .mystic-modal-content h3 {
@@ -1061,8 +1113,24 @@ tbody tr:hover {
   box-shadow: 0 0 22px #ffb3fa, 0 0 30px #a83279;
 }
 
+/* --- On-Hand Button Wrapper and ESL Badge Cleanup/Migration --- */
+.onhand-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.onhand-button-wrapper button {
+  min-width: 220px;
+  max-width: 300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .esl-badge {
-  background-color: #ff9f1c;
+  background-color: var(--highlight-esl);
   color: #1e1e1e;
   font-size: 0.7em;
   padding: 2px 6px;
@@ -1073,6 +1141,130 @@ tbody tr:hover {
 }
 
 tr[data-type="esl"] {
-  background-color: rgba(255, 223, 100, 0.12);
-  border-left: 3px solid #ff9f1c;
+  background-color: rgba(255, 184, 80, 0.07);
+  border-left: 3px solid var(--highlight-esl);
+}
+
+/* --- Smooth Advanced Controls Toggle --- */
+#advancedControls {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+#advancedControls.expanded {
+  max-height: 2000px; /* Enough space to expand */
+  padding-top: 10px;
+}
+/* Mobile View Polish Enhancements */
+
+@media (max-width: 600px) {
+  .mobile-wrapper,
+  .container,
+  .scan-capsule,
+  .tab-section,
+  .table-wrapper {
+    margin: 0 auto;
+    padding: 12px;
+    max-width: 480px;
+  }
+
+  .scan-fields,
+  .scan-buttons,
+  .grouped-buttons,
+  .button-grid,
+  .import-export-group,
+  #entryControls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-grid button,
+  .grouped-buttons button,
+  .settings-button,
+  .import-export-group button,
+  button {
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 8px auto !important;
+    display: block;
+  }
+
+  h1, h2, h3 {
+    font-size: 1.2rem;
+  }
+
+  input, textarea, select {
+    font-size: 14px;
+  }
+
+  .logo-banner {
+    padding: 0 12px;
+  }
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02), transparent 70%);
+  pointer-events: none;
+  z-index: -2;
+  mix-blend-mode: screen;
+  animation: shimmerGlow 12s ease-in-out infinite;
+}
+
+@keyframes shimmerGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#liveCategory {
+  margin-bottom: 10px;
+}
+/* --- Floating Nav Glow & Tooltip Enhancements --- */
+.nav-icon::after {
+  content: attr(data-label);
+  opacity: 0;
+  background: #2a0845;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  position: absolute;
+  left: 60px;
+  white-space: nowrap;
+  font-size: 12px;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.nav-icon:hover::after {
+  opacity: 1;
+}
+
+.nav-icon.active {
+  box-shadow: 0 0 14px #c084fc, 0 0 30px #6c2fd188;
+  animation: navPulse 2s infinite ease-in-out;
+}
+
+@keyframes navPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes modalPopIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* --- Table Sticky Header (Desktop View) --- */
+@media (min-width: 768px) {
+  .table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    background: #3b2a72;
+    z-index: 1;
+  }
 }

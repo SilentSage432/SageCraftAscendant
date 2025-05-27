@@ -1,4 +1,3 @@
-
 export function showScanMappingLog(scannedCode, mappedItem) {
   const log = document.createElement('div');
   log.textContent = `✅ Code ${scannedCode} recognized as Lowe’s #${mappedItem}`;
@@ -68,11 +67,11 @@ export function restoreFocusToEntry() {
 }
 export function setupMoreOptionsToggle() {
   const moreOptionsBtn = document.getElementById('moreOptionsBtn');
-  const moreOptionsSection = document.getElementById('moreOptionsSection');
+  const moreOptionsSection = document.getElementById('advancedControls');
 
   if (moreOptionsBtn && moreOptionsSection) {
     moreOptionsBtn.addEventListener('click', () => {
-      moreOptionsSection.classList.toggle('hidden');
+      moreOptionsSection.classList.toggle('expanded');
     });
   }
 }
