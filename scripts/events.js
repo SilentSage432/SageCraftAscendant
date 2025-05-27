@@ -263,6 +263,11 @@ export function initEventListeners() {
       });
 
       window.dispatchEvent(event);
+      // Reset inputs after manual scan
+      input.value = '';
+      document.getElementById('liveQty').value = '1';
+      document.getElementById('liveCategory').value = 'Uncategorized';
+      input.focus();
     });
   }
 
