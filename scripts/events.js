@@ -1,6 +1,5 @@
 
-import { createToast } from './ui.js';
-import { updateMapStatusDisplay } from './ui.js';
+import { createToast, updateMapStatusDisplay, renderBayAuditLog } from './ui.js';
 
 window.createToast = createToast;
 window.updateMapStatusDisplay = updateMapStatusDisplay;
@@ -422,32 +421,20 @@ export function initEventListeners() {
   const closeBayBtn = document.getElementById('closeBayBtn');
   if (closeBayBtn) {
     closeBayBtn.addEventListener('click', () => {
-      const bayStatusDisplay = document.getElementById('bayStatusDisplay');
-      const closeBayWrapper = document.getElementById('closeBayWrapper');
-      // --- BAY TIMER STOP LOGIC ---
-      if (currentBay && currentBay.startTime) {
-        const endTime = Date.now();
-        const durationSeconds = Math.floor((endTime - currentBay.startTime) / 1000);
-        const durationFormatted = `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`;
-
-        bayAuditTimes.push({
-          bay: currentBay.name,
-          duration: durationFormatted,
-          timestamp: new Date().toLocaleString()
-        });
-
-        console.log(`⏹️ Timer stopped for ${currentBay.name}. Duration: ${durationFormatted}`);
-      }
-
+      // Clear current bay from storage or memory
       currentBay = null;
-      if (bayStatusDisplay) {
-        bayStatusDisplay.textContent = '🚫 No Active Bay';
-        bayStatusDisplay.style.color = 'red';
-      }
-      if (closeBayWrapper) {
-        closeBayWrapper.style.display = 'none';
-      }
       localStorage.removeItem('activeBay');
+
+      // Update bay status display
+      const bayStatus = document.getElementById('bayStatusDisplay');
+      bayStatus.textContent = '🚫 No Active Bay';
+      bayStatus.style.color = 'red';
+
+      // Show bay closed notice
+      document.getElementById('bayClosedNotice').style.display = 'inline';
+
+      // Optional: reset bay-related logic if needed
+      createToast('Bay closed successfully.');
     });
   }
 
@@ -525,9 +512,6 @@ export function initEventListeners() {
     });
   }
 
-  // --- Bay Audit Log Export/Reset ---
-  import { renderBayAuditLog } from './ui.js';
-
   document.getElementById('exportAuditLog')?.addEventListener('click', async () => {
     // Use global bayAuditTimes object for export
     if (!window.bayAuditTimes || Object.keys(window.bayAuditTimes).length === 0) {
@@ -536,9 +520,16 @@ export function initEventListeners() {
     }
     // Load SheetJS
     const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs');
-    const wsData = [['Bay Name', 'Duration (seconds)']];
-    for (const [bay, duration] of Object.entries(window.bayAuditTimes)) {
-      wsData.push([bay, (duration / 1000).toFixed(1)]);
+    const wsData = [['Bay Name', 'Duration', 'Timestamp']];
+    if (Array.isArray(window.bayAuditTimes)) {
+      window.bayAuditTimes.forEach(entry => {
+        wsData.push([entry.bay, entry.duration, entry.timestamp]);
+      });
+    } else {
+      // fallback for object format (legacy)
+      for (const [bay, duration] of Object.entries(window.bayAuditTimes)) {
+        wsData.push([bay, (duration / 1000).toFixed(1), '']);
+      }
     }
     const worksheet = XLSX.utils.aoa_to_sheet(wsData);
     const workbook = XLSX.utils.book_new();
@@ -546,13 +537,16 @@ export function initEventListeners() {
     XLSX.writeFile(workbook, 'bay-audit-log.xlsx');
   });
 
-  document.getElementById('resetAuditLog')?.addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset all bay audit logs?')) {
-      window.bayAuditTimes = {};
-      renderBayAuditLog(window.bayAuditTimes);
-      alert('Audit log cleared.');
-    }
-  });
+  const resetAuditLogBtn = document.getElementById('resetAuditLog');
+  if (resetAuditLogBtn) {
+    resetAuditLogBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to reset all bay audit logs?')) {
+        window.bayAuditTimes = [];
+        renderBayAuditLog(window.bayAuditTimes);
+        alert('Audit log cleared.');
+      }
+    });
+  }
 
   const moreOptionsBtn = document.getElementById('moreOptionsBtn');
   if (moreOptionsBtn) {
