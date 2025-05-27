@@ -54,9 +54,59 @@ export function initEventListeners() {
 
   function startAutosave(minutes) {
     if (autosaveIntervalId) clearInterval(autosaveIntervalId);
-    autosaveIntervalId = setInterval(() => {
-      localStorage.setItem('savedSession', JSON.stringify(window.sessionMap || {}));
+    autosaveIntervalId = setInterval(async () => {
+      const sessionData = window.sessionMap || {};
+      localStorage.setItem('savedSession', JSON.stringify(sessionData));
       console.log('💾 Autosave complete');
+
+      // Also autosave to Excel
+      try {
+        const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs');
+        const sessionRows = Object.entries(sessionData).map(([item, data]) => ({
+          'Item #': item,
+          'Count': data.count || 1,
+          'Category': data.category || '',
+          'Location': data.location || ''
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(sessionRows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Session');
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `autosave-session-${timestamp}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+        // Also autosave to Dropbox if authenticated
+        try {
+          const accessToken = localStorage.getItem('dropboxAccessToken');
+          if (accessToken) {
+            const sessionBlob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+            const jsonFilename = `/autosave-session-${timestamp}.json`;
+
+            await fetch('https://content.dropboxapi.com/2/files/upload', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Dropbox-API-Arg': JSON.stringify({
+                  path: jsonFilename,
+                  mode: 'overwrite',
+                  autorename: false,
+                  mute: true
+                }),
+                'Content-Type': 'application/octet-stream'
+              },
+              body: sessionBlob
+            });
+
+            console.log(`📤 Autosaved session to Dropbox: ${jsonFilename}`);
+          }
+        } catch (err) {
+          console.error('❌ Dropbox autosave failed:', err);
+        }
+      } catch (err) {
+        console.error('❌ Excel autosave failed:', err);
+      }
     }, minutes * 60 * 1000);
   }
 
@@ -101,10 +151,31 @@ export function initEventListeners() {
     const saved = localStorage.getItem('config_numericKeypad') === 'true';
     numericKeypadToggle.checked = saved;
     document.body.classList.toggle('numeric-keypad', saved);
+
+    // Set inputmode on load if enabled
+    const liveEntry = document.getElementById('liveEntry');
+    if (liveEntry) {
+      if (saved) {
+        liveEntry.setAttribute('inputmode', 'numeric');
+      } else {
+        liveEntry.removeAttribute('inputmode');
+      }
+    }
+
     numericKeypadToggle.addEventListener('change', () => {
       const enabled = numericKeypadToggle.checked;
       localStorage.setItem('config_numericKeypad', enabled);
       document.body.classList.toggle('numeric-keypad', enabled);
+
+      const liveEntry = document.getElementById('liveEntry');
+      if (liveEntry) {
+        if (enabled) {
+          liveEntry.setAttribute('inputmode', 'numeric');
+        } else {
+          liveEntry.removeAttribute('inputmode');
+        }
+      }
+
       createToast(`🔢 Numeric Keypad ${enabled ? 'enabled' : 'disabled'}`);
     });
   }
@@ -588,6 +659,55 @@ export function initEventListeners() {
       });
       createToast(`🧹 Removed ${removed} stale session${removed !== 1 ? 's' : ''}`);
       if (removed > 0) location.reload();
+    });
+  }
+
+  // --- Merge Master Report Export ---
+  const mergeMasterReportBtn = document.getElementById('mergeMasterReport');
+  if (mergeMasterReportBtn) {
+    mergeMasterReportBtn.addEventListener('click', async () => {
+      const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs');
+
+      // Gather session data
+      const mergedRows = [];
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
+
+      keys.forEach(key => {
+        const session = JSON.parse(localStorage.getItem(key));
+        Object.entries(session).forEach(([item, data]) => {
+          mergedRows.push({
+            'Item #': item,
+            'Count': data.count || 1,
+            'Category': data.category || '',
+            'Location': data.location || ''
+          });
+        });
+      });
+
+      // Format each sheet
+      const summarySheet = XLSX.utils.json_to_sheet(mergedRows);
+      const upcMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+      const upcSheet = XLSX.utils.json_to_sheet(Object.entries(upcMap).map(([upc, item]) => ({
+        'UPC': upc,
+        'Item #': item
+      })));
+
+      const bayMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+      const baySheet = XLSX.utils.json_to_sheet(Object.entries(bayMap).map(([item, bay]) => ({
+        'Item #': item,
+        'Bay': bay
+      })));
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, summarySheet, 'Session Summary');
+      XLSX.utils.book_append_sheet(wb, upcSheet, 'UPC Mappings');
+      XLSX.utils.book_append_sheet(wb, baySheet, 'Bay Locations');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Coming soon...']]), 'Audit Rotation');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Coming soon...']]), 'Weekly Counts');
+
+      const now = new Date().toISOString().replace(/[:.]/g, '-');
+      XLSX.writeFile(wb, `merged-inventory-report-${now}.xlsx`);
+      createToast('📊 Merged Master Report generated.');
     });
   }
 
