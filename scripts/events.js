@@ -3,6 +3,12 @@ import { updateMapStatusDisplay } from './ui.js';
 
 export function initEventListeners() {
   console.log('🎛️ Event listeners initialized');
+  // Update map status display on startup with data from localStorage
+  updateMapStatusDisplay(
+    JSON.parse(localStorage.getItem('locationMap') || '{}'),
+    JSON.parse(localStorage.getItem('upcToItemMap') || '{}'),
+    JSON.parse(localStorage.getItem('eslToUPCMap') || '{}')
+  );
 
   setupTabNavigation();
 
