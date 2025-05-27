@@ -432,8 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalBtnESL = document.getElementById('modalBtnESL');
   if (modalBtnESL) {
     modalBtnESL.onclick = () => {
-      const item = currentESLItem;
-      const itemNum = prompt(`Enter the item number this ESL tag maps to:`);
+      const item = normalizeUPC(currentESLItem);
+      const itemNum = prompt(`Enter the Lowe’s item number for ESL: ${item}`);
       if (item && itemNum) {
         const trimmed = itemNum.trim();
         if (trimmed) {
@@ -1919,6 +1919,7 @@ syncBothBtn.addEventListener('click', () => {
       } else if (guess === 'esl') {
         message = `This looks like an ESL Tag (13-digit starting with 0). Confirm?`;
       }
+      currentESLItem = normalizeUPC(item);
 
       document.getElementById('modalPromptText').textContent = message;
       // Set the current ESL item for the handler
