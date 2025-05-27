@@ -194,7 +194,7 @@ function resolveScanCode(code) {
   const eslMatch = eslToUPC[normalized];
   if (eslMatch) {
     console.log(`🔁 ESL match: ESL ${normalized} → ${eslMatch}`);
-    return eslMatch;
+    return { type: 'esl', upc: normalized, item: eslMatch };
   }
   console.warn(`❌ Unrecognized code: ${code}`);
   return null;
@@ -784,6 +784,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // --- Use universal scan code resolution ---
       const resolved = resolveScanCode(val);
       if (resolved) {
+        if (typeof resolved === 'object' && resolved.type === 'esl') {
+          console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item}`);
+          upcToItem[resolved.upc] = resolved.item; // Optional back-reference if needed
+          processScan(resolved.item);
+          resetScanInput();
+          return;
+        }
         processScan(resolved);
         resetScanInput();
         return;
@@ -1991,6 +1998,29 @@ Bay Codes → ${Object.keys(locationMap).length}`;
           // --- Use universal scan code resolution ---
           const resolved = resolveScanCode(normalizedVal);
           if (resolved) {
+            if (typeof resolved === 'object' && resolved.type === 'esl') {
+              console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item}`);
+              upcToItem[resolved.upc] = resolved.item; // Optional back-reference if needed
+              processScan(resolved.item);
+              const toast = document.createElement('div');
+              toast.textContent = `✅ ESL ${resolved.upc} resolved to Lowe’s #${resolved.item}`;
+              Object.assign(toast.style, {
+                position: 'fixed',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: '#2e7d32',
+                color: '#fff',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                zIndex: '9999',
+                textAlign: 'center'
+              });
+              document.body.appendChild(toast);
+              setTimeout(() => document.body.removeChild(toast), 3000);
+              return;
+            }
             processScan(resolved);
             const toast = document.createElement('div');
             toast.textContent = `✅ Code ${normalizedVal} resolved to Lowe’s #${resolved}`;
