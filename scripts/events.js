@@ -56,6 +56,80 @@ export function initEventListeners() {
 
   // Add additional UI button/event listeners here as needed
 
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const upcMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+      const blob = new Blob([JSON.stringify(upcMap, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bay_location_backup.json';
+      a.click();
+    });
+  }
+
+  const importBtn = document.getElementById('importBtn');
+  if (importBtn) {
+    importBtn.addEventListener('click', () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            localStorage.setItem('locationMap', JSON.stringify(data));
+            alert('✅ Bay location map imported successfully');
+            location.reload();
+          } catch (e) {
+            alert('❌ Failed to import bay location map.');
+          }
+        };
+        reader.readAsText(file);
+      });
+      fileInput.click();
+    });
+  }
+
+  const exportUPCBtn = document.getElementById('exportUPCBtn');
+  if (exportUPCBtn) {
+    exportUPCBtn.addEventListener('click', () => {
+      const upcMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+      const blob = new Blob([JSON.stringify(upcMap, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'upc_mappings_backup.json';
+      a.click();
+    });
+  }
+
+  const importUPCBtn = document.getElementById('importUPCBtn');
+  if (importUPCBtn) {
+    importUPCBtn.addEventListener('click', () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            localStorage.setItem('upcToItemMap', JSON.stringify(data));
+            alert('✅ UPC mappings imported successfully');
+            location.reload();
+          } catch (e) {
+            alert('❌ Failed to import UPC mappings.');
+          }
+        };
+        reader.readAsText(file);
+      });
+      fileInput.click();
+    });
+  }
+
   const moreOptionsBtn = document.getElementById('moreOptionsBtn');
   if (moreOptionsBtn) {
     moreOptionsBtn.addEventListener('click', () => {
@@ -183,6 +257,45 @@ export function initEventListeners() {
         XLSX.utils.book_append_sheet(wb, ws, 'Template');
         XLSX.writeFile(wb, 'Template.xlsx');
       });
+    });
+  }
+
+  // --- Import/Export Options Toggle ---
+  const toggleImportExport = document.getElementById('toggleImportExport');
+  if (toggleImportExport) {
+    toggleImportExport.addEventListener('click', () => {
+      const group = document.getElementById('importExportControls');
+      if (group) {
+        const hidden = group.classList.toggle('hidden');
+        group.setAttribute('aria-hidden', hidden);
+      }
+    });
+  }
+
+  // --- On-Hand File Upload Trigger ---
+  const uploadDropboxFile = document.getElementById('uploadDropboxFile');
+  if (uploadDropboxFile) {
+    uploadDropboxFile.addEventListener('click', () => {
+      const input = document.getElementById('onHandFileInput');
+      if (input) input.click();
+    });
+  }
+
+  // --- Excel Session Upload Trigger ---
+  const importExcelTrigger = document.getElementById('triggerImportExcelSession');
+  if (importExcelTrigger) {
+    importExcelTrigger.addEventListener('click', () => {
+      const fileInput = document.getElementById('importExcelSession');
+      if (fileInput) fileInput.click();
+    });
+  }
+
+  // --- View Trends Modal Open ---
+  const viewTrends = document.getElementById('viewTrends');
+  if (viewTrends) {
+    viewTrends.addEventListener('click', () => {
+      const modal = document.getElementById('trendsModal');
+      if (modal) modal.style.display = 'flex';
     });
   }
 }

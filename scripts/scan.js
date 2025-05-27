@@ -25,13 +25,17 @@ async function handleScanInput(val) {
     if (typeof resolved === 'object' && resolved.type === 'esl') {
       console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
       if (resolved.item) upcToItem[resolved.upc] = resolved.item;
-      updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+      if (typeof updateMapStatusDisplay === 'function') {
+        updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+      }
       processScan(resolved.item || resolved.upc);
       resetScanInput();
       return;
     }
     processScan(resolved);
-    updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+    if (typeof updateMapStatusDisplay === 'function') {
+      updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+    }
     resetScanInput();
     return;
   }
@@ -52,10 +56,19 @@ async function handleScanInput(val) {
 function processScan(item) {
   console.log(`🔍 Scanning item: ${item}`);
   if (!item) return;
+
   if (!window.liveCounts) window.liveCounts = {};
-  window.liveCounts[item] = (window.liveCounts[item] || 0) + 1;
+
+  if (!window.liveCounts[item]) {
+    window.liveCounts[item] = 1;
+  } else {
+    window.liveCounts[item] += 1;
+  }
+
   if (typeof window.updateLiveTable === 'function') {
     window.updateLiveTable();
+  } else {
+    console.warn('⚠️ updateLiveTable function is not defined');
   }
 }
 
