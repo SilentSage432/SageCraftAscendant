@@ -68,7 +68,7 @@ export async function refreshAccessToken() {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: '/active_session.json' })
+        'Dropbox-API-Arg': JSON.stringify({ path: '/beta-test-1/active_session.json' })
       }
     });
   
@@ -78,7 +78,8 @@ export async function refreshAccessToken() {
       return;
     }
   
-    const session = await response.json();
+    const text = await response.text();
+    const session = JSON.parse(text);
     if (!session.liveCounts) return alert('❌ Invalid session format.');
     Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
     Object.entries(session.liveCounts).forEach(([k, v]) => {
@@ -140,3 +141,43 @@ export async function refreshAccessToken() {
 export function initDropbox() {
   console.log("🚀 Dropbox module initialized");
 }
+
+// Listen for 'load-dropbox-session' custom event to trigger session restoration
+window.addEventListener('load-dropbox-session', () => {
+  const onHandInput = document.getElementById('onhandText');
+  if (!onHandInput) {
+    alert("❌ Cannot load session: 'onhandText' input not found.");
+    return;
+  }
+
+  const liveCounts = window.liveCounts || {};
+  const updateLiveTable = window.updateLiveTable || (() => {
+    console.warn("⚠️ updateLiveTable not available.");
+  });
+
+  loadSessionFromDropbox(liveCounts, onHandInput, updateLiveTable);
+});
+
+// Connect to Dropbox
+window.addEventListener('connect-dropbox', () => {
+  console.log('🔐 Initiating Dropbox connection...');
+  beginDropboxLogin();
+});
+
+// Refresh Dropbox token
+window.addEventListener('refresh-dropbox-token', async () => {
+  const token = await refreshAccessToken();
+  if (token) {
+    alert('♻️ Dropbox token refreshed.');
+  }
+});
+
+// Sync all maps to Dropbox
+window.addEventListener('sync-all-maps', async () => {
+  alert('🛠 Sync logic for maps not yet implemented.');
+});
+
+// Restore all maps from Dropbox
+window.addEventListener('restore-all-maps', async () => {
+  alert('🛠 Restore logic for maps not yet implemented.');
+});

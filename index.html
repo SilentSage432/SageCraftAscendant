@@ -66,10 +66,10 @@
 <body class="dark-theme electric-fantasy">
   <!-- Floating navigation for main tabs -->
   <div class="floating-nav" role="navigation" aria-label="Main tabs">
-    <button class="nav-icon" data-tab="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
-    <button class="nav-icon" data-tab="vault" title="Session Vault" aria-label="Session Vault">📂</button>
-    <button class="nav-icon" data-tab="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
-    <button class="nav-icon" data-tab="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
+    <button class="tablink nav-icon active" data-target="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
+    <button class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
+    <button class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
+    <button class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -255,9 +255,13 @@
         </div>
 
         <h3>☁️ Dropbox Cloud Sync</h3>
-        <div class="button-grid">
-          <button id="saveToDrive">💾 Save Session to Dropbox</button>
-          <button id="loadFromDrive">📥 Load Session from Dropbox</button>
+        <div id="dropboxControls" class="button-grid">
+          <button id="connectDropbox">🔐 Connect to Dropbox</button>
+          <button id="refreshDropboxToken">♻️ Refresh Token</button>
+          <button id="loadDropboxSession">📥 Load Active Session</button>
+          <button id="syncDropboxMaps">🔄 Sync All Maps</button>
+          <button id="restoreDropboxMaps">📂 Restore All Maps</button>
+          <button id="disconnectDropbox">❌ Disconnect</button>
         </div>
         <h3>📁 Local Session Tools</h3>
         <div class="button-grid">
@@ -375,3 +379,19 @@ function showCustomPrompt(item) {
 <script type="module" src="scripts/index.js"></script>
 </body>
 </html>
+  <script>
+  // "More Options" button toggle logic for accessibility and visibility
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleAdvancedControlsBtn = document.getElementById('toggleAdvancedControls');
+    if (toggleAdvancedControlsBtn) {
+      toggleAdvancedControlsBtn.addEventListener('click', () => {
+        const panel = document.getElementById('advancedControls');
+        if (!panel) return;
+        const isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        panel.setAttribute('aria-hidden', String(!isHidden));
+        toggleAdvancedControlsBtn.setAttribute('aria-expanded', String(isHidden));
+      });
+    }
+  });
+  </script>
