@@ -17,6 +17,8 @@ import { setupReportButton, setupTemplateExportButton } from './report.js';
 console.log("✅ index.js is running");
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('✅ DOM fully loaded, initializing modules...');
+
   createToast('✅ index.js loaded', 3000);
 
   initAudit();
