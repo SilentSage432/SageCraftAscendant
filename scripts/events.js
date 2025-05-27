@@ -1,3 +1,59 @@
+// --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
+// --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
+// The modalEditConfirm button may be created dynamically, so bind the event outside DOMContentLoaded
+function handleModalEditConfirmClick() {
+  // Assumes scannedItems, saveScannedItems, renderLiveScanTable, and showToast exist in global scope
+  window.scannedItems = window.scannedItems || JSON.parse(localStorage.getItem('scannedItems') || '[]');
+  function saveScannedItems() {
+    localStorage.setItem('scannedItems', JSON.stringify(window.scannedItems));
+  }
+  function showToast(msg) { if (typeof createToast === 'function') createToast(msg); }
+
+  const modalEditConfirm = document.getElementById("modalEditConfirm");
+  const editIndex = modalEditConfirm?.dataset.index;
+  const updatedCode = document.getElementById("editCodeInput")?.value.trim();
+  let updatedType = document.getElementById("editTypeSelect")?.value;
+  // Fallback: if dropdown is missing or empty, check for checked radio button
+  if (!updatedType) {
+    const selectedRadio = document.querySelector('input[name="itemType"]:checked');
+    if (selectedRadio) {
+      updatedType = selectedRadio.value;
+    }
+  }
+  const updatedValue = document.getElementById("editValueInput")?.value.trim();
+
+  if (!updatedCode || !updatedType || !updatedValue || editIndex === undefined) {
+    showToast("Please fill out all fields.");
+    return;
+  }
+
+  window.scannedItems[editIndex] = {
+    code: updatedCode,
+    type: updatedType,
+    value: updatedValue,
+    timestamp: new Date().toLocaleString()
+  };
+
+  saveScannedItems();
+  if (typeof renderLiveScanTable === "function") renderLiveScanTable();
+  showToast(`Updated entry #${parseInt(editIndex) + 1}`);
+  const modal = document.getElementById("modalEdit");
+  if (modal) modal.style.display = "none";
+}
+
+// Attach the handler either immediately or after DOMContentLoaded if button not yet present
+function bindModalEditConfirmListener() {
+  const modalEditConfirm = document.getElementById("modalEditConfirm");
+  if (modalEditConfirm) {
+    // Remove any previous listener to prevent double binding
+    modalEditConfirm.removeEventListener("click", handleModalEditConfirmClick);
+    modalEditConfirm.addEventListener("click", handleModalEditConfirmClick);
+  }
+}
+// Try binding immediately in case button is present
+bindModalEditConfirmListener();
+// Also bind after DOMContentLoaded in case button is added later
+document.addEventListener('DOMContentLoaded', bindModalEditConfirmListener);
 
 import { createToast, updateMapStatusDisplay, renderBayAuditLog } from './ui.js';
 
@@ -97,62 +153,120 @@ window.handleManualScan = function (e) {
   window._mappingCode = code;
   window._selectedType = '';
 
+  // Only update currentMapType on user interaction with the selectors
   document.getElementById('mapTypeESL').onclick = () => {
     label.textContent = `Enter Lowe's Item # for this ESL:`;
     inputSection.classList.remove('hidden');
     window._selectedType = 'esl';
+    window.currentMapType = 'esl';
+    // set radio if present
+    const eslRadio = document.querySelector('input[name="itemType"][value="esl"]');
+    if (eslRadio) eslRadio.checked = true;
   };
 
   document.getElementById('mapTypeProduct').onclick = () => {
     label.textContent = `Enter Lowe's Item # for this Product:`;
     inputSection.classList.remove('hidden');
     window._selectedType = 'product';
+    window.currentMapType = 'product';
+    const prodRadio = document.querySelector('input[name="itemType"][value="product"]');
+    if (prodRadio) prodRadio.checked = true;
   };
 
   document.getElementById('mapTypeBay').onclick = () => {
     label.textContent = `Enter Bay Name:`;
     inputSection.classList.remove('hidden');
     window._selectedType = 'bay';
+    window.currentMapType = 'bay';
+    const bayRadio = document.querySelector('input[name="itemType"][value="bay"]');
+    if (bayRadio) bayRadio.checked = true;
   };
 
-  confirmBtn.onclick = () => {
-    const value = inputField.value.trim();
-    const type = window._selectedType;
-    const code = window._mappingCode;
-    if (!value || !type || !code) return;
+  // --- MODAL SUBMIT HANDLING (NEW LOGIC) ---
+  // This block replaces the confirmBtn.onclick for new modal submit logic
+  if (document.getElementById('modalSubmit')) {
+    document.getElementById('modalSubmit').addEventListener('click', () => {
+      // Get selected type and item number
+      const itemType = document.querySelector('input[name="itemType"]:checked')?.value;
+      const itemNumber = document.getElementById('modalItemNumber').value.trim();
+      // Get liveCategory from UI, default to 'Uncategorized'
+      const liveCategory = document.getElementById('liveCategory')?.value || 'Uncategorized';
 
-    let mappedItemNum = '';
-    if (type === 'esl') {
-      eslMap[code] = value;
-      localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
-      createToast(`🔗 ESL ${code} linked to Item #${value}`);
-      mappedItemNum = value;
-    } else if (type === 'product') {
-      upcMap[code] = value;
-      localStorage.setItem('upcToItemMap', JSON.stringify(upcMap));
-      createToast(`🔗 Product code ${code} mapped to Item #${value}`);
-      mappedItemNum = value;
-    } else if (type === 'bay') {
-      bayMap[code] = value;
-      localStorage.setItem('locationMap', JSON.stringify(bayMap));
-      createToast(`📍 Bay ${code} mapped to "${value}"`);
-      mappedItemNum = code;
-    }
+      function showToast(msg) { if (typeof createToast === 'function') createToast(msg); }
+      function saveUPCMap() {
+        localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem || {}));
+      }
+      function saveLocationMap() {
+        localStorage.setItem('locationMap', JSON.stringify(window.locationMap || {}));
+      }
+      function updateBayStatusDisplay() {
+        if (typeof window.updateMapStatusDisplay === 'function') {
+          window.updateMapStatusDisplay(
+            window.locationMap || {},
+            window.upcToItem || {},
+            window.eslToUPC || {}
+          );
+        }
+      }
+      function addItemToScanTable(itemNum, code, type, category) {
+        if (typeof window.addItemToScanTable === 'function') {
+          window.addItemToScanTable(itemNum, code, type, category);
+        }
+      }
+      function closeModal() {
+        const modal = document.getElementById('mapPromptModal');
+        if (modal) {
+          modal.style.display = 'none';
+          modal.classList.add('hidden');
+        }
+      }
 
-    // Re-run the scan now that the mapping exists, using correct quantity and category from live entry
-    const qty = parseInt(document.getElementById('liveQty')?.value || '1', 10);
-    const cat = document.getElementById('liveCategory')?.value || 'Uncategorized';
-    window.handleManualScan({ detail: { code: mappedItemNum, quantity: qty, category: cat } });
+      // Fallback to global maps if not defined
+      window.upcToItem = window.upcToItem || JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+      window.locationMap = window.locationMap || JSON.parse(localStorage.getItem('locationMap') || '{}');
+      window.eslToUPC = window.eslToUPC || JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
 
-    // Hide modal forcibly
-    modal.style.display = 'none';
-    modal.classList.add('hidden');
-    updateMapStatusDisplay(
-      JSON.parse(localStorage.getItem('locationMap') || '{}'),
-      JSON.parse(localStorage.getItem('upcToItemMap') || '{}'),
-      JSON.parse(localStorage.getItem('eslToUPCMap') || '{}')
-    );
-  };
+      if (!itemNumber) {
+        showToast('Please enter a valid item number.');
+        return;
+      }
+      if (!itemType) {
+        showToast('Please select a category for this code.');
+        return;
+      }
+      // Use most recent scanned value
+      const scannedCode = window.lastScannedCode || window._mappingCode || '';
+
+      if (itemType === 'esl') {
+        window.upcToItem[scannedCode] = itemNumber;
+        saveUPCMap();
+        showToast(`ESL ${scannedCode} mapped to item ${itemNumber}`);
+      } else if (itemType === 'product') {
+        window.upcToItem[scannedCode] = itemNumber;
+        saveUPCMap();
+        showToast(`Product ${scannedCode} mapped to item ${itemNumber}`);
+      } else if (itemType === 'bay') {
+        window.locationMap[scannedCode] = itemNumber;
+        saveLocationMap();
+        currentBay = itemNumber;
+        localStorage.setItem('activeBay', itemNumber);
+        updateBayStatusDisplay();
+        showToast(`Bay ${itemNumber} activated`);
+      }
+
+      // --- Ensure sessionMap is updated for product mappings with category ---
+      if (itemType === 'product') {
+        if (!window.sessionMap) window.sessionMap = {};
+        if (!window.sessionMap[itemNumber]) window.sessionMap[itemNumber] = { count: 0 };
+        window.sessionMap[itemNumber].count += 1;
+        window.sessionMap[itemNumber].category = liveCategory;
+        window.sessionMap[itemNumber].location = localStorage.getItem('activeBay') || '';
+      }
+
+      addItemToScanTable(itemNumber, scannedCode, itemType, liveCategory);
+      closeModal();
+    });
+  }
 
   // Always update the live table after a scan (manual or mapped)
   if (typeof window.updateLiveTable === 'function') {
@@ -1000,3 +1114,86 @@ export function setupTabNavigation() {
     });
   });
 }
+// --- Modal Confirm/Submit Button Handler (for mapPromptModal) ---
+document.addEventListener('DOMContentLoaded', () => {
+  const modalSubmitBtn = document.getElementById("modalSubmit");
+  if (modalSubmitBtn) {
+    modalSubmitBtn.addEventListener("click", () => {
+      // This logic assumes the presence of global variables: currentMapType, upcToItem, locationMap, saveUPCMap, saveLocationMap, showToast
+      // Fallbacks for demo: if not present, define them
+      window.upcToItem = window.upcToItem || JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+      window.locationMap = window.locationMap || JSON.parse(localStorage.getItem('locationMap') || '{}');
+      function saveUPCMap() { localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem)); }
+      function saveLocationMap() { localStorage.setItem('locationMap', JSON.stringify(window.locationMap)); }
+      function showToast(msg) { if (typeof createToast === 'function') createToast(msg); }
+
+      // --- scannedItems logic ---
+      window.scannedItems = window.scannedItems || JSON.parse(localStorage.getItem('scannedItems') || '[]');
+      function saveScannedItems() {
+        localStorage.setItem('scannedItems', JSON.stringify(window.scannedItems));
+      }
+
+      // Use currentMapType only as set by user interaction, do not reset after confirm
+      const input = document.getElementById("mapPromptInput")?.value.trim();
+      const code = document.getElementById("mapPromptCode")?.textContent;
+      // Only use the value set by the selector; do not reset here
+      const currentMapType = window.currentMapType || window._selectedType || '';
+      // Get liveCategory from UI, default to 'Uncategorized'
+      const liveCategory = document.getElementById('liveCategory')?.value || 'Uncategorized';
+
+      if (!input || !code) {
+        showToast("Please enter a valid value.");
+        return;
+      }
+
+      // Before rendering table, add manual entry to scannedItems if not already present
+      const alreadyExists = window.scannedItems.some(
+        item => item.code === code && item.type === currentMapType && item.value === input
+      );
+      if (!alreadyExists) {
+        window.scannedItems.push({
+          code,
+          type: currentMapType,
+          value: input,
+          timestamp: new Date().toLocaleString()
+        });
+        saveScannedItems();
+      }
+
+      if (currentMapType === "product") {
+        window.upcToItem[code] = input;
+        saveUPCMap();
+        showToast(`Mapped ${code} to Product: ${input}`);
+        updateMapStatusDisplay(); // Refresh status display
+        if (typeof renderLiveScanTable === "function") renderLiveScanTable(); // Refresh the scanned items table
+        // --- Update sessionMap for product mappings with category ---
+        if (!window.sessionMap) window.sessionMap = {};
+        if (!window.sessionMap[input]) window.sessionMap[input] = { count: 0 };
+        window.sessionMap[input].count += 1;
+        window.sessionMap[input].category = liveCategory;
+        window.sessionMap[input].location = localStorage.getItem('activeBay') || '';
+      } else if (currentMapType === "bay") {
+        window.locationMap[code] = input;
+        saveLocationMap();
+        showToast(`Mapped ${code} to Bay: ${input}`);
+        updateMapStatusDisplay();
+        if (typeof renderLiveScanTable === "function") renderLiveScanTable();
+      } else if (currentMapType === "esl") {
+        window.upcToItem[code] = input;
+        saveUPCMap();
+        showToast(`Mapped ${code} to ESL: ${input}`);
+        updateMapStatusDisplay();
+        if (typeof renderLiveScanTable === "function") renderLiveScanTable();
+      }
+
+      // Do NOT reset window.currentMapType here; keep it as last user selection
+      // Do NOT reset any category or map type radio/toggle UI here
+      const modal = document.getElementById("mapPromptModal");
+      if (modal) modal.style.display = "none";
+      const inputSection = document.getElementById("mapInputSection");
+      if (inputSection) inputSection.classList.add("hidden");
+      const inputField = document.getElementById("mapPromptInput");
+      if (inputField) inputField.value = "";
+    });
+  }
+});
