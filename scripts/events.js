@@ -6,6 +6,109 @@ export function initEventListeners() {
 
   setupTabNavigation();
 
+  // --- Appearance Controls ---
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  if (darkModeToggle) {
+    const darkPref = localStorage.getItem('config_darkMode');
+    if (darkPref === 'true') document.body.classList.add('dark-mode');
+    darkModeToggle.checked = darkPref === 'true';
+    darkModeToggle.addEventListener('change', () => {
+      const enabled = darkModeToggle.checked;
+      localStorage.setItem('config_darkMode', enabled);
+      document.body.classList.toggle('dark-mode', enabled);
+      createToast(`🌓 Dark mode ${enabled ? 'enabled' : 'disabled'}`);
+    });
+  }
+
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  if (fontSizeSelect) {
+    const savedSize = localStorage.getItem('config_fontSize') || 'medium';
+    document.body.classList.add(`font-${savedSize}`);
+    fontSizeSelect.value = savedSize;
+    fontSizeSelect.addEventListener('change', () => {
+      const newSize = fontSizeSelect.value;
+      document.body.classList.remove('font-small', 'font-medium', 'font-large');
+      document.body.classList.add(`font-${newSize}`);
+      localStorage.setItem('config_fontSize', newSize);
+      createToast(`🔠 Font size set to ${newSize}`);
+    });
+  }
+
+  // --- Scan Behavior Toggles ---
+  const batchScanToggle = document.getElementById('batchScanToggle');
+  if (batchScanToggle) {
+    const saved = localStorage.getItem('config_batchScan') === 'true';
+    batchScanToggle.checked = saved;
+    window.batchScanEnabled = saved;
+    batchScanToggle.addEventListener('change', () => {
+      window.batchScanEnabled = batchScanToggle.checked;
+      localStorage.setItem('config_batchScan', batchScanToggle.checked);
+      createToast(`🔄 Batch Scan ${batchScanToggle.checked ? 'enabled' : 'disabled'}`);
+    });
+  }
+
+  // --- Autosave Controls ---
+  const autosaveToggle = document.getElementById('autosaveToggle');
+  const autosaveIntervalSelect = document.getElementById('autosaveIntervalSelect');
+  let autosaveIntervalId = null;
+
+  function startAutosave(minutes) {
+    if (autosaveIntervalId) clearInterval(autosaveIntervalId);
+    autosaveIntervalId = setInterval(() => {
+      localStorage.setItem('savedSession', JSON.stringify(window.sessionMap || {}));
+      console.log('💾 Autosave complete');
+    }, minutes * 60 * 1000);
+  }
+
+  if (autosaveToggle) {
+    const enabled = localStorage.getItem('config_autosave') === 'true';
+    autosaveToggle.checked = enabled;
+
+    if (enabled && autosaveIntervalSelect) {
+      const savedMinutes = parseInt(localStorage.getItem('config_autosaveInterval') || '5', 10);
+      startAutosave(savedMinutes);
+    }
+
+    autosaveToggle.addEventListener('change', () => {
+      localStorage.setItem('config_autosave', autosaveToggle.checked);
+      if (!autosaveToggle.checked) {
+        clearInterval(autosaveIntervalId);
+        createToast('⛔ Autosave disabled');
+      } else {
+        const mins = parseInt(autosaveIntervalSelect?.value || '5', 10);
+        startAutosave(mins);
+        createToast(`✅ Autosave enabled (every ${mins} min)`);
+      }
+    });
+  }
+
+  if (autosaveIntervalSelect) {
+    const saved = localStorage.getItem('config_autosaveInterval') || '5';
+    autosaveIntervalSelect.value = saved;
+
+    autosaveIntervalSelect.addEventListener('change', () => {
+      const mins = parseInt(autosaveIntervalSelect.value, 10);
+      localStorage.setItem('config_autosaveInterval', mins);
+      if (autosaveToggle?.checked) {
+        startAutosave(mins);
+        createToast(`🔄 Autosave interval updated to ${mins} min`);
+      }
+    });
+  }
+
+  const numericKeypadToggle = document.getElementById('numericKeypadToggle');
+  if (numericKeypadToggle) {
+    const saved = localStorage.getItem('config_numericKeypad') === 'true';
+    numericKeypadToggle.checked = saved;
+    document.body.classList.toggle('numeric-keypad', saved);
+    numericKeypadToggle.addEventListener('change', () => {
+      const enabled = numericKeypadToggle.checked;
+      localStorage.setItem('config_numericKeypad', enabled);
+      document.body.classList.toggle('numeric-keypad', enabled);
+      createToast(`🔢 Numeric Keypad ${enabled ? 'enabled' : 'disabled'}`);
+    });
+  }
+
   // Clear only inventory session keys
   const clearSessionBtn = document.getElementById('clearSession');
   if (clearSessionBtn) {
@@ -442,6 +545,44 @@ export function initEventListeners() {
     toastsCheckbox.addEventListener('change', () => {
       localStorage.setItem('config_showToasts', toastsCheckbox.checked);
       createToast(`Toasts ${toastsCheckbox.checked ? 'enabled' : 'disabled'}`);
+    });
+  }
+
+  // --- Advanced Tools ---
+  const downloadBackupBtn = document.getElementById('downloadBackupBtn');
+  if (downloadBackupBtn) {
+    downloadBackupBtn.addEventListener('click', () => {
+      const backup = {
+        sessionMap: window.sessionMap || {},
+        locationMap: JSON.parse(localStorage.getItem('locationMap') || '{}'),
+        upcToItemMap: JSON.parse(localStorage.getItem('upcToItemMap') || '{}'),
+        eslToUPCMap: JSON.parse(localStorage.getItem('eslToUPCMap') || '{}'),
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `inventory_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      createToast('📦 Backup downloaded.');
+    });
+  }
+
+  const cleanStaleSessionsBtn = document.getElementById('cleanStaleSessions');
+  if (cleanStaleSessionsBtn) {
+    cleanStaleSessionsBtn.addEventListener('click', () => {
+      let removed = 0;
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('inventorySession_')) {
+          const val = localStorage.getItem(key);
+          if (val && val === '{}' || val === JSON.stringify({})) {
+            localStorage.removeItem(key);
+            removed++;
+          }
+        }
+      });
+      createToast(`🧹 Removed ${removed} stale session${removed !== 1 ? 's' : ''}`);
+      if (removed > 0) location.reload();
     });
   }
 
