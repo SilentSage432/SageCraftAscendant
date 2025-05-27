@@ -295,9 +295,11 @@ section {
 
 /* --- Entry Field Layout --- */
 
+/* Entry field layout for controls section */
 #entryControls {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
   gap: 10px;
   align-items: center;
   justify-content: center;
@@ -931,6 +933,23 @@ tbody tr:hover {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+/* --- On-Hand Counts Section --- */
+#onhand {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/* Ensure right-side textarea container is centered and has a max width */
+.onhand-textarea-container,
+#onhand-textarea-container {
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
 }
 /* --- Animations --- */
 
