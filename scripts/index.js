@@ -1,4 +1,4 @@
-import { createToast, updateMapStatusDisplay, restoreFocusToEntry, setupMoreOptionsToggle } from './ui.js';
+import { createToast, updateMapStatusDisplay, restoreFocusToEntry, setupMoreOptionsToggle, updateLiveTable } from './ui.js';
 import { initAudit } from './audit.js';
 import { initDropbox } from './dropbox.js';
 import {
@@ -35,7 +35,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTemplateExportButton();
 
   window.liveCounts = window.liveCounts || {};
-  window.updateLiveTable = window.updateLiveTable || function () {
-    console.warn('⚠️ updateLiveTable function is not yet defined.');
-  };
+  window.updateLiveTable = updateLiveTable;
 });

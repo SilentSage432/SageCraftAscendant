@@ -90,3 +90,119 @@ export function setupMoreOptionsToggle() {
     });
   }
 }
+
+export function updateLiveTable() {
+  const tableBody = document.querySelector('#liveScanTableBody');
+  if (!tableBody || !window.sessionMap) return;
+
+  console.log('[🔍] Rendering live table from sessionMap:', window.sessionMap);
+
+  tableBody.innerHTML = '';
+
+  const entries = Object.entries(window.sessionMap);
+  if (entries.length === 0) {
+    const row = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 5;
+    emptyCell.textContent = '📭 No scanned items yet.';
+    emptyCell.style.textAlign = 'center';
+    row.appendChild(emptyCell);
+    tableBody.appendChild(row);
+    return;
+  }
+
+  entries.forEach(([itemNum, data]) => {
+    const row = document.createElement('tr');
+
+    const itemCell = document.createElement('td');
+    itemCell.textContent = itemNum;
+    row.appendChild(itemCell);
+
+    const countCell = document.createElement('td');
+    countCell.textContent = data.count || 0;
+    row.appendChild(countCell);
+
+    const categoryCell = document.createElement('td');
+    categoryCell.textContent = data.category || 'Uncategorized';
+    row.appendChild(categoryCell);
+
+    const locationCell = document.createElement('td');
+    locationCell.textContent = data.location || '';
+    row.appendChild(locationCell);
+
+    const editCell = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.textContent = '✏️ Edit';
+    editButton.classList.add('edit-btn');
+    editButton.addEventListener('click', () => {
+      showEditModal(itemNum, data.count, (newVal) => {
+        data.count = newVal;
+        window.liveCounts[itemNum] = newVal;
+        updateLiveTable();
+      });
+    });
+    editCell.appendChild(editButton);
+    row.appendChild(editCell);
+
+    tableBody.appendChild(row);
+  });
+}
+// Modal-driven edit for item count
+export function showEditModal(itemNum, currentCount, onConfirm) {
+  // Remove existing modal if present
+  const existing = document.getElementById('editModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <h3>Edit Count for Item ${itemNum}</h3>
+        <input type="number" id="editItemCount" value="${currentCount}" min="0" />
+        <div class="modal-buttons">
+          <button id="confirmEditBtn">✅ Save</button>
+          <button id="cancelEditBtn">❌ Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  Object.assign(modal.style, {
+    position: 'fixed',
+    top: '0', left: '0',
+    width: '100%', height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: '10000'
+  });
+
+  modal.querySelector('.modal-content').style.cssText = `
+    background: #111;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 300px;
+  `;
+
+  modal.querySelector('.modal-buttons').style.cssText = `
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById('confirmEditBtn').onclick = () => {
+    const val = parseInt(document.getElementById('editItemCount').value, 10);
+    if (!isNaN(val)) {
+      onConfirm(val);
+      modal.remove();
+    }
+  };
+  document.getElementById('cancelEditBtn').onclick = () => modal.remove();
+}

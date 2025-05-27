@@ -25,9 +25,16 @@ window.handleManualScan = function (e) {
   if (itemNum) {
     if (!window.sessionMap) window.sessionMap = {};
     if (!window.sessionMap[itemNum]) {
-      window.sessionMap[itemNum] = { count: 0, category, location: bayMap[itemNum] || '' };
+      window.sessionMap[itemNum] = { count: 0 };
     }
     window.sessionMap[itemNum].count += quantity;
+    console.log('[🧪] Added to sessionMap:', itemNum, window.sessionMap[itemNum]);
+    window.sessionMap[itemNum].category = category || window.sessionMap[itemNum].category || '';
+    window.sessionMap[itemNum].location = bayMap[itemNum] || window.sessionMap[itemNum].location || '';
+    if (typeof window.updateLiveTable === 'function') {
+      console.log('[🧪] Calling updateLiveTable for', itemNum, window.sessionMap[itemNum]);
+      window.updateLiveTable();
+    }
     createToast(`✅ Added ${quantity} to Item #${itemNum} (${category})`);
     window.dispatchEvent(new CustomEvent('session-updated'));
     return;
@@ -41,7 +48,19 @@ window.handleManualScan = function (e) {
   const label = document.getElementById('mapPromptLabel');
 
   modal.classList.remove('hidden');
-  modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Forcefully center modal with fixed positioning and z-index for visibility, and ensure vibrant, visible modal
+  modal.style.display = 'flex';
+  modal.style.position = 'fixed';
+  modal.style.top = '50%';
+  modal.style.left = '50%';
+  modal.style.transform = 'translate(-50%, -50%)';
+  modal.style.zIndex = '9999';
+  modal.style.background = '#1a0033'; // deep purple background
+  modal.style.border = '2px solid #a972ff';
+  modal.style.padding = '2rem';
+  modal.style.borderRadius = '12px';
+  modal.style.boxShadow = '0 0 20px #a972ff';
+  modal.style.color = '#fff';
   codeSpan.textContent = code;
   inputSection.classList.add('hidden');
   inputField.value = '';
@@ -73,23 +92,44 @@ window.handleManualScan = function (e) {
     const code = window._mappingCode;
     if (!value || !type || !code) return;
 
+    let mappedItemNum = '';
     if (type === 'esl') {
       eslMap[code] = value;
       localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
       createToast(`🔗 ESL ${code} linked to Item #${value}`);
+      mappedItemNum = value;
     } else if (type === 'product') {
       upcMap[code] = value;
       localStorage.setItem('upcToItemMap', JSON.stringify(upcMap));
       createToast(`🔗 Product code ${code} mapped to Item #${value}`);
+      mappedItemNum = value;
     } else if (type === 'bay') {
       bayMap[code] = value;
       localStorage.setItem('locationMap', JSON.stringify(bayMap));
       createToast(`📍 Bay ${code} mapped to "${value}"`);
+      mappedItemNum = code;
     }
 
+    // Re-run the scan now that the mapping exists, using correct quantity and category from live entry
+    const qty = parseInt(document.getElementById('liveQty')?.value || '1', 10);
+    const cat = document.getElementById('liveCategory')?.value || 'Uncategorized';
+    window.handleManualScan({ detail: { code: mappedItemNum, quantity: qty, category: cat } });
+
+    // Hide modal forcibly
+    modal.style.display = 'none';
     modal.classList.add('hidden');
-    updateMapStatusDisplay(bayMap, upcMap, eslMap);
+    updateMapStatusDisplay(
+      JSON.parse(localStorage.getItem('locationMap') || '{}'),
+      JSON.parse(localStorage.getItem('upcToItemMap') || '{}'),
+      JSON.parse(localStorage.getItem('eslToUPCMap') || '{}')
+    );
   };
+
+  // Always update the live table after a scan (manual or mapped)
+  if (typeof window.updateLiveTable === 'function') {
+    console.log('[🧪] updateLiveTable firing from handleManualScan');
+    window.updateLiveTable();
+  }
 };
 
 window.addEventListener('manual-scan', window.handleManualScan);

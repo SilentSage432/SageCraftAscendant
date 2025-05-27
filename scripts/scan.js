@@ -1,12 +1,18 @@
 import { updateMapStatusDisplay } from './ui.js';
 
+// Ensure global fallback for itemCategory
+// if (!window.itemCategory) window.itemCategory = 'uncategorized';
+
 function resolveScanCode(code) {
   const trimmed = code.trim();
-  if (trimmed.length === 13 && trimmed.startsWith('0')) {
-    return { type: 'esl', upc: trimmed, item: null };
+  const match = trimmed.match(/\d{6,}/); // Extract 6+ digit number
+  const cleanCode = match ? match[0] : trimmed;
+
+  if (cleanCode.length === 13 && cleanCode.startsWith('0')) {
+    return { type: 'esl', upc: cleanCode, item: null };
   }
-  if (trimmed.length === 12 && /^\d+$/.test(trimmed)) {
-    return trimmed;
+  if (cleanCode.length === 12 && /^\d+$/.test(cleanCode)) {
+    return cleanCode;
   }
   return null;
 }
@@ -63,6 +69,20 @@ function processScan(item) {
     window.liveCounts[item] = 1;
   } else {
     window.liveCounts[item] += 1;
+  }
+
+  // Update sessionMap to reflect liveCounts and itemCategory
+  if (!window.sessionMap) window.sessionMap = {};
+  if (!window.sessionMap[item]) {
+    window.sessionMap[item] = {
+      item: item,
+      count: window.liveCounts[item],
+      category: window.itemCategory || 'uncategorized',
+      location: window.locationMap?.[item] || '',
+      editable: true // placeholder for enabling inline edits
+    };
+  } else {
+    window.sessionMap[item].count = window.liveCounts[item];
   }
 
   if (typeof window.updateLiveTable === 'function') {
