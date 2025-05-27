@@ -41,6 +41,7 @@ window.handleManualScan = function (e) {
   const label = document.getElementById('mapPromptLabel');
 
   modal.classList.remove('hidden');
+  modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
   codeSpan.textContent = code;
   inputSection.classList.add('hidden');
   inputField.value = '';
@@ -94,6 +95,24 @@ window.handleManualScan = function (e) {
 window.addEventListener('manual-scan', window.handleManualScan);
 
 export function initEventListeners() {
+  // --- Live Entry scanner input handler ---
+  const liveEntry = document.getElementById('liveEntry');
+  if (liveEntry) {
+    liveEntry.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        const quantity = parseInt(document.getElementById('liveQty')?.value || '1', 10);
+        const category = document.getElementById('liveCategory')?.value || 'Uncategorized';
+        const value = liveEntry.value.trim();
+        if (value && typeof window.handleManualScan === 'function') {
+          window.handleManualScan({ detail: { code: value, quantity, category } });
+          liveEntry.value = '';
+          document.getElementById('liveQty').value = '1';
+          document.getElementById('liveCategory').value = 'Uncategorized';
+          liveEntry.focus();
+        }
+      }
+    });
+  }
   console.log('🎛️ Event listeners initialized');
   // Update map status display on startup with data from localStorage
   updateMapStatusDisplay(
