@@ -206,3 +206,39 @@ export function showEditModal(itemNum, currentCount, onConfirm) {
   };
   document.getElementById('cancelEditBtn').onclick = () => modal.remove();
 }
+// Renders a UI log for bay audit durations
+export function renderBayAuditLog(auditTimes) {
+  const existingSection = document.getElementById('bayAuditLog');
+  if (existingSection) existingSection.remove();
+
+  const container = document.createElement('section');
+  container.id = 'bayAuditLog';
+  container.innerHTML = `
+    <h3>📋 Bay Audit Sessions</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="border-bottom: 1px solid #444;">Bay</th>
+          <th style="border-bottom: 1px solid #444;">Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(auditTimes).map(([bay, time]) => `
+          <tr>
+            <td style="padding: 6px; border-bottom: 1px solid #333;">${bay}</td>
+            <td style="padding: 6px; border-bottom: 1px solid #333;">${(time / 1000).toFixed(1)} seconds</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  container.style.cssText = `
+    background: #222;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+  `;
+
+  document.body.appendChild(container);
+}

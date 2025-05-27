@@ -5,6 +5,10 @@ import { updateMapStatusDisplay } from './ui.js';
 window.createToast = createToast;
 window.updateMapStatusDisplay = updateMapStatusDisplay;
 
+// --- Bay Audit Timing State ---
+let currentBay = null;
+let bayAuditTimes = [];
+
 // Show toast and handle unknown scan mappings interactively on manual scan event (modal version)
 console.log('✅ Binding global manual-scan listener');
 
@@ -21,6 +25,32 @@ window.handleManualScan = function (e) {
   if (upcMap[code]) itemNum = upcMap[code];
   else if (eslMap[code]) itemNum = eslMap[code];
   else if (bayMap[code]) itemNum = code;
+
+  // --- Bay Tag UI Handling ---
+  if (bayMap[code]) {
+    // This is a valid bay tag scan
+    localStorage.setItem('activeBay', bayMap[code]);
+    const bayStatusDisplay = document.getElementById('bayStatusDisplay');
+    const closeBayWrapper = document.getElementById('closeBayWrapper');
+
+    // --- BAY TIMER LOGIC ---
+    currentBay = {
+      name: bayMap[code],
+      startTime: Date.now()
+    };
+    console.log(`⏱️ Timer started for bay: ${bayMap[code]}`);
+
+    // Update UI for active bay
+    if (bayStatusDisplay) {
+      bayStatusDisplay.textContent = `📦 Bay Active: ${bayMap[code]}`;
+      bayStatusDisplay.style.color = 'green';
+    }
+    if (closeBayWrapper) {
+      closeBayWrapper.style.display = 'block';
+    }
+    // Optionally, you could return here if you want scanning a bay tag to only update the bay UI.
+    // return;
+  }
 
   if (itemNum) {
     if (!window.sessionMap) window.sessionMap = {};
@@ -388,6 +418,39 @@ export function initEventListeners() {
 
   // Add additional UI button/event listeners here as needed
 
+  // --- Close Bay Button Listener ---
+  const closeBayBtn = document.getElementById('closeBayBtn');
+  if (closeBayBtn) {
+    closeBayBtn.addEventListener('click', () => {
+      const bayStatusDisplay = document.getElementById('bayStatusDisplay');
+      const closeBayWrapper = document.getElementById('closeBayWrapper');
+      // --- BAY TIMER STOP LOGIC ---
+      if (currentBay && currentBay.startTime) {
+        const endTime = Date.now();
+        const durationSeconds = Math.floor((endTime - currentBay.startTime) / 1000);
+        const durationFormatted = `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`;
+
+        bayAuditTimes.push({
+          bay: currentBay.name,
+          duration: durationFormatted,
+          timestamp: new Date().toLocaleString()
+        });
+
+        console.log(`⏹️ Timer stopped for ${currentBay.name}. Duration: ${durationFormatted}`);
+      }
+
+      currentBay = null;
+      if (bayStatusDisplay) {
+        bayStatusDisplay.textContent = '🚫 No Active Bay';
+        bayStatusDisplay.style.color = 'red';
+      }
+      if (closeBayWrapper) {
+        closeBayWrapper.style.display = 'none';
+      }
+      localStorage.removeItem('activeBay');
+    });
+  }
+
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
@@ -461,6 +524,35 @@ export function initEventListeners() {
       fileInput.click();
     });
   }
+
+  // --- Bay Audit Log Export/Reset ---
+  import { renderBayAuditLog } from './ui.js';
+
+  document.getElementById('exportAuditLog')?.addEventListener('click', async () => {
+    // Use global bayAuditTimes object for export
+    if (!window.bayAuditTimes || Object.keys(window.bayAuditTimes).length === 0) {
+      alert('No audit logs to export.');
+      return;
+    }
+    // Load SheetJS
+    const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs');
+    const wsData = [['Bay Name', 'Duration (seconds)']];
+    for (const [bay, duration] of Object.entries(window.bayAuditTimes)) {
+      wsData.push([bay, (duration / 1000).toFixed(1)]);
+    }
+    const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Bay Audit Log');
+    XLSX.writeFile(workbook, 'bay-audit-log.xlsx');
+  });
+
+  document.getElementById('resetAuditLog')?.addEventListener('click', () => {
+    if (confirm('Are you sure you want to reset all bay audit logs?')) {
+      window.bayAuditTimes = {};
+      renderBayAuditLog(window.bayAuditTimes);
+      alert('Audit log cleared.');
+    }
+  });
 
   const moreOptionsBtn = document.getElementById('moreOptionsBtn');
   if (moreOptionsBtn) {
@@ -873,6 +965,21 @@ export function initEventListeners() {
       createToast('📊 Merged Master Report generated.');
     });
   }
+
+  // --- Audit Rotation Button ---
+  document.getElementById('auditRotationBtn')?.addEventListener('click', () => {
+    // Audit rotation logic: cycle through sections and persist state in localStorage
+    const auditSections = ['Appliances', 'Kitchen & Cabinets', 'Millwork'];
+    let currentAuditIndex = parseInt(localStorage.getItem('currentAuditIndex')) || 0;
+
+    const currentSection = auditSections[currentAuditIndex];
+    createToast(`🔍 Auditing: ${currentSection}`);
+    console.log(`🔍 Now auditing section: ${currentSection}`);
+
+    // Move to the next section for next time
+    currentAuditIndex = (currentAuditIndex + 1) % auditSections.length;
+    localStorage.setItem('currentAuditIndex', currentAuditIndex);
+  });
 
   // Override createToast if disabled
   if (localStorage.getItem('config_showToasts') === 'false') {

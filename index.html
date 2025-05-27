@@ -46,6 +46,12 @@
       <div class="fantasy-wrapper electric-vibe">
       <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
+        <div id="bayStatusDisplay" style="margin-bottom: 8px; font-weight: bold; color: red;">
+          🚫 No Active Bay
+        </div>
+        <div id="closeBayWrapper" style="display:none; margin-bottom: 12px;">
+          <button id="closeBayBtn" style="background-color: crimson; color: white;">❌ Close Bay</button>
+        </div>
         <!-- Live map tracking status -->
         <div id="mapStatusDisplay" style="margin-bottom: 12px; font-size: 0.9em; color: #aaf;">
           🧠 Map Status: UPC → 0 | ESL → 0 | Bay Codes → 0
@@ -165,6 +171,8 @@
       <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
         <h2>Export Tools</h2>
         <button id="downloadExcel">⬇️ Download Excel</button>
+        <button id="exportAuditLog">📤 Export Audit Log</button>
+        <button id="resetAuditLog">🗑️ Reset Audit Log</button>
       </section>
 
       <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
