@@ -374,8 +374,9 @@ section {
 }
 
 .grouped-buttons button {
-  flex: 1 1 180px;
-  max-width: 220px;
+  flex: 0 1 auto;
+  min-width: 160px;
+  max-width: 240px;
   padding: 10px 14px;
   font-size: 14px;
   text-align: center;
