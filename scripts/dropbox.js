@@ -194,12 +194,12 @@ window.addEventListener('refresh-dropbox-token', async () => {
 
 // Sync all maps to Dropbox
 window.addEventListener('sync-all-maps', async () => {
-  alert('🛠 Sync logic for maps not yet implemented.');
+  await syncAllMapsToDropbox();
 });
 
 // Restore all maps from Dropbox
 window.addEventListener('restore-all-maps', async () => {
-  alert('🛠 Restore logic for maps not yet implemented.');
+  await restoreAllMapsFromDropbox();
 });
 
 export { generateCodeVerifier, generateCodeChallenge };
