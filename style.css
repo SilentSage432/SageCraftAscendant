@@ -382,6 +382,22 @@ section {
   white-space: nowrap;
 }
 
+/* --- Toast Prompt Styles ---*/
+
+.toast-message {
+  background: #222;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+  opacity: 0.95;
+  transition: opacity 0.5s ease-out;
+}
+
+.toast-message.fade-out {
+  opacity: 0;
+}
+
 /* --- Hidden Import/Export Section --- */
 
 
@@ -1267,4 +1283,33 @@ body::after {
     background: #3b2a72;
     z-index: 1;
   }
+}
+@keyframes fadeScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 10px #8f3aff, 0 0 20px rgba(147, 51, 234, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 16px #a97ff3, 0 0 30px rgba(147, 51, 234, 0.6);
+  }
+}
+
+.toast-message {
+  animation: fadeScaleIn 0.3s ease-out;
+}
+
+.grouped-buttons button:hover,
+.button-grid button:hover,
+.settings-button:hover {
+  animation: pulseGlow 1.2s ease-in-out infinite alternate;
 }

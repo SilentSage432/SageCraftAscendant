@@ -121,15 +121,19 @@
               Auto-Scan Mode
             </label>
 
-            <!-- Group 1: Import / Export (collapsible stays intact) -->
-            <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">
-              📂 Import/Export Options
-            </button>
-            <div id="importExportControls" class="hidden button-grid" aria-hidden="true">
-              <button id="exportBtn">📤 Export Bay Locations</button>
-              <button id="importBtn">📥 Import Bay Locations</button>
-              <button id="exportUPCBtn">📤 Export UPC Mappings</button>
-              <button id="importUPCBtn">📥 Import UPC Mappings</button>
+            <!-- Group 1: Import / Export -->
+            <div class="grouped-buttons">
+              <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">
+                📂 Import/Export Options
+              </button>
+              <div id="importExportControls" class="hidden" aria-hidden="true">
+                <div class="grouped-buttons">
+                  <button id="exportBtn">📤 Export Bay Locations</button>
+                  <button id="importBtn">📥 Import Bay Locations</button>
+                  <button id="exportUPCBtn">📤 Export UPC Mappings</button>
+                  <button id="importUPCBtn">📥 Import UPC Mappings</button>
+                </div>
+              </div>
             </div>
 
             <!-- Group 2: Maintenance Tools -->
@@ -165,13 +169,28 @@
 
       <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
         <h2>Session Controls</h2>
-        <div class="session-button-wrapper">
-          <button id="clearLiveTable">🗑️ Clear Live Table</button>
-          <button id="saveSessionVault">💾 Save Session</button>
-          <button id="loadSession">📥 Load Session</button>
+        <div class="grouped-buttons">
+          <button id="clearLiveTableBtn">🗑️ Clear Live Table</button>
+          <button id="saveSessionBtn">💾 Save Session</button>
+          <button id="loadSessionBtn">📥 Load Session</button>
           <button id="triggerImportExcelSession">📂 Import Excel Session</button>
         </div>
         <input type="file" id="importExcelSession" accept=".xlsx,.xls" style="display:none;" />
+        <div style="margin-top: 15px;">
+          <button id="browseDropboxSessions">📂 Browse Dropbox Sessions</button>
+          <select id="dropboxSessionSelect" style="display:none; margin-top: 8px;"></select>
+        </div>
+        <div style="margin-top: 20px;">
+          <h3>🗃️ Versioned Session Manager</h3>
+          <input id="versionSessionName" type="text" placeholder="Enter session name..." />
+          <button id="saveNamedSession">💾 Save Named Session</button>
+          <br /><br />
+          <select id="namedSessionSelect" style="margin-right: 10px;">
+            <option value="">Select a saved session</option>
+          </select>
+          <button id="loadNamedSession">📥 Load</button>
+          <button id="deleteNamedSession">❌ Delete</button>
+        </div>
       </section>
 
       <section id="mappings" class="tab-section panel-glow" role="tabpanel" aria-label="Mapping Manager">
@@ -267,6 +286,20 @@
           <tbody></tbody>
         </table>
       </section>
+
+      <section id="configPanel" class="tab-section panel-glow" role="region" aria-label="User Config Panel" style="margin-top: 20px;">
+        <h2>⚙️ User Config Panel</h2>
+        <div class="settings-group">
+          <label>
+            <input type="checkbox" id="toggleAutoRestore" checked />
+            Enable Auto-Restore on Startup
+          </label>
+          <label>
+            <input type="checkbox" id="toggleToasts" checked />
+            Show Toast Notifications
+          </label>
+        </div>
+      </section>
       </div>
     </div>
   </main>
@@ -299,8 +332,15 @@
     Inventory Auditor — v2.0.0 ⚡
   </footer>
 
+</footer>
+
+  <!-- Toast container -->
+  <div id="toastContainer" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;"></div>
+
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- Toast system script -->
+  <script type="module" src="scripts/ui.js"></script>
   <!-- Main script -->
   <script type="module" src="scripts/index.js?v=2.0.1"></script>
 </body>

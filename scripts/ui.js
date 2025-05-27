@@ -34,20 +34,35 @@ export function createToast(message, duration = 3000) {
   const toast = document.createElement('div');
   toast.textContent = message;
   Object.assign(toast.style, {
-    position: 'fixed',
-    bottom: '20px',
-    left: '50%',
-    transform: 'translateX(-50%)',
     backgroundColor: '#222',
     color: '#fff',
     padding: '10px 18px',
     borderRadius: '8px',
     fontSize: '14px',
-    zIndex: '9999',
-    textAlign: 'center'
+    marginTop: '10px',
+    opacity: '0.95',
+    transition: 'opacity 0.5s ease-out'
   });
-  document.body.appendChild(toast);
-  setTimeout(() => document.body.removeChild(toast), duration);
+  toast.classList.add('toast-message');
+
+  const container = document.getElementById('toastContainer');
+  if (container) {
+    container.appendChild(toast);
+  } else {
+    document.body.appendChild(toast);
+  }
+
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+  
+    // Fallback: remove the toast after 1s if transitionend never fires
+    const fallback = setTimeout(() => toast.remove(), 1000);
+  
+    toast.addEventListener('transitionend', () => {
+      clearTimeout(fallback);
+      toast.remove();
+    });
+  }, duration);
 }
 
 export function updateMapStatusDisplay(upcToItem, eslToUPC, locationMap) {

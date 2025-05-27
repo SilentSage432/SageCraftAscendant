@@ -1,3 +1,4 @@
+import { createToast } from './ui.js';
 import { updateMapStatusDisplay } from './ui.js';
 
 export function initEventListeners() {
@@ -162,9 +163,9 @@ export function initEventListeners() {
     });
   }
 
-  const loadSessionBtn = document.getElementById('loadFromDropbox');
-  if (loadSessionBtn) {
-    loadSessionBtn.addEventListener('click', () => {
+  const loadFromDropboxBtn = document.getElementById('loadFromDropbox');
+  if (loadFromDropboxBtn) {
+    loadFromDropboxBtn.addEventListener('click', () => {
       const event = new CustomEvent('load-dropbox-session');
       window.dispatchEvent(event);
     });
@@ -215,24 +216,85 @@ export function initEventListeners() {
   const saveSessionBtn = document.getElementById('saveSessionBtn');
   if (saveSessionBtn) {
     saveSessionBtn.addEventListener('click', () => {
-      const event = new CustomEvent('save-session');
-      window.dispatchEvent(event);
+      console.log('💾 Save Session button clicked');
+      const sessionData = JSON.stringify(window.sessionMap || {});
+      localStorage.setItem('savedSession', sessionData);
+      createToast('💾 Session saved to local storage.');
     });
   }
 
   const clearLiveTableBtn = document.getElementById('clearLiveTableBtn');
   if (clearLiveTableBtn) {
     clearLiveTableBtn.addEventListener('click', () => {
-      const event = new CustomEvent('clear-live-table');
-      window.dispatchEvent(event);
+      console.log('🧹 Clear Live Table button clicked');
+      window.sessionMap = {};
+      const table = document.getElementById('liveTableBody');
+      if (table) table.innerHTML = '';
+      createToast('🧹 Live table cleared.');
     });
   }
+
+  // Load session from local storage button
+  const loadSessionBtn = document.getElementById('loadSessionBtn');
+  if (loadSessionBtn) {
+    loadSessionBtn.addEventListener('click', () => {
+      console.log('📥 Load Session button clicked');
+      const data = localStorage.getItem('savedSession');
+      if (data) {
+        window.sessionMap = JSON.parse(data);
+        createToast('🔄 Session loaded from local storage.');
+        const event = new CustomEvent('session-loaded');
+        window.dispatchEvent(event);
+      } else {
+        createToast('⚠️ No saved session found in local storage.');
+      }
+    });
+  }
+
 
   const uploadToExcelBtn = document.getElementById('uploadToExcelBtn');
   if (uploadToExcelBtn) {
     uploadToExcelBtn.addEventListener('click', () => {
       const event = new CustomEvent('upload-excel');
       window.dispatchEvent(event);
+    });
+  }
+
+  // --- Dropbox Sessions Browse/Select ---
+  const browseBtn = document.getElementById('browseDropboxSessions');
+  const sessionSelect = document.getElementById('dropboxSessionSelect');
+
+  if (browseBtn && sessionSelect) {
+    browseBtn.addEventListener('click', async () => {
+      sessionSelect.style.display = 'inline-block';
+      sessionSelect.innerHTML = '<option>Loading sessions...</option>';
+      try {
+        const { listDropboxSessions, loadSelectedDropboxSession } = await import('./dropbox.js');
+        const sessions = await listDropboxSessions();
+        sessionSelect.innerHTML = '<option value="">Select a session</option>';
+        sessions.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          sessionSelect.appendChild(opt);
+        });
+      } catch (err) {
+        sessionSelect.innerHTML = '<option>Error loading sessions</option>';
+        console.error(err);
+      }
+    });
+
+    sessionSelect.addEventListener('change', async () => {
+      const filename = sessionSelect.value;
+      if (!filename) return;
+      try {
+        const { loadSelectedDropboxSession } = await import('./dropbox.js');
+        const onHandInput = document.getElementById('onHandInput');
+        const updateLiveTable = window.updateLiveTable || (() => {});
+        await loadSelectedDropboxSession(filename, window.sessionMap, onHandInput, updateLiveTable);
+      } catch (err) {
+        console.error('Failed to load selected session:', err);
+      }
     });
   }
 
@@ -297,6 +359,95 @@ export function initEventListeners() {
       const modal = document.getElementById('trendsModal');
       if (modal) modal.style.display = 'flex';
     });
+  }
+
+  // Session versioning support
+  const saveNamedSessionBtn = document.getElementById('saveNamedSession');
+  const versionSessionNameInput = document.getElementById('versionSessionName');
+  const namedSessionSelect = document.getElementById('namedSessionSelect');
+  const loadNamedSessionBtn = document.getElementById('loadNamedSession');
+  const deleteNamedSessionBtn = document.getElementById('deleteNamedSession');
+
+  // Load saved session keys into dropdown
+  function refreshNamedSessionDropdown() {
+    namedSessionSelect.innerHTML = '<option value="">Select a saved session</option>';
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('inventorySession_')) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = key.replace('inventorySession_', '');
+        namedSessionSelect.appendChild(opt);
+      }
+    });
+  }
+
+  if (saveNamedSessionBtn && versionSessionNameInput) {
+    saveNamedSessionBtn.addEventListener('click', () => {
+      const name = versionSessionNameInput.value.trim();
+      if (!name) return alert('Please enter a session name.');
+      localStorage.setItem(`inventorySession_${name}`, JSON.stringify(window.sessionMap || {}));
+      createToast(`💾 Saved session: ${name}`);
+      refreshNamedSessionDropdown();
+      versionSessionNameInput.value = '';
+    });
+  }
+
+  if (loadNamedSessionBtn && namedSessionSelect) {
+    loadNamedSessionBtn.addEventListener('click', () => {
+      const key = namedSessionSelect.value;
+      if (!key) return;
+      const data = localStorage.getItem(key);
+      if (data) {
+        window.sessionMap = JSON.parse(data);
+        createToast(`📥 Loaded session: ${key.replace('inventorySession_', '')}`);
+        const event = new CustomEvent('session-loaded');
+        window.dispatchEvent(event);
+      }
+    });
+  }
+
+  if (deleteNamedSessionBtn && namedSessionSelect) {
+    deleteNamedSessionBtn.addEventListener('click', () => {
+      const key = namedSessionSelect.value;
+      if (!key) return;
+      if (confirm(`Are you sure you want to delete "${key.replace('inventorySession_', '')}"?`)) {
+        localStorage.removeItem(key);
+        createToast(`❌ Deleted session: ${key.replace('inventorySession_', '')}`);
+        refreshNamedSessionDropdown();
+      }
+    });
+  }
+
+  if (namedSessionSelect) {
+    refreshNamedSessionDropdown();
+  }
+
+  // --- Config Panel Settings ---
+  const autoRestoreCheckbox = document.getElementById('toggleAutoRestore');
+  const toastsCheckbox = document.getElementById('toggleToasts');
+
+  // Load saved config values
+  if (autoRestoreCheckbox) {
+    const stored = localStorage.getItem('config_autoRestore');
+    autoRestoreCheckbox.checked = stored !== 'false'; // default true
+    autoRestoreCheckbox.addEventListener('change', () => {
+      localStorage.setItem('config_autoRestore', autoRestoreCheckbox.checked);
+      createToast(`Auto-Restore ${autoRestoreCheckbox.checked ? 'enabled' : 'disabled'}`);
+    });
+  }
+
+  if (toastsCheckbox) {
+    const stored = localStorage.getItem('config_showToasts');
+    toastsCheckbox.checked = stored !== 'false'; // default true
+    toastsCheckbox.addEventListener('change', () => {
+      localStorage.setItem('config_showToasts', toastsCheckbox.checked);
+      createToast(`Toasts ${toastsCheckbox.checked ? 'enabled' : 'disabled'}`);
+    });
+  }
+
+  // Override createToast if disabled
+  if (localStorage.getItem('config_showToasts') === 'false') {
+    window.createToast = () => {};
   }
 }
 

@@ -161,32 +161,91 @@ export async function refreshAccessToken() {
     }
   }
   
-  export async function loadSessionFromDropbox(liveCounts, onHandInput, updateLiveTable) {
-    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: '/beta-test-1/active_session.json' })
-      }
-    });
-  
-    if (!response.ok) {
-      const err = await response.text();
-      alert(`❌ Failed to load: ${err}`);
-      return;
+export async function loadSessionFromDropbox(liveCounts, onHandInput, updateLiveTable) {
+  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+      'Dropbox-API-Arg': JSON.stringify({ path: '/beta-test-1/active_session.json' })
     }
-  
-    const text = await response.text();
-    const session = JSON.parse(text);
-    if (!session.liveCounts) return alert('❌ Invalid session format.');
-    Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-    Object.entries(session.liveCounts).forEach(([k, v]) => {
-      liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-    });
-    onHandInput.value = session.onHandText || '';
-    updateLiveTable();
-    alert('📥 Session loaded from Dropbox!');
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    alert(`❌ Failed to load: ${err}`);
+    return;
   }
+
+  const text = await response.text();
+  const session = JSON.parse(text);
+  if (!session.liveCounts) return alert('❌ Invalid session format.');
+  Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+  Object.entries(session.liveCounts).forEach(([k, v]) => {
+    liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+  });
+  onHandInput.value = session.onHandText || '';
+  updateLiveTable();
+  alert('📥 Session loaded from Dropbox!');
+}
+
+// List all Dropbox session files in /beta-test-1
+export async function listDropboxSessions() {
+  const response = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      path: '/beta-test-1',
+      recursive: false,
+      include_media_info: false,
+      include_deleted: false,
+      include_has_explicit_shared_members: false
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.error('❌ Failed to list Dropbox folder:', err);
+    return [];
+  }
+
+  const data = await response.json();
+  const sessionFiles = data.entries
+    .filter(entry => entry.name.endsWith('.json') && entry.name.startsWith('session_'))
+    .map(entry => entry.name);
+
+  return sessionFiles;
+}
+
+// Load a selected Dropbox session file by filename
+export async function loadSelectedDropboxSession(filename, liveCounts, onHandInput, updateLiveTable) {
+  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+      'Dropbox-API-Arg': JSON.stringify({ path: `/beta-test-1/${filename}` })
+    }
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    alert(`❌ Failed to load ${filename}: ${err}`);
+    return;
+  }
+
+  const text = await response.text();
+  const session = JSON.parse(text);
+  if (!session.liveCounts) return alert(`❌ Invalid session format in ${filename}`);
+  Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
+  Object.entries(session.liveCounts).forEach(([k, v]) => {
+    liveCounts[k] = { count: v.count, category: v.category, location: v.location };
+  });
+  onHandInput.value = session.onHandText || '';
+  updateLiveTable();
+  alert(`📥 ${filename} loaded from Dropbox!`);
+}
   
   export async function beginDropboxLogin() {
     const verifier = generateCodeVerifier();

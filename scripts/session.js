@@ -8,6 +8,19 @@ export function initSessionTools() {
   // Clean up stale sessions on load
   cleanEmptySessions();
 
+  // Auto-restore last saved session if it exists
+  const savedSession = localStorage.getItem('savedSession');
+  if (savedSession) {
+    try {
+      window.sessionMap = JSON.parse(savedSession);
+      const event = new CustomEvent('session-loaded');
+      window.dispatchEvent(event);
+      console.log('🔄 Auto-restored previous session from localStorage.');
+    } catch (err) {
+      console.error('❌ Failed to auto-restore session:', err);
+    }
+  }
+
   // Optional: log how many session entries are stored
   const keys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
   console.log(`🗂️ Found ${keys.length} stored session${keys.length !== 1 ? 's' : ''}`);
