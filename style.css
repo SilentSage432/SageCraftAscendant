@@ -350,9 +350,6 @@ section {
 
 /* --- Hidden Import/Export Section --- */
 
-.hidden {
-  display: none !important;
-}
 
 /* --- Dark Fantasy Vibe Enhancements --- */
 
@@ -683,7 +680,7 @@ body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('/images/magic-overlay.png') repeat;
+  background: url('/icon/magic-overlay.png') repeat;
   opacity: 0.015;
   pointer-events: none;
   z-index: -1;
@@ -982,7 +979,7 @@ tbody tr:hover {
   color: #f0e6ff;
   position: relative;
   animation: fadeIn 0.4s ease-out;
-  background-image: url('/images/mystic-sigil-fade.png');
+  background-image: url('/icon/mystic-sigil-fade.png');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

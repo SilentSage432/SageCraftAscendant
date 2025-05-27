@@ -1,3 +1,111 @@
+// === Inventory Tool: script-archive.js Analysis & Modularization Catalog ===
+//
+// -- This summary catalogs all functions, logic blocks, global variables, button handlers,
+//    and utilities defined in this file, to support modular migration/refactoring. --
+//
+// --- GLOBAL VARIABLES & CONSTANTS ---
+// - cleanStaleSessionsBtn: Button element for clearing empty sessions
+// - syncBothBtn: Button element for syncing both maps to Dropbox
+// - liveCounts: Main session inventory object (global, window.liveCounts)
+// - autosaveTimer: Timer for autosave debounce (null by default)
+// - upcToItem: UPC→Item mapping (global, window.upcToItem)
+// - locationMap: Location code→Name mapping (global, window.locationMap)
+// - eslToUPC: ESL→UPC mapping (global, window.eslToUPC)
+// - lastScannedLocationCode: Last scanned location code (string)
+// - settingsTarget: DOM node for settings controls
+// - currentESLItem: Stores ESL code for modal prompts
+// - currentLocation: Current bay/location name (string)
+// - newItemSound: Audio object for scan sound
+// - soundEnabled: Boolean, from localStorage, for scan sound
+// - Various DOM elements for buttons and input fields (e.g. liveEntryInput, liveQtyInput, categoryInput, etc.)
+
+// --- MAPPING/SYNC/LOCALSTORAGE UTILITIES ---
+// - saveUPCMap(): Save upcToItem to localStorage and update UI/stats; triggers autosync if enabled
+// - saveLocationMap(): Save locationMap to localStorage and update UI/stats; triggers autosync if enabled
+// - saveESLMap(): Save eslToUPC to localStorage, update UI, show toast; triggers autosync if enabled
+// - updateMapStatusDisplay(): Update mapping status display in UI
+// - normalizeUPC(code): Normalize UPC code (strip non-digits, remove leading '0' for 13-digit codes)
+// - resolveScanCode(code): Universal scan code resolver (UPC, reverse, ESL, or null)
+// - updateRotationDate(category): Update audit rotation date for a category in localStorage
+
+// --- DROPBOX INTEGRATION ---
+// - syncAllMapsToDropbox(silent): Upload upcToItem and locationMap to Dropbox (backup)
+// - refreshAccessToken(): Refresh Dropbox OAuth2 access token using refresh_token
+// - getDropboxAccessToken(): Get or refresh Dropbox access token
+// - saveSessionToDropbox(): Save current session (liveCounts, onHandText) to Dropbox
+// - loadSessionFromDropbox(): Load session from Dropbox (active_session.json)
+// - setupDropboxAutoBackup(intervalMinutes): Auto-backup session/maps to Dropbox every X minutes
+
+// --- UI/DOM LOGIC & BUTTON HANDLERS ---
+// - Clean Empty Sessions: Button handler for removing empty/corrupt sessions from localStorage
+// - ESL Modal Handler: Button handler for mapping ESL tag to item number via modal
+// - ESL Tag Modal Handler: Button handler for mapping ESL tag to item and updating both maps
+// - Render Audit Rotation Table: Function to render audit rotation status in a table
+// - Local Session Tools, Mapping Management, Advanced Tools: Button handlers for various session/map actions (save/load/export/import/merge)
+// - Trends Modal Button: Opens trends modal and triggers Chart.js rendering
+// - Collapsible Dropdown Logic: For toggling collapsible UI sections
+// - Dropbox OAuth2 PKCE: beginDropboxLogin(), handleDropboxCallback() for Dropbox login flow
+// - Audit Reminder Toast: On app load, show toast if audits are due/overdue
+// - Refresh Audit Log Button: Refreshes audit table and shows toast
+// - Navigation Tab Handler: Updates audit table on tab change
+// - Add Live Item Button: Handler for adding scanned item, runs scan code resolution, triggers mapping/prompt logic
+// - Clear Live Table Button: Handler for clearing all liveCounts (with safety checks)
+// - Toggle Advanced Controls: Show/hide advanced controls in UI
+// - Critical Button Listener Audit: Ensures all critical buttons have listeners (addLiveItem, clearLiveTable, uploadOnHandFile, etc.)
+// - Merge Master Report Button: Generates and downloads Excel report of all session/maps/audit data (with XLSX utils and custom styling)
+// - Scan Sound Controls: playNewItemSound(), sound toggle checkbox in settings
+// - Backup All Data Button: Exports all localStorage/session/mapping data as JSON
+// - Dropbox Load Options Selector: Loads session from Dropbox (active or most recent auto-backup)
+// - Dropbox Connection Buttons: Connect, reset, and restore maps from Dropbox
+// - Dropbox Backup Browser Modal: UI to browse and restore from Dropbox backups
+// - Sync/Backup Clean UPC Map: Button to upload cleaned upcToItem to Dropbox
+// - Restore Both Maps: Button to restore all maps from Dropbox (with toast/status)
+// - Lock Bay Map/Restore Locked Map: Buttons to save/restore locked bay maps in Dropbox
+// - Reset All Maps: Button to backup and clear all mappings (fresh start)
+
+// --- CUSTOM PROMPT & SCAN LOGIC ---
+// - guessCodeType(code): Guess type of code (location, product, esl) by regex
+// - showCustomPrompt(item): Smart modal prompt for unrecognized code, resolves to type (location/product/esl/cancel)
+// - processScan: (window.processScan) [not defined in this file, but referenced for scan logic]
+// - liveEntryInput keydown/input: Handles Enter key and scanner input for scan field
+// - showScanMappingLog(scannedCode, mappedItem): Shows log/toast for mapped scan (truncated in provided code)
+
+// --- MISCELLANEOUS UI/UTILITY ---
+// - Various DOM element creation and injection for settings, mapping overviews, status, and controls
+// - Category color coding and Excel sheet styling for reports
+// - Toast notifications for user feedback throughout
+
+// --- MODULARIZATION CANDIDATES (for future migration) ---
+// 1. Mapping Management:
+//    - saveUPCMap, saveLocationMap, saveESLMap, updateMapStatusDisplay, normalizeUPC, resolveScanCode
+//    - Mapping stats UI updates
+// 2. Dropbox Integration:
+//    - All Dropbox token, sync, backup, restore, auto-backup, and PKCE logic
+//    - Session save/load to Dropbox
+// 3. Audit Rotation/Log:
+//    - updateRotationDate, renderAuditRotationTable, audit reminder toast, refresh audit log
+// 4. Scan/Entry Logic:
+//    - Add Live Item, scan input handlers, showCustomPrompt, guessCodeType, processScan references
+// 5. UI/Settings Panel:
+//    - Settings DOM injection, backup/export/import controls, sound toggle, advanced controls toggle, collapsible logic
+// 6. Excel Report Generation:
+//    - Merge Master Report, XLSX utils, sheet styling
+// 7. Utility/Helpers:
+//    - Toasts, modal prompts, mapping log, location status, category suggestions, etc.
+// 8. Button/Listener Initialization:
+//    - All DOMContentLoaded button hookups, critical button audit
+
+// --- SUMMARY ---
+// The code is highly modularization-ready. Key logical boundaries exist for:
+//   - Mapping utilities (CRUD, normalization, stats, storage)
+//   - Dropbox integration (token, sync, restore, backup browser)
+//   - Audit rotation/log (UI, rotation logic, reminders)
+//   - Scan input and code resolution (prompting, mapping, processScan)
+//   - UI/DOM controls (settings, advanced, sound, feedback)
+//   - Report/export generation (Excel, backup, session data)
+//   - Button/handler initialization (robust, id-based)
+//
+// Each of these can be refactored into ES modules or classes for maintainability.
   // --- Clean Empty Sessions Button ---
   const cleanStaleSessionsBtn = document.getElementById('cleanStaleSessions');
   if (cleanStaleSessionsBtn) {

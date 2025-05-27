@@ -136,6 +136,55 @@ export function initEventListeners() {
       alert('🔌 Dropbox disconnected.');
     });
   }
+
+  // Additional button listeners
+  const saveSessionBtn = document.getElementById('saveSessionBtn');
+  if (saveSessionBtn) {
+    saveSessionBtn.addEventListener('click', () => {
+      const event = new CustomEvent('save-session');
+      window.dispatchEvent(event);
+    });
+  }
+
+  const clearLiveTableBtn = document.getElementById('clearLiveTableBtn');
+  if (clearLiveTableBtn) {
+    clearLiveTableBtn.addEventListener('click', () => {
+      const event = new CustomEvent('clear-live-table');
+      window.dispatchEvent(event);
+    });
+  }
+
+  const uploadToExcelBtn = document.getElementById('uploadToExcelBtn');
+  if (uploadToExcelBtn) {
+    uploadToExcelBtn.addEventListener('click', () => {
+      const event = new CustomEvent('upload-excel');
+      window.dispatchEvent(event);
+    });
+  }
+
+  const manualToggleBtn = document.getElementById('manualToggleBtn');
+  if (manualToggleBtn) {
+    manualToggleBtn.addEventListener('click', () => {
+      const manualSection = document.getElementById('manualEntrySection');
+      if (manualSection) {
+        manualSection.classList.toggle('hidden');
+      }
+    });
+  }
+
+  // Export template button listener
+  const exportTemplateBtn = document.getElementById('exportTemplateBtn');
+  if (exportTemplateBtn) {
+    exportTemplateBtn.addEventListener('click', () => {
+      import('https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs').then(XLSX => {
+        const headers = [{ Item: '', Count: '' }];
+        const ws = XLSX.utils.json_to_sheet(headers);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Template');
+        XLSX.writeFile(wb, 'Template.xlsx');
+      });
+    });
+  }
 }
 
 export function setupTabNavigation() {

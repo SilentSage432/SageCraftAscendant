@@ -11,6 +11,10 @@ import { saveESLMap } from './session.js';
   
   import { processScan } from './scan.js';
   
+  export function isESL(code) {
+    return typeof code === 'string' && code.length === 13 && code.startsWith('0');
+  }
+
   export function setupESLHandlers() {
     const modalBtnESL = document.getElementById('modalBtnESL');
     const modalBtnESLTag = document.getElementById('modalBtnESLTag');
@@ -27,6 +31,14 @@ import { saveESLMap } from './session.js';
         const itemNum = prompt(`Enter the Lowe’s item number for ESL: ${item}`);
         if (item && itemNum?.trim()) {
           const trimmed = itemNum.trim();
+          if (eslToUPC[item] && eslToUPC[item] !== trimmed) {
+            const confirmOverwrite = confirm(`⚠️ ESL ${item} is already mapped to Lowe’s #${eslToUPC[item]}. Overwrite with #${trimmed}?`);
+            if (!confirmOverwrite) {
+              const overlay = document.getElementById('customModal');
+              if (overlay) overlay.style.display = 'none';
+              return;
+            }
+          }
           eslToUPC[item] = trimmed;
           localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
   
@@ -53,6 +65,14 @@ import { saveESLMap } from './session.js';
         const itemNum = prompt(`Enter the Lowe’s item number for ESL tag: ${normalized}`);
         if (itemNum?.trim()) {
           const trimmed = itemNum.trim();
+          if (eslToUPC[normalized] && eslToUPC[normalized] !== trimmed) {
+            const confirmOverwrite = confirm(`⚠️ ESL ${normalized} is already mapped to Lowe’s #${eslToUPC[normalized]}. Overwrite with #${trimmed}?`);
+            if (!confirmOverwrite) {
+              const overlay = document.getElementById('customModal');
+              if (overlay) overlay.style.display = 'none';
+              return;
+            }
+          }
           eslToUPC[normalized] = trimmed;
           upcToItem[normalized] = trimmed;
           saveUPCMap();

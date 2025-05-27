@@ -1,4 +1,4 @@
-import { createToast, updateMapStatusDisplay, restoreFocusToEntry } from './ui.js';
+import { createToast, updateMapStatusDisplay, restoreFocusToEntry, setupMoreOptionsToggle } from './ui.js';
 import { initAudit } from './audit.js';
 import { initDropbox } from './dropbox.js';
 import {
@@ -11,6 +11,8 @@ import { initScan } from './scan.js';
 import { initESL } from './esl.js';
 import { initSessionTools } from './session.js';
 import { initEventListeners } from './events.js';
+import { renderTrendChart, setupTrendModalToggle } from './charts.js';
+import { setupReportButton, setupTemplateExportButton } from './report.js';
 
 console.log("✅ index.js is running");
 
@@ -23,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initESL();
   initSessionTools();
   initEventListeners();
+
+  setupTrendModalToggle();
+  renderTrendChart(window.weeklyCounts || {});
+  setupReportButton();
+  setupMoreOptionsToggle();
+  setupTemplateExportButton();
 
   window.liveCounts = window.liveCounts || {};
   window.updateLiveTable = window.updateLiveTable || function () {

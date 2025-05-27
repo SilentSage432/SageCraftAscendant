@@ -191,7 +191,6 @@
 
       <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
         <h2>Export Tools</h2>
-        <button id="authGoogleDrive">🔐 Connect Google Drive</button>
         <button id="downloadExcel">⬇️ Download Excel</button>
       </section>
 
@@ -283,7 +282,6 @@
 
         <h3>🧬 Advanced Tools</h3>
         <div class="button-grid">
-          <button id="mergeReport">🧬 Merge Master Report</button>
           <button id="downloadBackupBtn">📥 Download Backup</button>
           <button id="clearSessionsBtn">🧹 Clear All Sessions</button>
           <button id="cleanStaleSessions">🧹 Clean Empty Sessions</button>
@@ -340,58 +338,6 @@
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Main script -->
-  <script>
-function showCustomPrompt(item) {
-  return new Promise(resolve => {
-    const overlay = document.getElementById('customModal');
-    document.getElementById('modalPromptText').textContent = `What type of code is "${item}"?`;
-
-    overlay.style.display = 'flex';
-
-    const cleanup = (result) => {
-      overlay.style.display = 'none';
-      resolve(result);
-    };
-
-    document.getElementById('modalBtnLocation').onclick = () => cleanup('location');
-    document.getElementById('modalBtnProduct').onclick = () => cleanup('product');
-    document.getElementById('modalBtnESL').onclick = () => cleanup('esl');
-    document.getElementById('modalBtnCancel').onclick = () => cleanup(null);
-  });
-}
-  </script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const trendBtn = document.getElementById('viewTrends');
-    const trendModal = document.getElementById('trendsModal');
-
-    if (trendBtn && trendModal) {
-      trendBtn.addEventListener('click', () => {
-        console.log("Trend button clicked");
-        trendModal.style.display = 'flex';
-      });
-    } else {
-      console.warn('Trend button or modal not found in DOM');
-    }
-  });
-  </script>
-<!-- ✅ New -->
-<script type="module" src="scripts/index.js?v=2.0.1"></script>
+  <script type="module" src="scripts/index.js?v=2.0.1"></script>
 </body>
 </html>
-  <script>
-  // "More Options" button toggle logic for accessibility and visibility
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggleAdvancedControlsBtn = document.getElementById('toggleAdvancedControls');
-    if (toggleAdvancedControlsBtn) {
-      toggleAdvancedControlsBtn.addEventListener('click', () => {
-        const panel = document.getElementById('advancedControls');
-        if (!panel) return;
-        const isHidden = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden');
-        panel.setAttribute('aria-hidden', String(!isHidden));
-        toggleAdvancedControlsBtn.setAttribute('aria-expanded', String(isHidden));
-      });
-    }
-  });
-  </script>

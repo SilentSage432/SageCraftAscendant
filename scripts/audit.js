@@ -8,11 +8,33 @@ export function initAudit() {
     });
   }
 
+  function saveAuditData() {
+    localStorage.setItem('rotationData', JSON.stringify(rotationData));
+  }
+
+  function markAudited(category) {
+    if (rotationData[category]) {
+      rotationData[category].date = new Date().toISOString();
+      saveAuditData();
+      renderAuditRotationTable();
+    }
+  }
+
+  function auditClickHandler(e) {
+    if (e.target.tagName === 'BUTTON' && e.target.dataset.audit) {
+      const category = e.target.dataset.audit;
+      markAudited(category);
+    }
+  }
+
   function renderAuditRotationTable() {
     const rotationTable = document.getElementById('rotationTable');
     if (!rotationTable || typeof rotationData !== 'object') return;
 
     rotationTable.innerHTML = '';
+
+    rotationTable.removeEventListener('click', auditClickHandler);
+    rotationTable.addEventListener('click', auditClickHandler);
 
     Object.entries(rotationData).forEach(([category, info]) => {
       const row = document.createElement('tr');
@@ -32,6 +54,7 @@ export function initAudit() {
         <td>${interval} days</td>
         <td>${lastAuditedText}</td>
         <td>${nextDueText}</td>
+        <td><button data-audit="${category}">✔️ Audit Now</button></td>
       `;
 
       if (overdue) {

@@ -6,8 +6,6 @@ function normalizeUPC(code) {
     return code;
   }
   
-  let autosaveTimer = null;
-  
   const upcToItem = JSON.parse(localStorage.getItem('upcToItemMap')) || {};
   const locationMap = JSON.parse(localStorage.getItem('locationMap')) || {};
   const eslToUPC = JSON.parse(localStorage.getItem('eslToUPCMap')) || {};
@@ -35,6 +33,24 @@ function normalizeUPC(code) {
   function saveUPCMap() {
     localStorage.setItem('upcToItemMap', JSON.stringify(upcToItem));
   }
+
+  function saveESLMap() {
+    localStorage.setItem('eslToUPCMap', JSON.stringify(eslToUPC));
+  }
+
+  function saveLocationMap() {
+    localStorage.setItem('locationMap', JSON.stringify(locationMap));
+  }
+
+  function clearAllMaps() {
+    localStorage.removeItem('upcToItemMap');
+    localStorage.removeItem('eslToUPCMap');
+    localStorage.removeItem('locationMap');
+    Object.keys(upcToItem).forEach(k => delete upcToItem[k]);
+    Object.keys(eslToUPC).forEach(k => delete eslToUPC[k]);
+    Object.keys(locationMap).forEach(k => delete locationMap[k]);
+    updateMapStatusDisplay();
+  }
   
   export {
     upcToItem,
@@ -42,5 +58,8 @@ function normalizeUPC(code) {
     eslToUPC,
     normalizeUPC,
     updateMapStatusDisplay,
-    saveUPCMap
+    saveUPCMap,
+    saveESLMap,
+    saveLocationMap,
+    clearAllMaps
   };
