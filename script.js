@@ -472,14 +472,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalBtnESLTag = document.getElementById('modalBtnESLTag');
   if (modalBtnESLTag) {
     modalBtnESLTag.onclick = () => {
-      const item = currentESLItem;
-      const itemNum = prompt(`Enter the Lowe’s item number for ESL: ${item}`);
-      if (item && itemNum) {
+      const normalized = normalizeUPC(currentESLItem);
+      const itemNum = prompt(`Enter the Lowe’s item number for ESL tag: ${normalized}`);
+      if (itemNum) {
         const trimmed = itemNum.trim();
         if (trimmed) {
-          eslToUPC[item] = trimmed;
+          eslToUPC[normalized] = trimmed;
           saveESLMap();
-          processScan(trimmed); // ensure ESL scan gets counted
+          console.log(`📎 ESL ${normalized} → Lowe’s #${trimmed}`);
+          processScan(trimmed); // Ensure this now tracks
           if (liveEntryInput) liveEntryInput.value = '';
         }
       }
