@@ -1,3 +1,77 @@
+export async function syncAllMapsToDropbox() {
+  const upcToItem = window.upcToItem || {};
+  const locationMap = window.locationMap || {};
+  const eslToUPC = window.eslToUPC || {};
+
+  const files = [
+    { name: 'upcToItemMap.json', data: upcToItem },
+    { name: 'locationMap.json', data: locationMap },
+    { name: 'eslToUPCMap.json', data: eslToUPC }
+  ];
+
+  for (const file of files) {
+    const blob = new Blob([JSON.stringify(file.data)], { type: 'application/json' });
+
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path: `/beta-test-1/${file.name}`,
+          mode: 'overwrite',
+          autorename: false,
+          mute: true
+        })
+      },
+      body: blob
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error(`❌ Failed to upload ${file.name}:`, err);
+      alert(`❌ Failed to upload ${file.name}`);
+      return;
+    }
+  }
+
+  alert('✅ All maps synced to Dropbox!');
+}
+
+export async function restoreAllMapsFromDropbox() {
+  const mapFiles = [
+    { key: 'upcToItemMap', file: 'upcToItemMap.json' },
+    { key: 'locationMap', file: 'locationMap.json' },
+    { key: 'eslToUPCMap', file: 'eslToUPCMap.json' }
+  ];
+
+  for (const { key, file } of mapFiles) {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: `/beta-test-1/${file}` })
+      }
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.warn(`⚠️ Could not restore ${file}: ${err}`);
+      continue;
+    }
+
+    const text = await response.text();
+    try {
+      const parsed = JSON.parse(text);
+      localStorage.setItem(key, JSON.stringify(parsed));
+      window[key] = parsed;
+    } catch (e) {
+      console.error(`❌ Failed to parse ${file}:`, e);
+    }
+  }
+
+  alert('📂 Maps restored from Dropbox!');
+}
 // scripts/dropbox.js
 
 function generateCodeVerifier() {
