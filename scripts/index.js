@@ -6,7 +6,11 @@ import { initESL } from './esl.js';
 import { initSessionTools } from './session.js';
 import { initEventListeners } from './events.js';
 
+console.log("✅ index.js is running");
+
 document.addEventListener('DOMContentLoaded', () => {
+  createToast('✅ index.js loaded', 3000);
+
   initAudit();
   initDropbox();
   initScan();

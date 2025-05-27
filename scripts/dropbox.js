@@ -1,5 +1,25 @@
 // scripts/dropbox.js
 
+function generateCodeVerifier() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+async function generateCodeChallenge(verifier) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  const base64Digest = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return base64Digest;
+}
+
 export async function refreshAccessToken() {
     const refreshToken = localStorage.getItem('refresh_token');
     if (!refreshToken) {
@@ -181,3 +201,5 @@ window.addEventListener('sync-all-maps', async () => {
 window.addEventListener('restore-all-maps', async () => {
   alert('🛠 Restore logic for maps not yet implemented.');
 });
+
+export { generateCodeVerifier, generateCodeChallenge };
