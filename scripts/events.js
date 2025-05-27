@@ -721,6 +721,66 @@ export function initEventListeners() {
   if (localStorage.getItem('config_showToasts') === 'false') {
     window.createToast = () => {};
   }
+
+  // Show toast and handle unknown scan mappings interactively on manual scan event (modal version)
+  window.addEventListener('manual-scan', e => {
+    const { code, quantity, category } = e.detail;
+
+    const upcMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+    const eslMap = JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
+    const bayMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+
+    if (upcMap[code] || eslMap[code] || bayMap[code]) {
+      createToast(`✅ Scanned: ${code} (Qty: ${quantity}, Cat: ${category})`);
+      return;
+    }
+
+    // Show modal
+    const modal = document.getElementById('mapPromptModal');
+    const codeSpan = document.getElementById('mapPromptCode');
+    const inputSection = document.getElementById('mapInputSection');
+    const inputField = document.getElementById('mapPromptInput');
+    const confirmBtn = document.getElementById('mapConfirmBtn');
+    const label = document.getElementById('mapPromptLabel');
+
+    modal.classList.remove('hidden');
+    codeSpan.textContent = code;
+    inputSection.classList.add('hidden');
+    inputField.value = '';
+
+    function handleMapping(type) {
+      label.textContent = type === 'bay'
+        ? 'Enter Bay Name:'
+        : `Enter Lowe's Item # for this ${type.toUpperCase()}:`;
+      inputSection.classList.remove('hidden');
+
+      confirmBtn.onclick = () => {
+        const value = inputField.value.trim();
+        if (!value) return;
+
+        if (type === 'esl') {
+          eslMap[code] = value;
+          localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
+          createToast(`🔗 ESL ${code} linked to Item #${value}`);
+        } else if (type === 'product') {
+          upcMap[code] = value;
+          localStorage.setItem('upcToItemMap', JSON.stringify(upcMap));
+          createToast(`🔗 Product code ${code} mapped to Item #${value}`);
+        } else if (type === 'bay') {
+          bayMap[code] = value;
+          localStorage.setItem('locationMap', JSON.stringify(bayMap));
+          createToast(`📍 Bay ${code} mapped to "${value}"`);
+        }
+
+        modal.classList.add('hidden');
+        updateMapStatusDisplay(bayMap, upcMap, eslMap);
+      };
+    }
+
+    document.getElementById('mapTypeESL').onclick = () => handleMapping('esl');
+    document.getElementById('mapTypeProduct').onclick = () => handleMapping('product');
+    document.getElementById('mapTypeBay').onclick = () => handleMapping('bay');
+  });
 }
 
 export function setupTabNavigation() {
