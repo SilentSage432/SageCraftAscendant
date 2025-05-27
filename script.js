@@ -478,6 +478,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const trimmed = itemNum.trim();
         if (trimmed) {
           eslToUPC[normalized] = trimmed;
+          upcToItem[normalized] = trimmed;
+          saveUPCMap();
           saveESLMap();
           console.log(`📎 ESL ${normalized} → Lowe’s #${trimmed}`);
           processScan(trimmed); // Ensure this now tracks
