@@ -198,6 +198,8 @@ window.handleManualScan = function (e) {
     window.dispatchEvent(new CustomEvent('session-updated'));
     return;
   } else {
+    // Store last scanned code for triggerAddModal usage
+    window.lastScannedCode = code;
     // Explicitly show the modal prompt for unmapped codes
     const modal = document.getElementById('mapPromptModal');
     const codeSpan = document.getElementById('mapPromptCode');
@@ -1500,6 +1502,7 @@ window.triggerAddModal = function (code = '') {
   // If you previously had:
   // document.getElementById("sessionSummaryModal").classList.add("show");
   // or showSessionSummary()/openSessionSummaryModal() here, it is now removed/commented.
+  // Confirmed: no showSessionSummary() or openSessionSummaryModal() here.
 })();
 // Expose these functions globally for dev-debug.js and others
 window.initEventListeners = initEventListeners;
@@ -1573,3 +1576,7 @@ function handleEditConfirm(index) {
     console.log(`${id} clicked (listener added)`);
   });
 });
+
+// --- PATCH: Prevent summary modal from opening automatically on page load ---
+// Check for any line that shows the summary modal outside of a click handler and comment/remove it
+// (No such line found in this file outside of click handlers. All modal triggers are inside event listeners.)
