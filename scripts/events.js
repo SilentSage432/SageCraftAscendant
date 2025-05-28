@@ -665,30 +665,32 @@ function initEventListeners() {
       // Optional: reset bay-related logic if needed
       createToast('Bay closed successfully.');
 
-      // --- SESSION SUMMARY MODAL LOGIC (Refactored as per request) ---
-      // Show session summary modal
-      const summaryModal = document.getElementById('summaryModal');
-      const summaryContent = document.getElementById('summaryContent');
-      const activeBay = localStorage.getItem('activeBay');
-      const auditData = JSON.parse(localStorage.getItem('auditData')) || {};
-      const bayData = auditData[activeBay] || {};
-      const totalItems = Object.values(bayData).reduce((sum, count) => sum + count, 0);
-      const uniqueUPCs = Object.keys(bayData).length;
-      const auditTimers = JSON.parse(localStorage.getItem('bayAuditTimers')) || {};
-      const auditTime = auditTimers[activeBay] || 0;
+  // --- SESSION SUMMARY MODAL LOGIC (Refactored as per request) ---
+  // Show session summary modal ONLY when closing a bay
+  const summaryModal = document.getElementById('summaryModal');
+  const summaryContent = document.getElementById('summaryContent');
+  const activeBay = localStorage.getItem('activeBay');
+  const auditData = JSON.parse(localStorage.getItem('auditData')) || {};
+  const bayData = auditData[activeBay] || {};
+  const totalItems = Object.values(bayData).reduce((sum, count) => sum + count, 0);
+  const uniqueUPCs = Object.keys(bayData).length;
+  const auditTimers = JSON.parse(localStorage.getItem('bayAuditTimers')) || {};
+  const auditTime = auditTimers[activeBay] || 0;
 
-      if (summaryContent) {
-        summaryContent.innerHTML = `
-          <p><strong>Bay:</strong> ${activeBay}</p>
-          <p><strong>Total Items Scanned:</strong> ${totalItems}</p>
-          <p><strong>Unique Items:</strong> ${uniqueUPCs}</p>
-          <p><strong>Audit Time:</strong> ${auditTime} seconds</p>
-        `;
-      }
+  if (summaryContent) {
+    summaryContent.innerHTML = `
+      <p><strong>Bay:</strong> ${activeBay}</p>
+      <p><strong>Total Items Scanned:</strong> ${totalItems}</p>
+      <p><strong>Unique Items:</strong> ${uniqueUPCs}</p>
+      <p><strong>Audit Time:</strong> ${auditTime} seconds</p>
+    `;
+  }
 
-      if (summaryModal) {
-        summaryModal.style.display = 'block';
-      }
+  if (summaryModal) {
+    summaryModal.style.display = 'block';
+    // Remove 'show' class if present and ensure modal does not show by default after page load
+    summaryModal.classList.remove('show');
+  }
     });
   }
 
