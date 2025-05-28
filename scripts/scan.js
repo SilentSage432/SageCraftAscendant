@@ -46,12 +46,10 @@ async function handleScanInput(val) {
       !window.eslToUPC?.[resolved] &&
       !window.locationMap?.[resolved]
     ) {
-      const modal = document.getElementById("customModal");
-      const promptText = document.getElementById("modalPromptText");
-
-      if (modal && promptText) {
-        promptText.textContent = `Unknown Code: ${resolved}`;
-        modal.style.display = "flex";
+      const modal = document.getElementById("itemEntryModal");
+      if (modal) {
+        window.setCurrentUPC?.(resolved);
+        modal.style.display = "block";
       }
 
       resetScanInput();

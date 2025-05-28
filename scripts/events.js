@@ -711,6 +711,7 @@ function initEventListeners() {
     `;
   }
 
+  // Only show the summary modal in response to this user action (closing bay)
   if (summaryModal) {
     summaryModal.style.display = 'block';
     // Remove 'show' class if present and ensure modal does not show by default after page load
@@ -1500,9 +1501,10 @@ window.triggerAddModal = function (code = '') {
   }
   // DO NOT automatically open the session summary modal on load
   // If you previously had:
-  // document.getElementById("sessionSummaryModal").classList.add("show");
+  // document.getElementById("summaryModal").style.display = 'flex';
+  // or showModal(summaryModal);
   // or showSessionSummary()/openSessionSummaryModal() here, it is now removed/commented.
-  // Confirmed: no showSessionSummary() or openSessionSummaryModal() here.
+  // Confirmed: no summaryModal.style.display = 'flex' or showModal(summaryModal) on page load.
 })();
 // Expose these functions globally for dev-debug.js and others
 window.initEventListeners = initEventListeners;
@@ -1578,5 +1580,5 @@ function handleEditConfirm(index) {
 });
 
 // --- PATCH: Prevent summary modal from opening automatically on page load ---
-// Check for any line that shows the summary modal outside of a click handler and comment/remove it
-// (No such line found in this file outside of click handlers. All modal triggers are inside event listeners.)
+// There is no code here that shows the summary modal (#summaryModal) on page load or outside of a user-triggered function.
+// All summary modal displays (e.g., summaryModal.style.display = 'block') are inside click event handlers or conditionals.
