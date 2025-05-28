@@ -229,6 +229,11 @@ window.handleManualScan = function (e) {
       function addItemToScanTable(itemNum, code, type, category) {
         if (typeof window.addItemToScanTable === 'function') {
           window.addItemToScanTable(itemNum, code, type, category);
+          // Remove placeholder row after adding a new scanned item
+          const placeholderRow = document.querySelector('#liveScanTableBody .placeholder-row');
+          if (placeholderRow) {
+            placeholderRow.remove();
+          }
         }
       }
       function closeModal() {
@@ -329,6 +334,9 @@ export function initEventListeners() {
       }
     });
   }
+  // --- Add all main UI button listeners here ---
+  // Example: navigation tab buttons, etc.
+  // (Already present: see setupTabNavigation and other UI component listeners below.)
   console.log('🎛️ Event listeners initialized');
   // Update map status display on startup with data from localStorage
   updateMapStatusDisplay(
@@ -1271,6 +1279,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 0);
   };
+});
+
+// --- Ensure DOMContentLoaded sets up all UI interactions ---
+document.addEventListener('DOMContentLoaded', () => {
+  initEventListeners();
+  if (typeof initializeUI === 'function') {
+    initializeUI();
+  }
 });
 // --- Edit Modal Logic for Live Scan Table ---
 // Handles confirm/cancel for editing live scan table entries

@@ -100,7 +100,7 @@ function resetScanInput() {
   if (liveEntryInput) liveEntryInput.value = '';
 }
 
-export { processScan, handleScanInput, resetScanInput, resolveScanCode, setItemCategory };
+export { processScan, handleScanInput, resetScanInput, resolveScanCode };
 
 export function initScan() {
   console.log("🔧 Scan module initialized");
