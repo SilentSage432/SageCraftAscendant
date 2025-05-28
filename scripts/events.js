@@ -1438,6 +1438,10 @@ window.openEditModalForRow = function(row) {
   if (typeof initializeUI === 'function') {
     initializeUI();
   }
+  // DO NOT automatically open the session summary modal on load
+  // If you previously had:
+  // document.getElementById("sessionSummaryModal").classList.add("show");
+  // or showSessionSummary()/openSessionSummaryModal() here, it is now removed/commented.
 })();
 // Expose these functions globally for dev-debug.js and others
 window.initEventListeners = initEventListeners;
