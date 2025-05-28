@@ -31,11 +31,27 @@ async function handleScanInput(val) {
   if (resolved) {
     if (typeof resolved === 'object' && resolved.type === 'esl') {
       console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
-      if (resolved.item) upcToItem[resolved.upc] = resolved.item;
+      
+      if (!resolved.item) {
+        // Trigger the custom modal if no mapping is found
+        if (typeof window.promptCodeType === 'function') {
+          window.promptCodeType(resolved.upc);
+        } else {
+          const modal = document.getElementById("customModal");
+          if (modal) {
+            window.setCurrentUPC?.(resolved.upc);
+            modal.style.display = "block";
+          }
+        }
+        resetScanInput();
+        return;
+      }
+
+      upcToItem[resolved.upc] = resolved.item;
       if (typeof window.updateMapStatusDisplay === 'function') {
         window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       }
-      processScan(resolved.item || resolved.upc);
+      processScan(resolved.item);
       resetScanInput();
       return;
     }
@@ -145,6 +161,23 @@ window.initScan = function () {
   console.log("🔧 Scan module initialized");
 };
 
+document.addEventListener("DOMContentLoaded", () => {
+  const upcBtn = document.getElementById("assignUPCBtn");
+  const eslBtn = document.getElementById("linkESLBtn");
+  const bayBtn = document.getElementById("assignBayBtn");
+
+  const transitionToEntry = () => {
+    const modal = document.getElementById("customModal");
+    if (modal) modal.style.display = "none";
+    const entryModal = document.getElementById("itemEntryModal");
+    if (entryModal) entryModal.style.display = "block";
+  };
+
+  if (upcBtn) upcBtn.addEventListener("click", transitionToEntry);
+  if (eslBtn) eslBtn.addEventListener("click", transitionToEntry);
+  if (bayBtn) bayBtn.addEventListener("click", transitionToEntry);
+});
+
 window.setItemCategory = function (category) {
   window.itemCategory = category;
   localStorage.setItem('itemCategory', category);
@@ -165,19 +198,24 @@ window.promptCodeType = function(code) {
   const eslBtn = modal.querySelector("#linkESLBtn");
   const bayBtn = modal.querySelector("#assignBayBtn");
 
-  if (upcBtn) upcBtn.onclick = () => {
+  const transitionToEntry = () => {
     modal.style.display = "none";
     const entryModal = document.getElementById("itemEntryModal");
-    if (entryModal) entryModal.style.display = "block";
+    if (entryModal) {
+      entryModal.style.display = "block";
+    }
   };
-  if (eslBtn) eslBtn.onclick = () => {
-    modal.style.display = "none";
-    const eslModal = document.getElementById("customModal");
-    if (eslModal) eslModal.style.display = "block";
-  };
-  if (bayBtn) bayBtn.onclick = () => {
-    modal.style.display = "none";
-    const bayModal = document.getElementById("bayAssignModal");
-    if (bayModal) bayModal.style.display = "block";
-  };
+
+  if (upcBtn) {
+    upcBtn.removeEventListener("click", transitionToEntry);
+    upcBtn.addEventListener("click", transitionToEntry);
+  }
+  if (eslBtn) {
+    eslBtn.removeEventListener("click", transitionToEntry);
+    eslBtn.addEventListener("click", transitionToEntry);
+  }
+  if (bayBtn) {
+    bayBtn.removeEventListener("click", transitionToEntry);
+    bayBtn.addEventListener("click", transitionToEntry);
+  }
 };
