@@ -166,16 +166,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const eslBtn = document.getElementById("linkESLBtn");
   const bayBtn = document.getElementById("assignBayBtn");
 
-  const transitionToEntry = () => {
+  const transitionToEntry = (type) => {
     const modal = document.getElementById("customModal");
     if (modal) modal.style.display = "none";
     const entryModal = document.getElementById("itemEntryModal");
-    if (entryModal) entryModal.style.display = "block";
+    if (entryModal) {
+      entryModal.style.display = "block";
+      const codeTypeInput = entryModal.querySelector("#codeType");
+      if (codeTypeInput) codeTypeInput.value = type || '';
+    }
   };
 
-  if (upcBtn) upcBtn.addEventListener("click", transitionToEntry);
-  if (eslBtn) eslBtn.addEventListener("click", transitionToEntry);
-  if (bayBtn) bayBtn.addEventListener("click", transitionToEntry);
+  if (upcBtn) upcBtn.addEventListener("click", () => transitionToEntry('upc'));
+  if (eslBtn) eslBtn.addEventListener("click", () => transitionToEntry('esl'));
+  if (bayBtn) bayBtn.addEventListener("click", () => transitionToEntry('bay'));
 });
 
 window.setItemCategory = function (category) {
@@ -194,28 +198,33 @@ window.promptCodeType = function(code) {
   window.setCurrentUPC?.(code);
   modal.style.display = "block";
 
+  const transitionToEntry = (type) => {
+    const modal = document.getElementById("customModal");
+    if (modal) modal.style.display = "none";
+    const entryModal = document.getElementById("itemEntryModal");
+    if (entryModal) {
+      entryModal.style.display = "block";
+      const codeTypeInput = entryModal.querySelector("#codeType");
+      if (codeTypeInput) codeTypeInput.value = type || '';
+    }
+  };
+
   const upcBtn = modal.querySelector("#assignUPCBtn");
   const eslBtn = modal.querySelector("#linkESLBtn");
   const bayBtn = modal.querySelector("#assignBayBtn");
 
-  const transitionToEntry = () => {
-    modal.style.display = "none";
-    const entryModal = document.getElementById("itemEntryModal");
-    if (entryModal) {
-      entryModal.style.display = "block";
-    }
-  };
+  if (upcBtn && !upcBtn.hasAttribute("data-bound")) {
+    upcBtn.addEventListener("click", () => transitionToEntry('upc'));
+    upcBtn.setAttribute("data-bound", "true");
+  }
 
-  if (upcBtn) {
-    upcBtn.removeEventListener("click", transitionToEntry);
-    upcBtn.addEventListener("click", transitionToEntry);
+  if (eslBtn && !eslBtn.hasAttribute("data-bound")) {
+    eslBtn.addEventListener("click", () => transitionToEntry('esl'));
+    eslBtn.setAttribute("data-bound", "true");
   }
-  if (eslBtn) {
-    eslBtn.removeEventListener("click", transitionToEntry);
-    eslBtn.addEventListener("click", transitionToEntry);
-  }
-  if (bayBtn) {
-    bayBtn.removeEventListener("click", transitionToEntry);
-    bayBtn.addEventListener("click", transitionToEntry);
+
+  if (bayBtn && !bayBtn.hasAttribute("data-bound")) {
+    bayBtn.addEventListener("click", () => transitionToEntry('bay'));
+    bayBtn.setAttribute("data-bound", "true");
   }
 };
