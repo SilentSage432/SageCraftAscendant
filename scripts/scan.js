@@ -1,7 +1,10 @@
 import { updateMapStatusDisplay } from './ui.js';
 
-// Ensure global fallback for itemCategory
-// if (!window.itemCategory) window.itemCategory = 'uncategorized';
+// Load persisted category from localStorage if available
+if (!window.itemCategory) {
+  const storedCategory = localStorage.getItem('itemCategory');
+  window.itemCategory = storedCategory || 'uncategorized';
+}
 
 function resolveScanCode(code) {
   const trimmed = code.trim();
@@ -77,7 +80,7 @@ function processScan(item) {
     window.sessionMap[item] = {
       item: item,
       count: window.liveCounts[item],
-      category: window.itemCategory || 'uncategorized',
+      category: localStorage.getItem('itemCategory') || window.itemCategory || 'uncategorized',
       location: window.locationMap?.[item] || '',
       editable: true // placeholder for enabling inline edits
     };
@@ -97,8 +100,14 @@ function resetScanInput() {
   if (liveEntryInput) liveEntryInput.value = '';
 }
 
-export { processScan, handleScanInput, resetScanInput, resolveScanCode };
+export { processScan, handleScanInput, resetScanInput, resolveScanCode, setItemCategory };
 
 export function initScan() {
   console.log("🔧 Scan module initialized");
+}
+
+export function setItemCategory(category) {
+  window.itemCategory = category;
+  localStorage.setItem('itemCategory', category);
+  console.log(`📦 Category set to: ${category}`);
 }

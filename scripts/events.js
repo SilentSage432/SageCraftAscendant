@@ -77,9 +77,14 @@ window.handleManualScan = function (e) {
   const bayMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
 
   let itemNum = '';
-  if (upcMap[code]) itemNum = upcMap[code];
-  else if (eslMap[code]) itemNum = eslMap[code];
-  else if (bayMap[code]) itemNum = code;
+  // Stricter check: Only consider as mapped if the code is a direct key and the value is not empty
+  if (Object.prototype.hasOwnProperty.call(upcMap, code) && typeof upcMap[code] === "string" && upcMap[code].trim() !== "") {
+    itemNum = upcMap[code];
+  } else if (Object.prototype.hasOwnProperty.call(eslMap, code) && typeof eslMap[code] === "string" && eslMap[code].trim() !== "") {
+    itemNum = eslMap[code];
+  } else if (Object.prototype.hasOwnProperty.call(bayMap, code) && typeof bayMap[code] === "string" && bayMap[code].trim() !== "") {
+    itemNum = code;
+  }
 
   // --- Bay Tag UI Handling ---
   if (bayMap[code]) {
@@ -114,7 +119,7 @@ window.handleManualScan = function (e) {
     }
     window.sessionMap[itemNum].count += quantity;
     console.log('[🧪] Added to sessionMap:', itemNum, window.sessionMap[itemNum]);
-    window.sessionMap[itemNum].category = category || window.sessionMap[itemNum].category || '';
+    window.sessionMap[itemNum].category = localStorage.getItem('lastUsedCategory') || category || window.sessionMap[itemNum].category || '';
     window.sessionMap[itemNum].location = bayMap[itemNum] || window.sessionMap[itemNum].location || '';
     if (typeof window.updateLiveTable === 'function') {
       console.log('[🧪] Calling updateLiveTable for', itemNum, window.sessionMap[itemNum]);
@@ -123,6 +128,19 @@ window.handleManualScan = function (e) {
     createToast(`✅ Added ${quantity} to Item #${itemNum} (${category})`);
     window.dispatchEvent(new CustomEvent('session-updated'));
     return;
+  } else {
+    // Explicitly show the modal prompt for unmapped codes
+    const modal = document.getElementById('mapPromptModal');
+    const codeSpan = document.getElementById('mapPromptCode');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.zIndex = '9999';
+    codeSpan.textContent = code;
+    window._mappingCode = code;
   }
 
   const modal = document.getElementById('mapPromptModal');
@@ -237,20 +255,34 @@ window.handleManualScan = function (e) {
       // Use most recent scanned value
       const scannedCode = window.lastScannedCode || window._mappingCode || '';
 
-      if (itemType === 'esl') {
-        window.upcToItem[scannedCode] = itemNumber;
-        saveUPCMap();
-        showToast(`ESL ${scannedCode} mapped to item ${itemNumber}`);
-      } else if (itemType === 'product') {
-        window.upcToItem[scannedCode] = itemNumber;
-        saveUPCMap();
+      // Persist the last selected map type to localStorage
+      if (itemType) {
+        localStorage.setItem('lastSelectedMapType', itemType);
+      }
+
+      // --- Mapping Logic for each type ---
+      if (itemType === 'product') {
+        // Product mapping: update upcToItemMap
+        let upcToItemMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+        upcToItemMap[scannedCode] = itemNumber;
+        localStorage.setItem('upcToItemMap', JSON.stringify(upcToItemMap));
         showToast(`Product ${scannedCode} mapped to item ${itemNumber}`);
+        updateMapStatusDisplay();
+      } else if (itemType === 'esl') {
+        // ESL mapping: update eslMap (use eslToUPCMap or similar)
+        let eslMap = JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
+        eslMap[scannedCode] = itemNumber;
+        localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
+        showToast(`ESL ${scannedCode} mapped to item ${itemNumber}`);
+        updateMapStatusDisplay();
       } else if (itemType === 'bay') {
-        window.locationMap[scannedCode] = itemNumber;
-        saveLocationMap();
+        // Bay mapping: update locationMap
+        let locationMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+        locationMap[scannedCode] = itemNumber;
+        localStorage.setItem('locationMap', JSON.stringify(locationMap));
         currentBay = itemNumber;
         localStorage.setItem('activeBay', itemNumber);
-        updateBayStatusDisplay();
+        updateMapStatusDisplay();
         showToast(`Bay ${itemNumber} activated`);
       }
 
@@ -259,6 +291,7 @@ window.handleManualScan = function (e) {
         if (!window.sessionMap) window.sessionMap = {};
         if (!window.sessionMap[itemNumber]) window.sessionMap[itemNumber] = { count: 0 };
         window.sessionMap[itemNumber].count += 1;
+        localStorage.setItem('lastUsedCategory', liveCategory);
         window.sessionMap[itemNumber].category = liveCategory;
         window.sessionMap[itemNumber].location = localStorage.getItem('activeBay') || '';
       }
@@ -290,7 +323,7 @@ export function initEventListeners() {
           window.handleManualScan({ detail: { code: value, quantity, category } });
           liveEntry.value = '';
           document.getElementById('liveQty').value = '1';
-          document.getElementById('liveCategory').value = 'Uncategorized';
+          // document.getElementById('liveCategory').value = 'Uncategorized'; // Removed to preserve selected category
           liveEntry.focus();
         }
       }
@@ -531,6 +564,18 @@ export function initEventListeners() {
 
   // Add additional UI button/event listeners here as needed
 
+  // --- Map Prompt Modal Cancel Button ---
+  const cancelMapPromptBtn = document.getElementById('cancelMapPrompt');
+  if (cancelMapPromptBtn) {
+    cancelMapPromptBtn.addEventListener('click', () => {
+      const modal = document.getElementById('mapPromptModal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
+    });
+  }
+
   // --- Close Bay Button Listener ---
   const closeBayBtn = document.getElementById('closeBayBtn');
   if (closeBayBtn) {
@@ -681,6 +726,9 @@ export function initEventListeners() {
       const quantity = parseInt(document.getElementById('liveQty')?.value || '1', 10);
       const category = document.getElementById('liveCategory')?.value || 'Uncategorized';
 
+      // Store last used category for persistence
+      localStorage.setItem('lastUsedCategory', category);
+
       if (!input || !input.value.trim()) {
         alert('Please enter a valid item code.');
         return;
@@ -697,7 +745,7 @@ export function initEventListeners() {
       // Reset inputs after manual scan
       input.value = '';
       document.getElementById('liveQty').value = '1';
-      document.getElementById('liveCategory').value = 'Uncategorized';
+      // document.getElementById('liveCategory').value = 'Uncategorized'; // Removed to preserve selected category
       input.focus();
     });
   }
@@ -1160,28 +1208,40 @@ document.addEventListener('DOMContentLoaded', () => {
         saveScannedItems();
       }
 
+      // Persist the last selected map type globally
+      if (currentMapType) {
+        window._lastSelectedMapType = currentMapType;
+      }
+
+      // --- Mapping Logic for each type (Modal Confirm) ---
       if (currentMapType === "product") {
-        window.upcToItem[code] = input;
-        saveUPCMap();
+        // Product mapping: update upcToItemMap
+        let upcToItemMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+        upcToItemMap[code] = input;
+        localStorage.setItem('upcToItemMap', JSON.stringify(upcToItemMap));
         showToast(`Mapped ${code} to Product: ${input}`);
-        updateMapStatusDisplay(); // Refresh status display
-        if (typeof renderLiveScanTable === "function") renderLiveScanTable(); // Refresh the scanned items table
+        updateMapStatusDisplay();
+        if (typeof renderLiveScanTable === "function") renderLiveScanTable();
         // --- Update sessionMap for product mappings with category ---
         if (!window.sessionMap) window.sessionMap = {};
         if (!window.sessionMap[input]) window.sessionMap[input] = { count: 0 };
         window.sessionMap[input].count += 1;
         window.sessionMap[input].category = liveCategory;
         window.sessionMap[input].location = localStorage.getItem('activeBay') || '';
-      } else if (currentMapType === "bay") {
-        window.locationMap[code] = input;
-        saveLocationMap();
-        showToast(`Mapped ${code} to Bay: ${input}`);
+      } else if (currentMapType === "esl") {
+        // ESL mapping: update eslMap (use eslToUPCMap or similar)
+        let eslMap = JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
+        eslMap[code] = input;
+        localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
+        showToast(`Mapped ${code} to ESL: ${input}`);
         updateMapStatusDisplay();
         if (typeof renderLiveScanTable === "function") renderLiveScanTable();
-      } else if (currentMapType === "esl") {
-        window.upcToItem[code] = input;
-        saveUPCMap();
-        showToast(`Mapped ${code} to ESL: ${input}`);
+      } else if (currentMapType === "bay") {
+        // Bay mapping: update locationMap
+        let locationMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+        locationMap[code] = input;
+        localStorage.setItem('locationMap', JSON.stringify(locationMap));
+        showToast(`Mapped ${code} to Bay: ${input}`);
         updateMapStatusDisplay();
         if (typeof renderLiveScanTable === "function") renderLiveScanTable();
       }
@@ -1196,4 +1256,66 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inputField) inputField.value = "";
     });
   }
+
+  // Preselect the last used type when showing the modal, using localStorage for persistence
+  const origHandleManualScan = window.handleManualScan;
+  window.handleManualScan = function (...args) {
+    // Call the original
+    origHandleManualScan.apply(this, args);
+    // After modal is shown (else block in handleManualScan), preselect last-used map type from localStorage
+    setTimeout(() => {
+      const savedType = localStorage.getItem('lastSelectedMapType');
+      if (savedType) {
+        const radio = document.querySelector(`input[name="itemType"][value="${savedType}"]`);
+        if (radio) radio.checked = true;
+      }
+    }, 0);
+  };
 });
+// --- Edit Modal Logic for Live Scan Table ---
+// Handles confirm/cancel for editing live scan table entries
+document.addEventListener('DOMContentLoaded', () => {
+  // Confirm Edit Handler
+  const confirmEditBtn = document.getElementById('confirmEditItem');
+  if (confirmEditBtn) {
+    confirmEditBtn.addEventListener('click', () => {
+      const itemNumber = document.getElementById('editItemNumber').value.trim();
+      const quantity = parseInt(document.getElementById('editQuantity').value.trim(), 10);
+      const category = document.getElementById('editCategorySelect').value;
+      const row = document.querySelector('#liveScanTableBody tr.editing');
+
+      if (row) {
+        row.querySelector('.item-number').textContent = itemNumber;
+        row.querySelector('.quantity').textContent = quantity;
+        row.querySelector('.category').textContent = category;
+        row.classList.remove('editing');
+      }
+
+      document.getElementById('editModal').classList.remove('show');
+    });
+  }
+
+  // Cancel Edit Handler
+  const cancelEditBtn = document.getElementById('cancelEditItem');
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+      document.getElementById('editModal').classList.remove('show');
+      const row = document.querySelector('#liveScanTableBody tr.editing');
+      if (row) row.classList.remove('editing');
+    });
+  }
+});
+
+// Function to open the edit modal and prefill values (to be called from table row edit button)
+window.openEditModalForRow = function(row) {
+  // row is the <tr> DOM element
+  // Mark as editing
+  document.querySelectorAll('#liveScanTableBody tr.editing').forEach(r => r.classList.remove('editing'));
+  row.classList.add('editing');
+  // Prefill modal inputs
+  document.getElementById('editItemNumber').value = row.querySelector('.item-number').textContent;
+  document.getElementById('editQuantity').value = row.querySelector('.quantity').textContent;
+  document.getElementById('editCategorySelect').value = row.querySelector('.category').textContent;
+  // Show modal
+  document.getElementById('editModal').classList.add('show');
+};
