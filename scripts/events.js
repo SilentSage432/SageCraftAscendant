@@ -200,6 +200,22 @@ window.handleManualScan = function (e) {
   } else {
     // Store last scanned code for triggerAddModal usage
     window.lastScannedCode = code;
+
+    // --- PATCH: Show itemEntryModal for unknown UPCs if present and no other modal is active
+    const itemEntryModal = document.getElementById('itemEntryModal');
+    // Check if any modal is currently visible (simple check: look for modals with display not 'none')
+    const isAnyModalActive = Array.from(document.querySelectorAll('.modal'))
+      .some(modal => modal.style.display && modal.style.display !== 'none');
+    if (itemEntryModal && !isAnyModalActive) {
+      itemEntryModal.style.display = 'block';
+      const upcInput = document.getElementById('upcInputField');
+      if (upcInput) upcInput.value = code;
+      const itemNumInput = document.getElementById('itemNumberInputField');
+      if (itemNumInput) itemNumInput.focus();
+      return; // Do not show any other modal
+    }
+
+    // --- (Legacy/other modal fallback, if itemEntryModal is not present) ---
     // Explicitly show the modal prompt for unmapped codes
     const modal = document.getElementById('mapPromptModal');
     const codeSpan = document.getElementById('mapPromptCode');
@@ -214,169 +230,8 @@ window.handleManualScan = function (e) {
     window._mappingCode = code;
   }
 
-  const modal = document.getElementById('mapPromptModal');
-  const codeSpan = document.getElementById('mapPromptCode');
-  const inputSection = document.getElementById('mapInputSection');
-  const inputField = document.getElementById('mapPromptInput');
-  const confirmBtn = document.getElementById('mapConfirmBtn');
-  const label = document.getElementById('mapPromptLabel');
-
-  modal.classList.remove('hidden');
-  // Forcefully center modal with fixed positioning and z-index for visibility, and ensure vibrant, visible modal
-  modal.style.display = 'flex';
-  modal.style.position = 'fixed';
-  modal.style.top = '50%';
-  modal.style.left = '50%';
-  modal.style.transform = 'translate(-50%, -50%)';
-  modal.style.zIndex = '9999';
-  modal.style.background = '#1a0033'; // deep purple background
-  modal.style.border = '2px solid #a972ff';
-  modal.style.padding = '2rem';
-  modal.style.borderRadius = '12px';
-  modal.style.boxShadow = '0 0 20px #a972ff';
-  modal.style.color = '#fff';
-  codeSpan.textContent = code;
-  inputSection.classList.add('hidden');
-  inputField.value = '';
-
-  window._mappingCode = code;
-  window._selectedType = '';
-
-  // Only update currentMapType on user interaction with the selectors
-  document.getElementById('mapTypeESL').onclick = () => {
-    label.textContent = `Enter Lowe's Item # for this ESL:`;
-    inputSection.classList.remove('hidden');
-    window._selectedType = 'esl';
-    window.currentMapType = 'esl';
-    // set radio if present
-    const eslRadio = document.querySelector('input[name="itemType"][value="esl"]');
-    if (eslRadio) eslRadio.checked = true;
-  };
-
-  document.getElementById('mapTypeProduct').onclick = () => {
-    label.textContent = `Enter Lowe's Item # for this Product:`;
-    inputSection.classList.remove('hidden');
-    window._selectedType = 'product';
-    window.currentMapType = 'product';
-    const prodRadio = document.querySelector('input[name="itemType"][value="product"]');
-    if (prodRadio) prodRadio.checked = true;
-  };
-
-  document.getElementById('mapTypeBay').onclick = () => {
-    label.textContent = `Enter Bay Name:`;
-    inputSection.classList.remove('hidden');
-    window._selectedType = 'bay';
-    window.currentMapType = 'bay';
-    const bayRadio = document.querySelector('input[name="itemType"][value="bay"]');
-    if (bayRadio) bayRadio.checked = true;
-  };
-
-  // --- MODAL SUBMIT HANDLING (NEW LOGIC) ---
-  // This block replaces the confirmBtn.onclick for new modal submit logic
-  if (document.getElementById('modalSubmit')) {
-    document.getElementById('modalSubmit').addEventListener('click', () => {
-      // Get selected type and item number
-      const itemType = document.querySelector('input[name="itemType"]:checked')?.value;
-      const itemNumber = document.getElementById('modalItemNumber').value.trim();
-      // Get liveCategory from UI, default to 'Uncategorized'
-      const liveCategory = document.getElementById('liveCategory')?.value || 'Uncategorized';
-
-      function showToast(msg) { if (typeof createToast === 'function') createToast(msg); }
-      function saveUPCMap() {
-        localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem || {}));
-      }
-      function saveLocationMap() {
-        localStorage.setItem('locationMap', JSON.stringify(window.locationMap || {}));
-      }
-      function updateBayStatusDisplay() {
-        if (typeof window.updateMapStatusDisplay === 'function') {
-          window.updateMapStatusDisplay(
-            window.locationMap || {},
-            window.upcToItem || {},
-            window.eslToUPC || {}
-          );
-        }
-      }
-      function addItemToScanTable(itemNum, code, type, category) {
-        if (typeof window.addItemToScanTable === 'function') {
-          window.addItemToScanTable(itemNum, code, type, category);
-          // Remove placeholder row after adding a new scanned item
-          const placeholderRow = document.querySelector('#liveScanTableBody .placeholder-row');
-          if (placeholderRow) {
-            placeholderRow.remove();
-          }
-        }
-      }
-      function closeModal() {
-        const modal = document.getElementById('mapPromptModal');
-        if (modal) {
-          modal.style.display = 'none';
-          modal.classList.add('hidden');
-        }
-      }
-
-      // Fallback to global maps if not defined
-      window.upcToItem = window.upcToItem || JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
-      window.locationMap = window.locationMap || JSON.parse(localStorage.getItem('locationMap') || '{}');
-      window.eslToUPC = window.eslToUPC || JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
-
-      if (!itemNumber) {
-        showToast('Please enter a valid item number.');
-        return;
-      }
-      if (!itemType) {
-        showToast('Please select a category for this code.');
-        return;
-      }
-      // Use most recent scanned value
-      const scannedCode = window.lastScannedCode || window._mappingCode || '';
-
-      // Persist the last selected map type to localStorage
-      if (itemType) {
-        localStorage.setItem('lastSelectedMapType', itemType);
-      }
-
-      // --- Mapping Logic for each type ---
-      if (itemType === 'product') {
-        // Product mapping: update upcToItemMap
-        let upcToItemMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
-        upcToItemMap[scannedCode] = itemNumber;
-        localStorage.setItem('upcToItemMap', JSON.stringify(upcToItemMap));
-        showToast(`Product ${scannedCode} mapped to item ${itemNumber}`);
-        updateMapStatusDisplay();
-      } else if (itemType === 'esl') {
-        // ESL mapping: update eslMap (use eslToUPCMap or similar)
-        let eslMap = JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
-        eslMap[scannedCode] = itemNumber;
-        localStorage.setItem('eslToUPCMap', JSON.stringify(eslMap));
-        showToast(`ESL ${scannedCode} mapped to item ${itemNumber}`);
-        updateMapStatusDisplay();
-      } else if (itemType === 'bay') {
-        // Bay mapping: update locationMap
-        let locationMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
-        locationMap[scannedCode] = itemNumber;
-        localStorage.setItem('locationMap', JSON.stringify(locationMap));
-        currentBay = itemNumber;
-        localStorage.setItem('activeBay', itemNumber);
-        updateMapStatusDisplay();
-        showToast(`Bay ${itemNumber} activated`);
-      }
-
-      // --- Ensure sessionMap is updated for product mappings with category ---
-      if (itemType === 'product') {
-        if (!window.sessionMap) window.sessionMap = {};
-        if (!window.sessionMap[itemNumber]) window.sessionMap[itemNumber] = { count: 0 };
-        window.sessionMap[itemNumber].count += 1;
-        localStorage.setItem('lastUsedCategory', liveCategory);
-        window.sessionMap[itemNumber].category = liveCategory;
-        window.sessionMap[itemNumber].location = localStorage.getItem('activeBay') || '';
-      }
-
-      addItemToScanTable(itemNumber, scannedCode, itemType, liveCategory);
-      closeModal();
-    });
-  }
-
+  // --- (If itemEntryModal is used, do not show fallback modal or customModal logic) ---
+  // All customModal logic for unknown UPCs is removed/commented out.
   // Always update the live table after a scan (manual or mapped)
   if (typeof window.updateLiveTable === 'function') {
     console.log('[🧪] updateLiveTable firing from handleManualScan');
@@ -1582,3 +1437,108 @@ function handleEditConfirm(index) {
 // --- PATCH: Prevent summary modal from opening automatically on page load ---
 // There is no code here that shows the summary modal (#summaryModal) on page load or outside of a user-triggered function.
 // All summary modal displays (e.g., summaryModal.style.display = 'block') are inside click event handlers or conditionals.
+
+// --- RESTORED: Handle scanned UPCs (from scanner or input field) ---
+// Place this after modal setup logic so showItemModal is available
+(function() {
+  // Helper: get current bay (from memory or storage)
+  function getCurrentBay() {
+    // Prefer in-memory currentBay if available, else from localStorage
+    if (typeof currentBay === 'object' && currentBay && currentBay.name) return currentBay.name;
+    return localStorage.getItem('activeBay') || currentBay || '';
+  }
+
+  // Helper: update scan stats display (fallback to updateSessionStats if available)
+  function updateScanStatsDisplay() {
+    if (typeof updateSessionStats === 'function') {
+      updateSessionStats(getTotalItemCount(), getCurrentBay() || 'None', localStorage.getItem('selectedCategory') || 'None');
+    }
+  }
+
+  // Helper: increment item count in session (fallback logic)
+  function incrementItemCount(upc, itemNumber, category, bay) {
+    window.sessionMap = window.sessionMap || {};
+    if (!window.sessionMap[itemNumber]) window.sessionMap[itemNumber] = { count: 0 };
+    window.sessionMap[itemNumber].count += 1;
+    window.sessionMap[itemNumber].category = category;
+    window.sessionMap[itemNumber].location = bay;
+    if (typeof window.updateLiveTable === 'function') window.updateLiveTable();
+  }
+
+  // Helper: show toast
+  function showToast(msg, type) {
+    if (typeof createToast === 'function') createToast(msg, type);
+  }
+
+  // Helper: show item modal for unknown UPC
+  function showItemModal(upc) {
+    // Prefer itemEntryModal if present, else fallback to mapPromptModal
+    const itemEntryModal = document.getElementById('itemEntryModal');
+    const isAnyModalActive = Array.from(document.querySelectorAll('.modal'))
+      .some(modal => modal.style.display && modal.style.display !== 'none');
+    if (itemEntryModal && !isAnyModalActive) {
+      itemEntryModal.style.display = 'block';
+      const upcInput = document.getElementById('upcInputField');
+      if (upcInput) upcInput.value = upc;
+      const itemNumInput = document.getElementById('itemNumberInputField');
+      if (itemNumInput) itemNumInput.focus();
+      return;
+    }
+    // Fallback to mapPromptModal
+    const modal = document.getElementById('mapPromptModal');
+    const codeSpan = document.getElementById('mapPromptCode');
+    if (modal && codeSpan) {
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+      modal.style.position = 'fixed';
+      modal.style.top = '50%';
+      modal.style.left = '50%';
+      modal.style.transform = 'translate(-50%, -50%)';
+      modal.style.zIndex = '9999';
+      codeSpan.textContent = upc;
+      window._mappingCode = upc;
+    }
+  }
+
+  // --- UPC to Item map (in-memory or from storage) ---
+  function getUPCToItemMap() {
+    return window.upcToItem || JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+  }
+
+  // Main handler for scanned UPCs
+  window.handleScannedUPC = function handleScannedUPC(upc) {
+    const bay = getCurrentBay();
+    const category = localStorage.getItem('selectedCategory') || '';
+    const upcToItem = getUPCToItemMap();
+    const scannedItem = upcToItem[upc];
+
+    if (!bay || !category) {
+      showToast('Please select a bay and category before scanning.', 'error');
+      return;
+    }
+
+    if (scannedItem) {
+      incrementItemCount(upc, scannedItem, category, bay);
+    } else {
+      showItemModal(upc);
+    }
+
+    updateScanStatsDisplay(); // Refresh stats after each scan
+  };
+
+  // Attach scan line input listener (if present)
+  document.addEventListener('DOMContentLoaded', () => {
+    const scanLine = document.getElementById('scanLine');
+    if (scanLine) {
+      scanLine.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const input = e.target.value.trim();
+          e.target.value = '';
+          if (input) {
+            handleScannedUPC(input);
+          }
+        }
+      });
+    }
+  });
+})();

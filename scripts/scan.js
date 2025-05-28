@@ -46,14 +46,17 @@ async function handleScanInput(val) {
       !window.eslToUPC?.[resolved] &&
       !window.locationMap?.[resolved]
     ) {
-      const modal = document.getElementById("itemEntryModal");
-      if (modal) {
-        window.setCurrentUPC?.(resolved);
-        modal.style.display = "block";
+      if (typeof window.promptCodeType === 'function') {
+        window.promptCodeType(resolved);
+      } else {
+        const fallbackModal = document.getElementById("itemEntryModal");
+        if (fallbackModal) {
+          window.setCurrentUPC?.(resolved);
+          fallbackModal.style.display = "block";
+        }
       }
-
       resetScanInput();
-      return; // Stop further processing until mapped
+      return;
     }
 
     const modal = document.getElementById('itemEntryModal');
@@ -65,6 +68,12 @@ async function handleScanInput(val) {
     }
 
     processScan(resolved);
+    // Show modal for known UPC as well
+    const knownModal = document.getElementById('itemEntryModal');
+    if (knownModal) {
+      window.setCurrentUPC?.(resolved);
+      knownModal.style.display = 'block';
+    }
     if (typeof window.updateMapStatusDisplay === 'function') {
       window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
     }
@@ -140,4 +149,35 @@ window.setItemCategory = function (category) {
   window.itemCategory = category;
   localStorage.setItem('itemCategory', category);
   console.log(`📦 Category set to: ${category}`);
+};
+
+window.promptCodeType = function(code) {
+  const modal = document.getElementById("customModal");
+  if (!modal) {
+    console.warn("⚠️ customModal not found in DOM.");
+    return;
+  }
+
+  window.setCurrentUPC?.(code);
+  modal.style.display = "block";
+
+  const upcBtn = modal.querySelector("#assignUPCBtn");
+  const eslBtn = modal.querySelector("#linkESLBtn");
+  const bayBtn = modal.querySelector("#assignBayBtn");
+
+  if (upcBtn) upcBtn.onclick = () => {
+    modal.style.display = "none";
+    const entryModal = document.getElementById("itemEntryModal");
+    if (entryModal) entryModal.style.display = "block";
+  };
+  if (eslBtn) eslBtn.onclick = () => {
+    modal.style.display = "none";
+    const eslModal = document.getElementById("customModal");
+    if (eslModal) eslModal.style.display = "block";
+  };
+  if (bayBtn) bayBtn.onclick = () => {
+    modal.style.display = "none";
+    const bayModal = document.getElementById("bayAssignModal");
+    if (bayModal) bayModal.style.display = "block";
+  };
 };
