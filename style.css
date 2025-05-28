@@ -1314,3 +1314,54 @@ body::after {
 .settings-button:hover {
   animation: pulseGlow 1.2s ease-in-out infinite alternate;
 }
+/* Session Summary Modal */
+#sessionSummaryModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1e1e2f;
+  color: #fff;
+  border-radius: 10px;
+  padding: 30px;
+  z-index: 1001;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 500px;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#sessionSummaryModal.show {
+  display: block;
+  opacity: 1;
+}
+
+#sessionSummaryModal h2 {
+  margin-top: 0;
+  font-size: 24px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+#sessionSummaryModal p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+#closeSessionSummaryBtn {
+  display: inline-block;
+  margin-top: 20px;
+  background-color: #5c6bc0;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#closeSessionSummaryBtn:hover {
+  background-color: #7986cb;
+}

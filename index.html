@@ -395,6 +395,19 @@
     </div>
   </div>
 
+  <!-- Summary Modal -->
+  <div id="summaryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="summaryTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:10000;display:flex;justify-content:center;align-items:center;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;max-height:80%;overflow:auto;">
+      <h3 id="summaryTitle" style="text-align:center;">📋 Bay Audit Summary</h3>
+      <div id="summaryContent" style="margin-top:15px; font-size: 0.95em;">
+        <!-- Summary data will be injected here -->
+      </div>
+      <div style="text-align:center; margin-top:15px;">
+        <button id="closeSummaryBtn" style="margin:5px;">✅ Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Toast system script -->

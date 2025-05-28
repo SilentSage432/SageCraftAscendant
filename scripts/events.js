@@ -664,6 +664,39 @@ function initEventListeners() {
 
       // Optional: reset bay-related logic if needed
       createToast('Bay closed successfully.');
+
+      // --- SESSION SUMMARY MODAL LOGIC (Refactored as per request) ---
+      // Show session summary modal
+      const summaryModal = document.getElementById('summaryModal');
+      const summaryContent = document.getElementById('summaryContent');
+      const activeBay = localStorage.getItem('activeBay');
+      const auditData = JSON.parse(localStorage.getItem('auditData')) || {};
+      const bayData = auditData[activeBay] || {};
+      const totalItems = Object.values(bayData).reduce((sum, count) => sum + count, 0);
+      const uniqueUPCs = Object.keys(bayData).length;
+      const auditTimers = JSON.parse(localStorage.getItem('bayAuditTimers')) || {};
+      const auditTime = auditTimers[activeBay] || 0;
+
+      if (summaryContent) {
+        summaryContent.innerHTML = `
+          <p><strong>Bay:</strong> ${activeBay}</p>
+          <p><strong>Total Items Scanned:</strong> ${totalItems}</p>
+          <p><strong>Unique Items:</strong> ${uniqueUPCs}</p>
+          <p><strong>Audit Time:</strong> ${auditTime} seconds</p>
+        `;
+      }
+
+      if (summaryModal) {
+        summaryModal.style.display = 'block';
+      }
+    });
+  }
+
+  // --- Summary Modal Close Button Listener ---
+  const closeSummaryBtn = document.getElementById('closeSummaryBtn');
+  if (closeSummaryBtn) {
+    closeSummaryBtn.addEventListener('click', () => {
+      document.getElementById('summaryModal').style.display = 'none';
     });
   }
 
