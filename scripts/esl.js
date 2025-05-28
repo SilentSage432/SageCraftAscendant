@@ -9,7 +9,7 @@ import {
 
 import { saveESLMap } from './session.js';
   
-  import { processScan } from './scan.js';
+const processScan = window.processScan;
   
   export function isESL(code) {
     return typeof code === 'string' && code.length === 13 && code.startsWith('0');

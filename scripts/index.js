@@ -7,10 +7,10 @@ import {
   generateCodeVerifier,
   generateCodeChallenge
 } from './dropbox.js';
-import { initScan } from './scan.js';
+import './scan.js';
 import { initESL } from './esl.js';
 import { initSessionTools } from './session.js';
-import { initEventListeners } from './events.js';
+import './events.js';
 import { renderTrendChart, setupTrendModalToggle } from './charts.js';
 import { setupReportButton, setupTemplateExportButton } from './report.js';
 

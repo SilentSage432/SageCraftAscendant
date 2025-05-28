@@ -55,10 +55,6 @@ bindModalEditConfirmListener();
 // Also bind after DOMContentLoaded in case button is added later
 document.addEventListener('DOMContentLoaded', bindModalEditConfirmListener);
 
-import { createToast, updateMapStatusDisplay, renderBayAuditLog } from './ui.js';
-
-window.createToast = createToast;
-window.updateMapStatusDisplay = updateMapStatusDisplay;
 
 // --- Bay Audit Timing State ---
 let currentBay = null;
@@ -315,7 +311,7 @@ window.handleManualScan = function (e) {
 
 window.addEventListener('manual-scan', window.handleManualScan);
 
-export function initEventListeners() {
+function initEventListeners() {
   // --- Live Entry scanner input handler ---
   const liveEntry = document.getElementById('liveEntry');
   if (liveEntry) {
@@ -339,11 +335,7 @@ export function initEventListeners() {
   // (Already present: see setupTabNavigation and other UI component listeners below.)
   console.log('🎛️ Event listeners initialized');
   // Update map status display on startup with data from localStorage
-  updateMapStatusDisplay(
-    JSON.parse(localStorage.getItem('locationMap') || '{}'),
-    JSON.parse(localStorage.getItem('upcToItemMap') || '{}'),
-    JSON.parse(localStorage.getItem('eslToUPCMap') || '{}')
-  );
+  // (Removed direct call to updateMapStatusDisplay to avoid ReferenceError before async import)
 
   setupTabNavigation();
 
@@ -1151,7 +1143,7 @@ export function initEventListeners() {
   }
 }
 
-export function setupTabNavigation() {
+function setupTabNavigation() {
   const tabs = document.querySelectorAll('.tablink');
   const sections = document.querySelectorAll('.tab-section');
 
@@ -1281,13 +1273,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 
-// --- Ensure DOMContentLoaded sets up all UI interactions ---
-document.addEventListener('DOMContentLoaded', () => {
-  initEventListeners();
-  if (typeof initializeUI === 'function') {
-    initializeUI();
-  }
-});
 // --- Edit Modal Logic for Live Scan Table ---
 // Handles confirm/cancel for editing live scan table entries
 document.addEventListener('DOMContentLoaded', () => {
@@ -1335,3 +1320,20 @@ window.openEditModalForRow = function(row) {
   // Show modal
   document.getElementById('editModal').classList.add('show');
 };
+
+// --- Ensure UI helpers and event listeners are loaded in order ---
+(async () => {
+  const { createToast, updateMapStatusDisplay, renderBayAuditLog } = await import('./ui.js');
+  window.createToast = createToast;
+  window.updateMapStatusDisplay = updateMapStatusDisplay;
+  window.renderBayAuditLog = renderBayAuditLog;
+
+  // ✅ Safe to initialize after UI helpers are loaded
+  initEventListeners();
+  if (typeof initializeUI === 'function') {
+    initializeUI();
+  }
+})();
+// Expose these functions globally for dev-debug.js and others
+window.initEventListeners = initEventListeners;
+window.setupTabNavigation = setupTabNavigation;

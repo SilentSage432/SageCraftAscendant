@@ -1,4 +1,3 @@
-import { updateMapStatusDisplay } from './ui.js';
 
 // Load persisted category from localStorage if available
 if (!window.itemCategory) {
@@ -34,16 +33,16 @@ async function handleScanInput(val) {
     if (typeof resolved === 'object' && resolved.type === 'esl') {
       console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
       if (resolved.item) upcToItem[resolved.upc] = resolved.item;
-      if (typeof updateMapStatusDisplay === 'function') {
-        updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+      if (typeof window.updateMapStatusDisplay === 'function') {
+        window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       }
       processScan(resolved.item || resolved.upc);
       resetScanInput();
       return;
     }
     processScan(resolved);
-    if (typeof updateMapStatusDisplay === 'function') {
-      updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+    if (typeof window.updateMapStatusDisplay === 'function') {
+      window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
     }
     resetScanInput();
     return;
@@ -100,14 +99,17 @@ function resetScanInput() {
   if (liveEntryInput) liveEntryInput.value = '';
 }
 
-export { processScan, handleScanInput, resetScanInput, resolveScanCode };
+window.processScan = processScan;
+window.handleScanInput = handleScanInput;
+window.resetScanInput = resetScanInput;
+window.resolveScanCode = resolveScanCode;
 
-export function initScan() {
+window.initScan = function () {
   console.log("🔧 Scan module initialized");
-}
+};
 
-export function setItemCategory(category) {
+window.setItemCategory = function (category) {
   window.itemCategory = category;
   localStorage.setItem('itemCategory', category);
   console.log(`📦 Category set to: ${category}`);
-}
+};
