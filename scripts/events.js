@@ -1,3 +1,38 @@
+// --- Confirm and Cancel Edit Button Listeners for editItemModal ---
+// These listeners handle edits for the liveScanTable using the editItemModal modal.
+document.getElementById('confirmEditBtn')?.addEventListener('click', () => {
+  const rowIndex = parseInt(document.getElementById('editItemModal').dataset.rowIndex, 10);
+  const newQuantity = parseInt(document.getElementById('editItemQty').value, 10);
+  const newCategory = document.getElementById('editItemCategory').value.trim();
+
+  if (!isNaN(rowIndex) && !isNaN(newQuantity) && newCategory) {
+    const table = document.getElementById('liveScanTable');
+    const row = table.rows[rowIndex];
+    if (row) {
+      row.cells[1].textContent = newQuantity;
+      row.cells[2].textContent = newCategory;
+
+      const scannedItems = JSON.parse(localStorage.getItem('scannedItems') || '[]');
+      if (scannedItems[rowIndex]) {
+        scannedItems[rowIndex].quantity = newQuantity;
+        scannedItems[rowIndex].category = newCategory;
+        localStorage.setItem('scannedItems', JSON.stringify(scannedItems));
+      }
+
+      document.getElementById('editItemModal').classList.add('hidden');
+      console.log('✅ Edit confirmed and saved.');
+    }
+  } else {
+    console.warn('⚠️ Invalid edit values or row index.');
+  }
+});
+
+document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+  document.getElementById('editItemModal').classList.add('hidden');
+  document.getElementById('editItemQty').value = '';
+  document.getElementById('editItemCategory').value = '';
+  console.log('❌ Edit cancelled.');
+});
 // --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
 // --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
 // The modalEditConfirm button may be created dynamically, so bind the event outside DOMContentLoaded
@@ -1206,6 +1241,8 @@ document.addEventListener('DOMContentLoaded', () => {
           timestamp: new Date().toLocaleString()
         });
         saveScannedItems();
+        // Explicitly update the live scan table after adding an item
+        if (typeof renderLiveTable === "function") renderLiveTable();
       }
 
       // Persist the last selected map type globally
@@ -1337,3 +1374,42 @@ window.openEditModalForRow = function(row) {
 // Expose these functions globally for dev-debug.js and others
 window.initEventListeners = initEventListeners;
 window.setupTabNavigation = setupTabNavigation;
+// --- Edit Modal Logic for Live Scan Table (Alternative Edit Modal) ---
+// Wire up modal confirm/cancel for alternative edit modal if present
+document.addEventListener('DOMContentLoaded', () => {
+  // Confirm button for alternative edit modal
+  const editConfirmBtn = document.getElementById('editConfirmBtn');
+  if (editConfirmBtn) {
+    editConfirmBtn.addEventListener('click', () => {
+      const index = document.getElementById('editIndex')?.value;
+      const newItemNumber = document.getElementById('editItemNumber')?.value;
+      const newQuantity = parseInt(document.getElementById('editQuantity')?.value, 10);
+      const newCategory = document.getElementById('editCategory')?.value;
+
+      if (index !== null && !isNaN(index)) {
+        const idx = parseInt(index, 10);
+        if (window.scannedItems && window.scannedItems[idx]) {
+          const item = window.scannedItems[idx];
+          item.itemNumber = newItemNumber;
+          item.quantity = newQuantity;
+          item.category = newCategory;
+          if (typeof saveScannedItems === "function") saveScannedItems();
+          if (typeof renderLiveTable === "function") renderLiveTable();
+          if (typeof closeModal === "function") closeModal('editModal');
+          // Fallback close (if closeModal unavailable)
+          const modal = document.getElementById('editModal');
+          if (modal) modal.style.display = 'none';
+        }
+      }
+    });
+  }
+  // Cancel button for alternative edit modal
+  const editCancelBtn = document.getElementById('editCancelBtn');
+  if (editCancelBtn) {
+    editCancelBtn.addEventListener('click', () => {
+      if (typeof closeModal === "function") closeModal('editModal');
+      const modal = document.getElementById('editModal');
+      if (modal) modal.style.display = 'none';
+    });
+  }
+});
