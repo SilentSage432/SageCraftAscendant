@@ -1,3 +1,38 @@
+// --- Mapping Modal Confirm/Cancel and Scan Type Buttons ---
+// Confirm button in mapping modal
+document.getElementById('confirmModalBtn')?.addEventListener('click', () => {
+  if (typeof handleMappingConfirmation === 'function') {
+    handleMappingConfirmation();
+  }
+});
+// Cancel button in mapping modal
+document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
+  if (typeof closeSmartModal === 'function') {
+    closeSmartModal();
+  }
+});
+// Scan type buttons in mapping modal
+document.getElementById('modalBtnProduct')?.addEventListener('click', () => {
+  if (typeof setMappingType === 'function') setMappingType('product');
+});
+document.getElementById('modalBtnESL')?.addEventListener('click', () => {
+  if (typeof setMappingType === 'function') setMappingType('esl');
+});
+document.getElementById('modalBtnLocation')?.addEventListener('click', () => {
+  if (typeof setMappingType === 'function') setMappingType('bay');
+});
+
+// --- Edit Modal Confirm/Cancel Buttons ---
+document.getElementById('confirmEditBtn')?.addEventListener('click', () => {
+  if (typeof handleEditConfirmation === 'function') {
+    handleEditConfirmation();
+  }
+});
+document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+  if (typeof closeEditModal === 'function') {
+    closeEditModal();
+  }
+});
 // --- Confirm and Cancel Edit Button Listeners for editItemModal ---
 // These listeners handle edits for the liveScanTable using the editItemModal modal.
 document.getElementById('confirmEditBtn')?.addEventListener('click', () => {
@@ -1377,39 +1412,39 @@ window.setupTabNavigation = setupTabNavigation;
 // --- Edit Modal Logic for Live Scan Table (Alternative Edit Modal) ---
 // Wire up modal confirm/cancel for alternative edit modal if present
 document.addEventListener('DOMContentLoaded', () => {
-  // Confirm button for alternative edit modal
+  // Select modal buttons
   const editConfirmBtn = document.getElementById('editConfirmBtn');
+  const editCancelBtn = document.getElementById('editCancelBtn');
+
+  // Add event listeners as per requirements
   if (editConfirmBtn) {
     editConfirmBtn.addEventListener('click', () => {
-      const index = document.getElementById('editIndex')?.value;
-      const newItemNumber = document.getElementById('editItemNumber')?.value;
-      const newQuantity = parseInt(document.getElementById('editQuantity')?.value, 10);
-      const newCategory = document.getElementById('editCategory')?.value;
-
-      if (index !== null && !isNaN(index)) {
-        const idx = parseInt(index, 10);
-        if (window.scannedItems && window.scannedItems[idx]) {
-          const item = window.scannedItems[idx];
-          item.itemNumber = newItemNumber;
-          item.quantity = newQuantity;
-          item.category = newCategory;
-          if (typeof saveScannedItems === "function") saveScannedItems();
-          if (typeof renderLiveTable === "function") renderLiveTable();
-          if (typeof closeModal === "function") closeModal('editModal');
-          // Fallback close (if closeModal unavailable)
-          const modal = document.getElementById('editModal');
-          if (modal) modal.style.display = 'none';
-        }
-      }
+      const index = editConfirmBtn.getAttribute('data-index');
+      handleEditConfirm(index);
     });
   }
-  // Cancel button for alternative edit modal
-  const editCancelBtn = document.getElementById('editCancelBtn');
+
   if (editCancelBtn) {
     editCancelBtn.addEventListener('click', () => {
-      if (typeof closeModal === "function") closeModal('editModal');
-      const modal = document.getElementById('editModal');
-      if (modal) modal.style.display = 'none';
+      closeModal('editModal');
     });
   }
 });
+
+// Ensure handleEditConfirm is defined
+function handleEditConfirm(index) {
+  const newItem = document.getElementById('editItemNumberInput')?.value.trim();
+  const newQty = parseInt(document.getElementById('editQtyInput')?.value.trim(), 10);
+  const newCategory = document.getElementById('editCategorySelect')?.value;
+
+  if (index !== null && !isNaN(newQty) && newItem && newCategory) {
+    if (typeof updateItemEntry === 'function') {
+      updateItemEntry(index, newItem, newQty, newCategory);
+    }
+    if (typeof closeModal === 'function') {
+      closeModal('editModal');
+    }
+  } else {
+    console.warn('Invalid input on edit modal.');
+  }
+}

@@ -53,4 +53,33 @@ if (window.location.href.includes('debug=true')) {
       const session = JSON.parse(localStorage.getItem('sessionData') || '{}');
       console.log('%c[DEBUG] Session Data:', 'color: chartreuse;', session);
     };
+
+    // Run a full audit of critical elements and listeners
+    window.runAuditReport = function () {
+      console.log('%c[DEBUG] Running Full Audit Report...', 'color: magenta; font-weight: bold;');
+
+      const expectedIds = [
+        'scanInput', 'addItemBtn', 'categorySelect', 'liveScanTableBody',
+        'confirmEditBtn', 'cancelEditBtn', 'editModal', 'confirmModalBtn', 'cancelModalBtn'
+      ];
+
+      expectedIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          console.log(`%c✔ Element #${id} exists.`, 'color: green;');
+        } else {
+          console.warn(`%c✖ Element #${id} is missing.`, 'color: red;');
+        }
+      });
+
+      const testEvent = 'manual-scan';
+      const listenerCount = getEventListeners ? getEventListeners(window)[testEvent]?.length : undefined;
+      if (listenerCount > 0) {
+        console.log(`%c✔ '${testEvent}' has ${listenerCount} listener(s).`, 'color: green;');
+      } else {
+        console.warn(`%c✖ '${testEvent}' has no attached listeners.`, 'color: red;');
+      }
+
+      console.log('%c[DEBUG] Audit complete.', 'color: magenta;');
+    };
   }

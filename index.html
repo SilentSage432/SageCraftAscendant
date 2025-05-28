@@ -85,9 +85,9 @@
         <div id="entryControls" class="scan-capsule" role="region" aria-label="Scan Entry Controls">
           <h3>📲 Scan Entry</h3>
           <div class="scan-fields">
-            <input id="liveEntry" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
+            <input id="scanInput" data-id="scanInput" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
             <input type="number" id="liveQty" value="1" min="1" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
-            <select id="liveCategory" class="category-select" aria-label="Select item category">
+            <select id="categorySelect" data-id="categorySelect" class="category-select" aria-label="Select item category">
               <option value="Laundry">Laundry</option>
               <option value="Fridges & Freezers">Fridges & Freezers</option>
               <option value="Ranges">Ranges</option>
@@ -110,7 +110,7 @@
           </div>
 
           <div class="scan-buttons">
-            <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
+            <button id="addItemBtn" aria-label="Add scanned item to count">Add Item</button>
             <button id="moreOptionsBtn" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
           </div>
 
@@ -352,8 +352,8 @@
       <div id="mapInputSection" class="hidden" style="margin-top: 15px;">
         <label id="mapPromptLabel" for="mapPromptInput"></label>
         <input type="text" id="mapPromptInput" placeholder="Enter value..." />
-        <button id="modalSubmit" type="button" style="margin-top: 10px;">✅ Confirm</button>
-        <button id="modalCancel" type="button" style="margin-top: 10px; background-color: #b00; color: white;">❌ Cancel</button>
+        <button id="confirmModalBtn" type="button" style="margin-top: 10px;">✅ Confirm</button>
+        <button id="cancelModalBtn" type="button" style="margin-top: 10px; background-color: #b00; color: white;">❌ Cancel</button>
       </div>
     </div>
   </div>
@@ -362,7 +362,7 @@
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; align-items: center;"></div>
 
   <!-- Edit Item Modal -->
-  <div id="editItemModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editItemTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editItemTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
       <h3 id="editItemTitle">✏️ Edit Item</h3>
       <label for="editItemQty">Quantity:</label>
