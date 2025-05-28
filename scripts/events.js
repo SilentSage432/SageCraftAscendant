@@ -11,15 +11,83 @@ document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
     closeSmartModal();
   }
 });
-// Scan type buttons in mapping modal
-document.getElementById('modalBtnProduct')?.addEventListener('click', () => {
+// --- Modal Code Type Selection Buttons (Product/ESL/Bay) ---
+// Refactored: Add a single clean set of event listeners in DOMContentLoaded below
+// --- Handlers for modal code type selection buttons ---
+function handleProduct() {
   if (typeof setMappingType === 'function') setMappingType('product');
-});
-document.getElementById('modalBtnESL')?.addEventListener('click', () => {
+  window._selectedType = 'product';
+  window.currentMapType = 'product';
+  const inputSection = document.getElementById("mapInputSection");
+  if (inputSection) inputSection.classList.remove("hidden");
+  const inputField = document.getElementById("mapPromptInput");
+  if (inputField) inputField.focus();
+  // Prefill modal input with scanned code and focus submit
+  if (window._mappingCode) {
+    if (inputField) inputField.value = window._mappingCode;
+  }
+  const submitBtn = document.getElementById("modalSubmit");
+  if (submitBtn) submitBtn.focus();
+}
+function handleESL() {
   if (typeof setMappingType === 'function') setMappingType('esl');
-});
-document.getElementById('modalBtnLocation')?.addEventListener('click', () => {
+  window._selectedType = 'esl';
+  window.currentMapType = 'esl';
+  const inputSection = document.getElementById("mapInputSection");
+  if (inputSection) inputSection.classList.remove("hidden");
+  const inputField = document.getElementById("mapPromptInput");
+  if (inputField) inputField.focus();
+  // Prefill modal input with scanned code and focus submit
+  if (window._mappingCode) {
+    if (inputField) inputField.value = window._mappingCode;
+  }
+  const submitBtn = document.getElementById("modalSubmit");
+  if (submitBtn) submitBtn.focus();
+}
+function handleBay() {
   if (typeof setMappingType === 'function') setMappingType('bay');
+  window._selectedType = 'bay';
+  window.currentMapType = 'bay';
+  const inputSection = document.getElementById("mapInputSection");
+  if (inputSection) inputSection.classList.remove("hidden");
+  const inputField = document.getElementById("mapPromptInput");
+  if (inputField) inputField.focus();
+  // Prefill modal input with scanned code and focus submit
+  if (window._mappingCode) {
+    if (inputField) inputField.value = window._mappingCode;
+  }
+  const submitBtn = document.getElementById("modalSubmit");
+  if (submitBtn) submitBtn.focus();
+}
+// --- Refactored: Attach modal code type selection listeners robustly on DOMContentLoaded ---
+document.addEventListener("DOMContentLoaded", () => {
+  const modalBtnProduct = document.getElementById("modalBtnProduct");
+  const modalBtnESL = document.getElementById("modalBtnESL");
+  const modalBtnBay = document.getElementById("modalBtnLocation") || document.getElementById("modalBtnBay");
+
+  if (modalBtnProduct && !modalBtnProduct.dataset.bound) {
+    modalBtnProduct.addEventListener("click", () => {
+      console.log("Product button clicked");
+      handleProduct();
+    });
+    modalBtnProduct.dataset.bound = "true";
+  }
+
+  if (modalBtnESL && !modalBtnESL.dataset.bound) {
+    modalBtnESL.addEventListener("click", () => {
+      console.log("ESL button clicked");
+      handleESL();
+    });
+    modalBtnESL.dataset.bound = "true";
+  }
+
+  if (modalBtnBay && !modalBtnBay.dataset.bound) {
+    modalBtnBay.addEventListener("click", () => {
+      console.log("Bay button clicked");
+      handleBay();
+    });
+    modalBtnBay.dataset.bound = "true";
+  }
 });
 
 // --- Edit Modal Confirm/Cancel Buttons ---
@@ -1228,6 +1296,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`Mapped ${code} to ESL: ${input}`);
         updateMapStatusDisplay();
         if (typeof renderLiveScanTable === "function") renderLiveScanTable();
+        // Update sessionMap for esl
+        if (!window.sessionMap) window.sessionMap = {};
+        if (!window.sessionMap[input]) window.sessionMap[input] = { count: 0 };
+        window.sessionMap[input].count += 1;
+        window.sessionMap[input].category = liveCategory;
+        window.sessionMap[input].location = localStorage.getItem('activeBay') || '';
       } else if (currentMapType === "bay") {
         // Bay mapping: update locationMap
         let locationMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
@@ -1236,16 +1310,31 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`Mapped ${code} to Bay: ${input}`);
         updateMapStatusDisplay();
         if (typeof renderLiveScanTable === "function") renderLiveScanTable();
+        // Update sessionMap for bay
+        if (!window.sessionMap) window.sessionMap = {};
+        if (!window.sessionMap[input]) window.sessionMap[input] = { count: 0 };
+        window.sessionMap[input].count += 1;
+        window.sessionMap[input].category = liveCategory;
+        window.sessionMap[input].location = input;
       }
 
-      // Do NOT reset window.currentMapType here; keep it as last user selection
-      // Do NOT reset any category or map type radio/toggle UI here
+      // Dispatch session-updated event after all map types
+      window.dispatchEvent(new CustomEvent('session-updated'));
+
+      // Reset _mappingCode and currentMapType after modal closes
+      window._mappingCode = '';
+      window.currentMapType = '';
+
+      // Hide the modal completely and reset input/section
       const modal = document.getElementById("mapPromptModal");
-      if (modal) modal.style.display = "none";
-      const inputSection = document.getElementById("mapInputSection");
-      if (inputSection) inputSection.classList.add("hidden");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+      }
       const inputField = document.getElementById("mapPromptInput");
       if (inputField) inputField.value = "";
+      const inputSection = document.getElementById("mapInputSection");
+      if (inputSection) inputSection.classList.add("hidden");
     });
   }
 
@@ -1420,9 +1509,9 @@ function handleEditConfirm(index) {
   "restoreDropboxMaps",
   "downloadBackupBtn",
   "cleanStaleSessions",
-  "modalBtnLocation",
-  "modalBtnProduct",
-  "modalBtnESL",
+  // Removed: "modalBtnLocation",
+  // Removed: "modalBtnProduct",
+  // Removed: "modalBtnESL",
   "modalBtnCancel",
   "mapTypeESL",
   "mapTypeProduct",

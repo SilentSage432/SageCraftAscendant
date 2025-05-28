@@ -65,30 +65,30 @@ async function handleScanInput(val) {
       if (typeof window.promptCodeType === 'function') {
         window.promptCodeType(resolved);
       } else {
-        const fallbackModal = document.getElementById("itemEntryModal");
+        const fallbackModal = document.getElementById("mapPromptModal");
         if (fallbackModal) {
           window.setCurrentUPC?.(resolved);
-          fallbackModal.style.display = "block";
+          fallbackModal.classList.remove("hidden");
         }
       }
       resetScanInput();
       return;
     }
 
-    const modal = document.getElementById('itemEntryModal');
+    const modal = document.getElementById('mapPromptModal');
     if (modal) {
       window.setCurrentUPC?.(resolved);
-      modal.style.display = 'block';
+      modal.classList.remove('hidden');
       resetScanInput();
       return;
     }
 
     processScan(resolved);
     // Show modal for known UPC as well
-    const knownModal = document.getElementById('itemEntryModal');
+    const knownModal = document.getElementById('mapPromptModal');
     if (knownModal) {
       window.setCurrentUPC?.(resolved);
-      knownModal.style.display = 'block';
+      knownModal.classList.remove('hidden');
     }
     if (typeof window.updateMapStatusDisplay === 'function') {
       window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
@@ -161,28 +161,6 @@ window.initScan = function () {
   console.log("🔧 Scan module initialized");
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  const upcBtn = document.getElementById("assignUPCBtn");
-  const eslBtn = document.getElementById("linkESLBtn");
-  const bayBtn = document.getElementById("assignBayBtn");
-
-  const transitionToEntry = (type) => {
-    const modal = document.getElementById("customModal");
-    if (modal) modal.style.display = "none";
-    const entryModal = document.getElementById("itemEntryModal");
-    if (entryModal) {
-      entryModal.style.display = "block";
-      const codeTypeInput = entryModal.querySelector("#codeType");
-      if (codeTypeInput) codeTypeInput.value = type || '';
-      const liveEntryInput = entryModal.querySelector("#liveEntry");
-      if (liveEntryInput) liveEntryInput.focus();
-    }
-  };
-
-  if (upcBtn) upcBtn.addEventListener("click", () => transitionToEntry('upc'));
-  if (eslBtn) eslBtn.addEventListener("click", () => transitionToEntry('esl'));
-  if (bayBtn) bayBtn.addEventListener("click", () => transitionToEntry('bay'));
-});
 
 window.setItemCategory = function (category) {
   window.itemCategory = category;
@@ -199,17 +177,22 @@ window.promptCodeType = function(code) {
 
   window.setCurrentUPC?.(code);
   modal.style.display = "block";
+  modal.removeAttribute("aria-hidden");
+
+  const entryModal = document.getElementById("mapPromptModal");
+  if (entryModal) entryModal.classList.add("hidden");
 
   const transitionToEntry = (type) => {
-    const modal = document.getElementById("customModal");
-    if (modal) modal.style.display = "none";
-    const entryModal = document.getElementById("itemEntryModal");
+    modal.style.display = "none";
     if (entryModal) {
-      entryModal.style.display = "block";
-      const codeTypeInput = entryModal.querySelector("#codeType");
+      entryModal.classList.remove("hidden");
+      const codeTypeInput = entryModal.querySelector("#mapPromptLabel");
       if (codeTypeInput) codeTypeInput.value = type || '';
-      const liveEntryInput = entryModal.querySelector("#liveEntry");
-      if (liveEntryInput) liveEntryInput.focus();
+      const liveEntryInput = entryModal.querySelector("#mapPromptInput");
+      if (liveEntryInput) {
+        liveEntryInput.value = '';
+        liveEntryInput.focus();
+      }
     }
   };
 
@@ -217,18 +200,14 @@ window.promptCodeType = function(code) {
   const eslBtn = modal.querySelector("#linkESLBtn");
   const bayBtn = modal.querySelector("#assignBayBtn");
 
-  if (upcBtn && !upcBtn.hasAttribute("data-bound")) {
-    upcBtn.addEventListener("click", () => transitionToEntry('upc'));
-    upcBtn.setAttribute("data-bound", "true");
+  // Always rebind fresh listeners
+  if (upcBtn) {
+    upcBtn.onclick = () => transitionToEntry('upc');
   }
-
-  if (eslBtn && !eslBtn.hasAttribute("data-bound")) {
-    eslBtn.addEventListener("click", () => transitionToEntry('esl'));
-    eslBtn.setAttribute("data-bound", "true");
+  if (eslBtn) {
+    eslBtn.onclick = () => transitionToEntry('esl');
   }
-
-  if (bayBtn && !bayBtn.hasAttribute("data-bound")) {
-    bayBtn.addEventListener("click", () => transitionToEntry('bay'));
-    bayBtn.setAttribute("data-bound", "true");
+  if (bayBtn) {
+    bayBtn.onclick = () => transitionToEntry('bay');
   }
 };
