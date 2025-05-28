@@ -87,4 +87,23 @@ if (window.location.href.includes('debug=true')) {
       console.log(`🧪 Debug Scan Triggered for code: ${code}`);
       handleScanInput(code);
     };
+
+    // Clear console logs
+    window.clearDebugLogs = function () {
+      console.clear();
+      console.log('%c[DEBUG] Console cleared.', 'color: gray;');
+    };
+
+    // Force open item entry modal with predefined code
+    window.triggerAddModal = function (code = '123456789012') {
+      const input = document.getElementById('scanInput');
+      if (input) {
+        input.value = code;
+        console.log('%c[DEBUG] Forcing item entry modal for:', 'color: lime;', code);
+        const event = new CustomEvent('manual-scan', { detail: code });
+        window.dispatchEvent(event);
+      } else {
+        console.warn('[DEBUG] scanInput not found.');
+      }
+    };
 }

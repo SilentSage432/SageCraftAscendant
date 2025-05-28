@@ -1470,6 +1470,18 @@ function updateSessionStats(count = 0, bay = 'None', category = 'None') {
 // Expose globally if needed
 window.updateSessionStats = updateSessionStats;
 window.getTotalItemCount = getTotalItemCount;
+
+// --- PATCH: Expose triggerAddModal globally for simulateScan and dev console
+window.triggerAddModal = function (code = '') {
+  const input = document.getElementById('liveEntry');
+  if (input) input.value = code;
+  const quantity = parseInt(document.getElementById('liveQty')?.value || '1', 10);
+  const category = document.getElementById('liveCategory')?.value || 'Uncategorized';
+
+  if (typeof window.handleManualScan === 'function') {
+    window.handleManualScan({ detail: { code, quantity, category } });
+  }
+};
 })();
 
 // --- Ensure UI helpers and event listeners are loaded in order ---
