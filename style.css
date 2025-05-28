@@ -1,3 +1,23 @@
+--- Active Bay Status Styles ---
+.active-bay-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.active-bay-status.active {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.active-bay-status.inactive {
+  background-color: #f8d7da;
+  color: #842029;
+}
 /* --- Zebra Striping for Better Row Readability --- */
 tbody tr:nth-child(even):not(.match):not(.over):not(.under) {
   background-color: rgba(255, 255, 255, 0.02);
@@ -147,6 +167,24 @@ textarea {
 
   #summaryBar {
     font-size: 14px;
+  }
+
+  .floating-nav {
+    bottom: 8px;
+    left: 8px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+    padding: 3px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -511,21 +549,47 @@ button:hover {
   margin-top: 10px;
 }
 
+/* --- Button Grid Responsive Layout --- */
 .button-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 10px;
-  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+/* --- Bay Status Styles --- */
+.bay-status {
+  font-weight: bold;
+  padding: 0.5em;
+  border-radius: 5px;
+  margin-top: 0.5em;
 }
 
-.button-grid button {
+.bay-status.active {
+  background-color: #145f3d;
+  color: white;
+}
+
+.bay-status.inactive {
+  background-color: #990000;
+  color: white;
+}
+
+/* Unified button style for all grid buttons (export/import/clear/etc) */
+.button-grid button,
+#exportBtn,
+#importBtn,
+#clearStorageBtn,
+#exportUPCBtn,
+#importUPCBtn {
+  padding: 12px 16px;
+  font-size: 16px;
   width: 100%;
+  box-sizing: border-box;
   max-width: 300px;
   margin: 6px auto !important;
   display: block !important;
   text-align: center !important;
-  padding: 10px 12px;
-  font-size: 14px;
   border-radius: 6px;
   background: linear-gradient(145deg, #6c2fd1, #8f3aff);
   color: white;
@@ -683,16 +747,16 @@ footer {
 }
 
 .nav-tabs .tablink {
-  padding: 10px 24px;
-  border-radius: 30px;
-  border: 2px solid #8f3aff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #8f3aff;
   background: rgba(60, 20, 100, 0.3);
   color: #cab3ff;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(147, 51, 234, 0.2);
+  box-shadow: 0 0 4px rgba(147, 51, 234, 0.2);
 }
 
 .nav-tabs .tablink:hover {
@@ -766,19 +830,14 @@ body::before {
   text-shadow: 0 0 6px #6a0dad;
   margin: 0;
 }
-.category-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(144, 62, 255, 0.15);
-  color: #d6bbff;
-  border: 1px solid #5f8fff;
-  box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
-  text-shadow: 0 0 3px #9b59b6;
-  margin-right: 8px;
-  margin-bottom: 6px;
+/* --- Category Group Layout --- */
+.category-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
 
 /* --- Audit Rotation Fancy Table Enhancements --- */
@@ -843,60 +902,45 @@ body::before {
 
 .floating-nav {
   position: fixed;
-  top: 50%;
-  left: 15px;
-  transform: translateY(-50%);
+  bottom: 8px;
+  left: 8px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 9999;
+  flex-direction: row;
+  gap: 2px;
+  z-index: 1000;
   pointer-events: auto;
-  background: rgba(40, 20, 60, 0.35);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(140, 100, 255, 0.2);
-  border-radius: 16px;
-  padding: 10px;
-  box-shadow: 0 0 18px rgba(147, 51, 234, 0.25);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(140, 100, 255, 0.15);
+  border-radius: 6px;
+  padding: 2px 4px;
+  box-shadow: 0 0 8px rgba(147, 51, 234, 0.15);
 }
 
 .nav-icon {
   background: linear-gradient(145deg, #6c2fd1, #8f3aff);
   border: 1px solid #8b5cf6;
   color: #fff;
-  font-size: 20px;
-  padding: 10px;
+  font-size: 10px;
+  padding: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 0 10px #a97ff3, 0 0 15px rgba(147, 51, 234, 0.3);
+  box-shadow: 0 0 6px #a97ff3, 0 0 12px rgba(147, 51, 234, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s, box-shadow 0.3s;
 }
 
 .nav-icon:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 16px #c084fc;
+  box-shadow: 0 0 12px #c084fc;
 }
 
 
-@media (max-width: 600px) {
-  .floating-nav {
-    top: auto;
-    bottom: 20px;
-    left: 10px;
-    transform: none;
-    flex-direction: row;
-    gap: 8px;
-    padding: 8px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
-  }
 
-  .nav-icon {
-    padding: 8px;
-    font-size: 16px;
-    box-shadow: 0 0 6px rgba(147, 51, 234, 0.3);
-  }
-}
 
 
 
@@ -948,6 +992,38 @@ tbody td {
 /* --- Scan Feedback Animation Styles --- */
 /* --- Dark Fantasy Theme Styles --- */
 /* --- Button Styles --- */
+
+/* General button styling */
+button,
+.button,
+.button-grid button {
+  min-width: 140px;
+  min-height: 45px;
+  font-size: 1rem;
+  /* padding: 0.5rem 1rem; */ /* Removed to avoid stretching nav-buttons button */
+  margin: 0.5rem;
+  box-sizing: border-box;
+  text-align: center;
+}
+/* --- Nav Buttons Circular Style --- */
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-buttons button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  opacity: 0.75;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 /* --- Table Styles --- */
 
 @keyframes shake-error {
@@ -1364,4 +1440,509 @@ body::after {
 
 #closeSessionSummaryBtn:hover {
   background-color: #7986cb;
+}
+
+/* Status Bar Enhancements */
+.status-bar {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Category Indicator */
+#categoryStatus {
+  color: #e0c36c;
+  font-size: 1.1rem;
+}
+
+/* Bay Indicator */
+#bayStatus {
+  color: #90ee90;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Button Styling Improvements */
+.button-grid button {
+  margin: 6px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+}
+
+/* Scan Input Field Styling */
+#scanInput {
+  font-size: 1.1rem;
+  padding: 8px;
+  margin-top: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Modal & Log Section Padding */
+.modal, .log-section {
+  margin-top: 15px;
+}
+/* --- Responsive Layout for Major Sections (Mobile/Tablet) --- */
+@media (max-width: 768px) {
+  .flex-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .scan-section,
+  .category-selector,
+  .bay-display,
+  .scan-table {
+    width: 100% !important;
+    margin: 10px 0 !important;
+  }
+
+  .scan-input {
+    width: 100% !important;
+  }
+
+  #summaryModalContent {
+    width: 95% !important;
+  }
+
+  .modal-content input,
+  .modal-content select {
+    width: 100% !important;
+  }
+
+  button {
+    width: 100% !important;
+    margin-top: 5px !important;
+  }
+
+  .analytics-display {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .analytics-display span {
+    margin-bottom: 5px !important;
+  }
+}
+/* Responsive Enhancements */
+.summary-panel {
+  border: 1px solid #555;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 6px;
+  background: #1e1e1e;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+.summary-panel h4 {
+  margin: 0;
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+.summary-panel .summary-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #333;
+}
+
+@media (max-width: 600px) {
+  .summary-panel {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+  .summary-panel .summary-stat {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+#Category Status Indicator
+.status-indicator {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  padding: 5px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+#currentCategoryDisplay {
+  color: #4b0082;
+}
+/* --- Improved Summary Panel and Responsive Enhancements --- */
+.summary-panel {
+  padding: 15px;
+  background-color: #20232a;
+  border-radius: 5px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.summary-panel h3 {
+  margin-bottom: 10px;
+  color: #61dafb;
+}
+
+.summary-panel p {
+  margin: 5px 0;
+  color: #ccc;
+}
+
+/* --- Active Status Bar Styles --- */
+.active-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  padding: 8px 16px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.active-status-bar .active-bay,
+.active-status-bar .active-category {
+  font-weight: bold;
+}
+
+.active-status-bar .label {
+  font-weight: normal;
+  opacity: 0.75;
+  margin-right: 4px;
+}
+
+@media (max-width: 768px) {
+  .category-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-panel {
+    font-size: 14px;
+  }
+}
+@media (max-width: 600px) {
+  #scanInput, #confirmScanBtn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+.modal button, .summary-modal button {
+  margin: 5px;
+}
+
+.container {
+  padding: 20px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+}
+/* --- Mobile Friendly Tweaks --- */
+@media (max-width: 600px) {
+  .scan-section, .category-select, .bay-section {
+    display: block;
+    width: 100%;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+  }
+
+  table {
+    font-size: 14px;
+  }
+}
+/* --- Scan Section Polish & Responsive Enhancements --- */
+.scan-section {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.scan-section label {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.scan-section input[type="text"] {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: none;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Layout refinements for scan input section */
+#scanContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#scanLine {
+  width: 100%;
+  padding: 8px;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Live scan table styling */
+#liveScanTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#liveScanTable th,
+#liveScanTable td {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+#liveScanTable th {
+  background-color: #f0f0f0;
+}
+
+/* Highlight active bay and selected category */
+.bay-indicator.active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.category-button.selected {
+  background-color: #4caf50;
+  color: white;
+}
+
+/* --- Live Scan Table Polish --- */
+.live-scan-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.live-scan-table th,
+.live-scan-table td {
+  padding: 0.5rem;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.live-scan-table th {
+  background-color: #2a2a2a;
+  font-weight: bold;
+}
+
+.live-scan-table tbody tr:nth-child(odd) {
+  background-color: #202020;
+}
+
+.live-scan-table tbody tr:hover {
+  background-color: #333;
+}
+--- Current Status Bar Styles ---
+#currentStatusBar {
+  background-color: #1c1c1e;
+  color: #f5f5f7;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  margin-top: 10px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.status-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  flex: 1 1 200px;
+}
+
+.status-section span {
+  font-weight: 400;
+  color: #d1d1d6;
+}
+
+@media (max-width: 600px) {
+  #currentStatusBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .status-section {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+/* --- Enhanced Select Dropdown Styles with Button-like Appearance --- */
+select {
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  color: #fff;
+  font-weight: bold;
+  border: 1px solid #8a2be2;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  max-width: 300px;
+  width: 100%;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* --- Custom Glow Dropdown Style --- */
+.dropdown-glow {
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  color: #fff;
+  font-weight: bold;
+  border: 1px solid #8a2be2;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  max-width: 300px;
+  width: 100%;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.dropdown-glow:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* --- Checkbox Label and Spacing for Autosave Control --- */
+.autosave-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 0.95rem;
+}
+
+.autosave-control input[type="checkbox"] {
+  transform: scale(1.4);
+  accent-color: #8f3aff;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .floating-nav {
+    position: fixed;
+    bottom: 8px;
+    left: 8px;
+    flex-direction: row;
+    padding: 2px;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    width: auto;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(108, 47, 209, 0.3) !important;
+    box-shadow: 0 0 1px rgba(169, 127, 243, 0.2), 0 0 2px rgba(147, 51, 234, 0.1) !important;
+    margin: 2px !important;
+    opacity: 0.75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+/* --- Layout & Spacing Enhancements --- */
+.section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #1e1e2f;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.label-group {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+input, select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #282842;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  font-size: 1rem;
+}
+@media (max-width: 768px) {
+  .nav-buttons button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+  }
+}
+/* Prevent global button rules from affecting .nav-icon */
+.nav-icon {
+  min-width: auto !important;
+  min-height: auto !important;
 }

@@ -1,4 +1,3 @@
-
 // Load persisted category from localStorage if available
 if (!window.itemCategory) {
   const storedCategory = localStorage.getItem('itemCategory');
@@ -40,6 +39,33 @@ async function handleScanInput(val) {
       resetScanInput();
       return;
     }
+
+    // Check for unknown codes before processing the scan
+    if (
+      !window.upcToItem?.[resolved] &&
+      !window.eslToUPC?.[resolved] &&
+      !window.locationMap?.[resolved]
+    ) {
+      const modal = document.getElementById("customModal");
+      const promptText = document.getElementById("modalPromptText");
+
+      if (modal && promptText) {
+        promptText.textContent = `Unknown Code: ${resolved}`;
+        modal.style.display = "flex";
+      }
+
+      resetScanInput();
+      return; // Stop further processing until mapped
+    }
+
+    const modal = document.getElementById('itemEntryModal');
+    if (modal) {
+      window.setCurrentUPC?.(resolved);
+      modal.style.display = 'block';
+      resetScanInput();
+      return;
+    }
+
     processScan(resolved);
     if (typeof window.updateMapStatusDisplay === 'function') {
       window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
@@ -75,11 +101,15 @@ function processScan(item) {
 
   // Update sessionMap to reflect liveCounts and itemCategory
   if (!window.sessionMap) window.sessionMap = {};
+
+  const activeCategory = localStorage.getItem('itemCategory') || window.itemCategory || 'uncategorized';
+  window.itemCategory = activeCategory;
+
   if (!window.sessionMap[item]) {
     window.sessionMap[item] = {
       item: item,
       count: window.liveCounts[item],
-      category: localStorage.getItem('itemCategory') || window.itemCategory || 'uncategorized',
+      category: activeCategory,
       location: window.locationMap?.[item] || '',
       editable: true // placeholder for enabling inline edits
     };

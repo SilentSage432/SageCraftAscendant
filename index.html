@@ -46,8 +46,15 @@
       <div class="fantasy-wrapper electric-vibe">
       <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
+        <div class="active-status-bar">
+          <span id="currentBayStatus">🗂 Bay: None</span>
+          <span id="currentCategoryStatus">🧭 Category: None</span>
+        </div>
         <div id="bayStatusDisplay" style="margin-bottom: 8px; font-weight: bold; color: red;">
           🚫 No Active Bay
+        </div>
+        <div id="activeCategoryDisplay" style="margin-bottom: 8px; font-weight: bold; color: cyan;">
+          🧭 Active Category: None Selected
         </div>
         <div id="closeBayWrapper" style="margin-bottom: 12px;">
           <button id="closeBayBtn" style="background-color: crimson; color: white;">❌ Close Bay</button>
@@ -88,24 +95,24 @@
             <input id="scanInput" data-id="scanInput" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
             <input type="number" id="liveQty" value="1" min="1" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
             <select id="categorySelect" data-id="categorySelect" class="category-select" aria-label="Select item category">
-              <option value="Laundry">Laundry</option>
-              <option value="Fridges & Freezers">Fridges & Freezers</option>
-              <option value="Ranges">Ranges</option>
-              <option value="Dishwashers">Dishwashers</option>
-              <option value="Wall Ovens">Wall Ovens</option>
-              <option value="Cooktops">Cooktops</option>
-              <option value="OTR Microwaves">OTR Microwaves</option>
-              <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
-              <option value="Vent Hoods">Vent Hoods</option>
-              <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
-              <option value="Cabinets">Cabinets</option>
-              <option value="Countertops">Countertops</option>
-              <option value="Interior Doors">Interior Doors</option>
-              <option value="Exterior Doors">Exterior Doors</option>
-              <option value="Storm Doors">Storm Doors</option>
-              <option value="Windows">Windows</option>
-              <option value="Commodity Moulding">Commodity Moulding</option>
-              <option value="Other / Misc">Other / Misc</option>
+              <option value="Laundry" data-category="Laundry">Laundry</option>
+              <option value="Fridges & Freezers" data-category="Fridges $ Freezers">Fridges & Freezers</option>
+              <option value="Ranges" dats-category="Ranges">Ranges</option>
+              <option value="Dishwashers" data-category="Dishwashers">Dishwashers</option>
+              <option value="Wall Ovens" data-category="Wall Ovens">Wall Ovens</option>
+              <option value="Cooktops" data-category="Cooktops">Cooktops</option>
+              <option value="OTR Microwaves" data-category="OTR Microwaves">OTR Microwaves</option>
+              <option value="Microwaves (Countertop)" data-category="Microwaves (Countertop)">Microwaves (Countertop)</option>
+              <option value="Vent Hoods" data-category="Vent Hoods">Vent Hoods</option>
+              <option value="Beverage & Wine Coolers" data-category="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
+              <option value="Cabinets" data-category="Cabinets">Cabinets</option>
+              <option value="Countertops" data-category="Countertops">Countertops</option>
+              <option value="Interior Doors" data-category="Interior Doors">Interior Doors</option>
+              <option value="Exterior Doors" data-category="Exterior Doors">Exterior Doors</option>
+              <option value="Storm Doors" data-category="Storm Doors">Storm Doors</option>
+              <option value="Windows" data-category="Windows">Windows</option>
+              <option value="Commodity Moulding" data-category="Commodity Moulding">Commodity Moulding</option>
+              <option value="Other / Misc" data-category="Other / Misc">Other / Misc</option>
             </select>
           </div>
 
@@ -316,10 +323,10 @@
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
       <h3 id="modalPromptText"></h3>
       <div style="margin-top:15px;">
-        <button id="modalBtnLocation" style="margin:5px;">📍 Bay Location</button>
-        <button id="modalBtnProduct" style="margin:5px;">📦 Product</button>
-        <button id="modalBtnESL" style="margin:5px;">🏷️ ESL Tag</button>
-        <button id="modalBtnCancel" style="margin:5px;">❌ Cancel</button>
+        <button id="modalBtnLocation" role="button" aria-label="Set as Bay Location" style="margin:5px;">📍 Bay Location</button>
+        <button id="modalBtnProduct" role="button" aria-label="Set as Product" style="margin:5px;">📦 Product</button>
+        <button id="modalBtnESL" role="button" aria-label="Set as ESL Tag" style="margin:5px;">🏷️ ESL Tag</button>
+        <button id="modalBtnCancel" role="button" aria-label="Cancel modal" style="margin:5px;">❌ Cancel</button>
       </div>
     </div>
   </div>
@@ -389,8 +396,8 @@
         <option value="Other / Misc">Other / Misc</option>
       </select>
       <div style="margin-top:15px;">
-        <button id="confirmEditBtn" style="margin:5px;">✅ Save</button>
-        <button id="cancelEditBtn" style="margin:5px;">❌ Cancel</button>
+        <button id="confirmEditBtn" role="button" aria-label="Save edits to item" style="margin:5px;">✅ Save</button>
+        <button id="cancelEditBtn" role="button" aria-label="Cancel edit modal" style="margin:5px;">❌ Cancel</button>
       </div>
     </div>
   </div>
@@ -403,7 +410,7 @@
         <!-- Summary data will be injected here -->
       </div>
       <div style="text-align:center; margin-top:15px;">
-        <button id="closeSummaryBtn" style="margin:5px;">✅ Done</button>
+        <button id="closeSummaryBtn" role="button" aria-label="Close summary modal" style="margin:5px;">✅ Done</button>
       </div>
     </div>
   </div>
@@ -429,5 +436,14 @@
       });
     }
   </script>
+
+<script>
+  const categorySelect = document.getElementById('categorySelect');
+  const activeCategoryDisplay = document.getElementById('activeCategoryDisplay');
+  categorySelect.addEventListener('change', () => {
+    const selected = categorySelect.options[categorySelect.selectedIndex].text;
+    activeCategoryDisplay.textContent = `🧭 Active Category: ${selected}`;
+  });
+</script>
 </body>
 </html>

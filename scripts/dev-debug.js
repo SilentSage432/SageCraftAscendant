@@ -82,4 +82,9 @@ if (window.location.href.includes('debug=true')) {
 
       console.log('%c[DEBUG] Audit complete.', 'color: magenta;');
     };
-  }
+    // Quick debug scan
+    window.debugScan = function (code = "123456789012") {
+      console.log(`🧪 Debug Scan Triggered for code: ${code}`);
+      handleScanInput(code);
+    };
+}

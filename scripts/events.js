@@ -1481,3 +1481,33 @@ function handleEditConfirm(index) {
     console.warn('Invalid input on edit modal.');
   }
 }
+// --- PATCH: Add missing event listeners for buttons not handled above ---
+// Listeners for additional buttons as per requirements
+[
+  "uploadDropboxFile",
+  "viewSnapshotsBtn",
+  "clearSnapshotsBtn",
+  "browseDropboxSessions",
+  "exportMappings",
+  "importMappings",
+  "batchScanToggle",
+  "numericKeypadToggle",
+  "autosaveIntervalSelect",
+  "autosaveToggle",
+  "syncDropboxMaps",
+  "restoreDropboxMaps",
+  "downloadBackupBtn",
+  "cleanStaleSessions",
+  "modalBtnLocation",
+  "modalBtnProduct",
+  "modalBtnESL",
+  "modalBtnCancel",
+  "mapTypeESL",
+  "mapTypeProduct",
+  "mapTypeBay",
+  "toggleToasts"
+].forEach(id => {
+  document.getElementById(id)?.addEventListener("click", () => {
+    console.log(`${id} clicked (listener added)`);
+  });
+});
