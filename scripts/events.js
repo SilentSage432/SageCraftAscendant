@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', bindModalEditConfirmListener);
 // --- Bay Audit Timing State ---
 let currentBay = null;
 let bayAuditTimes = [];
+let selectedCategory = null;
 
 // Show toast and handle unknown scan mappings interactively on manual scan event (modal version)
 console.log('✅ Binding global manual-scan listener');
@@ -190,6 +191,8 @@ window.handleManualScan = function (e) {
     if (typeof window.updateLiveTable === 'function') {
       console.log('[🧪] Calling updateLiveTable for', itemNum, window.sessionMap[itemNum]);
       window.updateLiveTable();
+      // --- PATCH: update session stats after table update
+      updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
     }
     createToast(`✅ Added ${quantity} to Item #${itemNum} (${category})`);
     window.dispatchEvent(new CustomEvent('session-updated'));
@@ -376,12 +379,32 @@ window.handleManualScan = function (e) {
   if (typeof window.updateLiveTable === 'function') {
     console.log('[🧪] updateLiveTable firing from handleManualScan');
     window.updateLiveTable();
+    // --- PATCH: update session stats after table update
+    updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
   }
 };
 
 window.addEventListener('manual-scan', window.handleManualScan);
 
 function initEventListeners() {
+  // --- PATCH: Listen for category selector changes and update session stats mini panel ---
+  const categorySelector = document.getElementById('liveCategory') || document.getElementById('categorySelect');
+  if (categorySelector) {
+    categorySelector.addEventListener('change', () => {
+      selectedCategory = categorySelector.value || 'None';
+      updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
+    });
+    // Initialize selectedCategory on load
+    selectedCategory = categorySelector.value || 'None';
+  }
+  // --- PATCH: Listen for bay selector changes (if any) and update session stats mini panel ---
+  const baySelector = document.getElementById('baySelect');
+  if (baySelector) {
+    baySelector.addEventListener('change', () => {
+      currentBay = baySelector.value || 'None';
+      updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
+    });
+  }
   // --- Live Entry scanner input handler ---
   const liveEntry = document.getElementById('liveEntry');
   if (liveEntry) {
@@ -833,6 +856,8 @@ function initEventListeners() {
 
       // Store last used category for persistence
       localStorage.setItem('lastUsedCategory', category);
+      // PATCH: update selectedCategory global
+      selectedCategory = category;
 
       if (!input || !input.value.trim()) {
         alert('Please enter a valid item code.');
@@ -852,6 +877,8 @@ function initEventListeners() {
       document.getElementById('liveQty').value = '1';
       // document.getElementById('liveCategory').value = 'Uncategorized'; // Removed to preserve selected category
       input.focus();
+      // PATCH: update session stats after adding item
+      updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
     });
   }
 
@@ -1427,6 +1454,23 @@ window.openEditModalForRow = function(row) {
   // Show modal
   document.getElementById('editModal').classList.add('show');
 };
+
+(function() {
+// --- PATCH: Utility to get total item count in the live scan table
+function getTotalItemCount() {
+  const rows = document.querySelectorAll('#liveScanTableBody tr');
+  return rows.length;
+}
+// --- PATCH: Update session stats mini panel
+function updateSessionStats(count = 0, bay = 'None', category = 'None') {
+  if (document.getElementById('sessionItemCount')) document.getElementById('sessionItemCount').textContent = count;
+  if (document.getElementById('sessionBay')) document.getElementById('sessionBay').textContent = bay;
+  if (document.getElementById('sessionCategory')) document.getElementById('sessionCategory').textContent = category;
+}
+// Expose globally if needed
+window.updateSessionStats = updateSessionStats;
+window.getTotalItemCount = getTotalItemCount;
+})();
 
 // --- Ensure UI helpers and event listeners are loaded in order ---
 (async () => {
