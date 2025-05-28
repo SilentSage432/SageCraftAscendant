@@ -174,6 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
       entryModal.style.display = "block";
       const codeTypeInput = entryModal.querySelector("#codeType");
       if (codeTypeInput) codeTypeInput.value = type || '';
+      const liveEntryInput = entryModal.querySelector("#liveEntry");
+      if (liveEntryInput) liveEntryInput.focus();
     }
   };
 
@@ -206,6 +208,8 @@ window.promptCodeType = function(code) {
       entryModal.style.display = "block";
       const codeTypeInput = entryModal.querySelector("#codeType");
       if (codeTypeInput) codeTypeInput.value = type || '';
+      const liveEntryInput = entryModal.querySelector("#liveEntry");
+      if (liveEntryInput) liveEntryInput.focus();
     }
   };
 
