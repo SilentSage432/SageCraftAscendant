@@ -442,6 +442,46 @@
     </div>
   </div>
 
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="addItemTitle" aria-hidden="false" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
+      <h3 id="addItemTitle">➕ Add New Item</h3>
+
+      <label for="newItemCode">Item Number:</label>
+      <input type="text" id="newItemCode" placeholder="Enter item number..." style="margin: 5px 0;" />
+
+      <label for="newItemQty">Quantity:</label>
+      <input type="number" id="newItemQty" min="1" value="1" style="margin: 5px 0;" />
+
+      <label for="newItemCategory">Category:</label>
+      <select id="newItemCategory" style="margin: 5px 0;">
+        <option value="Laundry">Laundry</option>
+        <option value="Fridges & Freezers">Fridges & Freezers</option>
+        <option value="Ranges">Ranges</option>
+        <option value="Dishwashers">Dishwashers</option>
+        <option value="Wall Ovens">Wall Ovens</option>
+        <option value="Cooktops">Cooktops</option>
+        <option value="OTR Microwaves">OTR Microwaves</option>
+        <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
+        <option value="Vent Hoods">Vent Hoods</option>
+        <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
+        <option value="Cabinets">Cabinets</option>
+        <option value="Countertops">Countertops</option>
+        <option value="Interior Doors">Interior Doors</option>
+        <option value="Exterior Doors">Exterior Doors</option>
+        <option value="Storm Doors">Storm Doors</option>
+        <option value="Windows">Windows</option>
+        <option value="Commodity Moulding">Commodity Moulding</option>
+        <option value="Other / Misc">Other / Misc</option>
+      </select>
+
+      <div style="margin-top:15px;">
+        <button id="confirmAddItemBtn" role="button" aria-label="Confirm new item" style="margin:5px;">✅ Add</button>
+        <button id="cancelAddItemBtn" role="button" aria-label="Cancel add item modal" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Toast system script -->

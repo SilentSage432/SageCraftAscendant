@@ -1,3 +1,56 @@
+// --- Add Item Modal: Confirm and Cancel Button Logic ---
+// Cancel Button Logic
+const cancelBtn = document.getElementById('cancelAddItemBtn');
+if (cancelBtn) {
+  cancelBtn.addEventListener('click', () => {
+    const modal = document.getElementById('addItemModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+    }
+    document.getElementById('newItemCode').value = '';
+    document.getElementById('newItemQty').value = '1';
+    document.getElementById('newItemCategory').selectedIndex = 0;
+    console.log('❌ Add Item Modal cancelled');
+  });
+}
+
+// Confirm Button Logic
+const confirmBtn = document.getElementById('confirmAddItemBtn');
+if (confirmBtn) {
+  confirmBtn.addEventListener('click', () => {
+    const code = document.getElementById('newItemCode').value.trim();
+    const qty = parseInt(document.getElementById('newItemQty').value, 10);
+    const cat = document.getElementById('newItemCategory').value;
+
+    if (!code || isNaN(qty) || qty <= 0) {
+      console.warn('⚠️ Invalid input in Add Item modal');
+      return;
+    }
+
+    // Example logic to add to table (replace with your real logic)
+    const table = document.getElementById('liveItemTable');
+    if (table) {
+      const row = table.insertRow();
+      row.insertCell(0).textContent = code;
+      row.insertCell(1).textContent = qty;
+      row.insertCell(2).textContent = cat;
+    }
+
+    // Close modal and reset
+    const modal = document.getElementById('addItemModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+    }
+    document.getElementById('newItemCode').value = '';
+    document.getElementById('newItemQty').value = '1';
+    document.getElementById('newItemCategory').selectedIndex = 0;
+    console.log('✅ New item added to table');
+  });
+}
 // --- Mapping Modal Confirm/Cancel and Scan Type Buttons ---
 // Confirm button in mapping modal
 {
@@ -74,23 +127,75 @@ function handleBay() {
 // --- Refactored: Attach modal code type selection listeners robustly on DOMContentLoaded ---
 // --- Robustly bind key UI buttons using dataset.bound and a helper ---
 document.addEventListener('DOMContentLoaded', () => {
-  const bindOnce = (id, label) => {
-    const el = document.getElementById(id);
-    if (el && !el.dataset.bound) {
-      el.addEventListener('click', () => {
-        console.log(`✅ ${label} clicked`);
-      });
-      el.dataset.bound = 'true';
-    }
-  };
+  // --- Add Item Button: open add item modal (guaranteed clean one-off binding) ---
+  const addBtn = document.getElementById('addLiveItem');
+  if (addBtn) {
+    addBtn.replaceWith(addBtn.cloneNode(true)); // Remove all old listeners
+    const cleanBtn = document.getElementById('addLiveItem');
+    cleanBtn.addEventListener('click', () => {
+      console.log('🧩 Add Item Modal opened');
+      const modal = document.getElementById('addItemModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
+      }
+    });
+  }
 
-  // Ensure all 6 required buttons are reliably bound:
-  bindOnce('addLiveItem', 'addLiveItem');
-  bindOnce('modalBtnLocation', 'modalBtnLocation');
-  bindOnce('modalBtnProduct', 'modalBtnProduct');
-  bindOnce('modalBtnESL', 'modalBtnESL');
-  bindOnce('mapTypeESL', 'mapTypeESL');
-  bindOnce('mapTypeProduct', 'mapTypeProduct');
+  // --- Scan Type Modal Buttons: set scan type and close modal ---
+  // Helper to close scan type modal
+  function closeScanTypeModal() {
+    const modal = document.getElementById('scanTypeModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  const modalBtnLocation = document.getElementById('modalBtnLocation');
+  if (modalBtnLocation && !modalBtnLocation.dataset.bound) {
+    modalBtnLocation.addEventListener('click', () => {
+      localStorage.setItem('scanType', 'location');
+      closeScanTypeModal();
+      console.log('📍 Scan type set to Location');
+    });
+    modalBtnLocation.dataset.bound = 'true';
+  }
+  const modalBtnProduct = document.getElementById('modalBtnProduct');
+  if (modalBtnProduct && !modalBtnProduct.dataset.bound) {
+    modalBtnProduct.addEventListener('click', () => {
+      localStorage.setItem('scanType', 'product');
+      closeScanTypeModal();
+      console.log('📦 Scan type set to Product');
+    });
+    modalBtnProduct.dataset.bound = 'true';
+  }
+  const modalBtnESL = document.getElementById('modalBtnESL');
+  if (modalBtnESL && !modalBtnESL.dataset.bound) {
+    modalBtnESL.addEventListener('click', () => {
+      localStorage.setItem('scanType', 'esl');
+      closeScanTypeModal();
+      console.log('🏷️ Scan type set to ESL');
+    });
+    modalBtnESL.dataset.bound = 'true';
+  }
+
+  // Other buttons (leave as diagnostic or as previously)
+  const mapTypeESL = document.getElementById('mapTypeESL');
+  if (mapTypeESL && !mapTypeESL.dataset.bound) {
+    mapTypeESL.addEventListener('click', () => {
+      console.log('✅ mapTypeESL clicked');
+    });
+    mapTypeESL.dataset.bound = 'true';
+  }
+  const mapTypeProduct = document.getElementById('mapTypeProduct');
+  if (mapTypeProduct && !mapTypeProduct.dataset.bound) {
+    mapTypeProduct.addEventListener('click', () => {
+      console.log('✅ mapTypeProduct clicked');
+    });
+    mapTypeProduct.dataset.bound = 'true';
+  }
 });
 
 // --- Edit Modal Confirm/Cancel Buttons ---
@@ -814,42 +919,7 @@ function initEventListeners() {
   }
 
   // Wire up the Add Item button
-  const addLiveItemBtn = document.getElementById('addLiveItem');
-  if (addLiveItemBtn && !addLiveItemBtn.dataset.bound) {
-    addLiveItemBtn.addEventListener('click', () => {
-      console.log('✅ Add Item button clicked');
-      const input = document.getElementById('liveEntry');
-      const quantity = parseInt(document.getElementById('liveQty')?.value || '1', 10);
-      const category = document.getElementById('liveCategory')?.value || 'Uncategorized';
-
-      // Store last used category for persistence
-      localStorage.setItem('lastUsedCategory', category);
-      // PATCH: update selectedCategory global
-      selectedCategory = category;
-
-      if (!input || !input.value.trim()) {
-        alert('Please enter a valid item code.');
-        return;
-      }
-
-      const value = input.value.trim();
-      // Call handleManualScan directly instead of dispatching event
-      if (typeof window.handleManualScan === 'function') {
-        window.handleManualScan({ detail: { code: value, quantity, category } });
-      } else {
-        console.warn('❌ handleManualScan is not defined');
-      }
-      console.log('📤 manual-scan dispatched with:', value, quantity, category);
-      // Reset inputs after manual scan
-      input.value = '';
-      document.getElementById('liveQty').value = '1';
-      // document.getElementById('liveCategory').value = 'Uncategorized'; // Removed to preserve selected category
-      input.focus();
-      // PATCH: update session stats after adding item
-      updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
-    });
-    addLiveItemBtn.dataset.bound = 'true';
-  }
+  // (Handled above with one-off clean binding; logic for adding item on click should be handled elsewhere if needed)
 
   // --- PATCH: Add diagnostic listeners for buttons that previously had no click event ---
   // Add after existing button bindings
@@ -1971,7 +2041,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🔄 Bulletproof Button Rebinding (No Conditions)
 (function bindAllButtons() {
   const buttonIds = [
-    'addLiveItem',
     'modalBtnLocation',
     'modalBtnProduct',
     'modalBtnESL',
