@@ -391,11 +391,14 @@ function initEventListeners() {
     const saved = localStorage.getItem('config_batchScan') === 'true';
     batchScanToggle.checked = saved;
     window.batchScanEnabled = saved;
-    batchScanToggle.addEventListener('change', () => {
-      window.batchScanEnabled = batchScanToggle.checked;
-      localStorage.setItem('config_batchScan', batchScanToggle.checked);
-      createToast(`🔄 Batch Scan ${batchScanToggle.checked ? 'enabled' : 'disabled'}`);
-    });
+    if (!batchScanToggle.dataset.bound) {
+      batchScanToggle.addEventListener('change', () => {
+        window.batchScanEnabled = batchScanToggle.checked;
+        localStorage.setItem('config_batchScan', batchScanToggle.checked);
+        createToast(`🔄 Batch Scan ${batchScanToggle.checked ? 'enabled' : 'disabled'}`);
+      });
+      batchScanToggle.dataset.bound = 'true';
+    }
   }
 
   // --- Autosave Controls ---
@@ -470,31 +473,37 @@ function initEventListeners() {
       startAutosave(savedMinutes);
     }
 
-    autosaveToggle.addEventListener('change', () => {
-      localStorage.setItem('config_autosave', autosaveToggle.checked);
-      if (!autosaveToggle.checked) {
-        clearInterval(autosaveIntervalId);
-        createToast('⛔ Autosave disabled');
-      } else {
-        const mins = parseInt(autosaveIntervalSelect?.value || '5', 10);
-        startAutosave(mins);
-        createToast(`✅ Autosave enabled (every ${mins} min)`);
-      }
-    });
+    if (!autosaveToggle.dataset.bound) {
+      autosaveToggle.addEventListener('change', () => {
+        localStorage.setItem('config_autosave', autosaveToggle.checked);
+        if (!autosaveToggle.checked) {
+          clearInterval(autosaveIntervalId);
+          createToast('⛔ Autosave disabled');
+        } else {
+          const mins = parseInt(autosaveIntervalSelect?.value || '5', 10);
+          startAutosave(mins);
+          createToast(`✅ Autosave enabled (every ${mins} min)`);
+        }
+      });
+      autosaveToggle.dataset.bound = 'true';
+    }
   }
 
   if (autosaveIntervalSelect) {
     const saved = localStorage.getItem('config_autosaveInterval') || '5';
     autosaveIntervalSelect.value = saved;
 
-    autosaveIntervalSelect.addEventListener('change', () => {
-      const mins = parseInt(autosaveIntervalSelect.value, 10);
-      localStorage.setItem('config_autosaveInterval', mins);
-      if (autosaveToggle?.checked) {
-        startAutosave(mins);
-        createToast(`🔄 Autosave interval updated to ${mins} min`);
-      }
-    });
+    if (!autosaveIntervalSelect.dataset.bound) {
+      autosaveIntervalSelect.addEventListener('change', () => {
+        const mins = parseInt(autosaveIntervalSelect.value, 10);
+        localStorage.setItem('config_autosaveInterval', mins);
+        if (autosaveToggle?.checked) {
+          startAutosave(mins);
+          createToast(`🔄 Autosave interval updated to ${mins} min`);
+        }
+      });
+      autosaveIntervalSelect.dataset.bound = 'true';
+    }
   }
 
   const numericKeypadToggle = document.getElementById('numericKeypadToggle');
@@ -513,22 +522,25 @@ function initEventListeners() {
       }
     }
 
-    numericKeypadToggle.addEventListener('change', () => {
-      const enabled = numericKeypadToggle.checked;
-      localStorage.setItem('config_numericKeypad', enabled);
-      document.body.classList.toggle('numeric-keypad', enabled);
+    if (!numericKeypadToggle.dataset.bound) {
+      numericKeypadToggle.addEventListener('change', () => {
+        const enabled = numericKeypadToggle.checked;
+        localStorage.setItem('config_numericKeypad', enabled);
+        document.body.classList.toggle('numeric-keypad', enabled);
 
-      const liveEntry = document.getElementById('liveEntry');
-      if (liveEntry) {
-        if (enabled) {
-          liveEntry.setAttribute('inputmode', 'numeric');
-        } else {
-          liveEntry.removeAttribute('inputmode');
+        const liveEntry = document.getElementById('liveEntry');
+        if (liveEntry) {
+          if (enabled) {
+            liveEntry.setAttribute('inputmode', 'numeric');
+          } else {
+            liveEntry.removeAttribute('inputmode');
+          }
         }
-      }
 
-      createToast(`🔢 Numeric Keypad ${enabled ? 'enabled' : 'disabled'}`);
-    });
+        createToast(`🔢 Numeric Keypad ${enabled ? 'enabled' : 'disabled'}`);
+      });
+      numericKeypadToggle.dataset.bound = 'true';
+    }
   }
 
   // Clear only inventory session keys
