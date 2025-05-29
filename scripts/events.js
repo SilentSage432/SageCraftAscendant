@@ -1414,41 +1414,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmEditBtn = document.getElementById('confirmEditItem');
   if (confirmEditBtn && !confirmEditBtn.dataset.bound) {
     confirmEditBtn.addEventListener('click', () => {
-      const itemNumber = document.getElementById('editItemNumberInput')?.value.trim();
+      // Update all fields from modal
+      const item = document.getElementById('editItemNumberInput')?.value.trim();
       const quantity = parseInt(document.getElementById('editQtyInput')?.value.trim(), 10);
       const category = document.getElementById('editCategorySelect')?.value;
       const code = document.getElementById('editCodeInput')?.value.trim();
-      const scanType = document.getElementById('editTypeSelect')?.value;
-      const mappedValue = document.getElementById('editValueInput')?.value.trim();
-      const row = document.querySelector('#liveScanTableBody tr.editing');
+      const type = document.getElementById('editTypeSelect')?.value;
+      const value = document.getElementById('editValueInput')?.value.trim();
       const index = parseInt(confirmEditBtn.dataset.index, 10);
 
-      if (row && !isNaN(quantity) && itemNumber && category && code && scanType && mappedValue) {
-        row.querySelector('.item-number').textContent = itemNumber;
-        row.querySelector('.quantity').textContent = quantity;
-        row.querySelector('.category').textContent = category;
-        row.dataset.code = code;
-        row.dataset.type = scanType;
-        row.dataset.value = mappedValue;
-        row.classList.remove('editing');
-
-        window.scannedItems = window.scannedItems || JSON.parse(localStorage.getItem('scannedItems') || '[]');
-        if (window.scannedItems[index]) {
-          window.scannedItems[index].code = code;
-          window.scannedItems[index].type = scanType;
-          window.scannedItems[index].value = mappedValue;
-          window.scannedItems[index].quantity = quantity;
-          window.scannedItems[index].category = category;
-          window.scannedItems[index].itemNumber = itemNumber;
-          window.scannedItems[index].timestamp = new Date().toLocaleString();
-          localStorage.setItem('scannedItems', JSON.stringify(window.scannedItems));
-        }
-
-        document.getElementById('editModal').classList.remove('show');
-        console.log('✅ Full scan entry edit saved.');
-      } else {
-        console.warn('⚠️ Incomplete or invalid scan edit fields.');
+      if (!item || isNaN(quantity) || !category || !code || !type || !value || isNaN(index)) {
+        console.warn("⚠️ Incomplete edit modal data.");
+        return;
       }
+
+      const scannedItems = window.scannedItems || JSON.parse(localStorage.getItem("scannedItems") || "[]");
+
+      scannedItems[index] = {
+        itemNumber: item,
+        quantity,
+        category,
+        code,
+        type,
+        value,
+        timestamp: new Date().toLocaleString()
+      };
+
+      window.scannedItems = scannedItems;
+      localStorage.setItem("scannedItems", JSON.stringify(scannedItems));
+      updateLiveTable();
+      document.getElementById("editModal").classList.remove("show");
     });
     confirmEditBtn.dataset.bound = 'true';
   }

@@ -380,8 +380,26 @@
   <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editItemTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
       <h3 id="editItemTitle">✏️ Edit Item</h3>
+
+      <label for="editItemNumber">Item Number:</label>
+      <input type="text" id="editItemNumber" style="margin: 5px 0;" />
+
+      <label for="editScanCode">Scan Code:</label>
+      <input type="text" id="editScanCode" style="margin: 5px 0;" />
+
+      <label for="editScanType">Type:</label>
+      <select id="editScanType" style="margin: 5px 0;">
+        <option value="product">Product</option>
+        <option value="esl">ESL</option>
+        <option value="bay">Bay</option>
+      </select>
+
+      <label for="editScanValue">Mapped Value:</label>
+      <input type="text" id="editScanValue" style="margin: 5px 0;" />
+
       <label for="editItemQty">Quantity:</label>
       <input type="number" id="editItemQty" min="1" style="margin: 5px 0;" />
+
       <label for="editItemCategory">Category:</label>
       <select id="editItemCategory" style="margin: 5px 0;">
         <option value="Laundry">Laundry</option>
@@ -403,6 +421,7 @@
         <option value="Commodity Moulding">Commodity Moulding</option>
         <option value="Other / Misc">Other / Misc</option>
       </select>
+
       <div style="margin-top:15px;">
         <button id="confirmEditBtn" role="button" aria-label="Save edits to item" style="margin:5px;">✅ Save</button>
         <button id="cancelEditBtn" role="button" aria-label="Cancel edit modal" style="margin:5px;">❌ Cancel</button>
