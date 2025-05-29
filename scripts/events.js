@@ -485,30 +485,16 @@ window.handleManualScan = function (e) {
     window.lastScannedCode = code;
 
     // --- PATCH: Show itemEntryModal for unknown UPCs if present and no other modal is active
-    const itemEntryModal = document.getElementById('itemEntryModal');
-    // Check if any modal is currently visible (simple check: look for modals with display not 'none')
-    const isAnyModalActive = Array.from(document.querySelectorAll('.modal'))
-      .some(modal => modal.style.display && modal.style.display !== 'none');
-    if (itemEntryModal && !isAnyModalActive) {
-      itemEntryModal.style.display = 'block';
-      const upcInput = document.getElementById('upcInputField');
-      if (upcInput) upcInput.value = code;
-      const itemNumInput = document.getElementById('itemNumberInputField');
-      if (itemNumInput) itemNumInput.focus();
-      return; // Do not show any other modal
-    }
+    // (Removed check for isAnyModalActive and itemEntryModal modal gating to allow fallback modal to show)
 
     // --- (Legacy/other modal fallback, if itemEntryModal is not present) ---
-    // Explicitly show the modal prompt for unmapped codes
+    // Explicitly show the modal prompt for unmapped codes using new .show class logic
     const modal = document.getElementById('mapPromptModal');
     const codeSpan = document.getElementById('mapPromptCode');
     modal.classList.remove('hidden');
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
     modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '50%';
-    modal.style.left = '50%';
-    modal.style.transform = 'translate(-50%, -50%)';
-    modal.style.zIndex = '9999';
     codeSpan.textContent = code;
     window._mappingCode = code;
   }
@@ -837,6 +823,7 @@ function initEventListeners() {
       const modal = document.getElementById('mapPromptModal');
       if (modal) {
         modal.classList.remove('show');
+        modal.classList.add('hidden');
         modal.style.display = 'none';
       }
     });
@@ -1592,6 +1579,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Hide the modal completely and reset input/section
       const modal = document.getElementById("mapPromptModal");
       if (modal) {
+        modal.classList.remove("show");
         modal.classList.add("hidden");
         modal.style.display = "none";
       }
@@ -1992,17 +1980,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (itemNumInput) itemNumInput.focus();
       return;
     }
-    // Fallback to mapPromptModal
+    // Fallback to mapPromptModal using new .show class logic
     const modal = document.getElementById('mapPromptModal');
     const codeSpan = document.getElementById('mapPromptCode');
     if (modal && codeSpan) {
       modal.classList.remove('hidden');
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
       modal.style.display = 'flex';
-      modal.style.position = 'fixed';
-      modal.style.top = '50%';
-      modal.style.left = '50%';
-      modal.style.transform = 'translate(-50%, -50%)';
-      modal.style.zIndex = '9999';
       codeSpan.textContent = upc;
       window._mappingCode = upc;
     }

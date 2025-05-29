@@ -1988,7 +1988,7 @@ input, select {
   justify-content: center;
   align-items: center;
 }
-. 
+ 
 /* --- Map Prompt Overlay & Modal Dedicated Styles --- */
 #mapPromptOverlay {
   position: fixed;
@@ -2041,4 +2041,13 @@ input, select {
   background: linear-gradient(to right, #2575fc, #4b0082);
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(0, 191, 255, 0.4);
+}
+#Smooth Modal Transition Enhancements
+.modal {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.modal.show {
+  opacity: 1;
 }
