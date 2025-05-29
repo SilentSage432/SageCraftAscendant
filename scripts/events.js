@@ -76,6 +76,27 @@ if (confirmBtn) {
     btn.dataset.bound = 'true';
   }
 }
+
+// --- Category Memory and Suggestion Utilities ---
+function saveCategoryMemory(itemNumber, category) {
+  const memory = JSON.parse(localStorage.getItem('categoryMemory') || '{}');
+  memory[itemNumber] = category;
+  localStorage.setItem('categoryMemory', JSON.stringify(memory));
+}
+
+function suggestCategory(itemNumber) {
+  const memory = JSON.parse(localStorage.getItem('categoryMemory') || '{}');
+  if (memory[itemNumber]) return memory[itemNumber];
+  return guessCategory(itemNumber);
+}
+
+function guessCategory(code) {
+  if (/^10|^17/.test(code)) return "Fridges & Freezers";
+  if (/^24/.test(code)) return "Microwaves (Countertop)";
+  if (/^33/.test(code)) return "Ranges";
+  return "Other / Misc";
+}
+
 // --- Modal Code Type Selection Buttons (Product/ESL/Bay) ---
 // Refactored: Add a single clean set of event listeners in DOMContentLoaded below
 // --- Handlers for modal code type selection buttons ---
