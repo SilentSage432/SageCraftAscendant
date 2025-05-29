@@ -1,3 +1,92 @@
+// --- Centralized Map Prompt Modal Show/Hide Functions ---
+function showMapPromptModal() {
+  const modal = document.getElementById('mapPromptOverlay');
+  if (!modal) return;
+  if (modal.classList.contains('active')) return; // prevent duplicate triggers
+  modal.style.display = 'flex';
+  modal.classList.add('active');
+}
+
+function hideMapPromptModal() {
+  const modal = document.getElementById('mapPromptOverlay');
+  if (!modal) return;
+  modal.style.display = 'none';
+  modal.classList.remove('active');
+}
+// --- EARLY: Conditionally control mapPromptModal visibility on load (with lockout) ---
+// (Replaced by DOMContentLoaded block below)
+
+function toggleModal(modalId, show = true) {
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.warn(`Modal with ID ${modalId} not found.`);
+    return;
+  }
+
+  if (show) {
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    modal.style.display = 'flex';
+    console.log(`🔓 Modal '${modalId}' shown`);
+  } else {
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    console.log(`🔒 Modal '${modalId}' hidden`);
+  }
+}
+// --- PATCH: Show mapPromptModal on DOMContentLoaded ONLY if user-initiated scan has occurred ---
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const codeEl = document.getElementById('mapPromptCode');
+    if (codeEl) {
+      const code = codeEl.textContent?.trim();
+      // Debug: log initial code content
+      console.log('[🧪] Initial mapPromptCode on DOM load:', code);
+      const modal = document.getElementById('mapPromptModal');
+
+      // Only show the modal if a user-initiated scan has occurred
+      const hasUserTriggeredScan = !!(window.lastScannedCode || window._mappingCode || window.manualScanTriggered);
+
+      if (!hasUserTriggeredScan || !code || code === 'undefined' || code === '?' || code === '' || code.length <= 2) {
+        console.log('[🧪] Skipping modal — no valid scan or user action');
+        return;
+      }
+
+      // Debug logging
+      console.log('[🧪] Checking mapPromptModal logic on DOMContentLoaded...');
+      console.log('[🧪] mapPromptCode content:', code);
+      console.log('[🧪] Modal is', modal?.classList.contains('hidden') ? 'hidden' : 'visible');
+
+      const shouldPrompt = !!(code && code !== 'undefined' && code !== '?' && code !== '' && code.length > 2);
+
+      if (shouldPrompt && !window.modalLockout && modal?.classList.contains('hidden')) {
+        toggleModal('mapPromptModal', true);
+        window.modalLockout = true;
+        console.log('[🧪] mapPromptModal triggered by DOMContentLoaded');
+      } else {
+        toggleModal('mapPromptModal', false);
+        window.modalLockout = false;
+        console.log('[🧪] Modal forcibly hidden on load');
+      }
+    }
+  }, 200); // Increase timeout to 200ms to ensure layout has fully rendered
+});
+
+// --- PATCH: Remove unsafe Object.defineProperty interception of CSSStyleDeclaration.prototype.display ---
+// The following block caused "Cannot read properties of undefined (reading 'set')" TypeError and is unsafe.
+// It is commented out for safety. Use MutationObserver for modal display tracing instead.
+/*
+const descriptor = Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, 'display');
+const originalSet = descriptor.set;
+Object.defineProperty(CSSStyleDeclaration.prototype, 'display', {
+  set(value) {
+    // Debug: log all attempts to set display property
+    console.log("[DEBUG] Intercepted style.display set:", value, this);
+    return originalSet.call(this, value);
+  }
+});
+*/
 // --- Add Item Modal: Confirm and Cancel Button Logic ---
 // Cancel Button Logic
 const cancelBtn = document.getElementById('cancelAddItemBtn');
@@ -413,6 +502,7 @@ let selectedCategory = null;
 console.log('✅ Binding global manual-scan listener');
 
 window.handleManualScan = function (e) {
+  window.manualScanTriggered = true;
   const { code, quantity, category } = e.detail;
 
   // DEV hook: reroute scan through handleScanInput if defined
@@ -488,15 +578,19 @@ window.handleManualScan = function (e) {
     // (Removed check for isAnyModalActive and itemEntryModal modal gating to allow fallback modal to show)
 
     // --- (Legacy/other modal fallback, if itemEntryModal is not present) ---
-    // Explicitly show the modal prompt for unmapped codes using new .show class logic
-    const modal = document.getElementById('mapPromptModal');
-    const codeSpan = document.getElementById('mapPromptCode');
-    modal.classList.remove('hidden');
-    modal.classList.add('show');
-    modal.setAttribute('aria-hidden', 'false');
-    modal.style.display = 'flex';
-    codeSpan.textContent = code;
-    window._mappingCode = code;
+    // Explicitly show the modal prompt for unmapped codes using centralized function
+    if (e?.detail?.code && !itemNum) {
+      if (window.preventInitialMapPrompt || !e.detail.manualTrigger) {
+        console.warn("🛡️ Map Prompt suppressed due to preventInitialMapPrompt or non-manual trigger");
+        return;
+      }
+      const codeSpan = document.getElementById('mapPromptCode');
+      if (codeSpan) {
+        codeSpan.textContent = e.detail.code;
+        window._mappingCode = e.detail.code;
+        showMapPromptModal();
+      }
+    }
   }
 
   // --- (If itemEntryModal is used, do not show fallback modal or customModal logic) ---
@@ -820,12 +914,7 @@ function initEventListeners() {
   const cancelMapPromptBtn = document.getElementById('cancelMapPrompt');
   if (cancelMapPromptBtn) {
     cancelMapPromptBtn.addEventListener('click', () => {
-      const modal = document.getElementById('mapPromptModal');
-      if (modal) {
-        modal.classList.remove('show');
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
-      }
+      hideMapPromptModal();
     });
   }
 
@@ -1577,12 +1666,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.currentMapType = '';
 
       // Hide the modal completely and reset input/section
-      const modal = document.getElementById("mapPromptModal");
-      if (modal) {
-        modal.classList.remove("show");
-        modal.classList.add("hidden");
-        modal.style.display = "none";
-      }
+      toggleModal('mapPromptModal', false);
       const inputField = document.getElementById("mapPromptInput");
       if (inputField) inputField.value = "";
       const inputSection = document.getElementById("mapInputSection");
@@ -1704,7 +1788,7 @@ window.openEditModalForRow = function(row) {
   }
 };
 
-(function() {
+// (function() {   // <-- removed accidental IIFE open
 // --- PATCH: Utility to get total item count in the live scan table
 function getTotalItemCount() {
   const rows = document.querySelectorAll('#liveScanTableBody tr');
@@ -1721,14 +1805,13 @@ window.updateSessionStats = updateSessionStats;
 window.getTotalItemCount = getTotalItemCount;
 
 // --- PATCH: Expose triggerAddModal globally for simulateScan and dev console
-window.triggerAddModal = function (code = '') {
-  const input = document.getElementById('liveEntry');
-  if (input) input.value = code;
-  const quantity = parseInt(document.getElementById('liveQty')?.value || '1', 10);
-  const category = document.getElementById('liveCategory')?.value || 'Uncategorized';
+window.triggerAddModal = function (codeOrEvent = '') {
+  const detail = typeof codeOrEvent === 'string'
+    ? { code: codeOrEvent, quantity: 1, category: 'Uncategorized', manualTrigger: true }
+    : codeOrEvent.detail;
 
   if (typeof window.handleManualScan === 'function') {
-    window.handleManualScan({ detail: { code, quantity, category } });
+    window.handleManualScan({ detail });
   }
 };
 
@@ -1815,12 +1898,11 @@ window.triggerAddModal = function (code = '') {
   if (typeof initializeUI === 'function') {
     initializeUI();
   }
-  // DO NOT automatically open the session summary modal on load
-  // If you previously had:
-  // document.getElementById("summaryModal").style.display = 'flex';
-  // or showModal(summaryModal);
-  // or showSessionSummary()/openSessionSummaryModal() here, it is now removed/commented.
-  // Confirmed: no summaryModal.style.display = 'flex' or showModal(summaryModal) on page load.
+  // Prevent automatic display of map prompt overlay on app startup.
+  // Any direct calls to showMapPromptOverlay() or
+  // document.getElementById('mapPromptOverlay').style.display = 'flex';
+  // outside event listeners or scan logic have been removed/commented out.
+  // Modal is now only triggered by scan-related/user actions.
 })();
 // Expose these functions globally for dev-debug.js and others
 window.initEventListeners = initEventListeners;
@@ -1936,212 +2018,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- RESTORED: Handle scanned UPCs (from scanner or input field) ---
 // Place this after modal setup logic so showItemModal is available
-(function() {
-  // Helper: get current bay (from memory or storage)
-  function getCurrentBay() {
-    // Prefer in-memory currentBay if available, else from localStorage
-    if (typeof currentBay === 'object' && currentBay && currentBay.name) return currentBay.name;
-    return localStorage.getItem('activeBay') || currentBay || '';
+// --- PATCH: Define or update handleScanInput to show modal for unknown codes ---
+// This function should be defined near the scan logic, or here if not present.
+window.handleScanInput = function handleScanInput(code) {
+  console.log('[🧪] Simulated scan received:', code);
+
+  // Retrieve all mapping data
+  const upcMap = JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
+  const eslMap = JSON.parse(localStorage.getItem('eslToUPCMap') || '{}');
+  const bayMap = JSON.parse(localStorage.getItem('locationMap') || '{}');
+
+  // Check if the code exists in any map
+  const isMapped = upcMap[code] || eslMap[code] || bayMap[code];
+
+  // Populate modal content
+  const codeSpan = document.getElementById('mapPromptCode');
+  if (codeSpan) {
+    codeSpan.textContent = code;
+    window._mappingCode = code;
   }
 
-  // Helper: update scan stats display (fallback to updateSessionStats if available)
-  function updateScanStatsDisplay() {
-    if (typeof updateSessionStats === 'function') {
-      updateSessionStats(getTotalItemCount(), getCurrentBay() || 'None', localStorage.getItem('selectedCategory') || 'None');
-    }
+  // Show modal only for unknown codes
+  if (!isMapped && codeSpan) {
+    showMapPromptModal();
+  } else {
+    console.log('✅ Code already mapped — skipping modal.');
   }
-
-  // Helper: increment item count in session (fallback logic)
-  function incrementItemCount(upc, itemNumber, category, bay) {
-    window.sessionMap = window.sessionMap || {};
-    if (!window.sessionMap[itemNumber]) window.sessionMap[itemNumber] = { count: 0 };
-    window.sessionMap[itemNumber].count += 1;
-    window.sessionMap[itemNumber].category = category;
-    window.sessionMap[itemNumber].location = bay;
-    if (typeof window.updateLiveTable === 'function') window.updateLiveTable();
-  }
-
-  // Helper: show toast
-  function showToast(msg, type) {
-    if (typeof createToast === 'function') createToast(msg, type);
-  }
-
-  // Helper: show item modal for unknown UPC
-  function showItemModal(upc) {
-    // Prefer itemEntryModal if present, else fallback to mapPromptModal
-    const itemEntryModal = document.getElementById('itemEntryModal');
-    const isAnyModalActive = Array.from(document.querySelectorAll('.modal'))
-      .some(modal => modal.style.display && modal.style.display !== 'none');
-    if (itemEntryModal && !isAnyModalActive) {
-      itemEntryModal.style.display = 'block';
-      const upcInput = document.getElementById('upcInputField');
-      if (upcInput) upcInput.value = upc;
-      const itemNumInput = document.getElementById('itemNumberInputField');
-      if (itemNumInput) itemNumInput.focus();
-      return;
-    }
-    // Fallback to mapPromptModal using new .show class logic
-    const modal = document.getElementById('mapPromptModal');
-    const codeSpan = document.getElementById('mapPromptCode');
-    if (modal && codeSpan) {
-      modal.classList.remove('hidden');
-      modal.classList.add('show');
-      modal.setAttribute('aria-hidden', 'false');
-      modal.style.display = 'flex';
-      codeSpan.textContent = upc;
-      window._mappingCode = upc;
-    }
-  }
-
-  // --- UPC to Item map (in-memory or from storage) ---
-  function getUPCToItemMap() {
-    return window.upcToItem || JSON.parse(localStorage.getItem('upcToItemMap') || '{}');
-  }
-
-  // Main handler for scanned UPCs
-  window.handleScannedUPC = function handleScannedUPC(upc) {
-    const bay = getCurrentBay();
-    const category = localStorage.getItem('selectedCategory') || '';
-    const upcToItem = getUPCToItemMap();
-    const scannedItem = upcToItem[upc];
-
-    if (!bay || !category) {
-      showToast('Please select a bay and category before scanning.', 'error');
-      return;
-    }
-
-    if (scannedItem) {
-      incrementItemCount(upc, scannedItem, category, bay);
-    } else {
-      showItemModal(upc);
-    }
-
-    updateScanStatsDisplay(); // Refresh stats after each scan
-  };
-
-  // Attach scan line input listener (if present)
-  document.addEventListener('DOMContentLoaded', () => {
-    const scanLine = document.getElementById('scanLine');
-    if (scanLine) {
-      scanLine.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          const input = e.target.value.trim();
-          e.target.value = '';
-          if (input) {
-            handleScannedUPC(input);
-          }
-        }
-      });
-    }
-  });
-})();
-// --- PATCH: Failsafe for all major action buttons to prevent multiple bindings ---
-[
-  "confirmModalBtn",
-  "cancelModalBtn",
-  "confirmEditBtn",
-  "cancelEditBtn",
-  "confirmEditItem",
-  "cancelEditItem",
-  "modalEditConfirm",
-  "modalBtnProduct",
-  "modalBtnESL",
-  "modalBtnLocation",
-  "modalBtnBay",
-  "mapTypeESL",
-  "mapTypeProduct",
-  "mapTypeBay",
-  "cancelMapPrompt",
-  "closeBayBtn",
-  "viewTrendsBtn",
-  "exportBtn",
-  "importBtn",
-  "exportUPCBtn",
-  "importUPCBtn",
-  "addLiveItem",
-  "loadFromDropbox",
-  "connectDropbox",
-  "refreshDropboxToken",
-  "syncDropboxMaps",
-  "restoreDropboxMaps",
-  "disconnectDropbox",
-  "saveSessionBtn",
-  "clearLiveTableBtn",
-  "loadSessionBtn",
-  "uploadToExcelBtn",
-  "browseDropboxSessions",
-  "manualToggleBtn",
-  "exportTemplateBtn",
-  "toggleImportExport",
-  "uploadDropboxFile",
-  "triggerImportExcelSession",
-  "viewTrends",
-  "saveNamedSessionBtn",
-  "loadNamedSessionBtn",
-  "deleteNamedSessionBtn",
-  "downloadBackupBtn",
-  "cleanStaleSessions",
-  "mergeMasterReport",
-  "auditRotationBtn"
-].forEach(id => {
-  const btn = document.getElementById(id);
-  if (btn && !btn.dataset.bound) {
-    // Only set the .dataset.bound property, do not override existing handlers
-    btn.dataset.bound = 'true';
-  }
-});
-
-// --- PATCH: Diagnostic to validate button presence and listener binding ---
-document.addEventListener('DOMContentLoaded', () => {
-  const buttonsToCheck = [
-    { id: 'addLiveItem', label: 'Add Item' },
-    { id: 'downloadToExcelBtn', label: 'Download Excel' },
-    { id: 'loadActiveSession', label: 'Load Active Session' },
-    { id: 'loadSessionLocal', label: 'Load Session Locally' },
-    { id: 'clearSessionHistory', label: 'Clear Session History' },
-    { id: 'clearAllSessions', label: 'Clear All Sessions' },
-    { id: 'bayLocationBtn', label: 'Bay Location' },
-    { id: 'mapTypeProduct', label: 'Product' },
-    { id: 'mapTypeESL', label: 'ESL Tag' }
-  ];
-
-  buttonsToCheck.forEach(({ id, label }) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      if (!btn.dataset.bound) {
-        btn.addEventListener('click', () => {
-          console.log(`✅ ${label} clicked (listener active)`);
-        });
-        btn.dataset.bound = 'true';
-        console.log(`🟢 Bound listener for: ${label} (${id})`);
-      }
-    } else {
-      console.warn(`❌ Button not found in DOM: ${label} (${id})`);
-    }
-  });
-});
-
-// --- Ensure final IIFE is properly closed ---
-})();
-
-// 🔄 Bulletproof Button Rebinding (No Conditions)
-(function bindAllButtons() {
-  const buttonIds = [
-    'modalBtnLocation',
-    'modalBtnProduct',
-    'modalBtnESL',
-    'mapTypeESL',
-    'mapTypeProduct'
-  ];
-
-  buttonIds.forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener('click', () => {
-        console.log(`✅ ${id} clicked`);
-      });
-    }
-  });
-
-  console.log('🔁 Rebinding attempt complete.');
-})();
+};
