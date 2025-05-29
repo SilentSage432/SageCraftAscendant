@@ -65,12 +65,14 @@ if (confirmBtn) {
 }
 // --- PATCH: Suggest category in Add Item Modal based on item code ---
 const itemCodeInput = document.getElementById('newItemCode');
+let lastSuggestedCategory = '';
 if (itemCodeInput) {
   itemCodeInput.addEventListener('input', function () {
     const code = itemCodeInput.value.trim();
     let suggested = '';
     if (code) {
       suggested = suggestCategory(code);
+      lastSuggestedCategory = suggested;
       const catSelect = document.getElementById('newItemCategory');
       if (catSelect) {
         // Try to select the suggested category if it exists in the options
@@ -80,15 +82,32 @@ if (itemCodeInput) {
             break;
           }
         }
+        // Also update value for text/select inputs
+        catSelect.value = suggested;
+      }
+      // Show category suggestion note
+      const suggestionNote = document.getElementById('categorySuggestionNote');
+      if (suggestionNote) {
+        suggestionNote.textContent = `🤖 Category suggested: ${suggested}`;
+        suggestionNote.style.display = 'block';
       }
     }
-    // Show category suggestion note
-    const suggestionNote = document.getElementById('categorySuggestionNote');
-    if (suggestionNote) {
-      suggestionNote.textContent = `🤖 Category suggested: ${suggested}`;
-      suggestionNote.style.display = 'block';
-    }
   });
+  // --- PATCH: Listen for changes in category input and offer to remember new mapping ---
+  const categoryInput = document.getElementById('newItemCategory');
+  if (categoryInput) {
+    categoryInput.addEventListener('change', () => {
+      const code = itemCodeInput.value.trim();
+      const current = categoryInput.value.trim();
+      if (code && current && current !== lastSuggestedCategory) {
+        const confirmLearn = confirm(`🧠 You changed the category for ${code}.\nDo you want me to remember "${current}" instead of "${lastSuggestedCategory}"?`);
+        if (confirmLearn) {
+          saveCategoryMemory(code, current);
+          console.log(`🧠 Learned new category "${current}" for ${code}`);
+        }
+      }
+    });
+  }
 }
 // --- Mapping Modal Confirm/Cancel and Scan Type Buttons ---
 // Confirm button in mapping modal
