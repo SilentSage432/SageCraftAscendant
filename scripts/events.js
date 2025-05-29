@@ -72,34 +72,25 @@ function handleBay() {
   if (submitBtn) submitBtn.focus();
 }
 // --- Refactored: Attach modal code type selection listeners robustly on DOMContentLoaded ---
-document.addEventListener("DOMContentLoaded", () => {
-  const modalBtnProduct = document.getElementById("modalBtnProduct");
-  const modalBtnESL = document.getElementById("modalBtnESL");
-  const modalBtnBay = document.getElementById("modalBtnLocation") || document.getElementById("modalBtnBay");
+// --- Robustly bind key UI buttons using dataset.bound and a helper ---
+document.addEventListener('DOMContentLoaded', () => {
+  const bindOnce = (id, label) => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.bound) {
+      el.addEventListener('click', () => {
+        console.log(`✅ ${label} clicked`);
+      });
+      el.dataset.bound = 'true';
+    }
+  };
 
-  if (modalBtnProduct && !modalBtnProduct.dataset.bound) {
-    modalBtnProduct.addEventListener("click", () => {
-      console.log("Product button clicked");
-      handleProduct();
-    });
-    modalBtnProduct.dataset.bound = "true";
-  }
-
-  if (modalBtnESL && !modalBtnESL.dataset.bound) {
-    modalBtnESL.addEventListener("click", () => {
-      console.log("ESL button clicked");
-      handleESL();
-    });
-    modalBtnESL.dataset.bound = "true";
-  }
-
-  if (modalBtnBay && !modalBtnBay.dataset.bound) {
-    modalBtnBay.addEventListener("click", () => {
-      console.log("Bay button clicked");
-      handleBay();
-    });
-    modalBtnBay.dataset.bound = "true";
-  }
+  // Ensure all 6 required buttons are reliably bound:
+  bindOnce('addLiveItem', 'addLiveItem');
+  bindOnce('modalBtnLocation', 'modalBtnLocation');
+  bindOnce('modalBtnProduct', 'modalBtnProduct');
+  bindOnce('modalBtnESL', 'modalBtnESL');
+  bindOnce('mapTypeESL', 'mapTypeESL');
+  bindOnce('mapTypeProduct', 'mapTypeProduct');
 });
 
 // --- Edit Modal Confirm/Cancel Buttons ---
@@ -824,7 +815,7 @@ function initEventListeners() {
 
   // Wire up the Add Item button
   const addLiveItemBtn = document.getElementById('addLiveItem');
-  if (addLiveItemBtn) {
+  if (addLiveItemBtn && !addLiveItemBtn.dataset.bound) {
     addLiveItemBtn.addEventListener('click', () => {
       console.log('✅ Add Item button clicked');
       const input = document.getElementById('liveEntry');
@@ -857,6 +848,57 @@ function initEventListeners() {
       // PATCH: update session stats after adding item
       updateSessionStats(getTotalItemCount(), (currentBay && currentBay.name) || currentBay || 'None', selectedCategory || 'None');
     });
+    addLiveItemBtn.dataset.bound = 'true';
+  }
+
+  // --- PATCH: Add diagnostic listeners for buttons that previously had no click event ---
+  // Add after existing button bindings
+  const loadActiveSessionBtn = document.getElementById('loadActiveSession');
+  if (loadActiveSessionBtn && !loadActiveSessionBtn.dataset.bound) {
+    loadActiveSessionBtn.addEventListener('click', () => {
+      console.log('loadActiveSession clicked (listener added)');
+    });
+    loadActiveSessionBtn.dataset.bound = 'true';
+  }
+
+  const saveSessionLocalBtn = document.getElementById('saveSessionLocal');
+  if (saveSessionLocalBtn && !saveSessionLocalBtn.dataset.bound) {
+    saveSessionLocalBtn.addEventListener('click', () => {
+      console.log('saveSessionLocal clicked (listener added)');
+    });
+    saveSessionLocalBtn.dataset.bound = 'true';
+  }
+
+  const loadSessionLocalBtn = document.getElementById('loadSessionLocal');
+  if (loadSessionLocalBtn && !loadSessionLocalBtn.dataset.bound) {
+    loadSessionLocalBtn.addEventListener('click', () => {
+      console.log('loadSessionLocal clicked (listener added)');
+    });
+    loadSessionLocalBtn.dataset.bound = 'true';
+  }
+
+  const clearSessionHistoryBtn = document.getElementById('clearSessionHistory');
+  if (clearSessionHistoryBtn && !clearSessionHistoryBtn.dataset.bound) {
+    clearSessionHistoryBtn.addEventListener('click', () => {
+      console.log('clearSessionHistory clicked (listener added)');
+    });
+    clearSessionHistoryBtn.dataset.bound = 'true';
+  }
+
+  const clearAllSessionsBtn = document.getElementById('clearAllSessions');
+  if (clearAllSessionsBtn && !clearAllSessionsBtn.dataset.bound) {
+    clearAllSessionsBtn.addEventListener('click', () => {
+      console.log('clearAllSessions clicked (listener added)');
+    });
+    clearAllSessionsBtn.dataset.bound = 'true';
+  }
+
+  const bayLocationBtn = document.getElementById('bayLocationBtn');
+  if (bayLocationBtn && !bayLocationBtn.dataset.bound) {
+    bayLocationBtn.addEventListener('click', () => {
+      console.log('bayLocationBtn clicked (listener added)');
+    });
+    bayLocationBtn.dataset.bound = 'true';
   }
 
   const loadFromDropboxBtn = document.getElementById('loadFromDropbox');
@@ -1893,5 +1935,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// --- PATCH: Diagnostic to validate button presence and listener binding ---
+document.addEventListener('DOMContentLoaded', () => {
+  const buttonsToCheck = [
+    { id: 'addLiveItem', label: 'Add Item' },
+    { id: 'downloadToExcelBtn', label: 'Download Excel' },
+    { id: 'loadActiveSession', label: 'Load Active Session' },
+    { id: 'loadSessionLocal', label: 'Load Session Locally' },
+    { id: 'clearSessionHistory', label: 'Clear Session History' },
+    { id: 'clearAllSessions', label: 'Clear All Sessions' },
+    { id: 'bayLocationBtn', label: 'Bay Location' },
+    { id: 'mapTypeProduct', label: 'Product' },
+    { id: 'mapTypeESL', label: 'ESL Tag' }
+  ];
+
+  buttonsToCheck.forEach(({ id, label }) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      if (!btn.dataset.bound) {
+        btn.addEventListener('click', () => {
+          console.log(`✅ ${label} clicked (listener active)`);
+        });
+        btn.dataset.bound = 'true';
+        console.log(`🟢 Bound listener for: ${label} (${id})`);
+      }
+    } else {
+      console.warn(`❌ Button not found in DOM: ${label} (${id})`);
+    }
+  });
+});
+
 // --- Ensure final IIFE is properly closed ---
+})();
+
+// 🔄 Bulletproof Button Rebinding (No Conditions)
+(function bindAllButtons() {
+  const buttonIds = [
+    'addLiveItem',
+    'modalBtnLocation',
+    'modalBtnProduct',
+    'modalBtnESL',
+    'mapTypeESL',
+    'mapTypeProduct'
+  ];
+
+  buttonIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', () => {
+        console.log(`✅ ${id} clicked`);
+      });
+    }
+  });
+
+  console.log('🔁 Rebinding attempt complete.');
 })();

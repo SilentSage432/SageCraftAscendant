@@ -123,7 +123,7 @@
           </div>
 
           <div class="scan-buttons">
-            <button id="addItemBtn" aria-label="Add scanned item to count">Add Item</button>
+            <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
             <button id="moreOptionsBtn" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
           </div>
 
@@ -178,7 +178,7 @@
 
       <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
         <h2>Export Tools</h2>
-        <button id="downloadExcel">⬇️ Download Excel</button>
+        <button id="downloadToExcelBtn">⬇️ Download Excel</button>
         <button id="exportAuditLog">📤 Export Audit Log</button>
         <button id="resetAuditLog">🗑️ Reset Audit Log</button>
       </section>
@@ -265,7 +265,7 @@
         <div id="dropboxControls" class="button-grid">
           <button id="connectDropbox">🔐 Connect to Dropbox</button>
           <button id="refreshDropboxToken">♻️ Refresh Token</button>
-          <button id="loadDropboxSession">📥 Load Active Session</button>
+          <button id="loadActiveSession">📥 Load Active Session</button>
           <button id="syncDropboxMaps">🔄 Sync All Maps</button>
           <button id="restoreDropboxMaps">📂 Restore All Maps</button>
           <button id="disconnectDropbox">❌ Disconnect</button>
@@ -273,8 +273,8 @@
         <h3>📁 Local Session Tools</h3>
         <div class="button-grid">
           <button id="saveSessionLocal">💾 Save Session Locally</button>
-          <button id="loadSession">📂 Load Session Locally</button>
-          <button id="clearHistoryBtn">🧹 Clear Session History</button>
+          <button id="loadSessionLocal">📂 Load Session Locally</button>
+          <button id="clearSessionHistory">🧹 Clear Session History</button>
         </div>
 
         <h3>📤 Mapping Management</h3>
@@ -285,7 +285,7 @@
         <h3>🧬 Advanced Tools</h3>
         <div class="button-grid">
           <button id="downloadBackupBtn">📥 Download Backup</button>
-          <button id="clearSessionsBtn">🧹 Clear All Sessions</button>
+          <button id="clearAllSessions">🧹 Clear All Sessions</button>
           <button id="cleanStaleSessions">🧹 Clean Empty Sessions</button>
         </div>
       </section>
@@ -361,7 +361,7 @@
         <div class="button-group">
           <button id="mapTypeESL">🏷️ ESL Tag</button>
           <button id="mapTypeProduct">📦 Product</button>
-          <button id="mapTypeBay">📍 Bay Tag</button>
+          <button id="bayLocationBtn">📍 Bay Tag</button>
         </div>
         <div id="mapInputSection" class="hidden" style="margin-top: 15px;">
           <label id="mapPromptLabel" for="mapPromptInput"></label>
@@ -449,12 +449,11 @@
   <!-- Main script -->
   <script type="module" src="scripts/index.js?v=2.0.1"></script>
   <!-- Main App Scripts -->
-<script src="scripts/events.js" defer></script>
-<script src="scripts/scan.js" defer></script>
+  <script src="scripts/events.js" defer></script>
+  <script src="scripts/scan.js" defer></script>
 
-</script>
-<!-- Debugging Toolkit -->
-<script src="scripts/dev-debug.js" defer></script>
+  <!-- Debugging Toolkit -->
+  <script src="scripts/dev-debug.js" defer></script>
 
   <script type="module">
     if (window.location.search.includes('code=')) {
