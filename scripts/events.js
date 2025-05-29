@@ -12,6 +12,12 @@ if (cancelBtn) {
     document.getElementById('newItemCode').value = '';
     document.getElementById('newItemQty').value = '1';
     document.getElementById('newItemCategory').selectedIndex = 0;
+    // Reset category suggestion note
+    const suggestionNote = document.getElementById('categorySuggestionNote');
+    if (suggestionNote) {
+      suggestionNote.textContent = '';
+      suggestionNote.style.display = 'none';
+    }
     console.log('❌ Add Item Modal cancelled');
   });
 }
@@ -48,7 +54,40 @@ if (confirmBtn) {
     document.getElementById('newItemCode').value = '';
     document.getElementById('newItemQty').value = '1';
     document.getElementById('newItemCategory').selectedIndex = 0;
+    // Reset category suggestion note
+    const suggestionNote = document.getElementById('categorySuggestionNote');
+    if (suggestionNote) {
+      suggestionNote.textContent = '';
+      suggestionNote.style.display = 'none';
+    }
     console.log('✅ New item added to table');
+  });
+}
+// --- PATCH: Suggest category in Add Item Modal based on item code ---
+const itemCodeInput = document.getElementById('newItemCode');
+if (itemCodeInput) {
+  itemCodeInput.addEventListener('input', function () {
+    const code = itemCodeInput.value.trim();
+    let suggested = '';
+    if (code) {
+      suggested = suggestCategory(code);
+      const catSelect = document.getElementById('newItemCategory');
+      if (catSelect) {
+        // Try to select the suggested category if it exists in the options
+        for (let i = 0; i < catSelect.options.length; i++) {
+          if (catSelect.options[i].value === suggested) {
+            catSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+    // Show category suggestion note
+    const suggestionNote = document.getElementById('categorySuggestionNote');
+    if (suggestionNote) {
+      suggestionNote.textContent = `🤖 Category suggested: ${suggested}`;
+      suggestionNote.style.display = 'block';
+    }
   });
 }
 // --- Mapping Modal Confirm/Cancel and Scan Type Buttons ---
