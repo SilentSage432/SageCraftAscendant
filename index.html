@@ -98,8 +98,8 @@
         <div id="entryControls" class="scan-capsule" role="region" aria-label="Scan Entry Controls">
           <h3>📲 Scan Entry</h3>
           <div class="scan-fields">
-            <input id="scanInput" data-id="scanInput" type="text" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
-            <input type="number" id="liveQty" value="1" min="1" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
+            <input id="scanInput" data-id="scanInput" type="tel" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
+            <input type="number" id="liveQty" value="1" min="1" inputmode="numeric" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
             <select id="categorySelect" data-id="categorySelect" class="category-select" aria-label="Select item category">
               <option value="Laundry" data-category="Laundry">Laundry</option>
               <option value="Fridges & Freezers" data-category="Fridges $ Freezers">Fridges & Freezers</option>
@@ -448,10 +448,10 @@
       <h3 id="addItemTitle">➕ Add New Item</h3>
 
       <label for="newItemCode">Item Number:</label>
-      <input type="text" id="newItemCode" placeholder="Enter item number..." style="margin: 5px 0;" />
+      <input type="tel" id="newItemCode" placeholder="Enter item number..." style="margin: 5px 0;" />
 
       <label for="newItemQty">Quantity:</label>
-      <input type="number" id="newItemQty" min="1" value="1" style="margin: 5px 0;" />
+      <input type="number" id="newItemQty" min="1" value="1" inputmode="numeric" style="margin: 5px 0;" />
 
       <label for="newItemCategory">Category:</label>
       <select id="newItemCategory" style="margin: 5px 0;">
