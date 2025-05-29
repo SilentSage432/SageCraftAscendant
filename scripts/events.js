@@ -4,6 +4,7 @@ const cancelBtn = document.getElementById('cancelAddItemBtn');
 if (cancelBtn) {
   cancelBtn.addEventListener('click', () => {
     const modal = document.getElementById('addItemModal');
+    document.activeElement?.blur();
     if (modal) {
       modal.classList.add('hidden');
       modal.setAttribute('aria-hidden', 'true');
@@ -718,6 +719,27 @@ function initEventListeners() {
       });
       autosaveIntervalSelect.dataset.bound = 'true';
     }
+  }
+
+  // --- Clean Empty Sessions Button (Binding Failsafe Pattern) ---
+  const cleanEmptySessionsBtn = document.getElementById('cleanEmptySessionsBtn');
+  if (cleanEmptySessionsBtn && !cleanEmptySessionsBtn.dataset.bound) {
+    cleanEmptySessionsBtn.addEventListener('click', () => {
+      let removed = 0;
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('inventorySession_')) {
+          const val = localStorage.getItem(key);
+          if (val && val === '{}' || val === JSON.stringify({})) {
+            localStorage.removeItem(key);
+            removed++;
+          }
+        }
+      });
+      createToast(`🧹 Removed ${removed} empty session${removed !== 1 ? 's' : ''}`);
+      if (removed > 0) location.reload();
+    });
+    cleanEmptySessionsBtn.dataset.bound = 'true';
   }
 
   const numericKeypadToggle = document.getElementById('numericKeypadToggle');
