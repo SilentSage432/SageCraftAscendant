@@ -352,21 +352,23 @@
     Inventory Auditor — v2.0.0 ⚡
   </footer>
 
-  <!-- Smart Mapping Modal -->
-  <div id="mapPromptModal" class="modal hidden">
-    <div class="modal-content">
-      <h3>❓ Unknown Code: <span id="mapPromptCode"></span></h3>
-      <p>What type of tag is this?</p>
-      <div class="button-group">
-        <button id="mapTypeESL">🏷️ ESL Tag</button>
-        <button id="mapTypeProduct">📦 Product</button>
-        <button id="mapTypeBay">📍 Bay Tag</button>
-      </div>
-      <div id="mapInputSection" class="hidden" style="margin-top: 15px;">
-        <label id="mapPromptLabel" for="mapPromptInput"></label>
-        <input type="text" id="mapPromptInput" placeholder="Enter value..." />
-        <button id="confirmModalBtn" type="button" style="margin-top: 10px;">✅ Confirm</button>
-        <button id="cancelModalBtn" type="button" style="margin-top: 10px; background-color: #b00; color: white;">❌ Cancel</button>
+  <!-- Smart Mapping Modal with Overlay -->
+  <div id="mapPromptOverlay" style="display: none;">
+    <div id="mapPromptModal">
+      <div class="modal-content">
+        <h3>❓ Unknown Code: <span id="mapPromptCode"></span></h3>
+        <p>What type of tag is this?</p>
+        <div class="button-group">
+          <button id="mapTypeESL">🏷️ ESL Tag</button>
+          <button id="mapTypeProduct">📦 Product</button>
+          <button id="mapTypeBay">📍 Bay Tag</button>
+        </div>
+        <div id="mapInputSection" class="hidden" style="margin-top: 15px;">
+          <label id="mapPromptLabel" for="mapPromptInput"></label>
+          <input type="text" id="mapPromptInput" placeholder="Enter value..." />
+          <button id="confirmModalBtn" type="button" style="margin-top: 10px;">✅ Confirm</button>
+          <button id="cancelModalBtn" type="button" style="margin-top: 10px; background-color: #b00; color: white;">❌ Cancel</button>
+        </div>
       </div>
     </div>
   </div>

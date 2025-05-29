@@ -1,16 +1,28 @@
 // --- Mapping Modal Confirm/Cancel and Scan Type Buttons ---
 // Confirm button in mapping modal
-document.getElementById('confirmModalBtn')?.addEventListener('click', () => {
-  if (typeof handleMappingConfirmation === 'function') {
-    handleMappingConfirmation();
+{
+  const btn = document.getElementById('confirmModalBtn');
+  if (btn && !btn.dataset.bound) {
+    btn.addEventListener('click', () => {
+      if (typeof handleMappingConfirmation === 'function') {
+        handleMappingConfirmation();
+      }
+    });
+    btn.dataset.bound = 'true';
   }
-});
+}
 // Cancel button in mapping modal
-document.getElementById('cancelModalBtn')?.addEventListener('click', () => {
-  if (typeof closeSmartModal === 'function') {
-    closeSmartModal();
+{
+  const btn = document.getElementById('cancelModalBtn');
+  if (btn && !btn.dataset.bound) {
+    btn.addEventListener('click', () => {
+      if (typeof closeSmartModal === 'function') {
+        closeSmartModal();
+      }
+    });
+    btn.dataset.bound = 'true';
   }
-});
+}
 // --- Modal Code Type Selection Buttons (Product/ESL/Bay) ---
 // Refactored: Add a single clean set of event listeners in DOMContentLoaded below
 // --- Handlers for modal code type selection buttons ---
@@ -91,51 +103,74 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Edit Modal Confirm/Cancel Buttons ---
-document.getElementById('confirmEditBtn')?.addEventListener('click', () => {
-  if (typeof handleEditConfirmation === 'function') {
-    handleEditConfirmation();
+{
+  const btn = document.getElementById('confirmEditBtn');
+  if (btn && !btn.dataset.bound) {
+    btn.addEventListener('click', () => {
+      if (typeof handleEditConfirmation === 'function') {
+        handleEditConfirmation();
+      }
+    });
+    btn.dataset.bound = 'true';
   }
-});
-document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
-  if (typeof closeEditModal === 'function') {
-    closeEditModal();
+}
+{
+  const btn = document.getElementById('cancelEditBtn');
+  if (btn && !btn.dataset.bound) {
+    btn.addEventListener('click', () => {
+      if (typeof closeEditModal === 'function') {
+        closeEditModal();
+      }
+    });
+    btn.dataset.bound = 'true';
   }
-});
+}
 // --- Confirm and Cancel Edit Button Listeners for editItemModal ---
 // These listeners handle edits for the liveScanTable using the editItemModal modal.
-document.getElementById('confirmEditBtn')?.addEventListener('click', () => {
-  const rowIndex = parseInt(document.getElementById('editItemModal').dataset.rowIndex, 10);
-  const newQuantity = parseInt(document.getElementById('editItemQty').value, 10);
-  const newCategory = document.getElementById('editItemCategory').value.trim();
+{
+  const btn = document.getElementById('confirmEditBtn');
+  if (btn && !btn.dataset.bound2) { // allow for double binding for this unique handler
+    btn.addEventListener('click', () => {
+      const rowIndex = parseInt(document.getElementById('editItemModal').dataset.rowIndex, 10);
+      const newQuantity = parseInt(document.getElementById('editItemQty').value, 10);
+      const newCategory = document.getElementById('editItemCategory').value.trim();
 
-  if (!isNaN(rowIndex) && !isNaN(newQuantity) && newCategory) {
-    const table = document.getElementById('liveScanTable');
-    const row = table.rows[rowIndex];
-    if (row) {
-      row.cells[1].textContent = newQuantity;
-      row.cells[2].textContent = newCategory;
+      if (!isNaN(rowIndex) && !isNaN(newQuantity) && newCategory) {
+        const table = document.getElementById('liveScanTable');
+        const row = table.rows[rowIndex];
+        if (row) {
+          row.cells[1].textContent = newQuantity;
+          row.cells[2].textContent = newCategory;
 
-      const scannedItems = JSON.parse(localStorage.getItem('scannedItems') || '[]');
-      if (scannedItems[rowIndex]) {
-        scannedItems[rowIndex].quantity = newQuantity;
-        scannedItems[rowIndex].category = newCategory;
-        localStorage.setItem('scannedItems', JSON.stringify(scannedItems));
+          const scannedItems = JSON.parse(localStorage.getItem('scannedItems') || '[]');
+          if (scannedItems[rowIndex]) {
+            scannedItems[rowIndex].quantity = newQuantity;
+            scannedItems[rowIndex].category = newCategory;
+            localStorage.setItem('scannedItems', JSON.stringify(scannedItems));
+          }
+
+          document.getElementById('editItemModal').classList.add('hidden');
+          console.log('✅ Edit confirmed and saved.');
+        }
+      } else {
+        console.warn('⚠️ Invalid edit values or row index.');
       }
-
-      document.getElementById('editItemModal').classList.add('hidden');
-      console.log('✅ Edit confirmed and saved.');
-    }
-  } else {
-    console.warn('⚠️ Invalid edit values or row index.');
+    });
+    btn.dataset.bound2 = 'true';
   }
-});
-
-document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
-  document.getElementById('editItemModal').classList.add('hidden');
-  document.getElementById('editItemQty').value = '';
-  document.getElementById('editItemCategory').value = '';
-  console.log('❌ Edit cancelled.');
-});
+}
+{
+  const btn = document.getElementById('cancelEditBtn');
+  if (btn && !btn.dataset.bound2) {
+    btn.addEventListener('click', () => {
+      document.getElementById('editItemModal').classList.add('hidden');
+      document.getElementById('editItemQty').value = '';
+      document.getElementById('editItemCategory').value = '';
+      console.log('❌ Edit cancelled.');
+    });
+    btn.dataset.bound2 = 'true';
+  }
+}
 // --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
 // --- Modal Edit Confirm Button Handler (for modalEditConfirm) ---
 // The modalEditConfirm button may be created dynamically, so bind the event outside DOMContentLoaded
@@ -182,10 +217,9 @@ function handleModalEditConfirmClick() {
 // Attach the handler either immediately or after DOMContentLoaded if button not yet present
 function bindModalEditConfirmListener() {
   const modalEditConfirm = document.getElementById("modalEditConfirm");
-  if (modalEditConfirm) {
-    // Remove any previous listener to prevent double binding
-    modalEditConfirm.removeEventListener("click", handleModalEditConfirmClick);
+  if (modalEditConfirm && !modalEditConfirm.dataset.bound) {
     modalEditConfirm.addEventListener("click", handleModalEditConfirmClick);
+    modalEditConfirm.dataset.bound = "true";
   }
 }
 // Try binding immediately in case button is present
@@ -204,6 +238,11 @@ console.log('✅ Binding global manual-scan listener');
 
 window.handleManualScan = function (e) {
   const { code, quantity, category } = e.detail;
+
+  // DEV hook: reroute scan through handleScanInput if defined
+  if (typeof window.handleScanInput === 'function') {
+    return window.handleScanInput(code);
+  }
 
   console.log('🧪 Primary manual-scan triggered:', code);
 
@@ -625,33 +664,33 @@ function initEventListeners() {
       // Optional: reset bay-related logic if needed
       createToast('Bay closed successfully.');
 
-  // --- SESSION SUMMARY MODAL LOGIC (Refactored as per request) ---
-  // Show session summary modal ONLY when closing a bay
-  const summaryModal = document.getElementById('summaryModal');
-  const summaryContent = document.getElementById('summaryContent');
-  const activeBay = localStorage.getItem('activeBay');
-  const auditData = JSON.parse(localStorage.getItem('auditData')) || {};
-  const bayData = auditData[activeBay] || {};
-  const totalItems = Object.values(bayData).reduce((sum, count) => sum + count, 0);
-  const uniqueUPCs = Object.keys(bayData).length;
-  const auditTimers = JSON.parse(localStorage.getItem('bayAuditTimers')) || {};
-  const auditTime = auditTimers[activeBay] || 0;
+      // --- SESSION SUMMARY MODAL LOGIC (Refactored as per request) ---
+      // Show session summary modal ONLY when closing a bay
+      const summaryModal = document.getElementById('summaryModal');
+      const summaryContent = document.getElementById('summaryContent');
+      const activeBay = localStorage.getItem('activeBay');
+      const auditData = JSON.parse(localStorage.getItem('auditData')) || {};
+      const bayData = auditData[activeBay] || {};
+      const totalItems = Object.values(bayData).reduce((sum, count) => sum + count, 0);
+      const uniqueUPCs = Object.keys(bayData).length;
+      const auditTimers = JSON.parse(localStorage.getItem('bayAuditTimers')) || {};
+      const auditTime = auditTimers[activeBay] || 0;
 
-  if (summaryContent) {
-    summaryContent.innerHTML = `
-      <p><strong>Bay:</strong> ${activeBay}</p>
-      <p><strong>Total Items Scanned:</strong> ${totalItems}</p>
-      <p><strong>Unique Items:</strong> ${uniqueUPCs}</p>
-      <p><strong>Audit Time:</strong> ${auditTime} seconds</p>
-    `;
-  }
+      if (summaryContent) {
+        summaryContent.innerHTML = `
+          <p><strong>Bay:</strong> ${activeBay}</p>
+          <p><strong>Total Items Scanned:</strong> ${totalItems}</p>
+          <p><strong>Unique Items:</strong> ${uniqueUPCs}</p>
+          <p><strong>Audit Time:</strong> ${auditTime} seconds</p>
+        `;
+      }
 
-  // Only show the summary modal in response to this user action (closing bay)
-  if (summaryModal) {
-    summaryModal.style.display = 'block';
-    // Remove 'show' class if present and ensure modal does not show by default after page load
-    summaryModal.classList.remove('show');
-  }
+      // Only show the summary modal in response to this user action (closing bay)
+      if (summaryModal) {
+        summaryModal.style.display = 'block';
+        // Remove 'show' class if present and ensure modal does not show by default after page load
+        summaryModal.classList.remove('show');
+      }
     });
   }
 
@@ -1368,50 +1407,105 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Edit Modal Logic for Live Scan Table ---
 // Handles confirm/cancel for editing live scan table entries
+// --- Edit Modal Logic for Live Scan Table ---
+// Handles confirm/cancel for editing live scan table entries
 document.addEventListener('DOMContentLoaded', () => {
   // Confirm Edit Handler
   const confirmEditBtn = document.getElementById('confirmEditItem');
-  if (confirmEditBtn) {
+  if (confirmEditBtn && !confirmEditBtn.dataset.bound) {
     confirmEditBtn.addEventListener('click', () => {
-      const itemNumber = document.getElementById('editItemNumber').value.trim();
-      const quantity = parseInt(document.getElementById('editQuantity').value.trim(), 10);
-      const category = document.getElementById('editCategorySelect').value;
+      const itemNumber = document.getElementById('editItemNumberInput')?.value.trim();
+      const quantity = parseInt(document.getElementById('editQtyInput')?.value.trim(), 10);
+      const category = document.getElementById('editCategorySelect')?.value;
+      const code = document.getElementById('editCodeInput')?.value.trim();
+      const scanType = document.getElementById('editTypeSelect')?.value;
+      const mappedValue = document.getElementById('editValueInput')?.value.trim();
       const row = document.querySelector('#liveScanTableBody tr.editing');
+      const index = parseInt(confirmEditBtn.dataset.index, 10);
 
-      if (row) {
+      if (row && !isNaN(quantity) && itemNumber && category && code && scanType && mappedValue) {
         row.querySelector('.item-number').textContent = itemNumber;
         row.querySelector('.quantity').textContent = quantity;
         row.querySelector('.category').textContent = category;
+        row.dataset.code = code;
+        row.dataset.type = scanType;
+        row.dataset.value = mappedValue;
         row.classList.remove('editing');
-      }
 
-      document.getElementById('editModal').classList.remove('show');
+        window.scannedItems = window.scannedItems || JSON.parse(localStorage.getItem('scannedItems') || '[]');
+        if (window.scannedItems[index]) {
+          window.scannedItems[index].code = code;
+          window.scannedItems[index].type = scanType;
+          window.scannedItems[index].value = mappedValue;
+          window.scannedItems[index].quantity = quantity;
+          window.scannedItems[index].category = category;
+          window.scannedItems[index].itemNumber = itemNumber;
+          window.scannedItems[index].timestamp = new Date().toLocaleString();
+          localStorage.setItem('scannedItems', JSON.stringify(window.scannedItems));
+        }
+
+        document.getElementById('editModal').classList.remove('show');
+        console.log('✅ Full scan entry edit saved.');
+      } else {
+        console.warn('⚠️ Incomplete or invalid scan edit fields.');
+      }
     });
+    confirmEditBtn.dataset.bound = 'true';
   }
 
   // Cancel Edit Handler
   const cancelEditBtn = document.getElementById('cancelEditItem');
-  if (cancelEditBtn) {
+  if (cancelEditBtn && !cancelEditBtn.dataset.bound) {
     cancelEditBtn.addEventListener('click', () => {
       document.getElementById('editModal').classList.remove('show');
       const row = document.querySelector('#liveScanTableBody tr.editing');
       if (row) row.classList.remove('editing');
     });
+    cancelEditBtn.dataset.bound = 'true';
   }
 });
 
 // Function to open the edit modal and prefill values (to be called from table row edit button)
 window.openEditModalForRow = function(row) {
-  // row is the <tr> DOM element
-  // Mark as editing
+  // Clear previous editing states
   document.querySelectorAll('#liveScanTableBody tr.editing').forEach(r => r.classList.remove('editing'));
   row.classList.add('editing');
+
   // Prefill modal inputs
-  document.getElementById('editItemNumber').value = row.querySelector('.item-number').textContent;
-  document.getElementById('editQuantity').value = row.querySelector('.quantity').textContent;
-  document.getElementById('editCategorySelect').value = row.querySelector('.category').textContent;
+  document.getElementById('editItemNumberInput').value = row.querySelector('.item-number')?.textContent || '';
+  document.getElementById('editQtyInput').value = row.querySelector('.quantity')?.textContent || '1';
+  document.getElementById('editCategorySelect').value = row.querySelector('.category')?.textContent || '';
+
+  const code = row.dataset.code || '';
+  const type = row.dataset.type || '';
+  const value = row.dataset.value || '';
+
+  if (document.getElementById('editCodeInput')) {
+    document.getElementById('editCodeInput').value = code;
+  }
+
+  if (document.getElementById('editValueInput')) {
+    document.getElementById('editValueInput').value = value;
+  }
+
+  const typeSelect = document.getElementById('editTypeSelect');
+  if (typeSelect) {
+    typeSelect.value = type;
+    // Fallback: if typeSelect is not available, try to set radio
+    const radio = document.querySelector(`input[name="itemType"][value="${type}"]`);
+    if (radio) radio.checked = true;
+  }
+
   // Show modal
-  document.getElementById('editModal').classList.add('show');
+  const modal = document.getElementById('editModal');
+  if (modal) modal.classList.add('show');
+
+  // Store row index for saving
+  const index = Array.from(row.parentNode.children).indexOf(row);
+  const confirmBtn = document.getElementById('editConfirmBtn');
+  if (confirmBtn) {
+    confirmBtn.setAttribute('data-index', index);
+  }
 };
 
 (function() {
@@ -1441,7 +1535,77 @@ window.triggerAddModal = function (code = '') {
     window.handleManualScan({ detail: { code, quantity, category } });
   }
 };
-})();
+
+// --- PATCH: Replace editable row rendering in updateLiveTable for full-field editing ---
+// (This patch assumes updateLiveTable exists elsewhere, but the following block is to be placed inside it)
+// Find the section: if (editingIndex === index) { ... }
+// and replace with:
+//
+// if (editingIndex === index) {
+//   ... (see below) ...
+// }
+//
+// [The following code block should be used in updateLiveTable:]
+//
+// if (editingIndex === index) {
+//   const itemInput = document.createElement("input");
+//   itemInput.value = item;
+//   itemCell.textContent = "";
+//   itemCell.appendChild(itemInput);
+//
+//   const qtyInput = document.createElement("input");
+//   qtyInput.type = "number";
+//   qtyInput.value = count;
+//   countCell.textContent = "";
+//   countCell.appendChild(qtyInput);
+//
+//   const catInput = document.createElement("input");
+//   catInput.value = category || "";
+//   categoryCell.textContent = "";
+//   categoryCell.appendChild(catInput);
+//
+//   const bayInput = document.createElement("input");
+//   bayInput.value = location || "";
+//   locationCell.textContent = "";
+//   locationCell.appendChild(bayInput);
+//
+//   const saveBtn = document.createElement("button");
+//   saveBtn.textContent = "Save";
+//   saveBtn.onclick = () => {
+//     const newItem = itemInput.value.trim();
+//     const newQty = parseInt(qtyInput.value);
+//     const newCat = catInput.value.trim();
+//     const newBay = bayInput.value.trim();
+//
+//     if (!isNaN(newQty) && newItem) {
+//       liveCounts[newItem] = newQty;
+//       if (newItem !== item) delete liveCounts[item];
+//
+//       sessionMap[newItem] = newQty;
+//       if (newItem !== item) delete sessionMap[item];
+//
+//       itemCategory[newItem] = newCat;
+//       if (newItem !== item) delete itemCategory[item];
+//
+//       locationMap[newItem] = newBay;
+//       if (newItem !== item) delete locationMap[item];
+//
+//       editingIndex = null;
+//       updateLiveTable();
+//     }
+//   };
+//
+//   const cancelBtn = document.createElement("button");
+//   cancelBtn.textContent = "Cancel";
+//   cancelBtn.onclick = () => {
+//     editingIndex = null;
+//     updateLiveTable();
+//   };
+//
+//   actionCell.textContent = "";
+//   actionCell.appendChild(saveBtn);
+//   actionCell.appendChild(cancelBtn);
+// }
 
 // --- Ensure UI helpers and event listeners are loaded in order ---
 (async () => {
@@ -1525,14 +1689,49 @@ function handleEditConfirm(index) {
   // Removed: "modalBtnProduct",
   // Removed: "modalBtnESL",
   "modalBtnCancel",
-  "mapTypeESL",
-  "mapTypeProduct",
-  "mapTypeBay",
+  // NOTE: mapTypeESL, mapTypeProduct, mapTypeBay handled below
   "toggleToasts"
 ].forEach(id => {
   document.getElementById(id)?.addEventListener("click", () => {
     console.log(`${id} clicked (listener added)`);
   });
+});
+
+// --- PATCH: Bind mapTypeProduct, mapTypeESL, and mapTypeBay buttons to transition to next input section ---
+document.addEventListener("DOMContentLoaded", () => {
+  const mapProduct = document.querySelector("#mapPromptModal #mapTypeProduct");
+  const mapESL = document.querySelector("#mapPromptModal #mapTypeESL");
+  const mapBay = document.querySelector("#mapPromptModal #mapTypeBay");
+
+  if (mapProduct && !mapProduct.dataset.bound) {
+    mapProduct.addEventListener("click", () => {
+      console.log("✅ Product selected from mapPrompt");
+      const modal = document.getElementById('mapPromptModal');
+      if (modal) modal.classList.remove("hidden");
+      handleProduct();
+    });
+    mapProduct.dataset.bound = "true";
+  }
+
+  if (mapESL && !mapESL.dataset.bound) {
+    mapESL.addEventListener("click", () => {
+      console.log("✅ ESL selected from mapPrompt");
+      const modal = document.getElementById('mapPromptModal');
+      if (modal) modal.classList.remove("hidden");
+      handleESL();
+    });
+    mapESL.dataset.bound = "true";
+  }
+
+  if (mapBay && !mapBay.dataset.bound) {
+    mapBay.addEventListener("click", () => {
+      console.log("✅ Bay selected from mapPrompt");
+      const modal = document.getElementById('mapPromptModal');
+      if (modal) modal.classList.remove("hidden");
+      handleBay();
+    });
+    mapBay.dataset.bound = "true";
+  }
 });
 
 // --- PATCH: Prevent summary modal from opening automatically on page load ---
@@ -1642,4 +1841,62 @@ function handleEditConfirm(index) {
       });
     }
   });
+})();
+// --- PATCH: Failsafe for all major action buttons to prevent multiple bindings ---
+[
+  "confirmModalBtn",
+  "cancelModalBtn",
+  "confirmEditBtn",
+  "cancelEditBtn",
+  "confirmEditItem",
+  "cancelEditItem",
+  "modalEditConfirm",
+  "modalBtnProduct",
+  "modalBtnESL",
+  "modalBtnLocation",
+  "modalBtnBay",
+  "mapTypeESL",
+  "mapTypeProduct",
+  "mapTypeBay",
+  "cancelMapPrompt",
+  "closeBayBtn",
+  "viewTrendsBtn",
+  "exportBtn",
+  "importBtn",
+  "exportUPCBtn",
+  "importUPCBtn",
+  "addLiveItem",
+  "loadFromDropbox",
+  "connectDropbox",
+  "refreshDropboxToken",
+  "syncDropboxMaps",
+  "restoreDropboxMaps",
+  "disconnectDropbox",
+  "saveSessionBtn",
+  "clearLiveTableBtn",
+  "loadSessionBtn",
+  "uploadToExcelBtn",
+  "browseDropboxSessions",
+  "manualToggleBtn",
+  "exportTemplateBtn",
+  "toggleImportExport",
+  "uploadDropboxFile",
+  "triggerImportExcelSession",
+  "viewTrends",
+  "saveNamedSessionBtn",
+  "loadNamedSessionBtn",
+  "deleteNamedSessionBtn",
+  "downloadBackupBtn",
+  "cleanStaleSessions",
+  "mergeMasterReport",
+  "auditRotationBtn"
+].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn && !btn.dataset.bound) {
+    // Only set the .dataset.bound property, do not override existing handlers
+    btn.dataset.bound = 'true';
+  }
+});
+
+// --- Ensure final IIFE is properly closed ---
 })();

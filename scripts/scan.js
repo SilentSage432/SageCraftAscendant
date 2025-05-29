@@ -4,6 +4,9 @@ if (!window.itemCategory) {
   window.itemCategory = storedCategory || 'uncategorized';
 }
 
+// Developer flag to force modal on every scan input
+window.DEV_FORCE_MODAL = true; // Set to false to disable forced modal
+
 function resolveScanCode(code) {
   const trimmed = code.trim();
   const match = trimmed.match(/\d{6,}/); // Extract 6+ digit number
@@ -28,6 +31,15 @@ async function showCustomPrompt(code) {
 
 async function handleScanInput(val) {
   const resolved = resolveScanCode(val);
+
+  // Developer override: always prompt modal on scan input if flag is set
+  if (window.DEV_FORCE_MODAL) {
+    if (typeof window.promptCodeType === 'function') {
+      window.promptCodeType(resolved || val);
+      resetScanInput();
+      return;
+    }
+  }
   if (resolved) {
     if (typeof resolved === 'object' && resolved.type === 'esl') {
       console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
@@ -168,46 +180,104 @@ window.setItemCategory = function (category) {
   console.log(`📦 Category set to: ${category}`);
 };
 
+window.setCurrentUPC = function (code) {
+  window.currentUPC = code;
+};
+
 window.promptCodeType = function(code) {
-  const modal = document.getElementById("customModal");
-  if (!modal) {
-    console.warn("⚠️ customModal not found in DOM.");
-    return;
-  }
-
   window.setCurrentUPC?.(code);
-  modal.style.display = "block";
-  modal.removeAttribute("aria-hidden");
 
-  const entryModal = document.getElementById("mapPromptModal");
-  if (entryModal) entryModal.classList.add("hidden");
+  const overlay = document.getElementById("mapPromptOverlay");
+  const modal = document.getElementById("mapPromptModal");
 
-  const transitionToEntry = (type) => {
-    modal.style.display = "none";
-    if (entryModal) {
-      entryModal.classList.remove("hidden");
-      const codeTypeInput = entryModal.querySelector("#mapPromptLabel");
-      if (codeTypeInput) codeTypeInput.value = type || '';
-      const liveEntryInput = entryModal.querySelector("#mapPromptInput");
-      if (liveEntryInput) {
-        liveEntryInput.value = '';
-        liveEntryInput.focus();
-      }
+  if (overlay && modal) {
+    overlay.style.display = "flex";
+    modal.classList.remove("hidden");
+
+    const codeTypeInput = modal.querySelector("#mapPromptLabel");
+    if (codeTypeInput) codeTypeInput.textContent = "Enter Item Number:";
+
+    const liveEntryInput = modal.querySelector("#mapPromptInput");
+    if (liveEntryInput) {
+      liveEntryInput.value = '';
+      liveEntryInput.focus();
     }
-  };
 
-  const upcBtn = modal.querySelector("#assignUPCBtn");
-  const eslBtn = modal.querySelector("#linkESLBtn");
-  const bayBtn = modal.querySelector("#assignBayBtn");
+    const inputSection = document.getElementById("mapInputSection");
 
-  // Always rebind fresh listeners
-  if (upcBtn) {
-    upcBtn.onclick = () => transitionToEntry('upc');
-  }
-  if (eslBtn) {
-    eslBtn.onclick = () => transitionToEntry('esl');
-  }
-  if (bayBtn) {
-    bayBtn.onclick = () => transitionToEntry('bay');
+    const productBtn = document.getElementById("mapTypeProduct");
+    const eslBtn = document.getElementById("mapTypeESL");
+    const bayBtn = document.getElementById("mapTypeBay");
+
+    if (productBtn) {
+      productBtn.addEventListener("click", () => {
+        console.log("✅ Product selected");
+        inputSection?.classList.remove("hidden");
+        codeTypeInput.textContent = "Enter Product Item Number:";
+      });
+    }
+
+    if (eslBtn) {
+      eslBtn.addEventListener("click", () => {
+        console.log("✅ ESL selected");
+        inputSection?.classList.remove("hidden");
+        codeTypeInput.textContent = "Enter ESL Mapping:";
+      });
+    }
+
+    if (bayBtn) {
+      bayBtn.addEventListener("click", () => {
+        console.log("✅ Bay selected");
+        inputSection?.classList.remove("hidden");
+        codeTypeInput.textContent = "Enter Bay Location:";
+      });
+    }
+
+    const confirmBtn = document.getElementById("confirmModalBtn");
+    const cancelBtn = document.getElementById("cancelModalBtn");
+
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        const tagTypeText = codeTypeInput?.textContent || '';
+        const inputVal = liveEntryInput?.value?.trim();
+
+        if (!inputVal || !window.setCurrentUPC) return;
+
+        const upc = window.currentUPC;
+        const tagType = tagTypeText.toLowerCase();
+
+        if (tagType.includes("product")) {
+          window.upcToItem = window.upcToItem || {};
+          window.upcToItem[upc] = inputVal;
+          processScan(inputVal);
+        } else if (tagType.includes("esl")) {
+          window.eslToUPC = window.eslToUPC || {};
+          window.eslToUPC[upc] = inputVal;
+          processScan(inputVal);
+        } else if (tagType.includes("bay")) {
+          window.locationMap = window.locationMap || {};
+          window.locationMap[upc] = inputVal;
+          processScan(inputVal);
+        }
+
+        if (typeof window.updateMapStatusDisplay === "function") {
+          window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+        }
+
+        modal.classList.add("hidden");
+        overlay.style.display = "none";
+        resetScanInput();
+      };
+    }
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        modal.classList.add("hidden");
+        overlay.style.display = "none";
+        resetScanInput();
+      };
+    }
+  } else {
+    console.warn("⚠️ mapPromptOverlay or mapPromptModal not found.");
   }
 };
