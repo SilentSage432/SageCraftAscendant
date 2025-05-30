@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventory Auditor</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2.0.1" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon/icon-192.png" type="image/png" />
   <!-- <meta name="theme-color" content="#1e1e2f" /> -->
@@ -357,24 +357,6 @@
     Inventory Auditor — v2.0.0 ⚡
   </footer>
 
-  <div id="mapPromptModal" class="hidden" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 10000;">
-    <div style="background: #1e1e1e; padding: 20px; border-radius: 8px; color: white; max-width: 90%; text-align: center;">
-      <h3>❓ Unknown Code:</h3>
-      <p id="mapPromptCode"></p>
-      <input id="mapPromptInput" type="text" placeholder="Enter mapping value" style="margin: 10px 0; padding: 8px; width: 80%;">
-      <div style="margin-top: 10px;">
-        <select id="mapTypeSelect" style="padding: 8px; width: 80%;">
-          <option value="product">Product</option>
-          <option value="esl">ESL Tag</option>
-          <option value="bay">Bay Tag</option>
-        </select>
-      </div>
-      <div style="margin-top: 15px;">
-        <button id="modalSubmit" style="margin: 5px;">✅ Confirm</button>
-        <button id="cancelMapPrompt" style="margin: 5px;">❌ Cancel</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast container -->
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; align-items: center;"></div>
@@ -488,19 +470,19 @@
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Toast system script -->
-  <script type="module" src="scripts/ui.js"></script>
+  <script type="module" src="scripts/ui.js?v=2.0.1"></script>
   <!-- Main script -->
-  <script type="module" src="scripts/index.js?v=2.0.1"></script>
+  <script type="module" src="scripts/index.js?v=2.0.2"></script>
   <!-- Main App Scripts -->
-  <script src="scripts/events.js" defer></script>
-  <script src="scripts/scan.js" defer></script>
+  <script src="scripts/events.js?v=2.0.1" defer></script>
+  <script src="scripts/scan.js?v=2.0.1" defer></script>
 
   <!-- Debugging Toolkit -->
-  <script src="scripts/dev-debug.js" defer></script>
+  <script src="scripts/dev-debug.js?v=2.0.1" defer></script>
 
   <script type="module">
     if (window.location.search.includes('code=')) {
-      import('./scripts/dropbox.js').then(module => {
+      import('./scripts/dropbox.js?v=2.0.1').then(module => {
         module.handleDropboxCallback();
       });
     }
@@ -514,5 +496,72 @@
     activeCategoryDisplay.textContent = `🧭 Active Category: ${selected}`;
   });
 </script>
+</script>
+<!-- DOM Sync Audit Utility -->
+<script>
+// DOM Sync Audit Utility
+window.extractAllButtonIds = function () {
+  const buttons = document.querySelectorAll('button');
+  const ids = Array.from(buttons).map(btn => btn.id || '(no id)');
+  console.log('[DOM SYNC] Total buttons found:', ids.length);
+  console.log('[DOM SYNC] Button ID list:', ids);
+  return ids;
+};
+</script>
+</div>
+
+  <!-- Developer Diagnostic Panel -->
+  <div id="devDashboard" style="position:fixed; bottom:20px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:8px; padding:15px; z-index:99999; box-shadow:0 0 20px #ff00ff;">
+    <h3 style="margin:0 0 10px 0; color:#ff00ff; font-family:monospace;">🧪 Dev Tools</h3>
+    <button onclick="runFullSystemAudit()" style="display:block; margin:5px 0;">Full System Audit</button>
+    <button onclick="runWiringExpectationAudit()" style="display:block; margin:5px 0;">Wiring Audit</button>
+    <button onclick="runAutoHealingLayer()" style="display:block; margin:5px 0;">Heal Wiring</button>
+    <button onclick="runMasterDiagnostics()" style="display:block; margin:5px 0; font-weight:bold;">Master Diagnostic</button>
+  </div>
+
+  <!-- Live Listener Monitor -->
+  <div id="listenerMonitor" style="position:fixed; bottom:100px; right:20px; background:#222; border:2px solid #00ffff; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #00ffff; font-family:monospace; color:#fff;">
+    <div id="listenerMonitorText">🔎 Monitoring...</div>
+  </div>
+
+  <script>
+  // Real-Time Listener Monitor Logic
+  function updateListenerMonitor() {
+    const buttons = document.querySelectorAll("button");
+    const totalButtons = buttons.length;
+    let totalListeners = 0;
+    buttons.forEach(btn => {
+      try {
+        if (typeof getEventListeners === 'function') {
+          const attached = getEventListeners(btn);
+          totalListeners += Object.values(attached).reduce((sum, handlers) => sum + handlers.length, 0);
+        }
+      } catch {}
+    });
+    document.getElementById('listenerMonitorText').innerText = `🧮 ${totalButtons} btn | 🎯 ${totalListeners} listeners`;
+  }
+  setInterval(updateListenerMonitor, 1500);
+  </script>
+
+  <!-- Ghost Modal Detector -->
+  <div id="ghostModalAlert" style="position:fixed; top:20px; right:20px; background:#660000; border:2px solid #ff0000; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #ff0000; font-family:monospace; color:#fff; display:none;">
+    ⚠️ GHOST MODAL DETECTED!
+  </div>
+  <script>
+  // Modal Detection Logic
+  function checkForGhostModals() {
+    const activeModals = Array.from(document.querySelectorAll('div[role="dialog"]'))
+      .filter(modal => modal.style.display !== 'none' && modal.style.display !== '');
+    const ghostDetected = activeModals.length > 1;
+    const ghostAlert = document.getElementById('ghostModalAlert');
+    if (ghostDetected) {
+      ghostAlert.style.display = 'block';
+      console.warn('[MODAL DETECTOR] Ghost Modal detected:', activeModals);
+    } else {
+      ghostAlert.style.display = 'none';
+    }
+  }
+  setInterval(checkForGhostModals, 2000);
+  </script>
 </body>
 </html>

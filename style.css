@@ -24,13 +24,23 @@ tbody tr:nth-child(even):not(.match):not(.over):not(.under) {
 }
 
 /* --- Scan Highlight Animation on Success --- */
-@keyframes scanSuccessPulse {
-  0% { background-color: rgba(144, 238, 144, 0.2); }
-  100% { background-color: transparent; }
+@keyframes newScanGlowPulse {
+  0% {
+    background-color: rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 0, 255, 0.15);
+    box-shadow: 0 0 16px rgba(255, 0, 255, 0.6);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
 }
 
 .new-scan-row {
-  animation: scanSuccessPulse 1.5s ease-out;
+  animation: newScanGlowPulse 1.6s ease-out;
 }
 
 /* --- Color Palette Root Variables --- */
@@ -2023,24 +2033,25 @@ input, select {
 }
 
 #mapPromptModal button {
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  border: 1px solid #9b59b6;
+  background: linear-gradient(145deg, #ff00ff, #ff66ff);
+  border: 2px solid #ff00ff;
   color: #fff;
   font-weight: bold;
-  border-radius: 6px;
-  padding: 10px 16px;
+  border-radius: 10px;
+  padding: 12px 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
   width: 100%;
   max-width: 300px;
   display: block;
-  margin: 12px auto;
+  margin: 14px auto;
+  box-shadow: 0 0 18px #ff00ff, 0 0 28px #ff66ff;
 }
 
 #mapPromptModal button:hover {
-  background: linear-gradient(to right, #2575fc, #4b0082);
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(0, 191, 255, 0.4);
+  background: linear-gradient(to right, #ff33cc, #ff66ff);
+  transform: scale(1.08);
+  box-shadow: 0 0 24px #ff33cc, 0 0 40px #ff66ff;
 }
 #Smooth Modal Transition Enhancements
 .modal {
@@ -2070,4 +2081,24 @@ input, select {
   background: rgba(20, 10, 30, 0.98) !important;
   box-shadow: 0 0 24px #a97ff366, 0 0 50px #6c2fd166 !important;
   transition: all 0.4s ease !important;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9) !important;
+  transition: transform 0.4s ease, opacity 0.4s ease !important;
+}
+
+/* --- Neon Pink Border & Glow for #mapPromptModal (delayed-injection modal) --- */
+#mapPromptModal {
+  border: 3px solid #ff00ff !important;
+  box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 80px rgba(255, 0, 255, 0.35), 0 0 120px rgba(255, 0, 255, 0.2) !important;
+}
+
+#mapPromptModal.show {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* --- Neon Pink Border & Glow for #mapPromptModal (delayed-injection modal) --- */
+#mapPromptModal {
+  border: 3px solid #ff00ff !important;
+  box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff !important;
 }
