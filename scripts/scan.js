@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalContainer = document.createElement("div");
     modalContainer.id = "mapPromptModal";
     modalContainer.className = "hidden modal-overlay";
+    modalContainer.style.display = 'none';
     modalContainer.innerHTML = `
       <div class="modal-content">
         <h2>Unknown Code</h2>
