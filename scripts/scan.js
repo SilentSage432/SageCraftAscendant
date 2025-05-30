@@ -1,11 +1,8 @@
 // Load persisted category from localStorage if available
-if (!window.itemCategory) {
-  const storedCategory = localStorage.getItem('itemCategory');
-  window.itemCategory = storedCategory || 'uncategorized';
-}
-
-// Developer flag to force modal on every scan input
-window.DEV_FORCE_MODAL = false; // Set to false to disable forced modal
+let itemCategory;
+let currentUPC;
+const storedCategory = localStorage.getItem('itemCategory');
+itemCategory = storedCategory || 'uncategorized';
 
 function resolveScanCode(code) {
   const trimmed = code.trim();
@@ -30,13 +27,13 @@ async function showCustomPrompt(code) {
 }
 
 function setItemCategory(category) {
-  window.itemCategory = category;
+  itemCategory = category;
   localStorage.setItem('itemCategory', category);
   console.log(`📦 Category set to: ${category}`);
 }
 
 function setCurrentUPC(code) {
-  window.currentUPC = code;
+  currentUPC = code;
 }
 
 window.initScan = function () {
@@ -96,7 +93,7 @@ function promptCodeType(code) {
         showToast?.("Please select type and enter value.");
         return;
       }
-      const upc = window.currentUPC;
+      const upc = currentUPC;
 
       window.upcToItem = window.upcToItem || {};
       window.eslToUPC = window.eslToUPC || {};
@@ -167,8 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       targetContainer.appendChild(modalContainer);
       console.log("✅ Modal injected and ready.");
-      window.currentUPC = null;
-      window.selectedMapType = null;
+      // clear privatized state on modal inject (if needed)
+      currentUPC = null;
     }
   }
 
