@@ -186,98 +186,123 @@ window.setCurrentUPC = function (code) {
 
 window.promptCodeType = function(code) {
   window.setCurrentUPC?.(code);
-
-  const overlay = document.getElementById("mapPromptOverlay");
   const modal = document.getElementById("mapPromptModal");
 
-  if (overlay && modal) {
-    overlay.style.display = "flex";
-    modal.classList.remove("hidden");
+  if (!modal) {
+    console.warn("⚠️ mapPromptModal not found.");
+    return;
+  }
 
-    const codeTypeInput = modal.querySelector("#mapPromptLabel");
-    if (codeTypeInput) codeTypeInput.textContent = "Enter Item Number:";
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
 
-    const liveEntryInput = modal.querySelector("#mapPromptInput");
-    if (liveEntryInput) {
-      liveEntryInput.value = '';
-      liveEntryInput.focus();
-    }
+  const codeLabel = modal.querySelector("#mapPromptLabel");
+  const inputSection = modal.querySelector("#mapInputSection");
+  const liveEntryInput = modal.querySelector("#mapPromptInput");
 
-    const inputSection = document.getElementById("mapInputSection");
+  // Reset input field and hide input section by default
+  if (liveEntryInput) {
+    liveEntryInput.value = "";
+    liveEntryInput.blur();
+  }
+  if (inputSection) inputSection.classList.add("hidden");
+  if (codeLabel) codeLabel.textContent = "What type of tag is this?";
 
-    const productBtn = document.getElementById("mapTypeProduct");
-    const eslBtn = document.getElementById("mapTypeESL");
-    const bayBtn = document.getElementById("mapTypeBay");
+  let selectedType = null;
 
-    if (productBtn) {
-      productBtn.addEventListener("click", () => {
-        console.log("✅ Product selected");
-        inputSection?.classList.remove("hidden");
-        codeTypeInput.textContent = "Enter Product Item Number:";
-      });
-    }
+  const productBtn = document.getElementById("mapTypeProduct");
+  const eslBtn = document.getElementById("mapTypeESL");
+  const bayBtn = document.getElementById("mapTypeBay");
+  const confirmBtn = document.getElementById("confirmModalBtn");
+  const cancelBtn = document.getElementById("cancelModalBtn");
 
-    if (eslBtn) {
-      eslBtn.addEventListener("click", () => {
-        console.log("✅ ESL selected");
-        inputSection?.classList.remove("hidden");
-        codeTypeInput.textContent = "Enter ESL Mapping:";
-      });
-    }
+  function activateInput(labelText, type) {
+    selectedType = type;
+    if (inputSection) inputSection.classList.remove("hidden");
+    if (codeLabel) codeLabel.textContent = labelText;
+    if (liveEntryInput) liveEntryInput.focus();
+  }
 
-    if (bayBtn) {
-      bayBtn.addEventListener("click", () => {
-        console.log("✅ Bay selected");
-        inputSection?.classList.remove("hidden");
-        codeTypeInput.textContent = "Enter Bay Location:";
-      });
-    }
+  if (productBtn) productBtn.onclick = () => activateInput("Enter Product Item Number:", "product");
+  if (eslBtn) eslBtn.onclick = () => activateInput("Enter ESL Mapping:", "esl");
+  if (bayBtn) bayBtn.onclick = () => activateInput("Enter Bay Location:", "bay");
 
-    const confirmBtn = document.getElementById("confirmModalBtn");
-    const cancelBtn = document.getElementById("cancelModalBtn");
+  if (confirmBtn) {
+    confirmBtn.onclick = () => {
+      const value = liveEntryInput?.value?.trim();
+      if (!selectedType || !value) {
+        showToast?.("Please select type and enter value.");
+        return;
+      }
+      const upc = window.currentUPC;
 
-    if (confirmBtn) {
-      confirmBtn.onclick = () => {
-        const tagTypeText = codeTypeInput?.textContent || '';
-        const inputVal = liveEntryInput?.value?.trim();
+      // Initialize mapping stores if not present
+      window.upcToItem = window.upcToItem || {};
+      window.eslToUPC = window.eslToUPC || {};
+      window.locationMap = window.locationMap || {};
 
-        if (!inputVal || !window.setCurrentUPC) return;
+      if (selectedType === "product") {
+        window.upcToItem[upc] = value;
+        console.log(`✅ Product mapping: ${upc} ➔ ${value}`);
+        processScan(value);
+      } else if (selectedType === "esl") {
+        window.eslToUPC[upc] = value;
+        console.log(`✅ ESL mapping: ${upc} ➔ ${value}`);
+        processScan(value);
+      } else if (selectedType === "bay") {
+        window.locationMap[upc] = value;
+        console.log(`✅ Bay mapping: ${upc} ➔ ${value}`);
+        processScan(value);
+      }
 
-        const upc = window.currentUPC;
-        const tagType = tagTypeText.toLowerCase();
+      // Persist mappings to localStorage
+      localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem));
+      localStorage.setItem('eslToUPCMap', JSON.stringify(window.eslToUPC));
+      localStorage.setItem('locationMap', JSON.stringify(window.locationMap));
 
-        if (tagType.includes("product")) {
-          window.upcToItem = window.upcToItem || {};
-          window.upcToItem[upc] = inputVal;
-          processScan(inputVal);
-        } else if (tagType.includes("esl")) {
-          window.eslToUPC = window.eslToUPC || {};
-          window.eslToUPC[upc] = inputVal;
-          processScan(inputVal);
-        } else if (tagType.includes("bay")) {
-          window.locationMap = window.locationMap || {};
-          window.locationMap[upc] = inputVal;
-          processScan(inputVal);
-        }
+      if (typeof window.updateMapStatusDisplay === "function") {
+        window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
+      }
+      modal.classList.add("hidden");
+      resetScanInput();
+    };
+  }
 
-        if (typeof window.updateMapStatusDisplay === "function") {
-          window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
-        }
-
-        modal.classList.add("hidden");
-        overlay.style.display = "none";
-        resetScanInput();
-      };
-    }
-
-    if (cancelBtn) {
-      cancelBtn.onclick = () => {
-        modal.classList.add("hidden");
-        overlay.style.display = "none";
-        resetScanInput();
-      };
-    }
-  } else {
-    console.warn("⚠️ mapPromptOverlay or mapPromptModal not found.");
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      modal.classList.add("hidden");
+      resetScanInput();
+    };
   }
 };
+
+// Ensure modal structure is always injected at boot
+document.addEventListener("DOMContentLoaded", () => {
+  const targetContainer = document.getElementById("app") || document.body;
+
+  if (!document.getElementById("mapPromptModal")) {
+    const modalContainer = document.createElement("div");
+    modalContainer.id = "mapPromptModal";
+    modalContainer.className = "hidden modal-overlay";
+    modalContainer.innerHTML = `
+      <div class="modal-content">
+        <h2>Unknown Code</h2>
+        <p id="mapPromptLabel">What type of tag is this?</p>
+        <div id="mapInputSection" class="hidden">
+          <input type="text" id="mapPromptInput" placeholder="Enter value...">
+        </div>
+        <div class="button-grid">
+          <button id="mapTypeProduct">Product</button>
+          <button id="mapTypeESL">ESL Tag</button>
+          <button id="mapTypeBay">Bay Tag</button>
+        </div>
+        <div class="button-grid">
+          <button id="confirmModalBtn" class="confirm">Confirm</button>
+          <button id="cancelModalBtn" class="cancel">Cancel</button>
+        </div>
+      </div>
+    `;
+    targetContainer.appendChild(modalContainer);
+    console.log("✅ Modal injected and ready.");
+  }
+});

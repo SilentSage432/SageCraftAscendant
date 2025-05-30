@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initScan();
   initESL();
   initSessionTools();
-  initEventListeners();
 
   setupTrendModalToggle();
   renderTrendChart(window.weeklyCounts || {});

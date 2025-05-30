@@ -2051,3 +2051,23 @@ input, select {
 .modal.show {
   opacity: 1;
 }
+
+
+/* --- FINAL CENTERING CORRECTION PATCH for #mapPromptModal --- */
+#mapPromptModal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 400px !important;
+  max-width: 90% !important;
+  padding: 24px !important;
+  border-radius: 16px !important;
+  background: rgba(20, 10, 30, 0.98) !important;
+  box-shadow: 0 0 24px #a97ff366, 0 0 50px #6c2fd166 !important;
+  transition: all 0.4s ease !important;
+}
