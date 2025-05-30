@@ -354,8 +354,27 @@
   </div>
 
   <footer style="text-align:center; margin-top:30px; font-size:12px; color:#a366ff; font-family:'Share Tech Mono', monospace;">
-    Inventory Auditor — v2.0.0 ⚡
+    Inventory Auditor — <span id="versionInfo">Loading...</span> ⚡
   </footer>
+
+  <script>
+  // Dynamic Version Extractor
+  (function() {
+    try {
+      const scripts = document.querySelectorAll('script[src]');
+      let found = null;
+      scripts.forEach(script => {
+        if (script.src.includes('index.js?v=')) {
+          const version = script.src.split('v=')[1];
+          found = version;
+        }
+      });
+      document.getElementById('versionInfo').innerText = found || "v? (not detected)";
+    } catch {
+      document.getElementById('versionInfo').innerText = "v? (error)";
+    }
+  })();
+  </script>
 
 
   <!-- Toast container -->
@@ -510,8 +529,11 @@ window.extractAllButtonIds = function () {
 </script>
 </div>
 
+  <!-- Dev Panel Toggle Button -->
+  <button id="toggleDevDashboardBtn" style="position:fixed; bottom:20px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:50%; padding:10px; z-index:99999; box-shadow:0 0 15px #ff00ff; color:#ff00ff; font-weight:bold;">🧙‍♂️</button>
+
   <!-- Developer Diagnostic Panel -->
-  <div id="devDashboard" style="position:fixed; bottom:20px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:8px; padding:15px; z-index:99999; box-shadow:0 0 20px #ff00ff;">
+  <div id="devDashboard" style="position:fixed; bottom:80px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:8px; padding:15px; z-index:99999; box-shadow:0 0 20px #ff00ff; display:none;">
     <h3 style="margin:0 0 10px 0; color:#ff00ff; font-family:monospace;">🧪 Dev Tools</h3>
     <button onclick="runFullSystemAudit()" style="display:block; margin:5px 0;">Full System Audit</button>
     <button onclick="runWiringExpectationAudit()" style="display:block; margin:5px 0;">Wiring Audit</button>
@@ -564,4 +586,17 @@ window.extractAllButtonIds = function () {
   setInterval(checkForGhostModals, 2000);
   </script>
 </body>
+</html>
+
+<script>
+// Toggle Dev Dashboard Logic
+document.getElementById('toggleDevDashboardBtn').addEventListener('click', () => {
+  const panel = document.getElementById('devDashboard');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+});
+</script>
 </html>
