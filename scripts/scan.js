@@ -29,26 +29,22 @@ async function showCustomPrompt(code) {
   });
 }
 
-window.resolveScanCode = resolveScanCode;
+function setItemCategory(category) {
+  window.itemCategory = category;
+  localStorage.setItem('itemCategory', category);
+  console.log(`📦 Category set to: ${category}`);
+}
+
+function setCurrentUPC(code) {
+  window.currentUPC = code;
+}
 
 window.initScan = function () {
   console.log("🔧 Scan module initialized");
 };
 
-
-window.setItemCategory = function (category) {
-  window.itemCategory = category;
-  localStorage.setItem('itemCategory', category);
-  console.log(`📦 Category set to: ${category}`);
-};
-
-window.setCurrentUPC = function (code) {
-  window.currentUPC = code;
-};
-
-window.promptCodeType = function(code) {
-  window.setCurrentUPC?.(code);
-  // Global Boot Lock: prevent rogue modal calls during startup
+function promptCodeType(code) {
+  setCurrentUPC?.(code);
   if (!window.appBootComplete) {
     console.warn("🚫 Modal blocked: App not fully initialized.");
     return;
@@ -67,7 +63,6 @@ window.promptCodeType = function(code) {
   const inputSection = modal.querySelector("#mapInputSection");
   const liveEntryInput = modal.querySelector("#mapPromptInput");
 
-  // Reset input field and hide input section by default
   if (liveEntryInput) {
     liveEntryInput.value = "";
     liveEntryInput.blur();
@@ -103,7 +98,6 @@ window.promptCodeType = function(code) {
       }
       const upc = window.currentUPC;
 
-      // Initialize mapping stores if not present
       window.upcToItem = window.upcToItem || {};
       window.eslToUPC = window.eslToUPC || {};
       window.locationMap = window.locationMap || {};
@@ -119,7 +113,6 @@ window.promptCodeType = function(code) {
         console.log(`✅ Bay mapping: ${upc} ➔ ${value}`);
       }
 
-      // Persist mappings to localStorage
       localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem));
       localStorage.setItem('eslToUPCMap', JSON.stringify(window.eslToUPC));
       localStorage.setItem('locationMap', JSON.stringify(window.locationMap));
@@ -128,9 +121,7 @@ window.promptCodeType = function(code) {
         window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       }
 
-      // Call unified scan engine directly
       handleUnifiedScan(value);
-
       modal.classList.add("hidden");
       resetScanInput();
     };
@@ -142,7 +133,7 @@ window.promptCodeType = function(code) {
       resetScanInput();
     };
   }
-};
+}
 
 // Ensure modal structure is always injected at boot
 document.addEventListener("DOMContentLoaded", () => {
