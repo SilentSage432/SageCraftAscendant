@@ -73,12 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (modalSubmitBtn) {
     modalSubmitBtn.addEventListener('click', () => {
       const code = document.getElementById('mapPromptCode').textContent.trim();
-      const input = document.getElementById("mapPromptInput").value.trim();
+      const item = document.getElementById('mapPromptInput').value.trim();
       const mapType = selectedMapType || 'product';
       const liveCategory = document.getElementById('liveCategory')?.value || 'Uncategorized';
 
-      if (!code || !input) {
-        alert("Please enter valid item.");
+      if (!code || !item || !mapType) {
+        alert("Please complete all fields.");
+        return;
+      }
+
+      if (!/^\d{5,}$/.test(code)) {
+        alert("Scanned code must be numeric and at least 5 digits.");
         return;
       }
 
@@ -88,31 +93,34 @@ document.addEventListener('DOMContentLoaded', () => {
       window.locationMap = window.locationMap || {};
 
       if (mapType === 'product') {
-        window.upcToItem[code] = input;
+        window.upcToItem[code] = item;
         localStorage.setItem('upcToItemMap', JSON.stringify(window.upcToItem));
-        console.log(`✅ Product mapped: ${code} ➔ ${input}`);
+        console.log(`✅ Product mapped: ${code} ➔ ${item}`);
       } else if (mapType === 'esl') {
-        window.eslToUPC[code] = input;
+        window.eslToUPC[code] = item;
         localStorage.setItem('eslToUPCMap', JSON.stringify(window.eslToUPC));
-        console.log(`✅ ESL mapped: ${code} ➔ ${input}`);
+        console.log(`✅ ESL mapped: ${code} ➔ ${item}`);
       } else if (mapType === 'bay') {
-        window.locationMap[code] = input;
+        window.locationMap[code] = item;
         localStorage.setItem('locationMap', JSON.stringify(window.locationMap));
-        console.log(`✅ Bay mapped: ${code} ➔ ${input}`);
+        console.log(`✅ Bay mapped: ${code} ➔ ${item}`);
+      } else {
+        alert("Invalid mapping type selected.");
+        return;
       }
 
-      // Update live session map (if enabled)
-      if (!window.sessionMap) window.sessionMap = {};
-      if (!window.sessionMap[input]) window.sessionMap[input] = { count: 0 };
-      window.sessionMap[input].count += 1;
-      window.sessionMap[input].category = liveCategory;
-      window.sessionMap[input].location = mapType === 'bay' ? input : localStorage.getItem('activeBay') || '';
+      // Update sessionMap safely
+      window.sessionMap = window.sessionMap || {};
+      window.sessionMap[code] = {
+        count: window.sessionMap[code] ? window.sessionMap[code].count + 1 : 1,
+        category: liveCategory,
+        location: mapType === 'bay' ? item : localStorage.getItem('activeBay') || ''
+      };
 
       if (typeof window.updateMapStatusDisplay === "function") {
         window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       }
 
-      // Trigger live table render (if enabled)
       if (typeof window.renderLiveTable === "function") renderLiveTable();
 
       hideMapPromptModal();
@@ -137,5 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  window.addEventListener('manual-scan', window.handleManualScan);
+  if (!window._manualScanBound) {
+    window.addEventListener('manual-scan', window.handleManualScan);
+    window._manualScanBound = true;
+  }
 });

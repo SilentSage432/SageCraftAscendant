@@ -5,7 +5,7 @@ if (!window.itemCategory) {
 }
 
 // Developer flag to force modal on every scan input
-window.DEV_FORCE_MODAL = true; // Set to false to disable forced modal
+window.DEV_FORCE_MODAL = false; // Set to false to disable forced modal
 
 function resolveScanCode(code) {
   const trimmed = code.trim();
@@ -30,6 +30,10 @@ async function showCustomPrompt(code) {
 }
 
 async function handleScanInput(val) {
+  if (!val || typeof val !== 'string' || !val.trim()) {
+    console.warn("❌ handleScanInput(): No valid code provided");
+    return;
+  }
   const resolved = resolveScanCode(val);
 
   // Developer override: always prompt modal on scan input if flag is set
@@ -304,5 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     targetContainer.appendChild(modalContainer);
     console.log("✅ Modal injected and ready.");
+
+    window.currentUPC = null;
+    window.selectedMapType = null;
   }
 });

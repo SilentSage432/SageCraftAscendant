@@ -172,7 +172,7 @@ import { saveUPCMap, saveESLMap, saveLocationMap } from './scripts/session.js';
 
   import { setupESLHandlers, setCurrentESLItem } from './scripts/esl.js';
 
-  import { resolveScanCode, processScan } from './scripts/scan.js';
+import { resolveScanCode } from './scripts/scan.js';
 
   import { generateCodeVerifier, generateCodeChallenge } from './pkce.js';
 
@@ -418,96 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // --- Ensure all critical button variables are defined after DOMContentLoaded begins ---
   const addLiveItemBtn = document.getElementById('addLiveItem');
-  // Add event listener for Add Live Item button with updated logic (delayed prompt)
-  if (addLiveItemBtn) {
-    addLiveItemBtn.addEventListener('click', async () => {
-      console.log("📦 Add Item button clicked (manual)");
-      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      if (!val) return;
-
-      // For manually entered unknown codes, delay prompt until user confirms
-      console.warn("⚠️ Manual entry of unrecognized code:", val);
-      // --- Insert ESL duplicate check logic here ---
-      const rawESL = val;
-      const normalizedESL = normalizeUPC(val);
-
-      if (eslToUPC[rawESL] || eslToUPC[normalizedESL]) {
-        const item = eslToUPC[rawESL] || eslToUPC[normalizedESL];
-        console.log(`🔁 ESL ${val} already mapped to Lowe’s #${item}`);
-        const toast = document.createElement('div');
-        toast.textContent = `🔁 ESL ${val} → Lowe’s #${item}`;
-        Object.assign(toast.style, {
-          position: 'fixed',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: '#444',
-          color: '#fff',
-          padding: '8px 16px',
-          borderRadius: '8px',
-          fontSize: '14px',
-          zIndex: '9999',
-          textAlign: 'center'
-        });
-        document.body.appendChild(toast);
-        setTimeout(() => document.body.removeChild(toast), 3000);
-
-        processScan(item);
-        resetScanInput();
-        return;
-      }
-
-      const response = await showCustomPrompt(val);
-      updateSuggestions();
-      updateLiveTable();
-
-      if (response === 'location') {
-        const name = prompt(`🗂 Please enter a name for location "${val}":`);
-        if (name) {
-          locationMap[val] = name;
-          saveLocationMap();
-          currentLocation = name;
-          updateLocationStatus();
-          alert(`📍 Current location set to: ${name}`);
-        }
-        resetScanInput();
-      } else if (response === 'product') {
-        const inferredCategory = inferUserCategoryPattern(val) || suggestCategoryFromUPC(val);
-        const userDefined = prompt(
-          `UPC ${val} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
-        );
-        if (userDefined) {
-          const item = userDefined.trim();
-          if (!item) {
-            alert("❌ Invalid item number.");
-            resetScanInput();
-            return;
-          }
-          const originalCode = val;
-          if (/^\d{6}$/.test(originalCode)) {
-            eslToUPC[originalCode] = item;
-            saveESLMap();
-            console.log(`📎 ESL ${originalCode} now maps to Lowe’s #${item}`);
-          } else {
-            upcToItem[originalCode] = item;
-            saveUPCMap();
-          }
-          // Remove the raw UPC from liveCounts if present
-          if (liveCounts[val]) delete liveCounts[val];
-          liveCounts[item] = {
-            count: parseInt(liveQtyInput?.value?.trim()) || 1,
-            location: currentLocation,
-            category: categoryInput?.value?.trim() || inferredCategory || ''
-          };
-          updateRotationDate(liveCounts[item].category);
-          updateLiveTable();
-        }
-        resetScanInput();
-      } else {
-        resetScanInput();
-      }
-    });
-  }
+  // Remove legacy Add Live Item button handler in favor of unified scan engine.
   const saveToDriveBtn = document.getElementById('saveToDrive');
   const loadFromDriveBtn = document.getElementById('loadFromDrive');
 
@@ -1335,12 +1246,11 @@ syncBothBtn.addEventListener('click', () => {
   setupESLHandlers();
   let currentLocation = '';
 
-  // --- Scan Logic Setup ---
-  window.processScan = processScan;
+  // --- Unified Scan Engine ---
+  let scanLock = false;
   const liveEntryInput = document.getElementById('liveEntry');
-  // Add Enter key handler for liveEntryInput
+  // Insert Live Mapping Overview just after scan input
   if (liveEntryInput) {
-    // --- Insert Live Mapping Overview just after scan input ---
     const liveMappingOverview = document.createElement('div');
     liveMappingOverview.id = 'liveMappingOverview';
     liveMappingOverview.style.marginTop = '8px';
@@ -1351,90 +1261,179 @@ UPC → ${Object.keys(upcToItem).length}
 ESL → ${Object.keys(eslToUPC).length}
 Bay Codes → ${Object.keys(locationMap).length}`;
     liveEntryInput.insertAdjacentElement('afterend', liveMappingOverview);
-    // Enhanced Enter key detection with log for scan source
-    liveEntryInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // prevent accidental form submits or focus shifts
-        const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-        const isScannerInput = val.length >= 10 && !isNaN(val);
-        console.log("🧪 Enter key detected for input:", val, "isScanner?", isScannerInput);
-        if (val && isScannerInput) {
-          const normalizedVal = normalizeUPC(val);
-          // --- Use universal scan code resolution ---
-          const resolved = resolveScanCode(normalizedVal);
-          if (resolved) {
-            if (typeof resolved === 'object' && resolved.type === 'esl') {
-              console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item}`);
-              upcToItem[resolved.upc] = resolved.item; // Optional back-reference if needed
-              processScan(resolved.item);
-              const toast = document.createElement('div');
-              toast.textContent = `✅ ESL ${resolved.upc} resolved to Lowe’s #${resolved.item}`;
-              Object.assign(toast.style, {
-                position: 'fixed',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: '#2e7d32',
-                color: '#fff',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                zIndex: '9999',
-                textAlign: 'center'
-              });
-              document.body.appendChild(toast);
-              setTimeout(() => document.body.removeChild(toast), 3000);
-              return;
-            }
-            processScan(resolved);
-            const toast = document.createElement('div');
-            toast.textContent = `✅ Code ${normalizedVal} resolved to Lowe’s #${resolved}`;
-            Object.assign(toast.style, {
-              position: 'fixed',
-              bottom: '20px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: '#2e7d32',
-              color: '#fff',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              zIndex: '9999',
-              textAlign: 'center'
-            });
-            document.body.appendChild(toast);
-            setTimeout(() => document.body.removeChild(toast), 3000);
-            return;
+  }
+
+  /**
+   * Centralized unified scan handler for all scan input events.
+   * Handles ESL, UPC, location, modal mapping flow, and all scan race conditions.
+   * @param {string} rawVal
+   * @param {object} [opts] - Optional: {source: 'enter'|'debounced'|'button'}
+   */
+  async function handleUnifiedScan(rawVal, opts = {}) {
+    if (scanLock) {
+      console.warn('🔒 Scan engine is busy, ignoring scan:', rawVal);
+      return;
+    }
+    scanLock = true;
+    try {
+      let val = (rawVal || '').replace(/[\n\r]+/g, '').trim();
+      if (!val) {
+        return;
+      }
+      // Remove spaces for scanner input
+      val = val.replace(/\s+/g, '');
+      const normalizedVal = normalizeUPC(val);
+      // --- Check for location code
+      if (locationMap[normalizedVal]) {
+        if (currentLocation === locationMap[normalizedVal]) {
+          const close = confirm(`You scanned the current location tag (${normalizedVal}) again.\nWould you like to CLOSE this bay?`);
+          if (close) {
+            currentLocation = '';
+            updateLocationStatus();
+            alert('📦 Current location cleared.');
           }
-          processScan(normalizedVal);
+          resetScanInput();
+          return;
+        } else {
+          currentLocation = locationMap[normalizedVal];
+          updateLocationStatus();
+          alert(`📍 Current location set to: ${currentLocation}`);
+          resetScanInput();
+          return;
         }
       }
+      // --- Hardened ESL mapping logic ---
+      // Normalize ESL code for lookup, and verify mapping
+      let eslKey = null;
+      if (eslToUPC.hasOwnProperty(val)) eslKey = val;
+      else if (eslToUPC.hasOwnProperty(normalizedVal)) eslKey = normalizedVal;
+      if (eslKey) {
+        const item = eslToUPC[eslKey];
+        showScanMappingLog(val, item);
+        playNewItemSound();
+        if (liveCounts[item]) {
+          liveCounts[item].count = (parseInt(liveCounts[item].count) || 0) + 1;
+        } else {
+          liveCounts[item] = {
+            count: parseInt(liveQtyInput?.value?.trim()) || 1,
+            location: currentLocation,
+            category: categoryInput?.value?.trim() || ''
+          };
+        }
+        updateRotationDate(liveCounts[item].category);
+        updateLiveTable();
+        updateSuggestions();
+        resetScanInput();
+        return;
+      }
+      // --- Check for mapped UPC
+      if (upcToItem.hasOwnProperty(normalizedVal)) {
+        const item = upcToItem[normalizedVal];
+        showScanMappingLog(val, item);
+        playNewItemSound();
+        if (liveCounts[item]) {
+          liveCounts[item].count = (parseInt(liveCounts[item].count) || 0) + 1;
+        } else {
+          liveCounts[item] = {
+            count: parseInt(liveQtyInput?.value?.trim()) || 1,
+            location: currentLocation,
+            category: categoryInput?.value?.trim() || ''
+          };
+        }
+        updateRotationDate(liveCounts[item].category);
+        updateLiveTable();
+        updateSuggestions();
+        resetScanInput();
+        return;
+      }
+      // --- Modal-driven mapping flow for unknown codes (trigger modal ONLY here) ---
+      const response = await showCustomPrompt(val);
+      updateSuggestions();
+      updateLiveTable();
+      if (response === 'location') {
+        const name = prompt(`🗂 Please enter a name for location "${val}":`);
+        if (name) {
+          locationMap[val] = name;
+          saveLocationMap();
+          currentLocation = name;
+          updateLocationStatus();
+          alert(`📍 Current location set to: ${name}`);
+        }
+        resetScanInput();
+      } else if (response === 'product') {
+        const inferredCategory = inferUserCategoryPattern?.(val) || suggestCategoryFromUPC?.(val);
+        const userDefined = prompt(
+          `UPC ${val} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`
+        );
+        if (userDefined) {
+          const item = userDefined.trim();
+          if (!item) {
+            alert("❌ Invalid item number.");
+            resetScanInput();
+            return;
+          }
+          const originalCode = val;
+          if (/^\d{6}$/.test(originalCode)) {
+            eslToUPC[originalCode] = item;
+            saveESLMap();
+            console.log(`📎 ESL ${originalCode} now maps to Lowe’s #${item}`);
+          } else {
+            upcToItem[originalCode] = item;
+            saveUPCMap();
+          }
+          if (liveCounts[val]) delete liveCounts[val];
+          liveCounts[item] = {
+            count: parseInt(liveQtyInput?.value?.trim()) || 1,
+            location: currentLocation,
+            category: categoryInput?.value?.trim() || inferredCategory || ''
+          };
+          updateRotationDate(liveCounts[item].category);
+          updateLiveTable();
+        }
+        resetScanInput();
+      } else {
+        resetScanInput();
+      }
+    } catch (err) {
+      console.error('Error in unified scan:', err);
+    } finally {
+      scanLock = false;
+    }
+  }
+
+  // --- Wire up unified scan engine to all entry points, ensure no duplicate listeners ---
+  if (liveEntryInput) {
+    // Remove any existing unified scan event listeners (idempotent, as addEventListener is used only once here)
+    liveEntryInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
+        if (val) handleUnifiedScan(val, { source: 'enter' });
+      }
     });
-    // Debounced scanner-like input detection for liveEntryInput
     let scanDebounceTimer = null;
     liveEntryInput.addEventListener('input', () => {
       liveEntryInput.value = liveEntryInput.value.replace(/\s+/g, '');
       const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
-      // Only trigger scan logic if the value looks like a full scan (14+ digits, all numeric)
-      if (val.length >= 14 && !isNaN(val)) {
+      if (val.length >= 10 && !isNaN(val)) {
         if (scanDebounceTimer) clearTimeout(scanDebounceTimer);
         scanDebounceTimer = setTimeout(() => {
-          // If Enter key wasn't manually pressed (input lost focus), assume scan
-          if (document.activeElement !== liveEntryInput) {
-            console.log("🔍 Scanner input detected (debounced):", val);
-            // If known code, proceed as normal and prevent fallback
-            if (upcToItem[val]) {
-              const itemNum = upcToItem[val];
-              processScan(itemNum);
-              return;
-            }
-            processScan(val);
+          if (document.activeElement !== liveEntryInput && val) {
+            handleUnifiedScan(val, { source: 'debounced' });
           }
-        }, 200); // Adjust delay if needed
+        }, 200);
       }
     });
   }
-  // (Redundant Add Live Item button click listener removed above to avoid duplicate event handlers.)
+  // Ensure Add Live Item button uses only the unified scan engine
+  const addLiveItemBtnUni = document.getElementById('addLiveItem');
+  if (addLiveItemBtnUni) {
+    addLiveItemBtnUni.addEventListener('click', async () => {
+      const val = liveEntryInput.value.replace(/[\n\r]+/g, '').trim();
+      if (!val) return;
+      await handleUnifiedScan(val, { source: 'button' });
+    });
+  }
   const liveQtyInput = document.getElementById('liveQty');
   const liveTableBody = document.querySelector('#liveCountTable tbody');
   const categoryInput = document.getElementById('liveCategory');
@@ -1598,12 +1597,27 @@ Bay Codes → ${Object.keys(locationMap).length}`;
     lastSavedDiv.textContent = '📥 Last Auto-Saved: Not yet';
     onHandInput.insertAdjacentElement('afterend', lastSavedDiv);
 
-    // Restore from backup if available
+    // Restore from backup if available (sanitized)
     const savedBackup = localStorage.getItem('onHandBackup');
     if (savedBackup && !onHandInput.value.trim()) {
-      onHandInput.value = savedBackup;
-      lastSavedDiv.textContent = '📥 Restored from backup';
+      // Sanitize restored backup content
+      const sanitized = savedBackup
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => /^\d{5,6}(\s+\d+)?$/.test(line))
+        .join('\n');
+
+      onHandInput.value = sanitized;
+      lastSavedDiv.textContent = '📥 Restored sanitized backup';
+
+      // If nothing valid remains after sanitization, clear local backup
+      if (!sanitized) {
+        localStorage.removeItem('onHandBackup');
+      }
     }
+
+    // Prevent restored backup from being auto-processed on load
+    onHandInput.dataset.restored = 'true';
 
     // Auto-format input when pasted or changed
     onHandInput.addEventListener('blur', () => {
@@ -2042,1053 +2056,18 @@ Bay Codes → ${Object.keys(locationMap).length}`;
 
   const processBatchBtn = document.getElementById('processBatch');
   const batchInput = document.getElementById('batchInput');
+
   if (processBatchBtn) {
     processBatchBtn.addEventListener('click', () => {
       const lines = batchInput.value.trim().split(/\r?\n/);
-      lines.forEach(item => {
-        const trimmed = item.trim();
-        const normalized = normalizeUPC(trimmed);
-        if (!trimmed) return;
-        // Unified location/product detection and handling
-        if (!upcToItem[normalized] && !locationMap[normalized]) {
-          showCustomPrompt(normalized).then(response => {
-            if (response === 'location') {
-              const name = prompt(`🗂 Please enter a name for location "${normalized}":`);
-              if (name) {
-                locationMap[normalized] = name;
-                saveLocationMap();
-                currentLocation = name;
-                updateLocationStatus();
-                alert(`📍 Current location set to: ${name}`);
-                liveEntryInput.value = '';
-                restoreFocusToEntry();
-                return;
-              }
-            } else if (response === 'product') {
-              processProduct(normalized);
-              restoreFocusToEntry();
-            } else {
-              liveEntryInput.value = '';
-              restoreFocusToEntry();
-            }
-          });
-          return;
-        }
-        if (locationMap[normalized]) {
-          if (currentLocation === locationMap[normalized]) {
-            const close = confirm(`You scanned the current location tag (${normalized}) again.\nWould you like to CLOSE this bay?`);
-            if (close) {
-              currentLocation = '';
-              updateLocationStatus();
-              alert('📦 Current location cleared.');
-            }
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
-          } else {
-            currentLocation = locationMap[normalized];
-            updateLocationStatus();
-            alert(`📍 Current location set to: ${currentLocation}`);
-            liveEntryInput.value = '';
-            restoreFocusToEntry();
-            return;
-          }
-        }
-        // ESL-to-UPC mapping support in batch mode
-        let mappedItem = upcToItem[normalized] || (eslToUPC[normalized] ? eslToUPC[normalized] : normalized);
-        if (!upcToItem[normalized]) {
-          if (eslToUPC[normalized]) {
-            console.log(`🔄 ESL ${normalized} resolved to mapped item ${eslToUPC[normalized]}`);
-            mappedItem = eslToUPC[normalized];
-          } else {
-            const userDefined = prompt(`UPC ${normalized} is not linked to a Lowe's item #. Please enter it now:`);
-            if (userDefined) {
-              const item = userDefined.trim();
-              if (/^\d{6}$/.test(normalized)) {
-                // ESL tag being manually linked
-                eslToUPC[normalized] = item;
-                saveESLMap();
-                console.log(`📎 ESL ${normalized} now maps to Lowe’s #${item}`);
-                mappedItem = item;
-              } else {
-                upcToItem[normalized] = item;
-                saveUPCMap();
-                mappedItem = item;
-              }
-            }
-          }
-        }
-        if (!liveCounts[mappedItem]) {
-          liveCounts[mappedItem] = { count: 0, category: categoryInput.value };
-        }
-        liveCounts[mappedItem].count += 1;
-        liveCounts[mappedItem].location = currentLocation;
-      });
-      batchInput.value = '';
-      updateLiveTable();
-      const today = new Date().toISOString().split('T')[0];
-      weeklyCounts[today] = {};
-      Object.entries(liveCounts).forEach(([k, v]) => {
-        weeklyCounts[today][k] = v.count;
-      });
-      localStorage.setItem('weeklyCounts', JSON.stringify(weeklyCounts));
-      restoreFocusToEntry();
+      processBatchLines(lines);
     });
   }
 
-  const clearBatchBtn = document.getElementById('clearBatch');
-  if (clearBatchBtn) {
-    clearBatchBtn.addEventListener('click', () => {
-      batchInput.value = '';
-      restoreFocusToEntry();
-    });
-  }
-
-  // Live preview for batch input
-  if (batchInput) {
-    batchInput.addEventListener('input', () => {
-      const lines = batchInput.value.trim().split(/\r?\n/);
-      const counts = {};
-      lines.forEach(line => {
-        const item = line.trim();
-        if (!item) return;
-        counts[item] = (counts[item] || 0) + 1;
-      });
-
-      const previewDiv = document.getElementById('batchPreview');
-      if (Object.keys(counts).length === 0) {
-        previewDiv.innerHTML = '';
-        return;
-      }
-
-      let previewHTML = '<h3>Preview</h3><table style="width:100%; border-collapse: collapse;"><thead><tr><th>Item #</th><th>Qty</th></tr></thead><tbody>';
-      Object.entries(counts).forEach(([item, qty]) => {
-        previewHTML += `<tr><td>${item}</td><td>${qty}</td></tr>`;
-      });
-      previewHTML += '</tbody></table>';
-      previewDiv.innerHTML = previewHTML;
-    });
-  }
-
-
-  // --- Restored clean scanning logic ---
-  // const liveEntry = document.getElementById('liveEntry');
-  const liveQty = document.getElementById('liveQty');
-  // const liveCounts = window.liveCounts || {}; // fallback if not global
-  updateSuggestions();
-
-  function updateLiveTable() {
-    if (!liveTableBody) return;
-    liveTableBody.innerHTML = '';
-    // --- Category color map ---
-    const categoryColors = {
-      'Laundry': '#8ecae6',
-      'Fridges & Freezers': '#219ebc',
-      'Ranges': '#ffb703',
-      'Dishwashers': '#fb8500',
-      'Wall Ovens': '#ff6b6b',
-      'Cooktops': '#ffd166',
-      'OTR Microwaves': '#9b5de5',
-      'Microwaves (Countertop)': '#3a86ff',
-      'Vent Hoods': '#8338ec',
-      'Beverage & Wine Coolers': '#ff006e',
-      'Cabinets': '#8d99ae',
-      'Countertops': '#b5ead7',
-      'Interior Doors': '#ffdac1',
-      'Exterior Doors': '#e0aaff',
-      'Storm Doors': '#bc6c25',
-      'Windows': '#588157',
-      'Commodity Moulding': '#adb5bd',
-      'Other / Misc': '#f4a261'
-    };
-    const searchTerm = document.getElementById('liveSearchInput')?.value.toLowerCase().trim() || '';
-    // Ensure headers are in correct order and match the specified columns
-    const headerRow = document.querySelector('#liveCountTable thead tr');
-    if (headerRow) {
-      // Clear all existing headers
-      while (headerRow.firstChild) headerRow.removeChild(headerRow.firstChild);
-      [
-        'Item #',
-        'Expected',
-        'Found',
-        'Difference',
-        'Prev Week',
-        'Δ vs Last Week',
-        'Category',
-        'Location',
-        'Edit'
-      ].forEach((label, idx) => {
-        const th = document.createElement('th');
-        th.textContent = label;
-        // Optionally add classes for easy lookup
-        if (label === 'Category') th.className = 'category-header';
-        if (label === 'Location') th.className = 'location-header';
-        if (label === 'Edit') th.className = 'edit-header';
-        headerRow.appendChild(th);
-      });
-    }
-    const onHandText = document.getElementById('onHandInput').value;
-    const onHandLines = onHandText.trim().split(/\n+/);
-    const onHandMap = {};
-    onHandLines.forEach(line => {
-      const [item, count] = line.split(':');
-      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
-    });
-
-    const previousDates = Object.keys(weeklyCounts).sort().reverse();
-    // Get selected week from dropdown, or fallback to most recent previous week
-    const selectedWeek = document.getElementById('compareWeek')?.value;
-    const lastWeek = selectedWeek ? weeklyCounts[selectedWeek] : (previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null);
-
-    Object.entries(liveCounts).forEach(([rawItem, obj]) => {
-      const item = (rawItem || '').trim();
-      if (!item) return;
-      // --- Live search filter ---
-      if (searchTerm &&
-          !item.toLowerCase().includes(searchTerm) &&
-          !(obj.category || '').toLowerCase().includes(searchTerm) &&
-          !(obj.location || '').toLowerCase().includes(searchTerm)) {
-        return;
-      }
-      const count = obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = count - expected;
-      // --- Add diff color logic ---
-      let diffColor = 'black';
-      if (diff > 0) diffColor = 'green';
-      else if (diff < 0) diffColor = 'red';
-      const previous = lastWeek ? lastWeek[item] || 0 : '';
-      const weekDiff = lastWeek ? count - previous : '';
-      const category = obj.category || '';
-      const location = obj.location || '';
-
-      // --- Smart discrepancy/trend icons ---
-      let icon = '';
-      // Down arrow if counts are decreasing for 2+ weeks
-      if (previous !== '' && weekDiff < 0) {
-        // Check for 2+ week decreasing trend
-        let decreasing = false;
-        if (previousDates.length >= 3) {
-          // Get counts for this item for last 3 weeks (including this)
-          const idx = previousDates.indexOf(selectedWeek || previousDates[0]);
-          const w0 = liveCounts[item]?.count || 0;
-          const w1 = weeklyCounts[previousDates[idx + 1]] ? (weeklyCounts[previousDates[idx + 1]][item] || 0) : null;
-          const w2 = weeklyCounts[previousDates[idx + 2]] ? (weeklyCounts[previousDates[idx + 2]][item] || 0) : null;
-          if (w1 !== null && w2 !== null && w0 < w1 && w1 < w2) {
-            decreasing = true;
-          }
-        }
-        if (decreasing || previousDates.length < 3) icon = '📉';
-      }
-      // Up arrow for sharp increase from last week
-      else if (previous !== '' && weekDiff > 5) {
-        icon = '📈';
-      }
-      // Red flag if no expected on-hand count
-      if (!onHandMap[item]) icon += ' ❌';
-
-      // --- Create row with editable cells and Edit button in correct column order ---
-      const tr = document.createElement('tr');
-      tr.className = diff < 0 ? 'under' : diff > 0 ? 'over' : 'match';
-      // Set background color by category if defined
-      if (categoryColors[obj.category]) {
-        tr.style.backgroundColor = categoryColors[obj.category];
-      }
-      // Build table row using explicit cell creation for safety and alignment
-      const cells = [];
-
-      const itemCell = document.createElement('td');
-      itemCell.innerHTML = `${item} ${icon} ${category ? `<span class="category-badge">${category}</span>` : ''}`;
-      cells.push(itemCell);
-
-      const expectedCell = document.createElement('td');
-      expectedCell.textContent = expected;
-      cells.push(expectedCell);
-
-      const countCell = document.createElement('td');
-      countCell.className = 'editable';
-      countCell.dataset.field = 'count';
-      countCell.dataset.id = item;
-      countCell.innerHTML = `<span contenteditable="true" spellcheck="false">${count}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
-      cells.push(countCell);
-
-      const diffCell = document.createElement('td');
-      diffCell.textContent = diff > 0 ? `+${diff}` : `${diff}`;
-      diffCell.style.color = diffColor;
-      cells.push(diffCell);
-
-      const prevCell = document.createElement('td');
-      prevCell.textContent = previous !== '' ? previous : '-';
-      cells.push(prevCell);
-
-      const weekDiffCell = document.createElement('td');
-      weekDiffCell.textContent = weekDiff !== '' ? (weekDiff > 0 ? `+${weekDiff}` : `${weekDiff}`) : '-';
-      cells.push(weekDiffCell);
-
-      const categoryCell = document.createElement('td');
-      categoryCell.className = 'editable';
-      categoryCell.dataset.field = 'category';
-      categoryCell.dataset.id = item;
-      categoryCell.innerHTML = `<span contenteditable="true" spellcheck="false">${category}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
-      cells.push(categoryCell);
-
-      const locationCell = document.createElement('td');
-      locationCell.className = 'editable';
-      locationCell.dataset.field = 'location';
-      locationCell.dataset.id = item;
-      locationCell.innerHTML = `<span contenteditable="true" spellcheck="false">${location}</span><button class="saveEdit" title="Save" style="margin-left:2px;">✅</button>`;
-      cells.push(locationCell);
-
-      const editCell = document.createElement('td');
-      editCell.innerHTML = `<button class="editRow" data-id="${item}">✏️</button>`;
-      cells.push(editCell);
-
-      cells.forEach(cell => tr.appendChild(cell));
-      liveTableBody.appendChild(tr);
-    });
-
-    // Add edit/delete row logic with custom modal prompt
-    document.querySelectorAll('.editRow').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const item = btn.dataset.id;
-        // Custom modal-style prompt for Edit/Delete
-        const overlay = document.createElement('div');
-        overlay.id = 'editDeletePrompt';
-        overlay.style.position = 'fixed';
-        overlay.style.top = 0;
-        overlay.style.left = 0;
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
-        overlay.innerHTML = `
-          <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
-            <p>What would you like to do with "<strong>${item}</strong>"?</p>
-            <button id="editBtn">✏️ Edit</button>
-            <button id="deleteBtn">🗑️ Delete</button>
-            <button id="cancelBtn">❌ Cancel</button>
-          </div>
-        `;
-        document.body.appendChild(overlay);
-
-        document.getElementById('editBtn').onclick = () => {
-          document.body.removeChild(overlay);
-          const current = liveCounts[item];
-          const newItem = prompt('Edit Item #:', item);
-          if (!newItem) return;
-          const newCount = parseInt(prompt('Edit Count:', current.count)) || 0;
-          const newCategory = prompt('Edit Category:', current.category || '') || '';
-          const newLocation = prompt('Edit Location:', current.location || '') || '';
-          delete liveCounts[item];
-          liveCounts[newItem] = {
-            count: newCount,
-            category: newCategory,
-            location: newLocation
-          };
-          updateLiveTable();
-        };
-
-        document.getElementById('deleteBtn').onclick = () => {
-          if (confirm(`Are you sure you want to delete "${item}"?`)) {
-            delete liveCounts[item];
-            updateLiveTable();
-          }
-          document.body.removeChild(overlay);
-        };
-
-        document.getElementById('cancelBtn').onclick = () => {
-          document.body.removeChild(overlay);
-        };
-      });
-    });
-
-    // Add inline editable logic for Found, Category, and Location cells
-    document.querySelectorAll('.editable').forEach(cell => {
-      // Only allow one edit at a time per cell
-      const span = cell.querySelector('span[contenteditable]');
-      const saveBtn = cell.querySelector('button.saveEdit');
-      let originalValue = span ? span.textContent : '';
-      // Save on button click
-      if (saveBtn && span) {
-        saveBtn.onclick = (e) => {
-          e.stopPropagation();
-          const field = cell.dataset.field;
-          const id = cell.dataset.id;
-          const newValue = span.textContent.trim();
-          if (field === 'count') {
-            liveCounts[id].count = parseInt(newValue) || 0;
-          } else {
-            liveCounts[id][field] = newValue;
-          }
-          updateLiveTable();
-        };
-      }
-      // Save on Enter, cancel on Esc
-      if (span) {
-        span.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (saveBtn) saveBtn.click();
-          } else if (e.key === 'Escape') {
-            span.textContent = originalValue;
-            span.blur();
-          }
-        });
-        span.addEventListener('focus', () => {
-          originalValue = span.textContent;
-        });
-        span.addEventListener('blur', () => {
-          // When losing focus, don't auto-save (require save button or Enter)
-        });
-      }
-    });
-    // (END updateLiveTable)
-
-    // Update the summary bar
-    let totalItems = 0;
-    let totalUnits = 0;
-    let matches = 0;
-    let overs = 0;
-    let unders = 0;
-
-    Object.entries(liveCounts).forEach(([item, obj]) => {
-      totalItems += 1;
-      totalUnits += obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = obj.count - expected;
-      if (diff === 0) matches++;
-      else if (diff > 0) overs++;
-      else unders++;
-    });
-
-    summaryBar.innerHTML = `🧾 Total Unique Items: ${totalItems} &nbsp;&nbsp; 📦 Total Units Counted: ${totalUnits} &nbsp;&nbsp; ✅ Matches: ${matches} &nbsp;&nbsp; 🟢 Overs: ${overs} &nbsp;&nbsp; 🔴 Unders: ${unders}`;
-  }
-
-  function resetScanInput() {
-    if (liveEntryInput) {
-      liveEntryInput.value = '';
-      requestAnimationFrame(() => liveEntryInput.focus());
+  async function processBatchLines(lines) {
+    for (const item of lines) {
+      const trimmed = item.trim();
+      if (!trimmed) continue;
+      await handleUnifiedScan(trimmed, { source: 'batch' });
     }
   }
-
-  function proceedWithKnownScan(item) {
-    if (upcToItem[item]) {
-      item = upcToItem[item];
-    }
-    if (locationMap[item]) {
-      if (currentLocation === locationMap[item]) {
-        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
-        if (close) {
-          currentLocation = '';
-          updateLocationStatus();
-          alert('📦 Current location cleared.');
-        }
-      } else {
-        currentLocation = locationMap[item];
-        updateLocationStatus();
-        alert(`📍 Current location set to: ${currentLocation}`);
-      }
-      resetScanInput();
-      return;
-    }
-
-    if (!liveCounts[item]) {
-      liveCounts[item] = {
-        count: 0,
-        category: categoryInput.value,
-        location: currentLocation
-      };
-      playNewItemSound();
-    }
-
-    liveCounts[item].count += 1;
-    liveCounts[item].category = liveCounts[item].category || categoryInput.value;
-    liveCounts[item].location = currentLocation;
-
-    updateRotationDate(liveCounts[item].category);
-    updateLiveTable();
-    resetScanInput();
-  }
-
-  // Suggest category helper based on UPC prefix
-  function suggestCategoryFromUPC(upc) {
-    for (const knownUPC in upcToItem) {
-      if (knownUPC.slice(0, 5) === upc.slice(0, 5)) {
-        const item = upcToItem[knownUPC];
-        const category = liveCounts[item]?.category;
-        if (category) return category;
-      }
-    }
-    return null;
-  }
-
-  // Infer user category pattern from recent entries
-  function inferUserCategoryPattern(upc) {
-    const prefix = upc.slice(0, 5);
-    const recentCategories = Object.values(liveCounts)
-      .slice(-10)
-      .map(entry => entry.category)
-      .filter(Boolean);
-    if (!recentCategories.length) return null;
-    const freq = {};
-    recentCategories.forEach(cat => freq[cat] = (freq[cat] || 0) + 1);
-    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-    return sorted.length ? sorted[0][0] : null;
-  }
-
-  async function processScan(item) {
-    // --- Diagnostic logging at the very beginning ---
-    const originalItem = item;
-    console.log("🧪 processScan diagnostics:");
-    console.log("Original item:", item);
-    console.log("liveCounts keys:", Object.keys(liveCounts));
-    console.log("upcToItem keys:", Object.keys(upcToItem));
-    console.log("Mapped value (if any):", upcToItem[item]);
-    console.log("Item exists in liveCounts?", item in liveCounts);
-    console.log("OriginalItem exists in upcToItem?", originalItem in upcToItem);
-    console.log("OriginalItem exists in locationMap?", originalItem in locationMap);
-    console.log("Cleaned item exists in upcToItem?", item in upcToItem);
-    console.log("Cleaned item exists in locationMap?", item in locationMap);
-
-    // --- Scan lock/cooldown at top ---
-    if (window.scanLock) {
-      console.warn("🔒 Scan in progress — skipping duplicate call.");
-      return;
-    }
-    window.scanLock = true;
-
-    console.log("🔍 [SCAN] Initial item received:", item);
-    // const originalItem = item; // already declared above
-    // --- Attempt to extract clean UPC from beam tag or prefixed barcode ---
-    const upcMatch = originalItem.match(/(?:^0+|^900|^04)?(\d{10,14})$/);
-    if (upcMatch) {
-      item = upcMatch[1]; // Extracted clean 10-14 digit UPC
-      console.log("🔎 Cleaned UPC from prefix:", item);
-    }
-
-    const isMappedUPC = Object.prototype.hasOwnProperty.call(upcToItem, originalItem);
-    const isKnownLocation = Object.prototype.hasOwnProperty.call(locationMap, originalItem);
-    const resolvedItem = upcToItem[originalItem] || originalItem;
-
-    console.log("📦 [SCAN] Mapped UPC?", isMappedUPC);
-    console.log("📍 [SCAN] Known Location?", isKnownLocation);
-
-    // --- Enhanced location tag logic: handle both cleaned and original scanned code ---
-    // First check if the original scanned code is a location tag or a repeat scan of the last bay
-    if (
-      Object.prototype.hasOwnProperty.call(locationMap, originalItem) ||
-      originalItem === lastScannedLocationCode ||
-      locationMap[originalItem] === currentLocation
-    ) {
-      const mappedLocation = locationMap[originalItem];
-      if (currentLocation === mappedLocation) {
-        const close = confirm(`You scanned the current location tag (${originalItem}) again.\nWould you like to CLOSE this bay?`);
-        if (close) {
-          currentLocation = '';
-          updateLocationStatus();
-          alert('📦 Current location cleared.');
-        }
-      } else if (mappedLocation) {
-        currentLocation = mappedLocation;
-        updateLocationStatus();
-        alert(`📍 Current location set to: ${mappedLocation}`);
-      }
-      lastScannedLocationCode = originalItem;
-      resetScanInput();
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500);
-      return;
-    }
-    // If not, check if the cleaned item is a location tag or a repeat scan of the last bay (cleaned)
-    if (
-      Object.prototype.hasOwnProperty.call(locationMap, item) ||
-      item === lastScannedLocationCode ||
-      locationMap[item] === currentLocation
-    ) {
-      const mappedLocation = locationMap[item];
-      if (currentLocation === mappedLocation) {
-        const close = confirm(`You scanned the current location tag (${item}) again.\nWould you like to CLOSE this bay?`);
-        if (close) {
-          currentLocation = '';
-          updateLocationStatus();
-          alert('📦 Current location cleared.');
-        }
-      } else if (mappedLocation) {
-        currentLocation = mappedLocation;
-        updateLocationStatus();
-        alert(`📍 Current location set to: ${mappedLocation}`);
-      }
-      lastScannedLocationCode = item;
-      resetScanInput();
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500);
-      return;
-    }
-
-    // --- If already in liveCounts, skip prompt and proceed directly ---
-    if (liveCounts[upcToItem[item] || item]) {
-      console.log("🧼 Already in liveCounts — skipping prompt.");
-      proceedWithKnownScan(upcToItem[item] || item);
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500); // Cooldown before accepting another scan
-      return;
-    }
-
-    const response = await showCustomPrompt(originalItem);
-    updateSuggestions();
-    updateLiveTable();
-
-    if (response === 'location') {
-      const name = prompt(`🗂 Please enter a name for location "${originalItem}":`);
-      if (name) {
-        locationMap[originalItem] = name;
-        saveLocationMap();
-        currentLocation = name;
-        updateLocationStatus();
-        alert(`📍 Current location set to: ${name}`);
-      }
-      lastScannedLocationCode = originalItem;
-      resetScanInput();
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500); // Cooldown before accepting another scan
-      return;
-    } else if (response === 'product') {
-      const inferredCategory = inferUserCategoryPattern(originalItem) || suggestCategoryFromUPC(originalItem);
-      const userDefined = prompt(`UPC ${originalItem} is not linked to a Lowe's item #.\nEnter the item # (suggested category: "${inferredCategory || 'Unknown'}")`);
-      if (userDefined) {
-        const trimmedItem = userDefined.trim();
-        if (!trimmedItem) {
-          alert("❌ Invalid item number.");
-          resetScanInput();
-          setTimeout(() => {
-            window.scanLock = false;
-          }, 500);
-          return;
-        }
-
-        const existing = upcToItem[item];
-        if (existing && existing !== trimmedItem) {
-          const choice = confirm(`⚠️ This UPC is already mapped to item #${existing}.\nDo you want to overwrite it with #${trimmedItem}?`);
-          if (!choice) {
-            resetScanInput();
-            setTimeout(() => {
-              window.scanLock = false;
-            }, 500);
-            return;
-          }
-        }
-
-        upcToItem[item] = trimmedItem;
-        saveUPCMap();
-        if (originalItem !== trimmedItem) delete liveCounts[originalItem];
-        delete liveCounts[trimmedItem];
-        liveCounts[trimmedItem] = {
-          count: 1,
-          category: inferredCategory || categoryInput.value || '',
-          location: currentLocation
-        };
-
-        lastScannedLocationCode = item;
-        console.log("✅ Stored item:", trimmedItem, "for UPC:", item);
-        updateRotationDate(liveCounts[trimmedItem].category);
-        updateLiveTable();
-      }
-      resetScanInput();
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500); // Cooldown before accepting another scan
-      return;
-    } else {
-      resetScanInput();
-      setTimeout(() => {
-        window.scanLock = false;
-      }, 500); // Cooldown before accepting another scan
-      return;
-    }
-    // At the very end, unlock scanLock (should not reach here, but as fallback)
-    setTimeout(() => {
-      window.scanLock = false;
-    }, 500); // Cooldown before accepting another scan
-  }
-
-
-
-  // --- Ensure critical buttons are assigned after DOMContentLoaded ---
-  // (No duplicate clearLiveTable logic outside DOMContentLoaded; only the main one above with console.log.)
-
-  // --- Auto-save session at configured interval (default 30 seconds) ---
-  function getAutosaveIntervalMs() {
-    const autosaveIntervalSelect = document.getElementById('autosaveIntervalSelect');
-    const val = autosaveIntervalSelect ? parseInt(autosaveIntervalSelect.value) : 3;
-    return Math.max(5, val) * 1000;
-  }
-  function setupAutosaveLoop() {
-    if (autosaveTimer) clearInterval(autosaveTimer);
-    // Only run autosave if enabled
-    const enabled = document.getElementById('autosaveToggle')?.checked !== false;
-    if (!enabled) return;
-    const interval = getAutosaveIntervalMs();
-    autosaveTimer = setInterval(() => {
-      const session = {
-        liveCounts: JSON.parse(JSON.stringify(liveCounts)),
-        onHandText: document.getElementById('onHandInput').value
-      };
-      localStorage.setItem('inventorySession', JSON.stringify(session));
-      // Also store versioned session for merge report
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      localStorage.setItem(`inventorySession_${timestamp}`, JSON.stringify(session));
-      console.log('Auto-saved session');
-    }, interval);
-  }
-  // Start autosave on load if enabled
-  setupAutosaveLoop();
-
-  // Start Dropbox auto-backup every 15 minutes (customizable)
-  setupDropboxAutoBackup(15);
-
-  // Auto-restore session on load if available
-  const existingSession = localStorage.getItem('inventorySession');
-  if (existingSession) {
-    try {
-      const parsed = JSON.parse(existingSession);
-      const hasValidData = parsed && parsed.liveCounts && Object.keys(parsed.liveCounts).length > 0;
-      if (hasValidData) {
-        const confirmRestore = confirm("🧭 A previous session was found. Would you like to restore it?");
-        if (confirmRestore) {
-          Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-          Object.entries(parsed.liveCounts).forEach(([k, v]) => {
-            liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-          });
-          document.getElementById('onHandInput').value = parsed.onHandText || '';
-          updateLiveTable();
-          alert("✅ Previous session restored.");
-        }
-      }
-    } catch (e) {
-      console.warn("Invalid saved session:", e);
-    }
-  }
-  // Re-setup autosave on interval or enabled/disabled change
-  if (autosaveIntervalSelect) {
-    autosaveIntervalSelect.addEventListener('change', setupAutosaveLoop);
-  }
-  if (autosaveToggle) {
-    autosaveToggle.addEventListener('change', setupAutosaveLoop);
-  }
-
-  // (No auto Drive sync; Dropbox only supports manual save/load in this integration.)
-
-  // --- Auto-generate Excel file every 10 minutes ---
-  function pad(n) {
-    return n < 10 ? '0' + n : n;
-  }
-
-  function downloadAutoExcelBackup() {
-    if (Object.keys(liveCounts).length === 0) {
-      console.log("⏭️ Skipping Excel backup — no data to export.");
-      return;
-    }
-    const wb = XLSX.utils.book_new();
-    const ws_data = [['Item #', 'Expected', 'Found', 'Difference', 'Prev Week', 'Δ vs Last Week', 'Category', 'Location']];
-
-    const onHandText = document.getElementById('onHandInput').value;
-    const onHandLines = onHandText.trim().split(/\n+/);
-    const onHandMap = {};
-    onHandLines.forEach(line => {
-      const [item, count] = line.split(':');
-      if (item && count) onHandMap[item.trim()] = parseInt(count.trim());
-    });
-
-    const previousDates = Object.keys(weeklyCounts).sort().reverse();
-    const lastWeek = previousDates.length > 1 ? weeklyCounts[previousDates[1]] : null;
-
-    Object.entries(liveCounts).forEach(([item, obj]) => {
-      const count = obj.count;
-      const expected = onHandMap[item] || 0;
-      const diff = count - expected;
-      const previous = lastWeek ? lastWeek[item] || 0 : '';
-      const weekDiff = lastWeek ? count - previous : '';
-      ws_data.push([item, expected, count, diff, previous, weekDiff, obj.category || '', obj.location || '']);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    // --- Conditional formatting: color-code "Difference" column (D) ---
-    // Apply conditional styling to "Difference" column (D)
-    for (let i = 1; i < ws_data.length; i++) {
-      const diff = ws_data[i][3]; // Column D: Difference
-      const cellRef = `D${i + 1}`;
-      if (!ws[cellRef]) continue;
-      if (diff > 0) {
-        ws[cellRef].s = { font: { color: { rgb: "008000" } } }; // green
-      } else if (diff < 0) {
-        ws[cellRef].s = { font: { color: { rgb: "FF0000" } } }; // red
-      } else {
-        ws[cellRef].s = { font: { color: { rgb: "000000" } } }; // black
-      }
-    }
-    wb.Sheets['Inventory'] = ws;
-    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-
-    const now = new Date();
-    const timestamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
-    XLSX.writeFile(wb, `inventory-backup-${timestamp}.xlsx`);
-  }
-
-  // Auto-generate Excel file every 10 minutes
-  setInterval(() => {
-    if (Object.keys(liveCounts).length > 0) {
-      downloadAutoExcelBackup();
-      console.log('🔄 Auto-downloaded Excel backup');
-    }
-  }, 10 * 60 * 1000);
-
-  // Register service worker for PWA
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('Service Worker registered ✅', reg))
-      .catch(err => console.error('Service Worker registration failed ❌', err));
-  }
-
-  // --- Session Manager Logic ---
-  // --- Import Excel Session File ---
-  const importExcelSessionBtn = document.getElementById('importExcelSession');
-  const triggerImportExcelSessionBtn = document.getElementById('triggerImportExcelSession');
-
-  if (triggerImportExcelSessionBtn && importExcelSessionBtn) {
-    triggerImportExcelSessionBtn.addEventListener('click', () => {
-      importExcelSessionBtn.click();
-    });
-
-    importExcelSessionBtn.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      if (file.name.endsWith('.xlsx')) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-
-          const header = rows[0];
-          const upcIndex = header.findIndex(h => /upc/i.test(h));
-          const itemIndex = header.findIndex(h => /item/i.test(h));
-          const countIndex = header.findIndex(h => /found/i.test(h));
-          const categoryIndex = header.findIndex(h => /category/i.test(h));
-          const locationIndex = header.findIndex(h => /location/i.test(h));
-
-          // --- Validation logic for required columns ---
-          console.log('🧭 Excel Header Map:', {
-            upcIndex,
-            itemIndex,
-            countIndex,
-            categoryIndex,
-            locationIndex
-          });
-
-          const requiredFields = [
-            { name: 'Item', index: itemIndex },
-            { name: 'Count (Found)', index: countIndex },
-            { name: 'Category', index: categoryIndex },
-            { name: 'Location', index: locationIndex }
-          ];
-          const missing = requiredFields.filter(f => f.index === -1).map(f => f.name);
-          if (missing.length > 0) {
-            alert(`❌ Missing required column(s): ${missing.join(', ')}\nPlease check your Excel file and try again.`);
-            return;
-          }
-
-          Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-          for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            const upc = upcIndex !== -1 ? row[upcIndex] : null;
-            const item = (row[itemIndex] || '').toString().trim();
-            if (!item) continue;
-
-            const key = upc || item;
-
-            liveCounts[item] = {
-              count: parseInt(row[countIndex]) || 0,
-              category: row[categoryIndex] || '',
-              location: row[locationIndex] || ''
-            };
-
-            if (upc) {
-              upcToItem[upc] = item;
-            } else {
-              upcToItem[item] = item;
-            }
-
-            const loc = row[locationIndex];
-            if (loc && !Object.values(locationMap).includes(loc)) {
-              locationMap[item] = loc;
-            }
-          }
-          saveUPCMap();
-          saveLocationMap();
-          updateLiveTable();
-          alert('📥 Excel session imported!');
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const imported = JSON.parse(reader.result);
-            if (imported && imported.liveCounts) {
-              Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-              Object.entries(imported.liveCounts).forEach(([k, v]) => {
-                liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-              });
-              document.getElementById('onHandInput').value = imported.onHandText || '';
-              updateLiveTable();
-              alert('📥 Excel session imported successfully!');
-            } else {
-              alert('❌ Invalid session file.');
-            }
-          } catch (err) {
-            alert('❌ Failed to parse session file.');
-          }
-        };
-        reader.readAsText(file);
-      }
-    });
-  }
-  const savedSessionsList = document.getElementById('savedSessionsList');
-  const viewSavedSessionsBtn = document.getElementById('viewSavedSessions');
-  const clearAllSessionsBtn = document.getElementById('clearAllSessions');
-
-  function renderSavedSessions() {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('inventorySession_'));
-    if (keys.length === 0) {
-      if (savedSessionsList) savedSessionsList.innerHTML = '<p>No saved sessions found.</p>';
-      return;
-    }
-
-    const list = document.createElement('ul');
-    list.style.listStyle = 'none';
-    list.style.padding = 0;
-
-    keys.sort().reverse().forEach(key => {
-      const li = document.createElement('li');
-      li.style.marginBottom = '6px';
-      const dateLabel = key.replace('inventorySession_', '');
-      const loadBtn = document.createElement('button');
-      loadBtn.textContent = `📥 Load ${dateLabel}`;
-      loadBtn.style.marginRight = '6px';
-      loadBtn.onclick = () => {
-        const session = JSON.parse(localStorage.getItem(key));
-        if (!session || !session.liveCounts) return alert('Invalid session data.');
-        Object.keys(liveCounts).forEach(k => delete liveCounts[k]);
-        Object.entries(session.liveCounts).forEach(([k, v]) => {
-          liveCounts[k] = { count: v.count, category: v.category, location: v.location };
-        });
-        document.getElementById('onHandInput').value = session.onHandText || '';
-        updateLiveTable();
-        alert(`Session from ${dateLabel} loaded.`);
-      };
-
-      const exportBtn = document.createElement('button');
-      exportBtn.textContent = '📤 Export';
-      exportBtn.style.marginRight = '6px';
-      exportBtn.onclick = () => {
-        const session = localStorage.getItem(key);
-        const blob = new Blob([session], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${key}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      };
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '🗑️ Delete';
-      deleteBtn.onclick = () => {
-        if (confirm(`Delete session ${dateLabel}?`)) {
-          localStorage.removeItem(key);
-          renderSavedSessions();
-        }
-      };
-
-      li.appendChild(loadBtn);
-      li.appendChild(exportBtn);
-      li.appendChild(deleteBtn);
-      list.appendChild(li);
-    });
-
-    if (savedSessionsList) {
-      savedSessionsList.innerHTML = '';
-      savedSessionsList.appendChild(list);
-    }
-  }
-
-  if (viewSavedSessionsBtn) {
-    viewSavedSessionsBtn.addEventListener('click', () => {
-      renderSavedSessions();
-    });
-  }
-
-  if (clearAllSessionsBtn) {
-    clearAllSessionsBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to delete all saved sessions? This cannot be undone.')) {
-        Object.keys(localStorage)
-          .filter(k => k.startsWith('inventorySession_'))
-          .forEach(k => localStorage.removeItem(k));
-        renderSavedSessions();
-        alert('All saved sessions cleared.');
-      }
-    });
-  }
-
-  // --- Floating Nav Tab Switching (cleaned up) ---
-  const tabSections = document.querySelectorAll('.tab-section');
-  const floatingNavButtons = document.querySelectorAll('.floating-nav .nav-icon');
-
-  floatingNavButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-      tabSections.forEach(section => section.classList.remove('active'));
-      floatingNavButtons.forEach(b => b.classList.remove('active'));
-      const newTab = document.getElementById(targetTab);
-      if (newTab) newTab.classList.add('active');
-      btn.classList.add('active');
-    });
-  });
-
-  // Set default tab to 'count' on load
-  document.getElementById('count').classList.add('active');
-  document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
-  // --- Floating Nav Toggle Logic ---
-  const toggleFloatingNav = document.getElementById('toggleFloatingNav');
-  const floatingNav = document.querySelector('.floating-nav');
-
-  if (toggleFloatingNav && floatingNav) {
-    toggleFloatingNav.addEventListener('click', (e) => {
-      e.stopPropagation(); // prevent bubbling
-      floatingNav.classList.toggle('nav-collapsed');
-    });
-  }
-
-  // Activate the default tab on load
-  document.getElementById('count').classList.add('active');
-  document.querySelector('.floating-nav .nav-icon[data-tab="count"]').classList.add('active');
-  const today = new Date().toISOString().split('T')[0];
-if (!weeklyCounts[today]) weeklyCounts[today] = {};
-Object.entries(liveCounts).forEach(([item, obj]) => {
-  weeklyCounts[today][item] = obj.count;
-});
-localStorage.setItem('weeklyCounts', JSON.stringify(weeklyCounts));
-  // Focus the liveEntry input on load
-  restoreFocusToEntry();
-  // (Google API script loading removed; no longer required.)
-});
