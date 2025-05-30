@@ -48,6 +48,11 @@ window.setCurrentUPC = function (code) {
 
 window.promptCodeType = function(code) {
   window.setCurrentUPC?.(code);
+  // Global Boot Lock: prevent rogue modal calls during startup
+  if (!window.appBootComplete) {
+    console.warn("🚫 Modal blocked: App not fully initialized.");
+    return;
+  }
   const modal = document.getElementById("mapPromptModal");
 
   if (!modal) {
