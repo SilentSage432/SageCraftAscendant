@@ -1,7 +1,8 @@
-// dev-debug.js
+// Master Dev Profiler Switch
+const DEV_PROFILE = true;  // ✅ Set to false for full production stripping
 
 // Only activate in debug mode
-if (window.location.href.includes('debug=true')) {
+if (DEV_PROFILE && window.location.href.includes('debug=true')) {
     console.log('%c[DEBUG MODE ENABLED]', 'color: limegreen; font-weight: bold;');
   
     // Simulate a scan
