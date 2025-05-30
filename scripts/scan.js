@@ -29,148 +29,6 @@ async function showCustomPrompt(code) {
   });
 }
 
-async function handleScanInput(val) {
-  if (!val || typeof val !== 'string' || !val.trim()) {
-    console.warn("❌ handleScanInput(): No valid code provided");
-    return;
-  }
-  const resolved = resolveScanCode(val);
-
-  // Developer override: always prompt modal on scan input if flag is set
-  if (window.DEV_FORCE_MODAL) {
-    if (typeof window.promptCodeType === 'function') {
-      window.promptCodeType(resolved || val);
-      resetScanInput();
-      return;
-    }
-  }
-  if (resolved) {
-    if (typeof resolved === 'object' && resolved.type === 'esl') {
-      console.log(`🔁 ESL ${resolved.upc} maps to Lowe’s #${resolved.item || '(unmapped)'}`);
-      
-      if (!resolved.item) {
-        // Trigger the custom modal if no mapping is found
-        if (typeof window.promptCodeType === 'function') {
-          window.promptCodeType(resolved.upc);
-        } else {
-          const modal = document.getElementById("customModal");
-          if (modal) {
-            window.setCurrentUPC?.(resolved.upc);
-            modal.style.display = "block";
-          }
-        }
-        resetScanInput();
-        return;
-      }
-
-      upcToItem[resolved.upc] = resolved.item;
-      if (typeof window.updateMapStatusDisplay === 'function') {
-        window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
-      }
-      processScan(resolved.item);
-      resetScanInput();
-      return;
-    }
-
-    // Check for unknown codes before processing the scan
-    if (
-      !window.upcToItem?.[resolved] &&
-      !window.eslToUPC?.[resolved] &&
-      !window.locationMap?.[resolved]
-    ) {
-      if (typeof window.promptCodeType === 'function') {
-        window.promptCodeType(resolved);
-      } else {
-        const fallbackModal = document.getElementById("mapPromptModal");
-        if (fallbackModal) {
-          window.setCurrentUPC?.(resolved);
-          fallbackModal.classList.remove("hidden");
-        }
-      }
-      resetScanInput();
-      return;
-    }
-
-    const modal = document.getElementById('mapPromptModal');
-    if (modal) {
-      window.setCurrentUPC?.(resolved);
-      modal.classList.remove('hidden');
-      resetScanInput();
-      return;
-    }
-
-    processScan(resolved);
-    // Show modal for known UPC as well
-    const knownModal = document.getElementById('mapPromptModal');
-    if (knownModal) {
-      window.setCurrentUPC?.(resolved);
-      knownModal.classList.remove('hidden');
-    }
-    if (typeof window.updateMapStatusDisplay === 'function') {
-      window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
-    }
-    resetScanInput();
-    return;
-  }
-
-  if (locationMap[val]) {
-    processScan(val);
-    return;
-  }
-
-  const promptResult = await showCustomPrompt(val);
-  if (promptResult) {
-    window.setCurrentESLItem?.(val);
-    const modal = document.getElementById('customModal');
-    if (modal) modal.style.display = 'block';
-  }
-}
-
-function processScan(item) {
-  console.log(`🔍 Scanning item: ${item}`);
-  if (!item) return;
-
-  if (!window.liveCounts) window.liveCounts = {};
-
-  if (!window.liveCounts[item]) {
-    window.liveCounts[item] = 1;
-  } else {
-    window.liveCounts[item] += 1;
-  }
-
-  // Update sessionMap to reflect liveCounts and itemCategory
-  if (!window.sessionMap) window.sessionMap = {};
-
-  const activeCategory = localStorage.getItem('itemCategory') || window.itemCategory || 'uncategorized';
-  window.itemCategory = activeCategory;
-
-  if (!window.sessionMap[item]) {
-    window.sessionMap[item] = {
-      item: item,
-      count: window.liveCounts[item],
-      category: activeCategory,
-      location: window.locationMap?.[item] || '',
-      editable: true // placeholder for enabling inline edits
-    };
-  } else {
-    window.sessionMap[item].count = window.liveCounts[item];
-  }
-
-  if (typeof window.updateLiveTable === 'function') {
-    window.updateLiveTable();
-  } else {
-    console.warn('⚠️ updateLiveTable function is not defined');
-  }
-}
-
-function resetScanInput() {
-  const liveEntryInput = document.getElementById('liveEntry');
-  if (liveEntryInput) liveEntryInput.value = '';
-}
-
-window.processScan = processScan;
-window.handleScanInput = handleScanInput;
-window.resetScanInput = resetScanInput;
 window.resolveScanCode = resolveScanCode;
 
 window.initScan = function () {
@@ -248,15 +106,12 @@ window.promptCodeType = function(code) {
       if (selectedType === "product") {
         window.upcToItem[upc] = value;
         console.log(`✅ Product mapping: ${upc} ➔ ${value}`);
-        processScan(value);
       } else if (selectedType === "esl") {
         window.eslToUPC[upc] = value;
         console.log(`✅ ESL mapping: ${upc} ➔ ${value}`);
-        processScan(value);
       } else if (selectedType === "bay") {
         window.locationMap[upc] = value;
         console.log(`✅ Bay mapping: ${upc} ➔ ${value}`);
-        processScan(value);
       }
 
       // Persist mappings to localStorage
@@ -267,6 +122,10 @@ window.promptCodeType = function(code) {
       if (typeof window.updateMapStatusDisplay === "function") {
         window.updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
       }
+
+      // Call unified scan engine directly
+      handleUnifiedScan(value);
+
       modal.classList.add("hidden");
       resetScanInput();
     };

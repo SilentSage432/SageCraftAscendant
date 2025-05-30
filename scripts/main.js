@@ -1,30 +1,33 @@
-  // --- Clean Empty Sessions Button ---
-  const cleanStaleSessionsBtn = document.getElementById('cleanStaleSessions');
-  if (cleanStaleSessionsBtn) {
-    cleanStaleSessionsBtn.addEventListener('click', () => {
-      let deletedCount = 0;
-      for (let key in localStorage) {
-        if (key.startsWith('inventorySession_')) {
-          try {
-            const session = JSON.parse(localStorage.getItem(key));
-            const isEmpty =
-              session &&
-              typeof session === 'object' &&
-              Object.keys(session.liveCounts || {}).length === 0 &&
-              (!session.onHandText || session.onHandText.trim() === "");
+// 🚫 Global App Boot Lockout Flag
+let appBootComplete = false;
 
-            if (isEmpty) {
-              localStorage.removeItem(key);
-              deletedCount++;
-            }
-          } catch (e) {
-            console.warn(`⚠️ Skipped corrupt session: ${key}`);
+  // --- Clean Empty Sessions Button ---
+const cleanStaleSessionsBtn = document.getElementById('cleanStaleSessions');
+if (cleanStaleSessionsBtn) {
+  cleanStaleSessionsBtn.addEventListener('click', () => {
+    let deletedCount = 0;
+    for (let key in localStorage) {
+      if (key.startsWith('inventorySession_')) {
+        try {
+          const session = JSON.parse(localStorage.getItem(key));
+          const isEmpty =
+            session &&
+            typeof session === 'object' &&
+            Object.keys(session.liveCounts || {}).length === 0 &&
+            (!session.onHandText || session.onHandText.trim() === "");
+
+          if (isEmpty) {
+            localStorage.removeItem(key);
+            deletedCount++;
           }
+        } catch (e) {
+          console.warn(`⚠️ Skipped corrupt session: ${key}`);
         }
       }
-      alert(`🧼 Removed ${deletedCount} empty session(s) from local storage.`);
-    });
-  }
+    }
+    alert(`🧼 Removed ${deletedCount} empty session(s) from local storage.`);
+  });
+}
 
 
 // --- Chart.js (Trends) integration: ensure Chart.js is available ---
@@ -37,17 +40,17 @@ let liveCounts = window.liveCounts || {};
 
   // --- Sync/Restore ESL Map to Dropbox Buttons ---
   // Ensure settingsTarget is defined and present
-  let settingsTarget = document.querySelector('#tools .settings-group');
-  if (!settingsTarget) {
-    settingsTarget = document.createElement('div');
-    settingsTarget.className = 'settings-group';
-    const toolsSection = document.getElementById('tools');
-    if (toolsSection) {
-      toolsSection.appendChild(settingsTarget);
-    } else {
-      console.warn("⚠️ #tools section not found in DOM. Cannot append settings group.");
-    }
+let settingsTarget = document.querySelector('#tools .settings-group');
+if (!settingsTarget) {
+  settingsTarget = document.createElement('div');
+  settingsTarget.className = 'settings-group';
+  const toolsSection = document.getElementById('tools');
+  if (toolsSection) {
+    toolsSection.appendChild(settingsTarget);
+  } else {
+    console.warn("⚠️ #tools section not found in DOM. Cannot append settings group.");
   }
+}
 
   // --- FOLDER SELECT DROPDOWN FOR DROPBOX MAP RESTORE ---
   // Insert above Dropbox restore buttons
@@ -56,45 +59,45 @@ let liveCounts = window.liveCounts || {};
   folderSelect.style.marginTop = '10px';
   folderSelect.style.padding = '6px';
   folderSelect.style.fontSize = '14px';
-  ['/beta-test-1', '/beta-archive-legacy'].forEach(folder => {
-    const option = document.createElement('option');
-    option.value = folder;
-    option.textContent = folder;
-    folderSelect.appendChild(option);
-  });
+['/beta-test-1', '/beta-archive-legacy'].forEach(folder => {
+  const option = document.createElement('option');
+  option.value = folder;
+  option.textContent = folder;
+  folderSelect.appendChild(option);
+});
   // Insert before Dropbox restore buttons if possible, else at end of settingsTarget
   // Try to insert before restoreBothBtn if it exists later, else just append now
-  settingsTarget.appendChild(folderSelect);
+settingsTarget.appendChild(folderSelect);
 
   // Add Sync ESL Map to Dropbox button
   const syncESLBtn = document.createElement('button');
   syncESLBtn.className = 'settings-button';
   syncESLBtn.textContent = '🔄 Sync ESL Map to Dropbox';
   syncESLBtn.style.marginTop = '8px';
-  syncESLBtn.onclick = async () => {
-    const blob = new Blob([JSON.stringify(eslToUPC, null, 2)], { type: 'application/json' });
-    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Content-Type': 'application/octet-stream',
-        'Dropbox-API-Arg': JSON.stringify({
-          path: '/beta-test-1/esl_map_backup.json',
-          mode: 'overwrite',
-          autorename: false,
-          mute: true
-        })
-      },
-      body: blob
-    });
-    if (response.ok) {
-      alert('✅ ESL map synced to Dropbox!');
-    } else {
-      const err = await response.text();
-      alert(`❌ Failed to sync ESL map: ${err}`);
-    }
-  };
-  settingsTarget.appendChild(syncESLBtn);
+syncESLBtn.onclick = async () => {
+  const blob = new Blob([JSON.stringify(eslToUPC, null, 2)], { type: 'application/json' });
+  const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-API-Arg': JSON.stringify({
+        path: '/beta-test-1/esl_map_backup.json',
+        mode: 'overwrite',
+        autorename: false,
+        mute: true
+      })
+    },
+    body: blob
+  });
+  if (response.ok) {
+    alert('✅ ESL map synced to Dropbox!');
+  } else {
+    const err = await response.text();
+    alert(`❌ Failed to sync ESL map: ${err}`);
+  }
+};
+settingsTarget.appendChild(syncESLBtn);
 
   // --- Mapping Stats Display ---
   const mappingStats = document.createElement('div');
@@ -108,7 +111,7 @@ let liveCounts = window.liveCounts || {};
     ESL → UPC: ${Object.keys(eslToUPC).length}<br>
     Location Codes: ${Object.keys(locationMap).length}
   `;
-  settingsTarget.appendChild(mappingStats);
+settingsTarget.appendChild(mappingStats);
   // --- Insert Map Status Display ---
   const mapStatusDisplay = document.createElement('div');
   mapStatusDisplay.id = 'mapStatusDisplay';
@@ -116,40 +119,37 @@ let liveCounts = window.liveCounts || {};
   mapStatusDisplay.style.fontSize = '13px';
   mapStatusDisplay.style.color = '#aaf';
   mapStatusDisplay.textContent = '🧠 Map Status: Loading...';
-  settingsTarget?.appendChild(mapStatusDisplay);
-  updateMapStatusDisplay();
+settingsTarget?.appendChild(mapStatusDisplay);
+updateMapStatusDisplay();
 
   // Add Restore ESL Map from Dropbox button
   const restoreESLBtn = document.createElement('button');
   restoreESLBtn.className = 'settings-button';
   restoreESLBtn.textContent = '📥 Restore ESL Map from Dropbox';
   restoreESLBtn.style.marginTop = '8px';
-  restoreESLBtn.onclick = async () => {
-    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${await getDropboxAccessToken()}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: '/esl_map_backup.json' })
-      }
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      alert(`❌ Failed to restore ESL map: ${err}`);
-      return;
+restoreESLBtn.onclick = async () => {
+  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${await getDropboxAccessToken()}`,
+      'Dropbox-API-Arg': JSON.stringify({ path: '/esl_map_backup.json' })
     }
-
-    const map = await response.json();
-    if (!map || typeof map !== 'object') {
-      alert('❌ Invalid ESL map format.');
-      return;
-    }
-
-    Object.assign(eslToUPC, map);
-    saveESLMap();
-    alert('✅ ESL map restored from Dropbox!');
-  };
-  settingsTarget.appendChild(restoreESLBtn);
+  });
+  if (!response.ok) {
+    const err = await response.text();
+    alert(`❌ Failed to restore ESL map: ${err}`);
+    return;
+  }
+  const map = await response.json();
+  if (!map || typeof map !== 'object') {
+    alert('❌ Invalid ESL map format.');
+    return;
+  }
+  Object.assign(eslToUPC, map);
+  saveESLMap();
+  alert('✅ ESL map restored from Dropbox!');
+};
+settingsTarget.appendChild(restoreESLBtn);
 let lastScannedLocationCode = '';
 import {
     upcToItem,
@@ -195,6 +195,8 @@ function updateRotationDate(category) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  appBootComplete = true;
 
   // --- Render Audit Rotation Table ---
   function renderAuditRotationTable() {
@@ -599,7 +601,6 @@ document.addEventListener('DOMContentLoaded', () => {
     URL.revokeObjectURL(url);
   };
   // Add it to the first settings group
-  let settingsTarget = document.querySelector('#tools .settings-group');
   if (!settingsTarget) {
     settingsTarget = document.createElement('div');
     settingsTarget.className = 'settings-group';
@@ -610,12 +611,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // --- Display Audit Rotation Table on #audit page/tab or on audit page load ---
   // Check for audit section: show table if #audit hash, or if pathname contains 'audit'
+  // --- Audit Rotation Table on #audit page/tab or on audit page load ---
+  let auditSettingsTarget; // promote declaration for reuse
   if (
     (window.location.hash === '#audit' && settingsTarget) ||
     (window.location.pathname.includes('audit') && settingsTarget)
   ) {
     // If settingsTarget is not in the audit page, ensure one exists at the top of #audit section
-    let auditSettingsTarget = settingsTarget;
+    auditSettingsTarget = settingsTarget;
     // Try to find #audit section
     let auditSection = document.getElementById('audit');
     if (window.location.pathname.includes('audit')) {
@@ -1013,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-syncBothBtn = document.createElement('button');
+const syncBothBtn = document.createElement('button');
 syncBothBtn.className = 'settings-button';
 syncBothBtn.textContent = '🔄 Sync All Maps to Dropbox';
 syncBothBtn.style.marginTop = '8px';
@@ -1270,6 +1273,10 @@ Bay Codes → ${Object.keys(locationMap).length}`;
    * @param {object} [opts] - Optional: {source: 'enter'|'debounced'|'button'}
    */
   async function handleUnifiedScan(rawVal, opts = {}) {
+    if (!appBootComplete) {
+      console.warn("🚫 UnifiedScan blocked: App not fully initialized.");
+      return;
+    }
     if (scanLock) {
       console.warn('🔒 Scan engine is busy, ignoring scan:', rawVal);
       return;
@@ -2064,10 +2071,10 @@ Bay Codes → ${Object.keys(locationMap).length}`;
     });
   }
 
-  async function processBatchLines(lines) {
-    for (const item of lines) {
-      const trimmed = item.trim();
-      if (!trimmed) continue;
-      await handleUnifiedScan(trimmed, { source: 'batch' });
-    }
+async function processBatchLines(lines) {
+  for (const item of lines) {
+    const trimmed = item.trim();
+    if (!trimmed) continue;
+    await handleUnifiedScan(trimmed, { source: 'batch' });
   }
+}
