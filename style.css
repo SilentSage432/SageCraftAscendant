@@ -1301,6 +1301,11 @@ tr[data-type="esl"] {
   .logo-banner {
     padding: 0 12px;
   }
+  
+  .scan-fields,
+  .scan-buttons {
+    max-width: 400px !important;
+  }
 }
 
 body::after {
@@ -2101,4 +2106,34 @@ input, select {
 #mapPromptModal {
   border: 3px solid #ff00ff !important;
   box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff !important;
+}
+#toggleDevDashboardBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  border: 2px solid #ff00ff;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  z-index: 99999;
+  box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff88 !important;
+  color: #fff;
+  font-weight: bold;
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  text-align: center;
+  transition: all 0.3s ease;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+@media (max-width: 600px) {
+  #toggleDevDashboardBtn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 16px !important;
+  }
 }
