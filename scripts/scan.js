@@ -135,37 +135,48 @@ function promptCodeType(code) {
   }
 }
 
-// Ensure modal structure is always injected at boot
+// Delayed modal injection until appBootComplete
 document.addEventListener("DOMContentLoaded", () => {
-  const targetContainer = document.getElementById("app") || document.body;
+  console.log("✅ DOMContentLoaded fired — deferring modal injection");
 
-  if (!document.getElementById("mapPromptModal")) {
-    const modalContainer = document.createElement("div");
-    modalContainer.id = "mapPromptModal";
-    modalContainer.className = "hidden modal-overlay";
-    modalContainer.style.display = 'none';
-    modalContainer.innerHTML = `
-      <div class="modal-content">
-        <h2>Unknown Code</h2>
-        <p id="mapPromptLabel">What type of tag is this?</p>
-        <div id="mapInputSection" class="hidden">
-          <input type="text" id="mapPromptInput" placeholder="Enter value...">
-        </div>
-        <div class="button-grid">
-          <button id="mapTypeProduct">Product</button>
-          <button id="mapTypeESL">ESL Tag</button>
-          <button id="mapTypeBay">Bay Tag</button>
-        </div>
-        <div class="button-grid">
-          <button id="confirmModalBtn" class="confirm">Confirm</button>
-          <button id="cancelModalBtn" class="cancel">Cancel</button>
-        </div>
-      </div>
-    `;
-    targetContainer.appendChild(modalContainer);
-    console.log("✅ Modal injected and ready.");
+  function injectModal() {
+    const targetContainer = document.getElementById("app") || document.body;
 
-    window.currentUPC = null;
-    window.selectedMapType = null;
+    if (!document.getElementById("mapPromptModal")) {
+      const modalContainer = document.createElement("div");
+      modalContainer.id = "mapPromptModal";
+      modalContainer.className = "hidden modal-overlay";
+      modalContainer.style.display = 'none';
+      modalContainer.innerHTML = `
+        <div class="modal-content">
+          <h2>Unknown Code</h2>
+          <p id="mapPromptLabel">What type of tag is this?</p>
+          <div id="mapInputSection" class="hidden">
+            <input type="text" id="mapPromptInput" placeholder="Enter value...">
+          </div>
+          <div class="button-grid">
+            <button id="mapTypeProduct">Product</button>
+            <button id="mapTypeESL">ESL Tag</button>
+            <button id="mapTypeBay">Bay Tag</button>
+          </div>
+          <div class="button-grid">
+            <button id="confirmModalBtn" class="confirm">Confirm</button>
+            <button id="cancelModalBtn" class="cancel">Cancel</button>
+          </div>
+        </div>
+      `;
+      targetContainer.appendChild(modalContainer);
+      console.log("✅ Modal injected and ready.");
+      window.currentUPC = null;
+      window.selectedMapType = null;
+    }
   }
+
+  // Wait until full app boot finishes before injecting modal
+  const modalObserver = setInterval(() => {
+    if (window.appBootComplete === true) {
+      clearInterval(modalObserver);
+      injectModal();
+    }
+  }, 50);
 });
