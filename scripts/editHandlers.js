@@ -13,7 +13,7 @@ function handleEditItem() {
     inputField.value = "";
 }
 
-function handleConfirmEditItem() {
+function handleConfirmEdit() {
     const inputField = document.getElementById("editConfirmInputField");
     const value = inputField.value.trim();
 
@@ -26,4 +26,4 @@ function handleConfirmEditItem() {
     inputField.value = "";
 }
 
-export { handleEditItem, handleConfirmEditItem };
+export { handleEditItem, handleConfirmEdit };
