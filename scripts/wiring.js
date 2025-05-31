@@ -38,41 +38,52 @@ adjustOverlayUpdateInterval();
 setInterval(updateDiagnosticOverlay, overlayUpdateInterval);
 
 // ===============================
-// Live Field Log Viewer Wiring
-function renderFieldLog(filter = 'all') {
-  const container = document.getElementById('fieldLogContent');
-  if (!container) return;
+// Optimized Live Field Log Viewer Wiring
 
+const logContainer = document.getElementById('fieldLogContent');
+const refreshBtn = document.getElementById('refreshFieldLog');
+const exportBtn = document.getElementById('exportFieldLog');
+const filterButtons = document.querySelectorAll('.log-filter-btn');
+
+function renderFieldLog(filter = 'all') {
+  if (!logContainer) return;
   const logs = window.getFieldLog ? window.getFieldLog() : [];
   if (!logs.length) {
-    container.innerHTML = "<em>No log entries yet.</em>";
+    logContainer.innerHTML = "<em>No log entries yet.</em>";
     return;
   }
-
   const filteredLogs = (filter === 'all') ? logs : logs.filter(entry => entry.eventType === filter);
-
-  const logHtml = filteredLogs
+  logContainer.innerHTML = filteredLogs
     .slice().reverse()
     .map(entry => {
       const time = new Date(entry.timestamp).toLocaleString();
       return `<div style="margin-bottom:5px;"><strong>${time}</strong>: [${entry.eventType}] ${JSON.stringify(entry.details)}</div>`;
     })
     .join('');
-  container.innerHTML = logHtml;
 }
 
-const refreshBtn = document.getElementById('refreshFieldLog');
-if (refreshBtn) {
-  refreshBtn.addEventListener('click', renderFieldLog);
-}
+if (refreshBtn) refreshBtn.addEventListener('click', () => renderFieldLog());
 
-const filterButtons = document.querySelectorAll('.log-filter-btn');
 filterButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     const filter = btn.dataset.filter;
     renderFieldLog(filter);
   });
 });
+
+if (exportBtn) {
+  exportBtn.addEventListener('click', () => {
+    const logs = window.getFieldLog ? window.getFieldLog() : [];
+    const prettyJSON = JSON.stringify(logs, null, 2);
+    const blob = new Blob([prettyJSON], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fieldLog_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
 
 export { wireAllButtons, runWiringMasterHarvest, runFullSystemAudit };
 window.runWiringMasterHarvest = runWiringMasterHarvest;
