@@ -493,11 +493,14 @@
   <!-- Main script -->
   <script type="module" src="scripts/index.js?v=2.0.2"></script>
   <!-- Main App Scripts -->
-  <script src="scripts/events.js?v=2.0.1" defer></script>
-  <script src="scripts/scan.js?v=2.0.1" defer></script>
 
-  <!-- Debugging Toolkit -->
-  <script src="scripts/dev-debug.js?v=2.0.1" defer></script>
+  <!-- Modular App Bootloader -->
+  <script type="module" src="scripts/globals.js"></script>
+  <script type="module" src="scripts/utilities.js"></script>
+  <script type="module" src="scripts/handlers.js"></script>
+  <script type="module" src="scripts/dropbox.js"></script>
+  <script type="module" src="scripts/wiring.js"></script>
+  <script type="module" src="scripts/init.js"></script>
 
   <script type="module">
     if (window.location.search.includes('code=')) {

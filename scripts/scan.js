@@ -177,3 +177,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 });
+
+// Expose clearLiveTable globally for dev-debug.js healing layer
+window.clearLiveTable = function() {
+  const tableBody = document.querySelector("#scanTable tbody");
+  if (tableBody) {
+    tableBody.innerHTML = "";
+    console.log("🧹 Live scan table cleared.");
+  }
+};
