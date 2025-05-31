@@ -94,4 +94,19 @@ function runFullSystemAudit() {
   console.groupEnd();
 }
 
-export { runFullSystemAudit };
+function runWiringExpectationAudit() {
+  console.log("⚡ Running Wiring Expectation Audit...");
+  // Insert actual expectation test logic here
+}
+
+function runAutoHealingLayer() {
+  console.log("🩺 Running Auto-Healing Layer...");
+  // Insert actual healing logic here
+}
+
+function runMasterDiagnostics() {
+  console.log("🔧 Running Master Diagnostics...");
+  // Insert actual diagnostic logic here
+}
+
+export { runFullSystemAudit, runWiringExpectationAudit, runAutoHealingLayer, runMasterDiagnostics };

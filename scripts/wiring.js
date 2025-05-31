@@ -1,8 +1,40 @@
 // ===============================
-import { runFullSystemAudit } from './audit.js';
+import { 
+  runFullSystemAudit, 
+  runWiringExpectationAudit, 
+  runAutoHealingLayer, 
+  runMasterDiagnostics 
+} from './audit.js';
 // Master Button Wiring — wiring.js
 // Inventory Auditor — Modular Refactor v1
 // ===============================
+
+/**
+ * Toggle Developer Panel Visibility
+ */
+function toggleDevPanel() {
+  const panel = document.getElementById('devToolsPanel');
+  if (panel) {
+    if (panel.style.display === 'none' || panel.style.display === '') {
+      panel.style.display = 'block';
+      // Use buttonActionMap for fully accurate counts
+      const wiredCount = Object.keys(buttonActionMap).length;
+      const allButtons = document.querySelectorAll('button');
+      const totalCount = allButtons.length;
+      const monitorContent = `🛠 ${totalCount} btn | ${wiredCount} wired`;
+      const statsElem = document.getElementById('devPanelStats');
+      if (statsElem) {
+        statsElem.textContent = monitorContent;
+      }
+      console.log("🔧 Dev Panel Opened");
+    } else {
+      panel.style.display = 'none';
+      console.log("🔧 Dev Panel Closed");
+    }
+  } else {
+    console.warn("Developer panel element not found.");
+  }
+}
 
 /**
  * Global button map — all ID-to-function mappings
@@ -64,7 +96,6 @@ const buttonActionMap = {
   toggleImportExport: () => toggleImportExportPanel(),
 
   // (existing entries continue below, fully intact)
-  toggleDevDashboardBtn: () => toggleDevPanel(),
   runFullSystemAuditBtn: () => runFullSystemAudit(),
   runWiringAuditBtn: () => runWiringExpectationAudit(),
   runAutoHealingBtn: () => runAutoHealingLayer(),
@@ -105,7 +136,8 @@ const buttonActionMap = {
     } else {
       monitor.style.display = 'none';
     }
-  }
+  },
+  toggleDevDashboardBtn: () => toggleDevPanel()
   // ✅ FINAL CLEANUP
   // No trailing comma here
 };
