@@ -33,10 +33,10 @@
 <body class="dark-theme electric-fantasy">
   <!-- Floating navigation for main tabs -->
   <div class="floating-nav" role="navigation" aria-label="Main tabs">
-    <button class="tablink nav-icon active" data-target="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
-    <button class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
-    <button class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
-    <button class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
+    <button id="navCountBtn" class="tablink nav-icon active" data-target="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
+    <button id="navVaultBtn" class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
+    <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
+    <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -348,7 +348,7 @@
       <h3 style="text-align:center;">📈 Inventory Trends</h3>
       <canvas id="trendChart" width="400" height="250"></canvas>
       <div style="text-align:center; margin-top:15px;">
-        <button onclick="document.getElementById('trendsModal').style.display='none'">❌ Close</button>
+        <button id="closeTrendsBtn">❌ Close</button>
       </div>
     </div>
   </div>
@@ -538,14 +538,15 @@ window.extractAllButtonIds = function () {
   <!-- Developer Diagnostic Panel -->
   <div id="devDashboard" style="position:fixed; bottom:80px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:8px; padding:15px; z-index:99999; box-shadow:0 0 20px #ff00ff; display:none;">
     <h3 style="margin:0 0 10px 0; color:#ff00ff; font-family:monospace;">🧪 Dev Tools</h3>
-    <button onclick="runFullSystemAudit()" style="display:block; margin:5px 0;">Full System Audit</button>
-    <button onclick="runWiringExpectationAudit()" style="display:block; margin:5px 0;">Wiring Audit</button>
-    <button onclick="runAutoHealingLayer()" style="display:block; margin:5px 0;">Heal Wiring</button>
-    <button onclick="runMasterDiagnostics()" style="display:block; margin:5px 0; font-weight:bold;">Master Diagnostic</button>
+    <button id="runFullSystemAuditBtn" style="display:block; margin:5px 0;">Full System Audit</button>
+    <button id="runWiringAuditBtn" style="display:block; margin:5px 0;">Wiring Audit</button>
+    <button id="runAutoHealingBtn" style="display:block; margin:5px 0;">Heal Wiring</button>
+    <button id="runMasterDiagnosticBtn" style="display:block; margin:5px 0; font-weight:bold;">Master Diagnostic</button>
   </div>
 
   <!-- Live Listener Monitor -->
-  <div id="listenerMonitor" style="position:fixed; bottom:100px; right:20px; background:#222; border:2px solid #00ffff; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #00ffff; font-family:monospace; color:#fff;">
+  <div id="listenerMonitor" style="position:fixed; bottom:100px; right:20px; background:#222; border:2px solid #00ffff; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #00ffff; font-family:monospace; color:#fff; cursor:move;">
+    <div id="listenerMonitorHeader" style="font-weight:bold; margin-bottom:5px;">🖱 Drag Me</div>
     <div id="listenerMonitorText">🔎 Monitoring...</div>
   </div>
 
@@ -566,6 +567,33 @@ window.extractAllButtonIds = function () {
     document.getElementById('listenerMonitorText').innerText = `🧮 ${totalButtons} btn | 🎯 ${totalListeners} listeners`;
   }
   setInterval(updateListenerMonitor, 1500);
+  </script>
+
+  <script>
+    const monitor = document.getElementById("listenerMonitor");
+    const header = document.getElementById("listenerMonitorHeader");
+    let offsetX = 0, offsetY = 0, isDragging = false;
+
+    header.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - monitor.offsetLeft;
+      offsetY = e.clientY - monitor.offsetTop;
+      document.body.style.userSelect = "none";
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      document.body.style.userSelect = "auto";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        monitor.style.left = (e.clientX - offsetX) + "px";
+        monitor.style.top = (e.clientY - offsetY) + "px";
+        monitor.style.bottom = "auto";
+        monitor.style.right = "auto";
+      }
+    });
   </script>
 
   <!-- Ghost Modal Detector -->
