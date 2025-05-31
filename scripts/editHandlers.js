@@ -1,3 +1,6 @@
+import { learnMapping } from './scanHandlers.js';
+import { classifyScan } from './scanHandlers.js';
+
 function handleEditItem() {
     const inputField = document.getElementById("scanInput");
     const value = inputField.value.trim();
@@ -21,6 +24,12 @@ function handleConfirmEdit() {
     }
 
     console.log("Confirmed edit finalized:", value);
+    
+    const scanType = classifyScan(value);
+    const itemName = prompt(`Enter item name for ${scanType} learning:`);
+    if (itemName) {
+        learnMapping(scanType, value, itemName);
+    }
     inputField.value = "";
 }
 

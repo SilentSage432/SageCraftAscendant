@@ -17,11 +17,9 @@ function toggleDevPanel() {
   if (panel) {
     if (panel.style.display === 'none' || panel.style.display === '') {
       panel.style.display = 'block';
-      // Use buttonActionMap for fully accurate counts
-      const wiredCount = Object.keys(buttonActionMap).length;
-      const allButtons = document.querySelectorAll('button');
-      const totalCount = allButtons.length;
-      const monitorContent = `🛠 ${totalCount} btn | ${wiredCount} wired`;
+      const totalCount = document.querySelectorAll('button').length;
+      const listenerCount = document.querySelectorAll('button[listener-attached]').length;
+      const monitorContent = `🛠 ${totalCount} btn | 🎯 ${listenerCount} listeners`;
       const statsElem = document.getElementById('devPanelStats');
       if (statsElem) {
         statsElem.textContent = monitorContent;
