@@ -580,11 +580,13 @@ window.extractAllButtonIds = function () {
     offsetX = x - monitor.offsetLeft;
     offsetY = y - monitor.offsetTop;
     document.body.style.userSelect = "none";
+    document.body.style.overflow = "hidden";
   }
 
   function stopDrag() {
     isDragging = false;
     document.body.style.userSelect = "auto";
+    document.body.style.overflow = "auto";
   }
 
   function moveDrag(x, y) {
