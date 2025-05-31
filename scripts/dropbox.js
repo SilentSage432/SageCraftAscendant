@@ -1,4 +1,5 @@
 import { updateMapStatusDisplay } from './ui.js';
+import { logFieldEvent } from './globals.js';
 
 async function syncAllMapsToDropbox() {
   const upcToItem = window.upcToItem || {};
@@ -40,6 +41,7 @@ async function syncAllMapsToDropbox() {
   }
 
   alert('✅ All maps synced to Dropbox!');
+  logFieldEvent("DropboxSyncMaps", { files });
 }
 
 async function restoreAllMapsFromDropbox() {
@@ -78,6 +80,7 @@ async function restoreAllMapsFromDropbox() {
 
   updateMapStatusDisplay(window.upcToItem, window.eslToUPC, window.locationMap);
   alert('📂 Maps restored from Dropbox!');
+  logFieldEvent("DropboxRestoreMaps", { restored: true });
 }
 
 function generateCodeVerifier() {
@@ -160,6 +163,7 @@ async function saveSessionToDropbox(liveCounts, onHandText) {
     alert(`❌ Failed to save: ${err}`);
   } else {
     alert('✅ Session saved to Dropbox!');
+    logFieldEvent("DropboxSaveSession", { session });
   }
 }
 
@@ -188,6 +192,7 @@ async function loadSessionFromDropbox(liveCounts, onHandInput, updateLiveTable) 
   onHandInput.value = session.onHandText || '';
   updateLiveTable();
   alert('📥 Session loaded from Dropbox!');
+  logFieldEvent("DropboxLoadSession", { session });
 }
 
 async function listDropboxSessions() {

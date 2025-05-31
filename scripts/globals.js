@@ -56,3 +56,33 @@ const GlobalUtils = {
 
 // Expose globalButtonMap placeholder (to be populated during wiring phase)
 window.globalButtonMap = {};
+
+
+// ===============================
+// Field Logging Core — Phase 1
+// ===============================
+
+let fieldLog = loadFieldLog();
+
+function logFieldEvent(eventType, details) {
+    const timestamp = new Date().toISOString();
+    const entry = { timestamp, eventType, details };
+    fieldLog.push(entry);
+    saveFieldLog();
+    if (debugMode) {
+        console.log("[FIELD LOG]", entry);
+    }
+}
+
+function saveFieldLog() {
+    localStorage.setItem("fieldLog", JSON.stringify(fieldLog));
+}
+
+function loadFieldLog() {
+    const stored = localStorage.getItem("fieldLog");
+    return stored ? JSON.parse(stored) : [];
+}
+
+// Expose globally
+window.logFieldEvent = logFieldEvent;
+window.getFieldLog = () => fieldLog;

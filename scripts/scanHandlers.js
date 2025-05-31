@@ -47,6 +47,9 @@ export function handleScanInput(event) {
 
     console.log("Scanned value:", value);
 
+    // Field Logging Injection: Scan Event
+    logFieldEvent("ScanInput", { rawValue: value });
+
     // UPC Normalization Logic
     function normalizeUPC(value) {
         return (value.length === 13 && value.startsWith("0")) ? value.slice(1) : value;
@@ -68,6 +71,7 @@ export function handleScanInput(event) {
     if (scanType === "UPC Code" && upcToItemMap[normalizedValue]) {
         showToast(`Auto-saved: ${upcToItemMap[normalizedValue]}`, "success");
         console.log(`Auto-saved UPC ${normalizedValue} as ${upcToItemMap[normalizedValue]}`);
+        logFieldEvent("AutoSave", { scanType, normalizedValue, item: upcToItemMap[normalizedValue] });
         inputField.value = "";
         return; // Skip routing/modal entirely
     }
@@ -91,17 +95,21 @@ export function handleScanInput(event) {
         case "ESL Tag":
             document.getElementById('eslInput').value = value;
             openEditModal("ESL");
+            logFieldEvent("ModalRoute", { scanType: "ESL Tag", value });
             break;
         case "UPC Code":
             document.getElementById('productInput').value = value;
             openEditModal("Product");
+            logFieldEvent("ModalRoute", { scanType: "UPC Code", value });
             break;
         case "Item ID":
             document.getElementById('bayInput').value = value;
             openEditModal("Bay");
+            logFieldEvent("ModalRoute", { scanType: "Item ID", value });
             break;
         default:
             console.warn("No modal routing for unknown scan type.");
+            logFieldEvent("ModalRoute", { scanType: "Unknown", value });
             break;
     }
     inputField.value = "";

@@ -525,7 +525,10 @@
 </script>
 </script>
 <!-- DOM Sync Audit Utility -->
-<script>
+<script type="module">
+// Import logFieldEvent for use in ghost modal detection
+import { logFieldEvent } from './scripts/globals.js';
+
 // DOM Sync Audit Utility
 window.extractAllButtonIds = function () {
   const buttons = document.querySelectorAll('button');
@@ -534,6 +537,41 @@ window.extractAllButtonIds = function () {
   console.log('[DOM SYNC] Button ID list:', ids);
   return ids;
 };
+
+// --- Ghost Modal Detection and Healing ---
+function checkForGhostModals() {
+  // Example: Add more modal ids as needed
+  const modalIds = [
+    'customModal',
+    'editModal',
+    'summaryModal',
+    'addItemModal',
+    'trendsModal'
+  ];
+  modalIds.forEach(id => {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    // Condition: Modal is visually shown but should be hidden (ghost)
+    if (modal.style.display !== 'none' && modal.classList.contains('hidden')) {
+      // Ghost modal detected
+      logFieldEvent("GhostModalDetected", { modalId: id });
+      // Auto-heal: forcibly hide modal
+      modal.style.display = 'none';
+      modal.classList.remove('hidden');
+      logFieldEvent("GhostModalHealed", { modalId: id });
+    }
+    // Condition: Modal is hidden but has no 'hidden' class (possible ghost)
+    if (modal.style.display === 'none' && !modal.classList.contains('hidden') && id !== 'trendsModal') {
+      logFieldEvent("GhostModalDetected", { modalId: id });
+      // Auto-heal: ensure hidden class is applied
+      modal.classList.add('hidden');
+      logFieldEvent("GhostModalHealed", { modalId: id });
+    }
+    // Add other ghost modal detection heuristics as needed
+  });
+}
+// Run every 3 seconds
+setInterval(checkForGhostModals, 3000);
 </script>
 </div>
 
