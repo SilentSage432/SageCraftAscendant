@@ -1,4 +1,5 @@
 // ===============================
+import { syncEverythingToDropbox, restoreEverythingFromDropbox } from './dropbox.js';
 import { 
   runFullSystemAudit, 
   runWiringExpectationAudit, 
@@ -135,6 +136,17 @@ const buttonActionMap = {
       monitor.style.display = 'none';
     }
   },
+  masterBackupBtn: () => {
+    const liveCounts = {}; // replace with your actual liveCounts reference
+    const onHandText = ""; // replace with your actual onHandText reference
+    syncEverythingToDropbox(liveCounts, onHandText);
+  },
+  masterRestoreBtn: () => {
+    const liveCounts = {}; // replace with your actual liveCounts reference
+    const onHandInput = {}; // replace with your actual onHandInput reference
+    const updateLiveTable = () => {}; // replace with your actual update function
+    restoreEverythingFromDropbox(liveCounts, onHandInput, updateLiveTable);
+  },
   toggleDevDashboardBtn: () => toggleDevPanel()
   // ✅ FINAL CLEANUP
   // No trailing comma here
@@ -191,6 +203,45 @@ function runWiringMasterHarvest() {
     console.log(`${id} — ${wired}`);
   });
 }
+
+// ===============================
+// Live overlay updater — Diagnostics
+function updateDiagnosticOverlay() {
+  const totalButtons = document.querySelectorAll('button').length;
+  const listeners = document.querySelectorAll('button[listener-attached]').length;
+
+  const upcMapCount = (window.upcToItemMap) ? Object.keys(window.upcToItemMap).length : 0;
+  const eslMapCount = (window.eslToItemMap) ? Object.keys(window.eslToItemMap).length : 0;
+  const bayMapCount = (window.bayToItemMap) ? Object.keys(window.bayToItemMap).length : 0;
+
+  const overlay = document.getElementById('diagnosticOverlay');
+  if (overlay) {
+    overlay.innerHTML = `
+      🛡 Diagnostics<br>
+      🔘 Buttons: ${totalButtons}<br>
+      🎯 Listeners: ${listeners}<br>
+      🗂 UPC Map: ${upcMapCount}<br>
+      🏷 ESL Map: ${eslMapCount}<br>
+      🗃 Bay Map: ${bayMapCount}
+    `;
+  }
+}
+
+
+let overlayUpdateInterval = 2000;
+
+function adjustOverlayUpdateInterval() {
+  if (window.innerWidth <= 768) {
+    overlayUpdateInterval = 5000;  // Mobile devices: slower refresh for battery
+  } else {
+    overlayUpdateInterval = 2000;  // Desktop: normal refresh rate
+  }
+}
+
+window.addEventListener('resize', adjustOverlayUpdateInterval);
+adjustOverlayUpdateInterval();
+
+setInterval(updateDiagnosticOverlay, overlayUpdateInterval);
 
 export { wireAllButtons, runWiringMasterHarvest, runFullSystemAudit };
 window.runWiringMasterHarvest = runWiringMasterHarvest;

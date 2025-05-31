@@ -287,6 +287,10 @@
         <div id="mapStatusDisplay" style="margin-bottom: 12px; font-size: 0.9em; color: #aaf;">
           🧠 Map Status: Checking...
         </div>
+        <div class="button-grid" style="margin-top: 12px;">
+          <button id="masterBackupBtn">💾 Master Cloud Backup</button>
+          <button id="masterRestoreBtn">📥 Master Cloud Restore</button>
+        </div>
 
         <h3>🧬 Advanced Tools</h3>
         <div class="button-grid">
@@ -622,26 +626,27 @@ window.extractAllButtonIds = function () {
   }, { passive: true });
   </script>
 
-  <!-- Ghost Modal Detector -->
-  <div id="ghostModalAlert" style="position:fixed; top:20px; right:20px; background:#660000; border:2px solid #ff0000; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #ff0000; font-family:monospace; color:#fff; display:none;">
-    ⚠️ GHOST MODAL DETECTED!
+</div>
+
+  <!-- Mobile-Safe Diagnostic Overlay -->
+  <div id="diagnosticOverlay" style="
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    z-index: 99998;
+    width: auto;
+    min-width: 140px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 0.75em;
+    opacity: 0.85;
+    pointer-events: none;">
+    🛡 Diagnostics: Active
   </div>
-  <script>
-  // Modal Detection Logic
-  function checkForGhostModals() {
-    const activeModals = Array.from(document.querySelectorAll('div[role="dialog"]'))
-      .filter(modal => modal.style.display !== 'none' && modal.style.display !== '');
-    const ghostDetected = activeModals.length > 1;
-    const ghostAlert = document.getElementById('ghostModalAlert');
-    if (ghostDetected) {
-      ghostAlert.style.display = 'block';
-      console.warn('[MODAL DETECTOR] Ghost Modal detected:', activeModals);
-    } else {
-      ghostAlert.style.display = 'none';
-    }
-  }
-  setInterval(checkForGhostModals, 2000);
-  </script>
 </body>
 </html>
 

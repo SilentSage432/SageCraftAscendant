@@ -8,7 +8,9 @@ async function syncAllMapsToDropbox() {
   const files = [
     { name: 'upcToItemMap.json', data: upcToItem },
     { name: 'locationMap.json', data: locationMap },
-    { name: 'eslToUPCMap.json', data: eslToUPC }
+    { name: 'eslToUPCMap.json', data: eslToUPC },
+    { name: 'eslToItemMap.json', data: window.eslToItemMap || {} },
+    { name: 'bayToItemMap.json', data: window.bayToItemMap || {} }
   ];
 
   for (const file of files) {
@@ -44,7 +46,9 @@ async function restoreAllMapsFromDropbox() {
   const mapFiles = [
     { key: 'upcToItemMap', file: 'upcToItemMap.json' },
     { key: 'locationMap', file: 'locationMap.json' },
-    { key: 'eslToUPCMap', file: 'eslToUPCMap.json' }
+    { key: 'eslToUPCMap', file: 'eslToUPCMap.json' },
+    { key: 'eslToItemMap', file: 'eslToItemMap.json' },
+    { key: 'bayToItemMap', file: 'bayToItemMap.json' }
   ];
 
   for (const { key, file } of mapFiles) {
@@ -330,6 +334,19 @@ window.addEventListener('restore-all-maps', async () => {
   await restoreAllMapsFromDropbox();
 });
 
+
+async function syncEverythingToDropbox(liveCounts, onHandText) {
+  await syncAllMapsToDropbox();
+  await saveSessionToDropbox(liveCounts, onHandText);
+  alert("✅ Full backup completed to Dropbox!");
+}
+
+async function restoreEverythingFromDropbox(liveCounts, onHandInput, updateLiveTable) {
+  await restoreAllMapsFromDropbox();
+  await loadSessionFromDropbox(liveCounts, onHandInput, updateLiveTable);
+  alert("📥 Full restore completed from Dropbox!");
+}
+
 export {
   generateCodeVerifier,
   generateCodeChallenge,
@@ -343,5 +360,7 @@ export {
   loadSelectedDropboxSession,
   beginDropboxLogin,
   handleDropboxCallback,
-  initDropbox
+  initDropbox,
+  syncEverythingToDropbox,
+  restoreEverythingFromDropbox
 };
