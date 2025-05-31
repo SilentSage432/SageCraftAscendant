@@ -37,7 +37,6 @@
     <button id="navVaultBtn" class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
     <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
     <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
-    <button id="navMonitorBtn" class="tablink nav-icon" title="Listener Monitor" aria-label="Listener Monitor">🖱</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -298,6 +297,20 @@
           <button id="clearAllSessions">🧹 Clear All Sessions</button>
           <button id="cleanStaleSessions">🧹 Clean Empty Sessions</button>
         </div>
+
+        <h3>📄 Field Log Viewer</h3>
+        <div id="logFilterButtons" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+          <button class="log-filter-btn" data-filter="all">Show All</button>
+          <button class="log-filter-btn" data-filter="ScanInput">Scans</button>
+          <button class="log-filter-btn" data-filter="AutoSave">Auto-Saves</button>
+          <button class="log-filter-btn" data-filter="LearnMapping">Learned</button>
+          <button class="log-filter-btn" data-filter="GhostModalDetected">Ghost Incidents</button>
+          <button class="log-filter-btn" data-filter="DropboxSyncMaps">Dropbox Sync</button>
+        </div>
+        <div id="fieldLogContainer" style="max-height: 300px; overflow-y: auto; background: #111; border: 1px solid #555; border-radius: 5px; padding: 10px; color: #ccc; font-family: monospace; font-size: 0.75em;">
+          <div id="fieldLogContent">Loading field log...</div>
+        </div>
+        <button id="refreshFieldLog" style="margin-top: 10px;">🔄 Refresh Log</button>
       </section>
 
       <section id="audit" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Rotation Schedule">
@@ -575,8 +588,6 @@ setInterval(checkForGhostModals, 3000);
 </script>
 </div>
 
-  <!-- Dev Panel Toggle Button -->
-  <button id="toggleDevDashboardBtn" style="position:fixed; bottom:20px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:50%; padding:10px; z-index:99999; box-shadow:0 0 15px #ff00ff; color:#ff00ff; font-weight:bold;">🧙‍♂️</button>
 
   <!-- Developer Diagnostic Panel -->
   <div id="devDashboard" style="position:fixed; bottom:80px; right:20px; background:#111; border:2px solid #ff00ff; border-radius:8px; padding:15px; z-index:99999; box-shadow:0 0 20px #ff00ff; display:none;">
@@ -688,15 +699,4 @@ setInterval(checkForGhostModals, 3000);
 </body>
 </html>
 
-<script>
-// Toggle Dev Dashboard Logic
-document.getElementById('toggleDevDashboardBtn').addEventListener('click', () => {
-  const panel = document.getElementById('devDashboard');
-  if (panel.style.display === 'none') {
-    panel.style.display = 'block';
-  } else {
-    panel.style.display = 'none';
-  }
-});
-</script>
 </html>
