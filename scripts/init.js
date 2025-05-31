@@ -23,6 +23,7 @@ import {
   initDropbox
 } from './dropbox.js';
 import { wireAllButtons } from './wiring.js';
+import { displayAppVersion } from './version.js';
 
 // Unified Global Export Bridge
 window.InventoryApp = {
@@ -60,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!window.__buttonsWired__) {
     wireAllButtons();
+    displayAppVersion();
     window.__buttonsWired__ = true;
   }
 
