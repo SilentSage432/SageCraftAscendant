@@ -32,7 +32,7 @@ const buttonActionMap = {
   clearSessionHistory: () => clearLocalSessions(),
   downloadBackupBtn: () => exportFullBackup(),
   clearAllSessions: () => clearAllStoredSessions(),
-  cleanStaleSessions: () => cleanEmptySessions(),
+  clearStaleSessionsBtn: () => cleanEmptySessions(),
   refreshAuditLog: () => renderAuditRotationTable(),
   modalBtnLocation: () => handleModalLocation(),
   modalBtnProduct: () => handleModalProduct(),
@@ -70,10 +70,5 @@ function wireAllButtons() {
     }
   });
 }
-
-// Auto-run after stabilization
-window.addEventListener('load', () => {
-  setTimeout(wireAllButtons, 500);
-});
 
 export { wireAllButtons };

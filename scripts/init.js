@@ -58,11 +58,10 @@ window.InventoryApp = {
 document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded: App boot starting");
 
-  // (Optional future hooks — pre-wiring tasks can be placed here)
+  if (!window.__buttonsWired__) {
+    wireAllButtons();
+    window.__buttonsWired__ = true;
+  }
 
-  console.log("✅ Inventory Auditor fully booted.");
-
-  // ✅ Global wiring executed immediately on DOMContentLoaded
-  wireAllButtons();
   console.log("✅ Master wiring executed post-boot");
 });
