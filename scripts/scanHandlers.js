@@ -56,15 +56,7 @@ export function handleScanInput(event) {
     }
     const normalizedValue = normalizeUPC(value);
 
-    // Classification Module
-    function classifyScan(value) {
-        if (/^\d{4,6}$/.test(value)) return "ESL Tag";
-        if (/^\d{12,13}$/.test(value)) return "UPC Code";
-        if (/^\d{7,8}$/.test(value)) return "Item ID";
-        return "Unknown";
-    }
-
-    const scanType = classifyScan(value);
+    const scanType = window.classifyScan(value);
     console.log("Classified as:", scanType);
 
     // Smart Auto-Save Logic
@@ -114,6 +106,15 @@ export function handleScanInput(event) {
     }
     inputField.value = "";
 }
+
+// Classification Module
+function classifyScan(value) {
+    if (/^\d{4,6}$/.test(value)) return "ESL Tag";
+    if (/^\d{12,13}$/.test(value)) return "UPC Code";
+    if (/^\d{7,8}$/.test(value)) return "Item ID";
+    return "Unknown";
+}
+window.classifyScan = classifyScan;
 
 // Multi-Map Learning Module
 export function learnMapping(scanType, code, itemName) {

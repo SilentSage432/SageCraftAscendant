@@ -20,10 +20,8 @@ import {
   loadSelectedDropboxSession,
   beginDropboxLogin,
   handleDropboxCallback,
-  initDropbox,
-  bootstrapMappings
+  initDropbox
 } from './dropbox.js';
-import { wireAllButtons } from './wiring.js';
 import { displayAppVersion } from './version.js';
 
 // Unified Global Export Bridge
@@ -54,17 +52,14 @@ window.InventoryApp = {
   beginDropboxLogin,
   handleDropboxCallback,
   initDropbox,
-  bootstrapMappings
 };
 
 // DOMContentLoaded lifecycle manager
 document.addEventListener('DOMContentLoaded', () => {
   console.log("✅ DOMContentLoaded: App boot starting");
 
-  bootstrapMappings();  // Cloud-first mappings load
-
   if (!window.__buttonsWired__) {
-    wireAllButtons();
+    window.wireAllButtons();
     displayAppVersion();
     window.__buttonsWired__ = true;
   }
