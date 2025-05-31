@@ -5,10 +5,24 @@
 
 import './globals.js';
 import { formatDate, generateUUID, delay } from './utilities.js';
-import { handleScanInput, handleAddItem, handleEditItem } from './handlers.js';
-import './dropbox.js';
+import { handleScanInput } from './scanHandlers.js';
+import { handleAddItem, handleConfirmAddItem } from './addHandlers.js';
+import { handleEditItem, handleConfirmEdit, handleCancelEdit, handleCloseSummary, handleToggleDevDashboard } from './editHandlers.js';
+import { globalButtonMap } from './buttonMap.js';
+import { 
+  syncAllMapsToDropbox,
+  restoreAllMapsFromDropbox,
+  refreshAccessToken,
+  getDropboxAccessToken,
+  saveSessionToDropbox,
+  loadSessionFromDropbox,
+  listDropboxSessions,
+  loadSelectedDropboxSession,
+  beginDropboxLogin,
+  handleDropboxCallback,
+  initDropbox
+} from './dropbox.js';
 import { wireAllButtons } from './wiring.js';
-import './wiringObserver.js';
 
 // Unified Global Export Bridge
 window.InventoryApp = {
@@ -27,26 +41,17 @@ window.InventoryApp = {
   handleToggleDevDashboard,
 
   // Dropbox
-  uploadDropboxFile,
-  downloadDropboxFile,
-  connectDropbox,
-  disconnectDropbox,
-  refreshDropboxToken,
-
-  // Wiring Diagnostics (optional dev tools)
-  runFullSystemAudit,
-  runWiringExpectationAudit,
-  runAutoHealingLayer,
-
-  // Additional Utilities (optional as needed)
-  clearLiveTable,
-  clearSessionHistory,
-  clearAllSessions,
-  clearStaleSessions,
-  refreshAuditLog,
-
-  // New OnHand Upload Hook
-  uploadOnHandFile
+  syncAllMapsToDropbox,
+  restoreAllMapsFromDropbox,
+  refreshAccessToken,
+  getDropboxAccessToken,
+  saveSessionToDropbox,
+  loadSessionFromDropbox,
+  listDropboxSessions,
+  loadSelectedDropboxSession,
+  beginDropboxLogin,
+  handleDropboxCallback,
+  initDropbox
 };
 
 // DOMContentLoaded lifecycle manager

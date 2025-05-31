@@ -1,7 +1,5 @@
-// editHandlers.js
-
 function handleEditItem() {
-    const inputField = document.getElementById("editInputField");
+    const inputField = document.getElementById("scanInput");
     const value = inputField.value.trim();
 
     if (!/^\d+$/.test(value)) {
@@ -9,12 +7,12 @@ function handleEditItem() {
         return;
     }
 
-    console.log("Confirmed item edited:", value);
+    console.log("Edit initiated for:", value);
     inputField.value = "";
 }
 
 function handleConfirmEdit() {
-    const inputField = document.getElementById("editConfirmInputField");
+    const inputField = document.getElementById("scanInput");
     const value = inputField.value.trim();
 
     if (!/^\d+$/.test(value)) {
@@ -26,4 +24,27 @@ function handleConfirmEdit() {
     inputField.value = "";
 }
 
-export { handleEditItem, handleConfirmEdit };
+function handleCancelEdit() {
+    const inputField = document.getElementById("scanInput");
+    inputField.value = "";
+    console.log("Edit canceled — input cleared.");
+}
+
+function handleCloseSummary() {
+    document.getElementById("summaryModal").classList.add("hidden");
+    console.log("Summary modal closed.");
+}
+
+function handleToggleDevDashboard() {
+    const devTools = document.getElementById("devTools");
+    devTools.classList.toggle("hidden");
+    console.log("Developer dashboard toggled.");
+}
+
+export { 
+    handleEditItem, 
+    handleConfirmEdit, 
+    handleCancelEdit, 
+    handleCloseSummary, 
+    handleToggleDevDashboard 
+};

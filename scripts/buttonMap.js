@@ -1,11 +1,13 @@
 import { handleScanInput } from './scanHandlers.js';
 import { handleAddItem, handleConfirmAddItem } from './addHandlers.js';
-import { handleEditItem, handleConfirmEditItem } from './editHandlers.js';
+import { handleEditItem, handleConfirmEdit } from './editHandlers.js';
 
-export const globalButtonMap = {
-    scanSubmitBtn: handleScanInput,
-    addLiveItem: handleAddItem,
-    confirmAddItemBtn: handleConfirmAddItem,
-    editLiveItem: handleEditItem,
-    confirmEditBtn: handleConfirmEditItem
+const globalButtonMap = {
+  scanSubmitBtn: handleScanInput,
+  addSubmitBtn: handleAddItem,
+  confirmAddBtn: handleConfirmAddItem,
+  editSubmitBtn: handleEditItem,
+  confirmEditBtn: handleConfirmEdit
 };
+
+export { globalButtonMap };
