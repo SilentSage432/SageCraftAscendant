@@ -1,4 +1,5 @@
 // ===============================
+import { runFullSystemAudit } from './audit.js';
 // Master Button Wiring — wiring.js
 // Inventory Auditor — Modular Refactor v1
 // ===============================
@@ -95,8 +96,16 @@ const buttonActionMap = {
   clearStaleSessionsBtn: () => cleanStaleSessions(),
 
   // ✅ FILE EXPORT / IMPORT UTILITIES
-  clearLiveTableBtn: () => clearLiveTable()
+  clearLiveTableBtn: () => clearLiveTable(),
 
+  navMonitorBtn: () => {
+    const monitor = document.getElementById('listenerMonitor');
+    if (monitor.style.display === 'none' || monitor.style.display === '') {
+      monitor.style.display = 'block';
+    } else {
+      monitor.style.display = 'none';
+    }
+  }
   // ✅ FINAL CLEANUP
   // No trailing comma here
 };
@@ -153,5 +162,8 @@ function runWiringMasterHarvest() {
   });
 }
 
-export { wireAllButtons, runWiringMasterHarvest };
+export { wireAllButtons, runWiringMasterHarvest, runFullSystemAudit };
 window.runWiringMasterHarvest = runWiringMasterHarvest;
+
+// Expose full audit function globally for console access
+window.runFullSystemAudit = runFullSystemAudit;

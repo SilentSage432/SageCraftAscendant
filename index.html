@@ -37,6 +37,7 @@
     <button id="navVaultBtn" class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
     <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
     <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
+    <button id="navMonitorBtn" class="tablink nav-icon" title="Listener Monitor" aria-label="Listener Monitor">🖱</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -542,10 +543,13 @@ window.extractAllButtonIds = function () {
     <button id="runWiringAuditBtn" style="display:block; margin:5px 0;">Wiring Audit</button>
     <button id="runAutoHealingBtn" style="display:block; margin:5px 0;">Heal Wiring</button>
     <button id="runMasterDiagnosticBtn" style="display:block; margin:5px 0; font-weight:bold;">Master Diagnostic</button>
+    <label style="display:block; margin:5px 0; color:#ff00ff;">
+      <input type="checkbox" id="enableDragToggle" /> Enable Drag Mode
+    </label>
   </div>
 
   <!-- Live Listener Monitor -->
-  <div id="listenerMonitor" style="position:fixed; bottom:100px; right:20px; background:#222; border:2px solid #00ffff; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #00ffff; font-family:monospace; color:#fff; cursor:move;">
+  <div id="listenerMonitor" style="display:none; position:fixed; bottom:100px; right:20px; background:#222; border:2px solid #00ffff; border-radius:8px; padding:10px; z-index:99999; box-shadow:0 0 20px #00ffff; font-family:monospace; color:#fff; cursor:move;">
     <div id="listenerMonitorHeader" style="font-weight:bold; margin-bottom:5px;">🖱 Drag Me</div>
     <div id="listenerMonitorText">🔎 Monitoring...</div>
   </div>
@@ -574,8 +578,10 @@ window.extractAllButtonIds = function () {
   const header = document.getElementById("listenerMonitorHeader");
 
   let offsetX = 0, offsetY = 0, isDragging = false;
+  const enableDragToggle = document.getElementById("enableDragToggle");
 
   function startDrag(x, y) {
+    if (!enableDragToggle.checked) return;  // Disable drag if toggle is off
     isDragging = true;
     offsetX = x - monitor.offsetLeft;
     offsetY = y - monitor.offsetTop;

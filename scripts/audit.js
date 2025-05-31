@@ -69,3 +69,29 @@ export function initAudit() {
 
   // Additional audit-related logic will be moved here over time
 }
+
+
+function runFullSystemAudit() {
+  console.group("🔎 Full System Audit");
+
+  try {
+    console.log("✅ Audit system loaded:", typeof renderAuditRotationTable === 'function');
+    console.log("✅ Active session health:", sessionStorage.length, "items");
+    console.log("✅ Live counts integrity:", document.querySelectorAll("#liveTable tbody tr").length, "rows loaded");
+
+    const upcMap = JSON.parse(localStorage.getItem("upcToItemMap") || "{}");
+    const locationMap = JSON.parse(localStorage.getItem("locationMap") || "{}");
+    const sessionData = JSON.parse(localStorage.getItem("savedSessions") || "{}");
+
+    console.log("✅ Storage map: UPC map size:", Object.keys(upcMap).length);
+    console.log("✅ Storage map: Location map size:", Object.keys(locationMap).length);
+    console.log("✅ Storage map: Session count:", Object.keys(sessionData).length);
+
+  } catch (err) {
+    console.error("❌ Audit failed:", err);
+  }
+
+  console.groupEnd();
+}
+
+export { runFullSystemAudit };
