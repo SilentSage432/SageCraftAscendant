@@ -1,6 +1,5 @@
 import { learnMapping } from './scanHandlers.js';
 import { classifyScan } from './scanHandlers.js';
-import { logFieldEvent } from './globals.js';
 
 function handleEditItem() {
     const inputField = document.getElementById("scanInput");
@@ -26,13 +25,13 @@ function handleConfirmEdit() {
 
     console.log("Confirmed edit finalized:", value);
     // Field Logging Injection: Edit Confirm
-    logFieldEvent("EditConfirm", { rawValue: value });
+    window.logFieldEvent("EditConfirm", { rawValue: value });
     
     const scanType = classifyScan(value);
     const itemName = prompt(`Enter item name for ${scanType} learning:`);
     if (itemName) {
         learnMapping(scanType, value, itemName);
-        logFieldEvent("LearnMapping", { scanType, code: value, itemName });
+        window.logFieldEvent("LearnMapping", { scanType, code: value, itemName });
     }
     inputField.value = "";
 }
