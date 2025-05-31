@@ -210,6 +210,31 @@ function wireAllButtons() {
 }
 window.wireAllButtons = wireAllButtons;
 
+// ===============================
+// Global Tab Controller — Floating Nav Logic
+
+function switchTab(target) {
+  const allSections = document.querySelectorAll('.tab-section');
+  const allNavButtons = document.querySelectorAll('.tablink');
+
+  allSections.forEach(section => {
+    section.style.display = (section.id === target) ? 'block' : 'none';
+  });
+
+  allNavButtons.forEach(button => {
+    const btnTarget = button.dataset.target;
+    if (btnTarget === target) {
+      button.classList.add('active');
+      button.setAttribute('aria-pressed', 'true');
+    } else {
+      button.classList.remove('active');
+      button.setAttribute('aria-pressed', 'false');
+    }
+  });
+}
+
+window.switchTab = switchTab;
+
 function runWireAudit() {
   const totalButtons = document.querySelectorAll('button').length;
   const listeners = document.querySelectorAll('button[listener-attached]').length;
