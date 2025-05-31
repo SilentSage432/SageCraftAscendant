@@ -4,17 +4,51 @@ let currentUPC;
 const storedCategory = localStorage.getItem('itemCategory');
 itemCategory = storedCategory || 'uncategorized';
 
+function handleScanInput(code) {
+  const resolved = resolveScanCode(code);
+  if (resolved === null) {
+    console.warn("⚠️ Could not resolve scan code.");
+    resetScanInput?.();
+    return;
+  }
+
+  if (typeof resolved === 'string') {
+    // Raw UPC resolved
+    const upc = resolved;
+    const knownProduct = window.upcToItem?.[upc];
+    const knownESL = window.eslToUPC?.[upc];
+    const knownBay = window.locationMap?.[upc];
+
+    if (knownProduct || knownESL || knownBay) {
+      console.log("✅ Known code processed.");
+      handleUnifiedScan?.(upc);
+      resetScanInput?.();
+    } else {
+      // Launch modal
+      promptCodeType(upc);
+    }
+  } else {
+    // ESL structure already resolved
+    promptCodeType(resolved.upc);
+  }
+}
+
 function resolveScanCode(code) {
   const trimmed = code.trim();
   const match = trimmed.match(/\d{6,}/); // Extract 6+ digit number
   const cleanCode = match ? match[0] : trimmed;
 
-  if (cleanCode.length === 13 && cleanCode.startsWith('0')) {
+  console.log("🧪 Resolving Scan Code:", cleanCode);
+
+  if (cleanCode.length === 13 && cleanCode.startsWith('0') && /^\d+$/.test(cleanCode)) {
+    console.log("🧪 ESL Format Detected.");
     return { type: 'esl', upc: cleanCode, item: null };
   }
   if (cleanCode.length === 12 && /^\d+$/.test(cleanCode)) {
+    console.log("🧪 UPC Format Detected.");
     return cleanCode;
   }
+  console.warn("❌ Unrecognized code format.");
   return null;
 }
 
@@ -186,3 +220,18 @@ window.clearLiveTable = function() {
     console.log("🧹 Live scan table cleared.");
   }
 };
+
+
+// Reset scan input utility
+function resetScanInput() {
+  const scanInput = document.querySelector('#scanInput');
+  if (scanInput) {
+    scanInput.value = "";
+    scanInput.blur();
+  }
+}
+window.resetScanInput = resetScanInput;
+
+// Expose handleScanInput for module and global access
+export { handleScanInput };
+window.handleScanInput = handleScanInput;

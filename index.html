@@ -570,30 +570,48 @@ window.extractAllButtonIds = function () {
   </script>
 
   <script>
-    const monitor = document.getElementById("listenerMonitor");
-    const header = document.getElementById("listenerMonitorHeader");
-    let offsetX = 0, offsetY = 0, isDragging = false;
+  const monitor = document.getElementById("listenerMonitor");
+  const header = document.getElementById("listenerMonitorHeader");
 
-    header.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      offsetX = e.clientX - monitor.offsetLeft;
-      offsetY = e.clientY - monitor.offsetTop;
-      document.body.style.userSelect = "none";
-    });
+  let offsetX = 0, offsetY = 0, isDragging = false;
 
-    document.addEventListener("mouseup", () => {
-      isDragging = false;
-      document.body.style.userSelect = "auto";
-    });
+  function startDrag(x, y) {
+    isDragging = true;
+    offsetX = x - monitor.offsetLeft;
+    offsetY = y - monitor.offsetTop;
+    document.body.style.userSelect = "none";
+  }
 
-    document.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        monitor.style.left = (e.clientX - offsetX) + "px";
-        monitor.style.top = (e.clientY - offsetY) + "px";
-        monitor.style.bottom = "auto";
-        monitor.style.right = "auto";
-      }
-    });
+  function stopDrag() {
+    isDragging = false;
+    document.body.style.userSelect = "auto";
+  }
+
+  function moveDrag(x, y) {
+    if (isDragging) {
+      monitor.style.left = (x - offsetX) + "px";
+      monitor.style.top = (y - offsetY) + "px";
+      monitor.style.bottom = "auto";
+      monitor.style.right = "auto";
+    }
+  }
+
+  // Mouse support
+  header.addEventListener("mousedown", (e) => startDrag(e.clientX, e.clientY));
+  document.addEventListener("mouseup", stopDrag);
+  document.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
+
+  // Touch support
+  header.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    startDrag(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  document.addEventListener("touchend", stopDrag);
+  document.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    moveDrag(touch.clientX, touch.clientY);
+  }, { passive: true });
   </script>
 
   <!-- Ghost Modal Detector -->
