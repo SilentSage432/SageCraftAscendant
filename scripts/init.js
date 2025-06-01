@@ -14,8 +14,7 @@ import {
   restoreAllMapsFromDropbox,
   refreshAccessToken,
   saveSessionToDropbox,
-  loadSessionFromDropbox,
-  loadSelectedDropboxSession
+  loadSessionFromDropbox
 } from './dropbox.js';
 import { displayAppVersion } from './version.js';
 

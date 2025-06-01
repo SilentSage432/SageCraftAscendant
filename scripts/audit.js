@@ -517,3 +517,131 @@ function exportProgressReport() {
 window.exportDeltaReport = exportDeltaReport;
 window.exportExceptionsReport = exportExceptionsReport;
 window.exportProgressReport = exportProgressReport;
+
+// 🔬 Phase 77 — Master Export System (MES) Logic
+
+function exportAllSessions() {
+  const sessions = JSON.parse(localStorage.getItem("savedSessions") || "{}");
+  if (!sessions || Object.keys(sessions).length === 0) {
+    showToast("No session data to export.");
+    return;
+  }
+
+  let csv = "Session ID,Created On,Item Count\n";
+  Object.entries(sessions).forEach(([id, session]) => {
+    const itemCount = Array.isArray(session) ? session.length : 0;
+    csv += `${id},${new Date().toLocaleDateString()},${itemCount}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'AllSessions.csv');
+  link.click();
+}
+
+function exportAllMappings() {
+  const map = JSON.parse(localStorage.getItem("upcToItemMap") || "{}");
+  if (!map || Object.keys(map).length === 0) {
+    showToast("No mapping data to export.");
+    return;
+  }
+
+  let csv = "UPC,Item #\n";
+  Object.entries(map).forEach(([upc, item]) => {
+    csv += `${upc},${item}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'AllMappings.csv');
+  link.click();
+}
+
+function exportFullDelta() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available to export.");
+    return;
+  }
+
+  const csvContent = generateDeltaCSV(deltas);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'FullDelta.csv');
+  link.click();
+}
+
+function exportFullExceptions() {
+  const tbody = document.querySelector('#exceptionTable tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].querySelector('td').textContent.includes("No exceptions")) {
+    showToast("No exceptions to export.");
+    return;
+  }
+
+  let csv = "Item #,Delta,Category,Location,Tag,Notes\n";
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const item = cells[0].textContent.trim();
+    const delta = cells[1].textContent.trim();
+    const category = cells[2].textContent.trim();
+    const location = cells[3].textContent.trim();
+    const tag = cells[4].querySelector('input').value.trim();
+    const notes = cells[5].querySelector('input').value.trim();
+
+    csv += `${item},${delta},${category},${location},${tag},${notes}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'FullExceptions.csv');
+  link.click();
+}
+
+function exportFullProgress() {
+  const data = JSON.parse(localStorage.getItem("rotationData") || "{}");
+  if (!data || Object.keys(data).length === 0) {
+    showToast("No progress data to export.");
+    return;
+  }
+
+  let csv = "Category,Last Audited,Next Due,Status\n";
+
+  Object.entries(data).forEach(([category, info]) => {
+    const interval = info.interval || 30;
+    const lastDate = new Date(info.date);
+    const isValid = !isNaN(lastDate.getTime());
+    const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
+
+    const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+    const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+    const overdue = nextDue && new Date() > nextDue;
+    const status = overdue ? 'Overdue' : 'On Schedule';
+
+    csv += `${category},${lastAuditedText},${nextDueText},${status}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'FullProgress.csv');
+  link.click();
+}
+
+// 🌐 Expose Master Export functions globally
+window.exportAllSessions = exportAllSessions;
+window.exportAllMappings = exportAllMappings;
+window.exportFullDelta = exportFullDelta;
+window.exportFullExceptions = exportFullExceptions;
+window.exportFullProgress = exportFullProgress;

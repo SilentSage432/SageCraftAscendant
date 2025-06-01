@@ -2137,3 +2137,54 @@ input, select {
     font-size: 16px !important;
   }
 }
+/* --- Diagnostic Overlay Top-Right Anchor --- */
+#diagnosticOverlay {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 99999 !important;
+  width: auto;
+  min-width: 140px;
+  max-width: calc(100vw - 60px);
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.75em;
+  opacity: 0.85;
+  pointer-events: none;
+  transition: right 0.3s ease;
+}
+# --- Drawer Toggle Hamburger Button Fix ---
+#drawerToggleBtn {
+  position: fixed;
+  top: 20px;
+  left: 10px;
+  z-index: 900;
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  border: 2px solid #ff00ff;
+  box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff88;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: left 0.3s ease, z-index 0.3s ease;
+}
+
+/* Responsive tuning for mobile */
+@media (max-width: 600px) {
+  #drawerToggleBtn {
+    top: 16px;
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+}

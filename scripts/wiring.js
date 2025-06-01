@@ -130,6 +130,7 @@ const buttonMap = {
     navExceptionBtn: () => window.switchTab('exceptionManager'),
     navProgressBtn: () => window.switchTab('progressDashboard'),
     navReportingBtn: () => window.switchTab('reportingHub'),
+    navMasterExportBtn: () => window.switchTab('masterExportHub'),
     purgeLocalStorageBtn: () => window.purgeLocalStorage(),
     refreshAuditLogBtn: () => window.refreshAuditLog(),
     refreshFieldLog: () => renderFieldLog(),
@@ -216,6 +217,12 @@ const buttonMap = {
     exportDeltaReportBtn: () => window.exportDeltaReport(),
     exportExceptionsReportBtn: () => window.exportExceptionsReport(),
     exportProgressReportBtn: () => window.exportProgressReport(),
+    // === Master Export Hub Buttons ===
+    exportAllSessionsBtn: () => window.exportAllSessions(),
+    exportAllMappingsBtn: () => window.exportAllMappings(),
+    exportFullDeltaBtn: () => window.exportFullDelta(),
+    exportFullExceptionsBtn: () => window.exportFullExceptions(),
+    exportFullProgressBtn: () => window.exportFullProgress(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");
@@ -567,3 +574,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 500);
 });
+
+// ===============================
+// Phase 80 — Command Drawer Toggle Logic
+
+const drawerToggleBtn = document.getElementById('drawerToggleBtn');
+const commandDrawer = document.getElementById('commandDrawer');
+
+if (drawerToggleBtn && commandDrawer) {
+  drawerToggleBtn.addEventListener('click', () => {
+    if (commandDrawer.style.left === '0px') {
+      commandDrawer.style.left = '-250px';
+    } else {
+      commandDrawer.style.left = '0px';
+    }
+  });
+}
