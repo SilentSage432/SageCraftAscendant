@@ -286,6 +286,14 @@ function performDeltaAnalysis() {
   window.auditArchive.lastDeltaResults = deltas;
   renderDeltaReviewTable(deltas);
   showToast("Delta analysis complete.");
+  // Phase 84 — Persist Delta Analyzer State
+  localStorage.setItem("lastDeltaBaseAudit", baseSelect.value);
+  localStorage.setItem("lastDeltaCompareAudit", compareSelect.value);
+  localStorage.setItem("lastDeltaResults", JSON.stringify(deltas));
+  // Phase 85.1 — Persist Merge Session State
+  localStorage.setItem("lastMergeBaseAudit", baseSelect.value);
+  localStorage.setItem("lastMergeCompareAudit", compareSelect.value);
+  localStorage.setItem("lastMergedAudit", JSON.stringify(deltas));
 }
 // 🌐 Expose renderDeltaReviewTable globally for Delta Review UI
 window.renderDeltaReviewTable = renderDeltaReviewTable;
@@ -325,6 +333,8 @@ function refreshExceptions() {
     `;
     tbody.appendChild(tr);
   });
+  // Phase 86 — Persist Exceptions Data
+  localStorage.setItem("lastExceptionsData", JSON.stringify(exceptions));
 }
 
 function exportExceptionsCSV() {
@@ -645,3 +655,114 @@ window.exportAllMappings = exportAllMappings;
 window.exportFullDelta = exportFullDelta;
 window.exportFullExceptions = exportFullExceptions;
 window.exportFullProgress = exportFullProgress;
+
+
+// 🔬 Phase 82 — Master Export Automation Logic
+
+function exportAllReports() {
+  exportDeltaReport();
+  setTimeout(() => { exportExceptionsReport(); }, 500);
+  setTimeout(() => { exportProgressReport(); }, 1000);
+}
+
+
+window.exportAllReports = exportAllReports;
+
+
+// 🔬 Phase 83.3.2 — Direct Session Loader by Name
+
+window.loadNamedSessionByName = function(sessionName) {
+  const sessions = JSON.parse(localStorage.getItem("savedSessions") || "{}");
+  const sessionData = sessions[sessionName];
+  if (!sessionData) {
+    console.warn("⚠️ Unable to restore session:", sessionName);
+    showToast("Session data not found.");
+    return;
+  }
+
+  console.log("🔄 Restoring session:", sessionName);
+  // Your existing session loading logic goes here (replace live table data, etc)
+  window.liveTableData = sessionData;
+  refreshLiveTable();
+  showToast(`Session "${sessionName}" restored.`);
+}
+
+// Phase 84 — Restore Delta Analyzer State
+window.restoreDeltaAnalyzerState = function() {
+  const baseSelect = document.getElementById('baseAuditSelect');
+  const compareSelect = document.getElementById('compareAuditSelect');
+  const savedBase = localStorage.getItem("lastDeltaBaseAudit");
+  const savedCompare = localStorage.getItem("lastDeltaCompareAudit");
+  const savedDeltas = localStorage.getItem("lastDeltaResults");
+
+  if (savedBase && [...baseSelect.options].some(opt => opt.value === savedBase)) {
+    baseSelect.value = savedBase;
+  }
+  if (savedCompare && [...compareSelect.options].some(opt => opt.value === savedCompare)) {
+    compareSelect.value = savedCompare;
+  }
+  if (savedDeltas) {
+    try {
+      const parsedDeltas = JSON.parse(savedDeltas);
+      window.auditArchive.lastDeltaResults = parsedDeltas;
+      renderDeltaReviewTable(parsedDeltas);
+      console.log("🔄 Delta Analyzer state restored.");
+    } catch (err) {
+      console.warn("⚠️ Failed to parse stored deltas:", err);
+    }
+  }
+};
+
+// Phase 85.1 — Restore Merge Session State
+window.restoreMergeSessionState = function() {
+  const baseSelect = document.getElementById('baseAuditSelect');
+  const compareSelect = document.getElementById('compareAuditSelect');
+  const savedBase = localStorage.getItem("lastMergeBaseAudit");
+  const savedCompare = localStorage.getItem("lastMergeCompareAudit");
+  const savedMerged = localStorage.getItem("lastMergedAudit");
+
+  if (savedBase && [...baseSelect.options].some(opt => opt.value === savedBase)) {
+    baseSelect.value = savedBase;
+  }
+  if (savedCompare && [...compareSelect.options].some(opt => opt.value === savedCompare)) {
+    compareSelect.value = savedCompare;
+  }
+  if (savedMerged) {
+    try {
+      const parsedMerged = JSON.parse(savedMerged);
+      window._lastMergedAudit = parsedMerged;
+      console.log("🔄 Merge session state restored.");
+    } catch (err) {
+      console.warn("⚠️ Failed to parse stored merged audit:", err);
+    }
+  }
+};
+
+// Phase 86 — Restore Exceptions State
+window.restoreExceptionsState = function() {
+  const savedExceptions = localStorage.getItem("lastExceptionsData");
+  if (!savedExceptions) return;
+
+  try {
+    const exceptions = JSON.parse(savedExceptions);
+    const tbody = document.querySelector('#exceptionTable tbody');
+    tbody.innerHTML = '';
+
+    exceptions.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.item}</td>
+        <td>${row.delta}</td>
+        <td>${row.category || '-'}</td>
+        <td>${row.location || '-'}</td>
+        <td><input type="text" placeholder="Tag" style="width: 100px;"></td>
+        <td><input type="text" placeholder="Notes" style="width: 150px;"></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    console.log("🔄 Exceptions state restored.");
+  } catch (err) {
+    console.warn("⚠️ Failed to parse stored exceptions:", err);
+  }
+};

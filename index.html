@@ -103,15 +103,25 @@
   <div id="commandDrawer">
     <h3 style="color: #fff; font-family: monospace;">📂 Navigation</h3>
     <div id="drawerNavButtons" style="display: flex; flex-direction: column; gap: 10px; margin-top: 40px;">
+
+      <!-- Audit Modules -->
+      <div style="color: #fff; font-family: monospace; margin-bottom: 5px;">📊 Audit Modules</div>
       <button id="navCountBtn" class="tablink nav-icon active" data-target="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
       <button id="navVaultBtn" class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
-      <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
+      <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🧬</button>
+
+      <!-- Analysis -->
+      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧮 Analysis</div>
       <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
       <button id="navDeltaBtn" class="tablink nav-icon" data-target="deltaAnalyzer" title="Delta Analyzer" aria-label="Delta Analyzer">🧮</button>
       <button id="navExceptionBtn" class="tablink nav-icon" data-target="exceptionManager" title="Exception Manager" aria-label="Exception Manager">🚩</button>
       <button id="navProgressBtn" class="tablink nav-icon" data-target="progressDashboard" title="Audit Progress" aria-label="Audit Progress">📅</button>
+
+      <!-- Reporting -->
+      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">📤 Reporting</div>
       <button id="navReportingBtn" class="tablink nav-icon" data-target="reportingHub" title="Reporting Hub" aria-label="Reporting Hub">🖨️</button>
       <button id="navMasterExportBtn" class="tablink nav-icon" data-target="masterExportHub" title="Master Export Hub" aria-label="Master Export Hub">📦</button>
+
     </div>
   </div>
 
@@ -404,6 +414,7 @@
           <button id="exportDeltaReportBtn">📊 Export Delta Report</button>
           <button id="exportExceptionsReportBtn">🚩 Export Exceptions Report</button>
           <button id="exportProgressReportBtn">📅 Export Progress Report</button>
+          <button id="exportAllReportsBtn">📦 Export All Reports</button>
         </div>
 
         <div style="color:#aaa; font-size:0.9em;">
@@ -420,6 +431,8 @@
           <button id="exportFullDeltaBtn">📊 Export Full Delta History</button>
           <button id="exportFullExceptionsBtn">🚩 Export Full Exceptions Log</button>
           <button id="exportFullProgressBtn">📅 Export Full Progress Logs</button>
+          <button id="exportMemorySnapshotBtn">🧠 Export Memory Snapshot</button>
+          <button id="uploadMemorySnapshotBtn">☁️ Upload Memory Snapshot</button>
         </div>
 
         <div style="color:#aaa; font-size:0.9em;">

@@ -68,7 +68,14 @@ filterButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     const filter = btn.dataset.filter;
     renderFieldLog(filter);
+    localStorage.setItem('fieldLogFilter', filter);
   });
+});
+
+// Phase 83.2 — Persistent Field Log Filter Restore
+document.addEventListener('DOMContentLoaded', () => {
+  const savedFilter = localStorage.getItem('fieldLogFilter') || 'all';
+  renderFieldLog(savedFilter);
 });
 
 if (exportBtn) {
@@ -165,7 +172,12 @@ const buttonMap = {
     triggerImportExcelSessionBtn: () => window.triggerImportExcelSession(),
     browseDropboxSessionsBtn: () => window.browseDropboxSessions(),
     saveNamedSessionBtn: () => window.saveNamedSession(),
-    loadNamedSessionBtn: () => window.loadNamedSession(),
+    loadNamedSessionBtn: () => {
+      const sessionName = window.loadNamedSession();
+      if (sessionName) {
+        localStorage.setItem('lastLoadedSession', sessionName);
+      }
+    },
     deleteNamedSessionBtn: () => window.deleteNamedSession(),
     mergeMasterReportBtn: () => window.mergeMasterReport(),
     exportMappingsBtn: () => window.exportMappings(),
@@ -223,6 +235,8 @@ const buttonMap = {
     exportFullDeltaBtn: () => window.exportFullDelta(),
     exportFullExceptionsBtn: () => window.exportFullExceptions(),
     exportFullProgressBtn: () => window.exportFullProgress(),
+    exportMemorySnapshotBtn: () => window.exportFullMemoryState(),
+    uploadMemorySnapshotBtn: () => window.uploadMemorySnapshotToDropbox(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");
@@ -450,6 +464,46 @@ function switchTab(target) {
 
 window.switchTab = switchTab;
 
+// Phase 83 — Persistent State: Save active tab to localStorage
+document.querySelectorAll('.tablink').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.target;
+    if (target) {
+      localStorage.setItem('activeTab', target);
+    }
+  });
+});
+
+// Phase 83 — Persistent State: Restore last active tab on load
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTab = localStorage.getItem('activeTab');
+  if (savedTab) {
+    switchTab(savedTab);
+  }
+
+  // Phase 83.3 — Restore Last Loaded Session
+  const lastSession = localStorage.getItem('lastLoadedSession');
+  if (lastSession && window.loadNamedSessionByName) {
+    console.log("🔄 Restoring last loaded session:", lastSession);
+    window.loadNamedSessionByName(lastSession);
+  }
+
+  // Phase 84 — Restore Delta Analyzer State
+  if (window.restoreDeltaAnalyzerState) {
+    window.restoreDeltaAnalyzerState();
+  }
+
+  // Phase 85 — Restore Merge Session State
+  if (window.restoreMergeSessionState) {
+    window.restoreMergeSessionState();
+  }
+
+  // Phase 86 — Restore Exceptions State
+  if (window.restoreExceptionsState) {
+    window.restoreExceptionsState();
+  }
+});
+
 function runWireAudit() {
   const totalButtons = document.querySelectorAll('button').length;
   const listeners = document.querySelectorAll('button[listener-attached]').length;
@@ -590,3 +644,81 @@ if (drawerToggleBtn && commandDrawer) {
     }
   });
 }
+
+// ===============================
+// Phase 87 — Master Memory Export Engine
+
+window.exportFullMemoryState = function() {
+  const keys = [
+    'activeTab',
+    'fieldLogFilter',
+    'lastLoadedSession',
+    'lastDeltaBaseAudit',
+    'lastDeltaCompareAudit',
+    'lastDeltaResults',
+    'lastMergeBaseAudit',
+    'lastMergeCompareAudit',
+    'lastMergedAudit',
+    'lastExceptionsData',
+    'savedSessions',
+    'upcToItemMap',
+    'locationMap',
+    'bayToItemMap',
+    'eslToItemMap'
+  ];
+
+  const memoryDump = {};
+
+  keys.forEach(key => {
+    const value = localStorage.getItem(key);
+    memoryDump[key] = value ? JSON.parse(value) : null;
+  });
+
+  const blob = new Blob([JSON.stringify(memoryDump, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `InventoryMemoryBackup_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// ===============================
+// Phase 87.4 — Dropbox Upload Hook-In for Memory Snapshot
+
+window.uploadMemorySnapshotToDropbox = function() {
+  const keys = [
+    'activeTab',
+    'fieldLogFilter',
+    'lastLoadedSession',
+    'lastDeltaBaseAudit',
+    'lastDeltaCompareAudit',
+    'lastDeltaResults',
+    'lastMergeBaseAudit',
+    'lastMergeCompareAudit',
+    'lastMergedAudit',
+    'lastExceptionsData',
+    'savedSessions',
+    'upcToItemMap',
+    'locationMap',
+    'bayToItemMap',
+    'eslToItemMap'
+  ];
+
+  const memoryDump = {};
+
+  keys.forEach(key => {
+    const value = localStorage.getItem(key);
+    memoryDump[key] = value ? JSON.parse(value) : null;
+  });
+
+  const jsonData = JSON.stringify(memoryDump, null, 2);
+  const filename = `MemoryBackup_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+
+  if (window.uploadDropboxFile) {
+    window.uploadDropboxFile(jsonData, filename);
+    showToast("☁️ Memory Snapshot uploaded to Dropbox.");
+  } else {
+    alert("Dropbox upload function not available.");
+  }
+};
