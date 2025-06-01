@@ -2,25 +2,36 @@
 
 export function handleScanInput(scanCode) {
     console.log("Resolving Scan Code:", scanCode);
+    if (!scanCode || typeof scanCode !== 'string' || scanCode.trim() === '') {
+        console.warn("⚠️ Invalid scan code provided. Skipping scan.");
+        return;
+    }
 
     const extractedUPC = extractUPC(scanCode);
     if (extractedUPC) {
         console.log("✅ Resolved UPC:", extractedUPC);
-        // Phase 43 — Item Link Trigger Injector
+        // Phase 50 — Enhanced Item Link Logic
         if (typeof window.itemLinkStorage !== 'undefined') {
-            const existingItem = window.itemLinkStorage.getMapping(extractedUPC);
-            if (!existingItem) {
-                console.log("🧬 No Item Link found for UPC:", extractedUPC, "Triggering Item Link Modal...");
-                // Phase 45 — Only new modal logic here:
-                console.log("Attempting to call Item Link Modal on UPC:", extractedUPC);
-                if (window.itemLinkModalManager && typeof window.itemLinkModalManager.promptForLink === 'function') {
-                    console.log("✅ Item Link Modal Manager found — opening modal...");
-                    window.itemLinkModalManager.promptForLink(extractedUPC);
-                } else {
-                    console.warn("❌ Item Link Modal Manager still not found.");
+            const mapping = window.itemLinkStorage.getMapping(extractedUPC);
+            if (mapping) {
+                console.log("🧬 Auto-recalling mapping:", mapping);
+                if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+                    window.liveTableManager.addRow({
+                        itemNumber: mapping.item,
+                        upc: extractedUPC,
+                        count: 1,
+                        category: mapping.category || 'Unassigned',
+                        location: '',
+                        previous: '',
+                        delta: ''
+                    });
+                    window.liveTableManager.renderTable();
                 }
             } else {
-                console.log("✅ Item Link already exists for UPC:", extractedUPC, "→", existingItem);
+                console.log("🧬 No Item Link found for UPC:", extractedUPC, "Triggering Item Link Modal...");
+                if (window.itemLinkModalManager && typeof window.itemLinkModalManager.promptForLink === 'function') {
+                    window.itemLinkModalManager.promptForLink(extractedUPC);
+                }
             }
         }
         // Only classifier logic, storage logic, and updated modal trigger logic remain.
@@ -31,6 +42,10 @@ export function handleScanInput(scanCode) {
 
 function extractUPC(scanCode) {
     let code = scanCode.trim();
+    if (!/^\d+$/.test(code)) {
+        console.warn("⚠️ Non-numeric scan detected. Skipping resolver.");
+        return null;
+    }
 
     // Phase 25 — Classifier Feedback Loop Injection (upgraded from Phase 23)
     if (window.resolverClassifierLoader && window.resolverClassifierLoader.classifiers.length > 0) {
@@ -674,3 +689,82 @@ window.itemLinkModalManager = {
         };
     }
 };
+// ================================
+// Phase 54 — Autonomous Self-Audit Engine
+// ================================
+
+window.selfAuditEngine = {
+    runFullAudit: function() {
+        console.log("🧬 Running Full System Self-Audit...");
+
+        this.checkDuplicateMappings();
+        this.validateClassifiers();
+        this.verifyAdaptiveLogs();
+
+        console.log("✅ Self-Audit Complete.");
+    },
+
+    checkDuplicateMappings: function() {
+        if (!window.itemLinkStorage || !window.itemLinkStorage.loadMemory) {
+            console.warn("⚠️ ItemLinkStorage unavailable for audit.");
+            return;
+        }
+        const memory = window.itemLinkStorage.loadMemory();
+        const upcMap = memory.mappings || {};
+        const reverseMap = {};
+        let duplicates = 0;
+
+        for (let [upc, entry] of Object.entries(upcMap)) {
+            const item = entry.item;
+            if (reverseMap[item]) {
+                duplicates++;
+                console.warn(`⚠ Duplicate Item#: ${item} mapped from multiple UPCs`);
+            } else {
+                reverseMap[item] = true;
+            }
+        }
+        if (duplicates === 0) {
+            console.log("✅ No duplicate item mappings found.");
+        }
+    },
+
+    validateClassifiers: function() {
+        if (!window.resolverClassifierLoader) {
+            console.warn("⚠️ ResolverClassifierLoader unavailable for audit.");
+            return;
+        }
+        window.resolverClassifierLoader.classifiers.forEach(cl => {
+            try {
+                new RegExp(cl.pattern);
+            } catch {
+                console.error(`❌ Invalid regex pattern detected in classifier: ${cl.name}`);
+            }
+        });
+        console.log("✅ Classifier patterns validated.");
+    },
+
+    verifyAdaptiveLogs: function() {
+        const log = window.adaptiveScanLog || [];
+        let invalids = 0;
+        log.forEach(entry => {
+            if (!entry.input || !entry.timestamp) {
+                invalids++;
+            }
+        });
+        if (invalids === 0) {
+            console.log("✅ Adaptive scan log integrity validated.");
+        } else {
+            console.warn(`⚠ Found ${invalids} corrupt adaptive log entries.`);
+        }
+    },
+
+    autoLoop: function() {
+        setInterval(() => {
+            this.runFullAudit();
+        }, 900000); // Audit every 15 minutes
+        console.log("🧬 Self-Audit Engine Online");
+    }
+};
+
+// Activate audit loop on startup
+window.selfAuditEngine.autoLoop();

@@ -19,16 +19,20 @@ window.itemLinkStorage = {
         localStorage.setItem("itemLinkMemory", JSON.stringify(memory));
     },
 
-    saveMapping: function(upc, itemNumber) {
+    saveMapping: function(upc, itemNumber, category) {
         const memory = this.loadMemory();
-        memory.mappings[upc] = { item: itemNumber, linked: new Date().toISOString() };
+        memory.mappings[upc] = { 
+            item: itemNumber, 
+            category: category,
+            linked: new Date().toISOString() 
+        };
         this.saveMemory(memory);
-        console.log(`🧬 Item mapping saved: UPC ${upc} → Lowe's Item ${itemNumber}`);
+        console.log(`🧬 Item mapping saved: UPC ${upc} → Lowe's Item ${itemNumber} [${category}]`);
     },
 
     getMapping: function(upc) {
         const memory = this.loadMemory();
-        return memory.mappings[upc] ? memory.mappings[upc].item : null;
+        return memory.mappings[upc] ? memory.mappings[upc] : null;
     },
 
     exportMappings: function() {
@@ -42,6 +46,11 @@ window.itemLinkStorage = {
             memory.mappings[upc] = data;
         }
         this.saveMemory(memory);
+    },
+
+    getExportPayload: function() {
+        const memory = this.loadMemory();
+        return JSON.stringify(memory);
     }
 };
 
@@ -75,7 +84,7 @@ window.itemLinkModalManager = {
             return;
         }
 
-        window.itemLinkStorage.saveMapping(this.currentUPC, itemNumber);
+        window.itemLinkStorage.saveMapping(this.currentUPC, itemNumber, category);
         if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
             window.liveTableManager.addRow({
                 itemNumber: itemNumber,
