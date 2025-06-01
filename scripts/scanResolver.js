@@ -2,6 +2,12 @@
 
 export function handleScanInput(scanCode) {
     console.log("Resolving Scan Code:", scanCode);
+    // Phase 107.C — Bay Scan Auto-Validator Injection
+    if (window.validateBayScan && scanCode.startsWith("BAY:")) {
+      const bayId = scanCode.replace("BAY:", "").trim();
+      window.validateBayScan(bayId);
+      return;  // Bypass normal UPC resolver for bay tags
+    }
     if (!scanCode || typeof scanCode !== 'string' || scanCode.trim() === '') {
         console.warn("⚠️ Invalid scan code provided. Skipping scan.");
         return;

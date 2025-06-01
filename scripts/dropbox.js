@@ -45,3 +45,13 @@ async function restoreAllMapsFromDropbox() {
   alert('📂 Maps restored from Dropbox!');
   window.logFieldEvent("DropboxRestoreMaps", { restored: true });
 }
+
+// Phase 107.B — Dropbox Connection State Logic
+window.isDropboxConnected = function() {
+  try {
+    const token = localStorage.getItem("dropboxAccessToken");
+    return (token && token.length > 0);
+  } catch {
+    return false;
+  }
+};

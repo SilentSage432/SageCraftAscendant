@@ -19,6 +19,19 @@ function updateDiagnosticOverlay() {
       🗃 Bay Map: ${bayMapCount}
     `;
   }
+
+  // Dropbox overlay update logic
+  const dropboxOverlay = document.getElementById('dropboxStatusOverlay');
+  if (dropboxOverlay) {
+    const dropboxConnected = (window.isDropboxConnected && typeof window.isDropboxConnected === 'function') ? window.isDropboxConnected() : false;
+    if (dropboxConnected) {
+      dropboxOverlay.innerHTML = "☁️ Dropbox: Connected";
+      dropboxOverlay.style.borderColor = "#00cc66";
+    } else {
+      dropboxOverlay.innerHTML = "☁️ Dropbox: Offline";
+      dropboxOverlay.style.borderColor = "#cc3300";
+    }
+  }
 }
 
 
@@ -125,7 +138,11 @@ const buttonMap = {
     masterBackupBtn: () => window.syncEverythingToDropbox({}, ''),
     masterRestoreBtn: () => window.restoreEverythingFromDropbox({}, {}, () => {}),
     moreOptionsBtn: () => {
-      document.getElementById("importExportControls").classList.toggle("hidden");
+      const panel = document.getElementById("advancedControlsPanel");
+      if (panel) {
+        const isVisible = panel.style.display === "block";
+        panel.style.display = isVisible ? "none" : "block";
+      }
     },
     navAboutBtn: () => window.switchTab('about'),
     navAuditBtn: () => window.switchTab('audit'),
@@ -261,6 +278,46 @@ const buttonMap = {
         window.renderHistoricalTrendDashboard(summary);
       }
     },
+    generateForecastCurveBtn: () => {
+      const projection = window.generateForecastCurve();
+      if (projection) {
+        window.renderForecastCurveChart(projection);
+      }
+    },
+    generatePatternSignalsBtn: () => {
+      const signals = window.generatePatternSignals();
+      if (signals) {
+        window.renderPatternSignalsTable(signals);
+      }
+    },
+    generateMasterAuditReportBtn: () => {
+      const report = window.generateMasterAuditReport();
+      if (report) {
+        console.log("📊 Master Audit Report ready for export or processing.");
+      }
+    },
+    renderControlRoomDashboardBtn: () => {
+      window.renderControlRoomDashboard();
+    },
+    runAISelfOptimizerBtn: () => {
+      window.runAISelfOptimizer();
+    },
+    runRotationEngineAuditBtn: () => {
+      window.runRotationEngineAudit();
+    },
+    // === Phase 103.1 Admin Console Purge Buttons ===
+    purgeLongTermMemoryBtn: () => {
+      localStorage.removeItem("longTermHeuristicMemory");
+      showToast("🧹 Long-Term Memory purged.");
+    },
+    purgeMappingsBtn: () => {
+      localStorage.removeItem("upcToItemMap");
+      showToast("🧹 Mappings purged.");
+    },
+    purgeSessionsBtn: () => {
+      localStorage.removeItem("savedSessions");
+      showToast("🧹 Saved Sessions purged.");
+    },
     // === Master Export Hub Buttons ===
     exportAllSessionsBtn: () => window.exportAllSessions(),
     exportAllMappingsBtn: () => window.exportAllMappings(),
@@ -269,6 +326,17 @@ const buttonMap = {
     exportFullProgressBtn: () => window.exportFullProgress(),
     exportMemorySnapshotBtn: () => window.exportFullMemoryState(),
     uploadMemorySnapshotBtn: () => window.uploadMemorySnapshotToDropbox(),
+    // === Phase 104.2: Master Export Engine wiring ===
+    exportFullSystemSnapshotBtn: () => {
+      window.exportFullSystemSnapshot();
+    },
+    // === Phase 98 Reporting Exports ===
+    exportAuditSummaryBtn: () => window.exportAuditSummary(),
+    exportForecastModelBtn: () => window.exportForecastModel(),
+    exportAnomalyProfilesBtn: () => window.exportAnomalyProfiles(),
+    exportHeuristicScoresBtn: () => window.exportHeuristicScores(),
+    exportRiskMatrixBtn: () => window.exportRiskMatrix(),
+    exportRecommendationPlanBtn: () => window.exportRecommendationPlan(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");
@@ -765,4 +833,33 @@ window.uploadMemorySnapshotToDropbox = function() {
   } else {
     alert("Dropbox upload function not available.");
   }
+};
+
+// ===============================
+// Phase 98 — Reporting Engine Scaffold Injection
+
+// Reporting Engine — Export Hooks (Future State)
+
+window.exportAuditSummary = function() {
+  console.warn("⚠️ Audit Summary export engine not yet implemented.");
+};
+
+window.exportForecastModel = function() {
+  console.warn("⚠️ Forecast Model export engine not yet implemented.");
+};
+
+window.exportAnomalyProfiles = function() {
+  console.warn("⚠️ Anomaly Profile export engine not yet implemented.");
+};
+
+window.exportHeuristicScores = function() {
+  console.warn("⚠️ Heuristic Score export engine not yet implemented.");
+};
+
+window.exportRiskMatrix = function() {
+  console.warn("⚠️ Risk Matrix export engine not yet implemented.");
+};
+
+window.exportRecommendationPlan = function() {
+  console.warn("⚠️ Recommendation Plan export engine not yet implemented.");
 };

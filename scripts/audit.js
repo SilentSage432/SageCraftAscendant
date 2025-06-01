@@ -1128,3 +1128,232 @@ window.renderHistoricalTrendDashboard = function(summary) {
   `;
   container.appendChild(summaryDiv);
 };
+
+// 🔬 Phase 96.1 — Predictive Anomaly Forecast Curve Engine
+
+window.generateForecastCurve = function() {
+  const memory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+  if (!memory || Object.keys(memory).length === 0) {
+    showToast("No long-term memory data available for forecasting.");
+    return;
+  }
+
+  const projection = [];
+  let shrinkProjected = 0;
+  let swellProjected = 0;
+
+  for (let month = 1; month <= 6; month++) {
+    shrinkProjected += Math.floor((Object.values(memory).reduce((acc, rec) => acc + rec.shrink, 0)) * 0.15);
+    swellProjected += Math.floor((Object.values(memory).reduce((acc, rec) => acc + rec.swell, 0)) * 0.10);
+
+    projection.push({
+      month: `+${month} mo`,
+      shrink: shrinkProjected,
+      swell: swellProjected
+    });
+  }
+
+  console.log("📉 Forecast Curve Projection:", projection);
+  return projection;
+};
+
+// 🔬 Phase 96.2 — Forecast Curve Renderer
+
+window.renderForecastCurveChart = function(projection) {
+  const container = document.getElementById('forecastCurveContainer');
+  container.innerHTML = '';
+
+  if (!projection || projection.length === 0) {
+    container.innerHTML = '<div style="color:#aaa;">No forecast curve data available.</div>';
+    return;
+  }
+
+  const labels = projection.map(p => p.month);
+  const shrinkData = projection.map(p => p.shrink);
+  const swellData = projection.map(p => p.swell);
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'forecastCurveChart';
+  container.appendChild(canvas);
+
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Shrink Projection', data: shrinkData, borderColor: '#ff3333', fill: false },
+        { label: 'Swell Projection', data: swellData, borderColor: '#3399ff', fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: '6-Month Forecast Curve' }
+      }
+    }
+  });
+};
+// 🔬 Phase 97.1 — AI Pattern Analyzer Engine
+
+window.generatePatternSignals = function() {
+  const memory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+  if (!memory || Object.keys(memory).length === 0) {
+    showToast("No long-term memory data available for pattern analysis.");
+    return;
+  }
+
+  const categoryPatterns = {};
+
+  Object.entries(memory).forEach(([item, record]) => {
+    const category = record.category || 'Uncategorized';
+    if (!categoryPatterns[category]) {
+      categoryPatterns[category] = { shrink: 0, swell: 0, total: 0, items: 0 };
+    }
+    categoryPatterns[category].shrink += record.shrink;
+    categoryPatterns[category].swell += record.swell;
+    categoryPatterns[category].total += record.total;
+    categoryPatterns[category].items += 1;
+  });
+
+  const signals = Object.entries(categoryPatterns).map(([category, counts]) => {
+    const shrinkRate = counts.shrink / counts.total;
+    const swellRate = counts.swell / counts.total;
+    let signal = 'Stable';
+
+    if (shrinkRate > 0.5) signal = 'Severe Shrink Risk';
+    else if (shrinkRate > 0.3) signal = 'High Shrink Tendency';
+    else if (swellRate > 0.5) signal = 'Severe Swell Risk';
+    else if (swellRate > 0.3) signal = 'High Swell Tendency';
+
+    return {
+      category,
+      shrinkTotal: counts.shrink,
+      swellTotal: counts.swell,
+      total: counts.total,
+      signal
+    };
+  });
+
+  console.log("📊 Category Pattern Signals Generated:", signals);
+  return signals;
+};
+
+// 🔬 Phase 97.2 — Pattern Signal Table Renderer
+
+window.renderPatternSignalsTable = function(signals) {
+  const container = document.getElementById('patternSignalsContainer');
+  container.innerHTML = '';
+
+  if (!signals || signals.length === 0) {
+    container.innerHTML = '<div style="color:#aaa;">No pattern signals available.</div>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'forecast-table';
+  table.innerHTML = `
+    <thead><tr><th>Category</th><th>Total Shrink</th><th>Total Swell</th><th>Total Activity</th><th>Signal</th></tr></thead>
+    <tbody>${signals.map(row => `
+      <tr>
+        <td>${row.category}</td>
+        <td>${row.shrinkTotal}</td>
+        <td>${row.swellTotal}</td>
+        <td>${row.total}</td>
+        <td style="font-weight:bold;">${row.signal}</td>
+      </tr>
+    `).join('')}</tbody>
+  `;
+
+  container.appendChild(table);
+};
+
+// 🔬 Phase 99.1 — Master Audit Command Processor
+
+window.generateMasterAuditReport = function() {
+  console.log("🧭 Master Audit Command Processor activated.");
+
+  const forecastSummary = window.generateForecastSummary();
+  const heuristicWeights = window.generateHeuristicWeights();
+  const riskFactors = window.generateAnomalyRiskScores();
+  const recommendations = window.generateAuditRecommendations();
+  const longTermSummary = window.generateHistoricalTrendSummary();
+  const forecastCurve = window.generateForecastCurve();
+  const patternSignals = window.generatePatternSignals();
+
+  const masterReport = {
+    forecastSummary,
+    heuristicWeights,
+    riskFactors,
+    recommendations,
+    longTermSummary,
+    forecastCurve,
+    patternSignals
+  };
+
+  console.log("📊 Master Audit Report Generated:", masterReport);
+  showToast("Master Audit Report compiled successfully.");
+  return masterReport;
+};
+
+// 🔬 Phase 100.1 — AI Control Room Dashboard Engine
+
+window.renderControlRoomDashboard = function() {
+  const container = document.getElementById('controlRoomContainer');
+  container.innerHTML = '';
+
+  let upcMap = JSON.parse(localStorage.getItem("upcToItemMap") || "{}");
+  let sessions = JSON.parse(localStorage.getItem("savedSessions") || "{}");
+  let longTermMemory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+
+  const totalMappings = Object.keys(upcMap).length;
+  const totalSessions = Object.keys(sessions).length;
+  const totalMemoryItems = Object.keys(longTermMemory).length;
+
+  const panel = document.createElement('div');
+  panel.innerHTML = `
+    <h3>🧭 AI Control Room</h3>
+    <p><strong>Total Active Sessions:</strong> ${totalSessions}</p>
+    <p><strong>Mapped UPCs:</strong> ${totalMappings}</p>
+    <p><strong>Long-Term Memory Items:</strong> ${totalMemoryItems}</p>
+  `;
+
+  container.appendChild(panel);
+};
+
+// 🔬 Phase 101.1 — AI Self-Tuning Optimizer Engine
+
+window.runAISelfOptimizer = function() {
+  console.log("⚙️ Running AI Self-Optimizer...");
+
+  const memory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+  if (!memory || Object.keys(memory).length === 0) {
+    showToast("No long-term memory available for optimizer.");
+    return;
+  }
+
+  let adjustments = 0;
+
+  Object.entries(memory).forEach(([item, record]) => {
+    if (record.total > 100) {
+      const shrinkBias = record.shrink / record.total;
+      const swellBias = record.swell / record.total;
+
+      if (shrinkBias > 0.6) {
+        record.shrink = Math.floor(record.shrink * 0.95);
+        adjustments++;
+      }
+      if (swellBias > 0.6) {
+        record.swell = Math.floor(record.swell * 0.95);
+        adjustments++;
+      }
+    }
+  });
+
+  localStorage.setItem("longTermHeuristicMemory", JSON.stringify(memory));
+  console.log(`✅ AI Optimizer complete — ${adjustments} records adjusted.`);
+  showToast(`AI Optimizer complete — ${adjustments} items balanced.`);
+};
+
+// 🌐 Expose Rotation Engine Audit globally
+window.runRotationEngineAudit = runRotationEngineAudit;

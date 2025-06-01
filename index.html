@@ -158,6 +158,24 @@
           pointer-events: none;">
           🛡 Diagnostics: Active
         </div>
+        <div id="dropboxStatusOverlay" style="
+          position: absolute;
+          top: 130px;
+          right: 20px;
+          z-index: 99998;
+          width: auto;
+          min-width: 160px;
+          padding: 8px;
+          background: rgba(0, 0, 0, 0.7);
+          border: 2px solid #ffaa00;
+          border-radius: 8px;
+          color: #fff;
+          font-family: monospace;
+          font-size: 0.75em;
+          opacity: 0.85;
+          pointer-events: none;">
+          ☁️ Dropbox: Checking...
+        </div>
       <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
         <div class="active-status-bar">
@@ -410,22 +428,33 @@
       <section id="reportingHub" class="tab-section panel-glow" role="tabpanel" aria-label="Reporting Hub">
         <h2>🖨️ Reporting Hub</h2>
 
-        <div class="reporting-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
-          <button id="exportDeltaReportBtn">📊 Export Delta Report</button>
-          <button id="exportExceptionsReportBtn">🚩 Export Exceptions Report</button>
-          <button id="exportProgressReportBtn">📅 Export Progress Report</button>
-          <button id="exportAllReportsBtn">📦 Export All Reports</button>
-          <button id="generateForecastBtn">🔮 Generate Forecast Summary</button>
-          <button id="generateHeuristicBtn">🔬 Generate Heuristic Summary</button>
-          <button id="generateRiskBtn">🚩 Generate Risk Factor Table</button>
-          <button id="generateRecommendationsBtn">🎯 Generate Audit Recommendations</button>
-          <button id="feedLongTermMemoryBtn">📚 Feed Long-Term Memory</button>
+        <div class="reporting-controls" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; padding: 10px;">
+          <button id="exportDeltaReportBtn" style="width: 100%;">📊 Export Delta Report</button>
+          <button id="exportExceptionsReportBtn" style="width: 100%;">🚩 Export Exceptions Report</button>
+          <button id="exportProgressReportBtn" style="width: 100%;">📅 Export Progress Report</button>
+          <button id="exportAllReportsBtn" style="width: 100%;">📦 Export All Reports</button>
+          <button id="generateForecastBtn" style="width: 100%;">🔮 Generate Forecast Summary</button>
+          <button id="generateHeuristicBtn" style="width: 100%;">🔬 Generate Heuristic Summary</button>
+          <button id="generateRiskBtn" style="width: 100%;">🚩 Generate Risk Factor Table</button>
+          <button id="generatePatternSignalsBtn">🧬 Generate Pattern Signals</button>
+          <button id="generateMasterAuditReportBtn" style="width: 100%;">📋 Generate Master Audit Report</button>
+          <button id="renderControlRoomDashboardBtn" style="width: 100%;">🧭 Open AI Control Room</button>
+          <button id="runAISelfOptimizerBtn" style="width: 100%;">⚙️ Run AI Optimizer</button>
+          <!-- Phase 103.2 Admin Console Buttons -->
+          <button id="purgeLongTermMemoryBtn" style="width: 100%;">🧹 Purge Long-Term Memory</button>
+          <button id="purgeMappingsBtn" style="width: 100%;">🧹 Purge Mappings</button>
+          <button id="purgeSessionsBtn" style="width: 100%;">🧹 Purge Sessions</button>
+          <hr style="border: 1px solid #555;">
+          <button id="runRotationEngineAuditBtn" style="width: 100%;">🧮 Run Rotation Engine Audit</button>
         </div>
         <div id="forecastSummaryContainer" style="margin-top: 20px; color: #fff;"></div>
         <div id="heuristicSummaryContainer" style="margin-top: 20px; color: #fff;"></div>
         <div id="riskFactorContainer" style="margin-top: 20px; color: #fff;"></div>
         <div id="auditRecommendationsContainer" style="margin-top: 20px; color: #fff;"></div>
         <div id="historicalTrendContainer" style="margin-top: 20px; color: #fff;"></div>
+        <div id="forecastCurveContainer" style="margin-top: 20px; color: #fff;"></div>
+        <div id="patternSignalsContainer" style="margin-top: 20px; color: #fff;"></div>
+        <div id="controlRoomContainer" style="margin-top: 20px; color: #fff;"></div>
 
         <div style="color:#aaa; font-size:0.9em;">
           Use this centralized hub to export full reports for audits, exceptions, and audit progress. All reports are formatted for print, email, or management review handoff.
@@ -443,6 +472,14 @@
           <button id="exportFullProgressBtn">📅 Export Full Progress Logs</button>
           <button id="exportMemorySnapshotBtn">🧠 Export Memory Snapshot</button>
           <button id="uploadMemorySnapshotBtn">☁️ Upload Memory Snapshot</button>
+          <!-- Phase 98.3 Reporting Export Engine Buttons -->
+          <button id="exportAuditSummaryBtn">📋 Export Audit Summary</button>
+          <button id="exportForecastModelBtn">📊 Export Forecast Model</button>
+          <button id="exportAnomalyProfilesBtn">🧬 Export Anomaly Profiles</button>
+          <button id="exportHeuristicScoresBtn">🎯 Export Heuristic Scores</button>
+          <button id="exportRiskMatrixBtn">🚩 Export Risk Matrix</button>
+          <button id="exportRecommendationPlanBtn">📝 Export Recommendations Plan</button>
+          <button id="exportFullSystemSnapshotBtn">📦 Export Full System Snapshot</button>
         </div>
 
         <div style="color:#aaa; font-size:0.9em;">
@@ -450,29 +487,6 @@
         </div>
       </section>
 
-      <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
-        <h2>Export Tools</h2>
-        <button id="exportDeltaReportBtn">📊 Export Delta Report</button>
-        <button id="downloadToExcelBtn">⬇️ Download Excel</button>
-        <button id="exportAuditLog">📤 Export Audit Log</button>
-        <button id="resetAuditLog">🗑️ Reset Audit Log</button>
-
-        <!-- Audit History Panel Controls -->
-        <button id="viewAuditHistoryBtn">📜 View Audit History</button>
-        <button id="uploadArchiveBtn">☁️ Upload Archive to Cloud</button>
-        <button id="downloadArchiveBtn">☁️ Restore Archive from Cloud</button>
-
-        <div id="auditHistoryPanel" class="hidden panel-glow" style="margin-top: 15px; padding: 10px; background-color: #222; border: 1px solid #555; border-radius: 5px;">
-          <h3>📜 Audit History</h3>
-          <select id="auditHistorySelect" style="width: 100%; margin-bottom: 10px;">
-            <option value="">Select archived audit...</option>
-          </select>
-          <div style="display: flex; gap: 8px;">
-            <button id="loadSelectedAuditBtn">📂 Load</button>
-            <button id="deleteSelectedAuditBtn">🗑️ Delete</button>
-          </div>
-        </div>
-      </section>
 
       <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
         <h2>Session Controls</h2>
@@ -563,25 +577,10 @@
           <label><input type="checkbox" id="numericKeypadToggle" /> Use Numeric Keypad for Manual Entry</label>
         </div>
 
-        <div class="settings-group">
-          <h3>⏱ Autosave</h3>
-          <label>Autosave Every:
-            <select id="autosaveIntervalSelect">
-              <option value="1">1 min</option>
-              <option value="3" selected>3 min</option>
-              <option value="5">5 min</option>
-              <option value="10">10 min</option>
-              <option value="20">20 min</option>
-            </select>
-          </label>
-          <label><input type="checkbox" id="autosaveToggle" checked /> Enable Autosave</label>
-        </div>
 
         <h3>☁️ Dropbox Cloud Sync</h3>
         <div id="dropboxControls" class="button-grid">
           <button id="connectDropbox">🔐 Connect to Dropbox</button>
-          <button id="refreshDropboxToken">♻️ Refresh Token</button>
-          <button id="loadActiveSession">📥 Load Active Session</button>
           <button id="syncDropboxMaps">🔄 Sync All Maps</button>
           <button id="restoreDropboxMaps">📂 Restore All Maps</button>
           <button id="disconnectDropbox">❌ Disconnect</button>
@@ -1014,8 +1013,7 @@ setInterval(checkForGhostModals, 3000);
 </div>
 
 <script>
-const drawerToggleBtn = document.getElementById('drawerToggleBtn');
-const commandDrawer = document.getElementById('commandDrawer');
+// Drawer toggle and drawer logic
 let drawerOpen = false;
 
 function getDrawerWidth() {

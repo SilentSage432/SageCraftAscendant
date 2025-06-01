@@ -102,3 +102,26 @@ export { formatDate, generateTimestamp as generateUUID, sleep as delay, safePars
 // 🌐 Expose exportDeltaToCSV globally for Delta Review UI
 window.exportDeltaToCSV = exportDeltaToCSV;
 window.showToast = showToast;
+
+// ===============================
+// Phase 104.1 — Master Export Engine
+// ===============================
+
+window.exportFullSystemSnapshot = function() {
+  const exportBlob = {
+    sessions: safeParse(localStorage.getItem("savedSessions")),
+    mappings: safeParse(localStorage.getItem("upcToItemMap")),
+    longTermMemory: safeParse(localStorage.getItem("longTermHeuristicMemory")),
+    timestamp: generateTimestamp()
+  };
+
+  const jsonString = JSON.stringify(exportBlob, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `SystemSnapshot_${exportBlob.timestamp}.json`);
+  link.click();
+  
+  showToast("📦 Full system snapshot exported.");
+};
