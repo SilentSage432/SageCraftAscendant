@@ -6,13 +6,24 @@ export function handleScanInput(scanCode) {
     const extractedUPC = extractUPC(scanCode);
     if (extractedUPC) {
         console.log("✅ Resolved UPC:", extractedUPC);
-        // Phase 37A — Item Link Modal Trigger Injection
-        if (typeof window.openItemLinkModal === 'function') {
-            window.openItemLinkModal(extractedUPC);
-        } else {
-            console.warn("⚠ Item Link Modal function not yet implemented.");
+        // Phase 43 — Item Link Trigger Injector
+        if (typeof window.itemLinkStorage !== 'undefined') {
+            const existingItem = window.itemLinkStorage.getMapping(extractedUPC);
+            if (!existingItem) {
+                console.log("🧬 No Item Link found for UPC:", extractedUPC, "Triggering Item Link Modal...");
+                // Phase 45 — Only new modal logic here:
+                console.log("Attempting to call Item Link Modal on UPC:", extractedUPC);
+                if (window.itemLinkModalManager && typeof window.itemLinkModalManager.promptForLink === 'function') {
+                    console.log("✅ Item Link Modal Manager found — opening modal...");
+                    window.itemLinkModalManager.promptForLink(extractedUPC);
+                } else {
+                    console.warn("❌ Item Link Modal Manager still not found.");
+                }
+            } else {
+                console.log("✅ Item Link already exists for UPC:", extractedUPC, "→", existingItem);
+            }
         }
-        // You can trigger modal or next phase here once integrated.
+        // Only classifier logic, storage logic, and updated modal trigger logic remain.
     } else {
         console.warn("⚠️ Could not resolve scan code.");
     }
@@ -616,5 +627,50 @@ window.fieldAuditEngine = {
         const exportData = JSON.stringify(snapshot, null, 2);
         console.log("🧬 Field Audit Export Ready:", exportData);
         return exportData;
+    }
+};
+
+// ================================
+// Phase 43.5 — Item Link Modal Manager Bootstrap
+// ================================
+
+window.itemLinkModalManager = {
+    promptForLink: function(upc) {
+        const modal = document.getElementById('itemLinkModal');
+        const upcField = document.getElementById('modalUPC');
+        const itemField = document.getElementById('modalItemNumber');
+        const saveButton = document.getElementById('modalSaveBtn');
+        const cancelButton = document.getElementById('modalCancelBtn');
+
+        if (!modal || !upcField || !itemField || !saveButton || !cancelButton) {
+            console.error("❌ Modal elements not found.");
+            return;
+        }
+
+        upcField.value = upc;
+        itemField.value = "";
+
+        modal.classList.remove('hidden');
+
+        saveButton.onclick = () => {
+            const itemNumber = itemField.value.trim();
+            if (!itemNumber) {
+                alert("Please enter a valid item number.");
+                return;
+            }
+
+            if (!window.itemLinkStorage) {
+                console.error("❌ Item Link Storage not available.");
+                return;
+            }
+
+            window.itemLinkStorage.saveMapping(upc, itemNumber);
+            console.log(`✅ Linked UPC ${upc} to Item ${itemNumber}`);
+            modal.classList.add('hidden');
+        };
+
+        cancelButton.onclick = () => {
+            modal.classList.add('hidden');
+        };
     }
 };

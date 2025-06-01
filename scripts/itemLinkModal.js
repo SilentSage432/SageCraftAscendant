@@ -1,132 +1,145 @@
-
-
 // ================================
-// Phase 37B — Item Link Modal UI Module Injection
+// Phase 43 — Linker Memory Core Expansion
 // ================================
-
-window.openItemLinkModal = function(upc) {
-    let modal = document.getElementById("itemLinkModal");
-    if (!modal) {
-        modal = document.createElement("div");
-        modal.id = "itemLinkModal";
-        modal.style.position = "fixed";
-        modal.style.top = "50%";
-        modal.style.left = "50%";
-        modal.style.transform = "translate(-50%, -50%)";
-        modal.style.background = "#222";
-        modal.style.color = "#fff";
-        modal.style.padding = "20px";
-        modal.style.border = "2px solid #888";
-        modal.style.zIndex = "9999";
-        modal.style.borderRadius = "8px";
-        modal.style.boxShadow = "0 0 10px #000";
-
-        modal.innerHTML = `
-            <h3>Link Lowe's Item #</h3>
-            <p>UPC: <b>${upc}</b></p>
-            <input type="text" id="lowesItemInput" placeholder="Enter Lowe's Item #" style="padding:5px; width:200px;">
-            <br><br>
-            <button id="saveLinkBtn" style="padding:5px 10px; margin-right:10px;">Save</button>
-            <button id="cancelLinkBtn" style="padding:5px 10px;">Cancel</button>
-        `;
-        document.body.appendChild(modal);
-    } else {
-        modal.querySelector("p").innerHTML = `UPC: <b>${upc}</b>`;
-        modal.style.display = "block";
-    }
-
-    document.getElementById("saveLinkBtn").onclick = () => {
-        const itemNumber = document.getElementById("lowesItemInput").value.trim();
-        if (!itemNumber) {
-            alert("Please enter a valid Lowe's Item #");
-            return;
-        }
-        window.itemLinkStorage.saveMapping(upc, itemNumber);
-        modal.style.display = "none";
-    };
-
-    document.getElementById("cancelLinkBtn").onclick = () => {
-        modal.style.display = "none";
-    };
-};
 
 window.itemLinkStorage = {
+    version: 1,
+
+    loadMemory: function() {
+        const raw = localStorage.getItem("itemLinkMemory");
+        if (!raw) return { version: this.version, mappings: {} };
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return { version: this.version, mappings: {} };
+        }
+    },
+
+    saveMemory: function(memory) {
+        localStorage.setItem("itemLinkMemory", JSON.stringify(memory));
+    },
+
     saveMapping: function(upc, itemNumber) {
-        const map = JSON.parse(localStorage.getItem("itemLinkMap") || "{}");
-        map[upc] = itemNumber;
-        localStorage.setItem("itemLinkMap", JSON.stringify(map));
+        const memory = this.loadMemory();
+        memory.mappings[upc] = { item: itemNumber, linked: new Date().toISOString() };
+        this.saveMemory(memory);
         console.log(`🧬 Item mapping saved: UPC ${upc} → Lowe's Item ${itemNumber}`);
     },
 
     getMapping: function(upc) {
-        const map = JSON.parse(localStorage.getItem("itemLinkMap") || "{}");
-        return map[upc] || null;
+        const memory = this.loadMemory();
+        return memory.mappings[upc] ? memory.mappings[upc].item : null;
     },
 
     exportMappings: function() {
-        const map = JSON.parse(localStorage.getItem("itemLinkMap") || "{}");
-        return map;
+        const memory = this.loadMemory();
+        return memory.mappings;
+    },
+
+    importMappings: function(importedMap) {
+        const memory = this.loadMemory();
+        for (const [upc, data] of Object.entries(importedMap)) {
+            memory.mappings[upc] = data;
+        }
+        this.saveMemory(memory);
     }
 };
 
 // ================================
-// Phase 37C — Cloud Mapping Sync Integration
+// Phase 42.5 — Modal Manager Link Loader Injection
 // ================================
 
-window.itemLinkCloudSync = {
-    filePath: "/adaptive/item_mappings.json",
+// ================================
+// Phase 43 — Item Link Modal Core Rendering Engine
+// ================================
 
-    async saveToCloud() {
-        if (!window.dropboxSyncEngine) {
-            console.error("❌ Dropbox Sync Engine not initialized.");
+window.itemLinkModalManager = {
+    currentUPC: null,
+
+    promptForLink: function(upc) {
+        this.currentUPC = upc;
+
+        // Pre-fill modal fields
+        document.getElementById("itemLinkUpc").value = upc;
+        document.getElementById("itemLinkItemNumber").value = "";
+
+        // Show the modal
+        document.getElementById("itemLinkModalContainer").style.display = "flex";
+    },
+
+    saveLink: function() {
+        const itemNumber = document.getElementById("itemLinkItemNumber").value.trim();
+        const category = document.getElementById("itemLinkCategory").value.trim() || 'Unassigned';
+        if (!itemNumber) {
+            alert("Please enter a valid Lowe's Item Number.");
             return;
         }
-        const exportData = JSON.stringify(window.itemLinkStorage.exportMappings(), null, 2);
-        await dropboxSyncEngine.upload(this.filePath, exportData);
-        console.log("🧬 Item mappings saved to cloud.");
+
+        window.itemLinkStorage.saveMapping(this.currentUPC, itemNumber);
+        if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+            window.liveTableManager.addRow({
+                itemNumber: itemNumber,
+                upc: this.currentUPC,
+                count: 1,
+                category: category,
+                location: '',
+                previous: '',
+                delta: ''
+            });
+            console.log("📊 Live table row inserted automatically.");
+            window.liveTableManager.renderTable();
+        }
+        this.closeModal();
     },
 
-    async loadFromCloud() {
-        if (!window.dropboxSyncEngine) {
-            console.error("❌ Dropbox Sync Engine not initialized.");
-            return;
-        }
-        const data = await dropboxSyncEngine.download(this.filePath);
-        if (data) {
-            const importedMap = JSON.parse(data);
-            const localMap = JSON.parse(localStorage.getItem("itemLinkMap") || "{}");
-            const mergedMap = { ...localMap, ...importedMap };
-            localStorage.setItem("itemLinkMap", JSON.stringify(mergedMap));
-            console.log("🧬 Item mappings loaded and merged from cloud.");
-        }
+    closeModal: function() {
+        document.getElementById("itemLinkModalContainer").style.display = "none";
+    },
+
+    wireModal: function() {
+        document.getElementById("saveItemLinkBtn").onclick = () => this.saveLink();
+        document.getElementById("cancelItemLinkBtn").onclick = () => this.closeModal();
+
+        const categorySelect = document.getElementById("itemLinkCategory");
+        const categories = [
+            "Laundry",
+            "Fridges & Freezers",
+            "Ranges",
+            "Dishwashers",
+            "Wall Ovens",
+            "Cooktops",
+            "OTR Microwaves",
+            "Microwaves (Countertop)",
+            "Vent Hoods",
+            "Beverage & Wine Coolers",
+            "Cabinets",
+            "Countertops",
+            "Interior Doors",
+            "Exterior Doors",
+            "Storm Doors",
+            "Windows",
+            "Commodity Moulding",
+            "Other / Misc"
+        ];
+
+        categorySelect.innerHTML = "";
+        categories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
     }
 };
-// ================================
-// Phase 38 — Unified Cross-Sync Engine
-// ================================
 
-window.unifiedCrossSyncEngine = {
-    async fullSave() {
-        console.log("🧬 Starting Unified Cloud Save...");
-        await adaptiveCloudMemory.save();
-        await itemLinkCloudSync.saveToCloud();
-        console.log("🧬 Unified Cloud Save Complete.");
-    },
-
-    async fullLoad() {
-        console.log("🧬 Starting Unified Cloud Load...");
-        await adaptiveCloudMemory.load();
-        await itemLinkCloudSync.loadFromCloud();
-        console.log("🧬 Unified Cloud Load Complete.");
-    },
-
-    startAutoSync(intervalMs = 60000) {
-        console.log("🧬 Unified Auto Cloud Sync Online");
-        setInterval(async () => {
-            await this.fullSave();
-        }, intervalMs);
+// Auto-wire on DOM load
+window.addEventListener("DOMContentLoaded", () => {
+    if (window.itemLinkModalManager) {
+        window.itemLinkModalManager.wireModal();
+        console.log("🧬 Item Link Modal Manager fully wired.");
     }
-};
+});
 
-// Auto-start unified sync loop
-window.unifiedCrossSyncEngine.startAutoSync();
+// Phase 44 — Item Link Modal Global Bootstrap
+window.itemLinkModalManager = window.itemLinkModalManager;
+console.log("✅ Item Link Modal Manager wired globally.");

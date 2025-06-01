@@ -120,7 +120,9 @@ function wireAllButtons() {
     loadSessionBtn: () => window.loadSession(),
     masterBackupBtn: () => window.syncEverythingToDropbox({}, ''),
     masterRestoreBtn: () => window.restoreEverythingFromDropbox({}, {}, () => {}),
-    moreOptionsBtn: () => window.toggleMoreOptions(),
+    moreOptionsBtn: () => {
+      document.getElementById("importExportControls").classList.toggle("hidden");
+    },
     navAboutBtn: () => window.switchTab('about'),
     navAuditBtn: () => window.switchTab('audit'),
     navCountBtn: () => window.switchTab('count'),

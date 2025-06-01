@@ -505,6 +505,24 @@
     </div>
   </div>
 
+  <!-- Item Link Modal -->
+  <div id="itemLinkModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="itemLinkModalTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
+      <h3 id="itemLinkModalTitle">🔗 Link Lowe's Item to UPC</h3>
+
+      <label for="itemNumberInput">Lowe's Item #:</label>
+      <input type="text" id="itemNumberInput" style="margin: 5px 0;" placeholder="Enter Lowe's item number..." />
+
+      <label for="linkedUpcInput">Linked UPC:</label>
+      <input type="text" id="linkedUpcInput" style="margin: 5px 0;" placeholder="Enter UPC code..." />
+
+      <div style="margin-top:15px;">
+        <button id="confirmLinkBtn" role="button" aria-label="Save item link" style="margin:5px;">✅ Save Link</button>
+        <button id="cancelLinkBtn" role="button" aria-label="Cancel link modal" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- External libraries -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Toast system script -->
@@ -676,6 +694,9 @@ setInterval(checkForGhostModals, 3000);
   <!-- Resolver Loader Sequencer -->
   <script type="module" src="scripts/scanResolver.js"></script>
 
+  <!-- Modal Manager for Item Link Modal -->
+  <script type="module" src="scripts/itemLinkModal.js"></script>
+
   <!-- Wiring.js - global load -->
   <script src="scripts/wiring.js"></script>
 
@@ -701,4 +722,43 @@ setInterval(checkForGhostModals, 3000);
     🛡 Diagnostics: Active
   </div>
 </body>
+  <!-- Item Link Modal Injection -->
+  <div id="itemLinkModalContainer" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="itemLinkTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
+      <h3 id="itemLinkTitle">🔗 Link Item to UPC</h3>
+
+      <label for="itemLinkItemNumber">Lowe's Item #:</label>
+      <input type="text" id="itemLinkItemNumber" style="margin: 5px 0;" placeholder="Enter Lowe's Item #..." />
+
+      <label for="itemLinkUpc">Resolved UPC:</label>
+      <input type="text" id="itemLinkUpc" style="margin: 5px 0;" readonly />
+
+      <label for="itemLinkCategory">Category:</label>
+      <select id="itemLinkCategory" style="margin: 5px 0;">
+        <option value="Laundry">Laundry</option>
+        <option value="Fridges & Freezers">Fridges & Freezers</option>
+        <option value="Ranges">Ranges</option>
+        <option value="Dishwashers">Dishwashers</option>
+        <option value="Wall Ovens">Wall Ovens</option>
+        <option value="Cooktops">Cooktops</option>
+        <option value="OTR Microwaves">OTR Microwaves</option>
+        <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
+        <option value="Vent Hoods">Vent Hoods</option>
+        <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
+        <option value="Cabinets">Cabinets</option>
+        <option value="Countertops">Countertops</option>
+        <option value="Interior Doors">Interior Doors</option>
+        <option value="Exterior Doors">Exterior Doors</option>
+        <option value="Storm Doors">Storm Doors</option>
+        <option value="Windows">Windows</option>
+        <option value="Commodity Moulding">Commodity Moulding</option>
+        <option value="Other / Misc">Other / Misc</option>
+      </select>
+
+      <div style="margin-top:15px;">
+        <button id="saveItemLinkBtn" role="button" aria-label="Save item link" style="margin:5px;">✅ Save Link</button>
+        <button id="cancelItemLinkBtn" role="button" aria-label="Cancel" style="margin:5px;">❌ Cancel</button>
+      </div>
+    </div>
+  </div>
 </html>
