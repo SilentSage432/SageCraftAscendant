@@ -129,6 +129,7 @@ const buttonMap = {
     navDeltaBtn: () => window.switchTab('deltaAnalyzer'),
     navExceptionBtn: () => window.switchTab('exceptionManager'),
     navProgressBtn: () => window.switchTab('progressDashboard'),
+    navReportingBtn: () => window.switchTab('reportingHub'),
     purgeLocalStorageBtn: () => window.purgeLocalStorage(),
     refreshAuditLogBtn: () => window.refreshAuditLog(),
     refreshFieldLog: () => renderFieldLog(),
@@ -211,6 +212,10 @@ const buttonMap = {
     // === Progress Dashboard Buttons ===
     refreshProgressBtn: () => window.refreshProgress(),
     exportProgressBtn: () => window.exportProgressCSV(),
+    // === Reporting Hub Buttons ===
+    exportDeltaReportBtn: () => window.exportDeltaReport(),
+    exportExceptionsReportBtn: () => window.exportExceptionsReport(),
+    exportProgressReportBtn: () => window.exportProgressReport(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");
@@ -218,7 +223,7 @@ const buttonMap = {
         tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#888;'>Session manager temporarily disabled (audit rebuild in progress)</td></tr>";
       }
     },
-    exportDeltaReportBtn: () => window.exportTools.exportDeltaReport(),
+    exportDeltaReportBtn: () => window.exportDeltaReport(),
     // === Audit History Panel Buttons ===
     viewAuditHistoryBtn: () => {
       const panel = document.getElementById('auditHistoryPanel');

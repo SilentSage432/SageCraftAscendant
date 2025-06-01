@@ -431,3 +431,89 @@ function exportProgressCSV() {
 // 🌐 Expose progress functions globally for wiring.js
 window.refreshProgress = refreshProgress;
 window.exportProgressCSV = exportProgressCSV;
+
+
+// 🔬 Phase 76 — Reporting Hub Logic
+
+function exportDeltaReport() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available to export.");
+    return;
+  }
+
+  const csvContent = generateDeltaCSV(deltas);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'DeltaReport.csv');
+  link.click();
+}
+
+function exportExceptionsReport() {
+  const tbody = document.querySelector('#exceptionTable tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].querySelector('td').textContent.includes("No exceptions")) {
+    showToast("No exceptions to export.");
+    return;
+  }
+
+  let csv = "Item #,Delta,Category,Location,Tag,Notes\n";
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const item = cells[0].textContent.trim();
+    const delta = cells[1].textContent.trim();
+    const category = cells[2].textContent.trim();
+    const location = cells[3].textContent.trim();
+    const tag = cells[4].querySelector('input').value.trim();
+    const notes = cells[5].querySelector('input').value.trim();
+
+    csv += `${item},${delta},${category},${location},${tag},${notes}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'ExceptionsReport.csv');
+  link.click();
+}
+
+function exportProgressReport() {
+  const data = JSON.parse(localStorage.getItem("rotationData") || "{}");
+  if (!data || Object.keys(data).length === 0) {
+    showToast("No progress data to export.");
+    return;
+  }
+
+  let csv = "Category,Last Audited,Next Due,Status\n";
+
+  Object.entries(data).forEach(([category, info]) => {
+    const interval = info.interval || 30;
+    const lastDate = new Date(info.date);
+    const isValid = !isNaN(lastDate.getTime());
+    const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
+
+    const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+    const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+    const overdue = nextDue && new Date() > nextDue;
+    const status = overdue ? 'Overdue' : 'On Schedule';
+
+    csv += `${category},${lastAuditedText},${nextDueText},${status}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'ProgressReport.csv');
+  link.click();
+}
+
+// 🌐 Expose reporting functions globally for wiring.js
+window.exportDeltaReport = exportDeltaReport;
+window.exportExceptionsReport = exportExceptionsReport;
+window.exportProgressReport = exportProgressReport;

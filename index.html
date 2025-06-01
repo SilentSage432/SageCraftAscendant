@@ -40,6 +40,7 @@
     <button id="navDeltaBtn" class="tablink nav-icon" data-target="deltaAnalyzer" title="Delta Analyzer" aria-label="Delta Analyzer">🧮</button>
     <button id="navExceptionBtn" class="tablink nav-icon" data-target="exceptionManager" title="Exception Manager" aria-label="Exception Manager">🚩</button>
     <button id="navProgressBtn" class="tablink nav-icon" data-target="progressDashboard" title="Audit Progress" aria-label="Audit Progress">📅</button>
+    <button id="navReportingBtn" class="tablink nav-icon" data-target="reportingHub" title="Reporting Hub" aria-label="Reporting Hub">🖨️</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -298,6 +299,20 @@
               <tr><td colspan="4" style="text-align:center; color:#888;">No progress data loaded</td></tr>
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <section id="reportingHub" class="tab-section panel-glow" role="tabpanel" aria-label="Reporting Hub">
+        <h2>🖨️ Reporting Hub</h2>
+
+        <div class="reporting-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
+          <button id="exportDeltaReportBtn">📊 Export Delta Report</button>
+          <button id="exportExceptionsReportBtn">🚩 Export Exceptions Report</button>
+          <button id="exportProgressReportBtn">📅 Export Progress Report</button>
+        </div>
+
+        <div style="color:#aaa; font-size:0.9em;">
+          Use this centralized hub to export full reports for audits, exceptions, and audit progress. All reports are formatted for print, email, or management review handoff.
         </div>
       </section>
 
