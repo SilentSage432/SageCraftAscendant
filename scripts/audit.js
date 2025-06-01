@@ -243,8 +243,120 @@ export function renderDeltaReviewTable(deltaData) {
     tbody.appendChild(tr);
   });
 }
+
+// 🔬 Phase 73.5.5 — Delta Analyzer CSV Export Logic
+function exportMergedDeltaCSV() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available to export.");
+    return;
+  }
+
+  const csvContent = generateDeltaCSV(deltas);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'MergedDeltaExport.csv');
+  link.click();
+}
+
+// 🔬 Phase 73.5.4 — Delta Analyzer Core Compute Logic
+function performDeltaAnalysis() {
+  const baseSelect = document.getElementById('baseAuditSelect');
+  const compareSelect = document.getElementById('compareAuditSelect');
+
+  if (!baseSelect.value || !compareSelect.value) {
+    showToast("Please select both audits to compare.");
+    return;
+  }
+
+  const baseAudit = auditArchive.loadAudit(baseSelect.value);
+  const compareAudit = auditArchive.loadAudit(compareSelect.value);
+
+  if (!baseAudit || !compareAudit) {
+    showToast("One or both selected audits could not be loaded.");
+    return;
+  }
+
+  const baseCSV = auditArchive.generateMergedCSV(baseAudit);
+  const compareCSV = auditArchive.generateMergedCSV(compareAudit);
+  const deltas = compareAuditDeltas(baseCSV, compareCSV);
+
+  window.auditArchive.lastDeltaResults = deltas;
+  renderDeltaReviewTable(deltas);
+  showToast("Delta analysis complete.");
+}
 // 🌐 Expose renderDeltaReviewTable globally for Delta Review UI
 window.renderDeltaReviewTable = renderDeltaReviewTable;
 // 🌐 Expose remaining Delta Analyzer functions globally
 window.performDeltaAnalysis = performDeltaAnalysis;
 window.exportMergedDeltaCSV = exportMergedDeltaCSV;
+
+
+// 🔬 Phase 74 — Exception Manager Core Logic
+
+function refreshExceptions() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  const tbody = document.querySelector('#exceptionTable tbody');
+  tbody.innerHTML = '';
+
+  if (!deltas || deltas.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No exceptions loaded</td></tr>';
+    return;
+  }
+
+  const exceptions = deltas.filter(row => Math.abs(row.delta) >= 5); // Threshold for exception flagging
+
+  if (exceptions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No exceptions found</td></tr>';
+    return;
+  }
+
+  exceptions.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.item}</td>
+      <td>${row.delta}</td>
+      <td>${row.category || '-'}</td>
+      <td>${row.location || '-'}</td>
+      <td><input type="text" placeholder="Tag" style="width: 100px;"></td>
+      <td><input type="text" placeholder="Notes" style="width: 150px;"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportExceptionsCSV() {
+  const tbody = document.querySelector('#exceptionTable tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].querySelector('td').textContent.includes("No exceptions")) {
+    showToast("No exceptions to export.");
+    return;
+  }
+
+  let csv = "Item #,Delta,Category,Location,Tag,Notes\n";
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const item = cells[0].textContent.trim();
+    const delta = cells[1].textContent.trim();
+    const category = cells[2].textContent.trim();
+    const location = cells[3].textContent.trim();
+    const tag = cells[4].querySelector('input').value.trim();
+    const notes = cells[5].querySelector('input').value.trim();
+
+    csv += `${item},${delta},${category},${location},${tag},${notes}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'AuditExceptions.csv');
+  link.click();
+}
+
+// 🌐 Expose exception functions globally for wiring.js
+window.refreshExceptions = refreshExceptions;
+window.exportExceptionsCSV = exportExceptionsCSV;

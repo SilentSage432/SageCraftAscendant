@@ -127,6 +127,7 @@ const buttonMap = {
     navToolsBtn: () => window.switchTab('tools'),
     navVaultBtn: () => window.switchTab('vault'),
     navDeltaBtn: () => window.switchTab('deltaAnalyzer'),
+    navExceptionBtn: () => window.switchTab('exceptionManager'),
     purgeLocalStorageBtn: () => window.purgeLocalStorage(),
     refreshAuditLogBtn: () => window.refreshAuditLog(),
     refreshFieldLog: () => renderFieldLog(),
@@ -203,6 +204,9 @@ const buttonMap = {
     },
     runDeltaAnalysis: () => window.performDeltaAnalysis(),
     exportDeltaCSV: () => window.exportMergedDeltaCSV(),
+    // === Exception Manager Buttons ===
+    refreshExceptionsBtn: () => window.refreshExceptions(),
+    exportExceptionsBtn: () => window.exportExceptionsCSV(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");

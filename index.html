@@ -38,6 +38,7 @@
     <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🛠</button>
     <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
     <button id="navDeltaBtn" class="tablink nav-icon" data-target="deltaAnalyzer" title="Delta Analyzer" aria-label="Delta Analyzer">🧮</button>
+    <button id="navExceptionBtn" class="tablink nav-icon" data-target="exceptionManager" title="Exception Manager" aria-label="Exception Manager">🚩</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -240,6 +241,34 @@
             </thead>
             <tbody>
               <tr><td colspan="7" style="text-align:center; color:#888;">No delta loaded</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Phase 74 — Audit Exception Manager -->
+      <section id="exceptionManager" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Exception Manager">
+        <h2>🚩 Audit Exception Manager</h2>
+
+        <div class="exception-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
+          <button id="refreshExceptionsBtn">🔄 Refresh Exceptions</button>
+          <button id="exportExceptionsBtn">📥 Export Exceptions to CSV</button>
+        </div>
+
+        <div id="exceptionTableWrapper" style="max-height: 400px; overflow-y: auto; border: 1px solid #555; border-radius: 5px;">
+          <table id="exceptionTable" style="width:100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th>Item #</th>
+                <th>Delta</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Action Tag</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" style="text-align:center; color:#888;">No exceptions loaded</td></tr>
             </tbody>
           </table>
         </div>

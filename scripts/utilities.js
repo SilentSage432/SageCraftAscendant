@@ -101,3 +101,4 @@ export { formatDate, generateTimestamp as generateUUID, sleep as delay, safePars
 
 // 🌐 Expose exportDeltaToCSV globally for Delta Review UI
 window.exportDeltaToCSV = exportDeltaToCSV;
+window.showToast = showToast;
