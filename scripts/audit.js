@@ -110,3 +110,141 @@ function runMasterDiagnostics() {
 }
 
 export { runFullSystemAudit, runWiringExpectationAudit, runAutoHealingLayer, runMasterDiagnostics };
+
+
+// 🔰 Audit Archive Manager Injection - Phase 70
+
+export const auditArchive = {
+  listAudits: () => {
+    const data = JSON.parse(localStorage.getItem("savedAuditArchives") || "{}");
+    return Object.keys(data);
+  },
+
+  saveAudit: (id, auditData) => {
+    const data = JSON.parse(localStorage.getItem("savedAuditArchives") || "{}");
+    data[id] = auditData;
+    localStorage.setItem("savedAuditArchives", JSON.stringify(data));
+  },
+
+  loadAudit: (id) => {
+    const data = JSON.parse(localStorage.getItem("savedAuditArchives") || "{}");
+    return data[id] || null;
+  },
+
+  deleteAudit: (id) => {
+    const data = JSON.parse(localStorage.getItem("savedAuditArchives") || "{}");
+    delete data[id];
+    localStorage.setItem("savedAuditArchives", JSON.stringify(data));
+  },
+
+  generateMergedCSV: (mergedData) => {
+    let csv = "Item #,Count,Category,Location\n";
+    mergedData.forEach(entry => {
+      csv += `${entry.item},${entry.count},${entry.category},${entry.location}\n`;
+    });
+    return csv;
+  }
+};
+
+// 🔰 Phase 71.5 Merge Stability Hook Injection
+
+function autoRefreshMergeList() {
+  if (typeof window.refreshMergeSessionList === 'function') {
+    window.refreshMergeSessionList();
+  }
+}
+
+// Wrap existing save/delete calls to trigger merge list refresh
+const originalSaveAudit = auditArchive.saveAudit;
+auditArchive.saveAudit = function(id, auditData) {
+  originalSaveAudit.call(this, id, auditData);
+  autoRefreshMergeList();
+}
+
+const originalDeleteAudit = auditArchive.deleteAudit;
+auditArchive.deleteAudit = function(id) {
+  originalDeleteAudit.call(this, id);
+  autoRefreshMergeList();
+}
+
+// 🔬 Phase 72 — Delta Analyzer Core
+
+export function compareAuditDeltas(baseAuditCSV, compareAuditCSV) {
+  const parseCSV = (csv) => {
+    const rows = csv.trim().split('\n').slice(1);
+    const map = {};
+    rows.forEach(row => {
+      const [item, countStr, category, location] = row.split(',');
+      map[item] = {
+        count: parseInt(countStr, 10),
+        category: category || '',
+        location: location || ''
+      };
+    });
+    return map;
+  };
+
+  const baseMap = parseCSV(baseAuditCSV);
+  const compareMap = parseCSV(compareAuditCSV);
+
+  const deltas = [];
+
+  const allItems = new Set([...Object.keys(baseMap), ...Object.keys(compareMap)]);
+  allItems.forEach(item => {
+    const baseEntry = baseMap[item] || { count: 0, category: '', location: '' };
+    const compareEntry = compareMap[item] || { count: 0, category: '', location: '' };
+    const delta = compareEntry.count - baseEntry.count;
+
+    deltas.push({
+      item,
+      baseCount: baseEntry.count,
+      compareCount: compareEntry.count,
+      delta,
+      category: baseEntry.category || compareEntry.category,
+      location: baseEntry.location || compareEntry.location
+    });
+  });
+
+  return deltas;
+}
+
+
+export function generateDeltaCSV(deltas) {
+  let csv = "Item #,Base Count,Compare Count,Delta,Category,Location\n";
+  deltas.forEach(entry => {
+    csv += `${entry.item},${entry.baseCount},${entry.compareCount},${entry.delta},${entry.category},${entry.location}\n`;
+  });
+  return csv;
+}
+
+// 🔬 Phase 73.5 Delta Review UI Integration
+export function renderDeltaReviewTable(deltaData) {
+  const tbody = document.querySelector('#deltaReviewTable tbody');
+  tbody.innerHTML = '';
+
+  if (!deltaData || deltaData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#888;">No delta loaded</td></tr>';
+    return;
+  }
+
+  deltaData.forEach(row => {
+    const tr = document.createElement('tr');
+    const status = (row.delta !== 0) ? '⚠️ Review' : '✅ Match';
+
+    tr.innerHTML = `
+      <td>${row.item}</td>
+      <td>${row.baseCount}</td>
+      <td>${row.compareCount}</td>
+      <td>${row.delta}</td>
+      <td>${row.category || '-'}</td>
+      <td>${row.location || '-'}</td>
+      <td>${status}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+// 🌐 Expose renderDeltaReviewTable globally for Delta Review UI
+window.renderDeltaReviewTable = renderDeltaReviewTable;
+// 🌐 Expose remaining Delta Analyzer functions globally
+window.performDeltaAnalysis = performDeltaAnalysis;
+window.exportMergedDeltaCSV = exportMergedDeltaCSV;

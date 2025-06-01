@@ -70,4 +70,34 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-export { formatDate, generateTimestamp as generateUUID, sleep as delay, safeParse, showToast };
+
+/**
+ * Export Delta Review data to CSV
+ */
+function exportDeltaToCSV(deltaData) {
+  if (!deltaData || deltaData.length === 0) {
+    showToast('No delta data to export.');
+    return;
+  }
+
+  const headers = ['Item #', 'Base', 'Compare', 'Delta', 'Category', 'Location', 'Status'];
+  const rows = deltaData.map(row => [
+    row.item, row.baseCount, row.compareCount, row.delta,
+    row.category || '-', row.location || '-',
+    (row.delta !== 0) ? 'Review' : 'Match'
+  ]);
+
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'DeltaReview.csv');
+  link.click();
+}
+
+export { formatDate, generateTimestamp as generateUUID, sleep as delay, safeParse, showToast, exportDeltaToCSV };
+
+// 🌐 Expose exportDeltaToCSV globally for Delta Review UI
+window.exportDeltaToCSV = exportDeltaToCSV;

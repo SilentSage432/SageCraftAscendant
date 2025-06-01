@@ -89,10 +89,7 @@ if (exportBtn) {
 // Phase 19.5 — Resolver Bootstrap Linker Injection
 
 // Full global exposure for master wiring stability
-function wireAllButtons() {
-  console.log("Wiring process starting...");
-
-  const buttonMap = {
+const buttonMap = {
     addItemBtn: () => window.addItemModal(),
     addLiveItemBtn: () => window.addLiveItem(),
     clearHistoryBtn: () => window.clearHistory(),
@@ -129,6 +126,7 @@ function wireAllButtons() {
     navInventoryBtn: () => window.switchTab('inventory'),
     navToolsBtn: () => window.switchTab('tools'),
     navVaultBtn: () => window.switchTab('vault'),
+    navDeltaBtn: () => window.switchTab('deltaAnalyzer'),
     purgeLocalStorageBtn: () => window.purgeLocalStorage(),
     refreshAuditLogBtn: () => window.refreshAuditLog(),
     refreshFieldLog: () => renderFieldLog(),
@@ -194,6 +192,24 @@ function wireAllButtons() {
     runFinalIntegrityAuditBtn: () => window.runFinalIntegrityAudit(),
     runFullSystemAuditBtn: () => window.runFullSystemAudit(),
     // ---- END ADDITIVE ENTRIES ----
+    // === Delta Review Interface Buttons ===
+    refreshDeltaView: () => {
+      const data = window.auditArchive?.lastDeltaResults || [];
+      window.renderDeltaReviewTable(data);
+    },
+    exportDeltaView: () => {
+      const data = window.auditArchive?.lastDeltaResults || [];
+      window.exportDeltaToCSV(data);
+    },
+    runDeltaAnalysis: () => window.performDeltaAnalysis(),
+    exportDeltaCSV: () => window.exportMergedDeltaCSV(),
+    // === Session Manager Wiring ===
+    refreshSessionList: () => {
+      const tbody = document.getElementById("sessionManagerTableBody");
+      if (tbody) {
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#888;'>Session manager temporarily disabled (audit rebuild in progress)</td></tr>";
+      }
+    },
     exportDeltaReportBtn: () => window.exportTools.exportDeltaReport(),
     // === Audit History Panel Buttons ===
     viewAuditHistoryBtn: () => {
@@ -256,7 +272,37 @@ function wireAllButtons() {
     // === Cloud Archive Sync Buttons ===
     uploadArchiveBtn: () => window.cloudArchiveSync.uploadArchive(),
     downloadArchiveBtn: () => window.cloudArchiveSync.downloadArchive(),
+    // === Merge UI Buttons ===
+    performMergeBtn: () => {
+      const select = document.getElementById('mergeSessionSelect');
+      const options = [...select.selectedOptions].map(opt => opt.value);
+      if (options.length < 2) {
+        alert("Please select at least 2 sessions to merge.");
+        return;
+      }
+      const merged = window.auditArchive.mergeAudits(options);
+      window._lastMergedAudit = merged;
+      alert("✅ Merge complete. You may now export.");
+    },
+    exportMergedAuditBtn: () => {
+      if (!window._lastMergedAudit) {
+        alert("No merged audit available. Perform a merge first.");
+        return;
+      }
+      const csv = window.auditArchive.generateMergedCSV(window._lastMergedAudit);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `MergedAudit_${new Date().toISOString().replace(/[:.]/g, "-")}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   };
+
+function wireAllButtons() {
+  console.log("Wiring process starting...");
 
   Object.entries(buttonMap).forEach(([btnId, handler]) => {
     const btn = document.getElementById(btnId);
@@ -501,5 +547,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     console.log("🔄 Executing Stability Sync Pass...");
     window.wireAllButtons();
+
+    if (typeof buttonMap.refreshSessionList === 'function') {
+      console.log("🧬 Auto-refreshing Session Manager...");
+      buttonMap.refreshSessionList();
+    }
   }, 500);
 });
