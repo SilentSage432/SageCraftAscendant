@@ -6,6 +6,12 @@ export function handleScanInput(scanCode) {
     const extractedUPC = extractUPC(scanCode);
     if (extractedUPC) {
         console.log("✅ Resolved UPC:", extractedUPC);
+        // Phase 37A — Item Link Modal Trigger Injection
+        if (typeof window.openItemLinkModal === 'function') {
+            window.openItemLinkModal(extractedUPC);
+        } else {
+            console.warn("⚠ Item Link Modal function not yet implemented.");
+        }
         // You can trigger modal or next phase here once integrated.
     } else {
         console.warn("⚠️ Could not resolve scan code.");
@@ -318,3 +324,297 @@ window.selfHealingEngine = {
 
 // Auto-activate engine on load
 window.selfHealingEngine.start();
+
+// ================================
+// Phase 29 — Intelligent Pruning Engine
+// ================================
+
+window.pruningEngine = {
+    pruneThreshold: 0.3,
+
+    prune: function() {
+        if (!window.resolverClassifierLoader || !window.classifierEvolution) {
+            console.warn("Pruning Engine: Classifier system not initialized.");
+            return;
+        }
+
+        const classifiersBefore = resolverClassifierLoader.classifiers.length;
+
+        resolverClassifierLoader.classifiers = resolverClassifierLoader.classifiers.filter(cl => {
+            const mutation = classifierEvolution.mutations[cl.name];
+            if (mutation && mutation.score < this.pruneThreshold) {
+                console.warn(`🧹 Pruning classifier: ${cl.name} (score ${mutation.score})`);
+                return false;
+            }
+            return true;
+        });
+
+        const classifiersAfter = resolverClassifierLoader.classifiers.length;
+        console.log(`🧬 Pruning Engine Complete — Removed ${classifiersBefore - classifiersAfter} classifiers.`);
+    }
+};
+// ================================
+// Phase 29.5 — Adaptive Sync Engine
+// ================================
+
+window.adaptiveSyncEngine = {
+    export: function() {
+        const state = {
+            adaptiveScanLog: window.adaptiveScanLog || [],
+            classifierStats: window.classifierEvolution?.stats || {},
+            classifierMutations: window.classifierEvolution?.mutations || {},
+            classifiers: window.resolverClassifierLoader?.classifiers || []
+        };
+        const exportData = JSON.stringify(state, null, 2);
+        console.log("🧬 Exported Adaptive Brain:", exportData);
+        return exportData;
+    },
+
+    import: function(jsonData) {
+        try {
+            const state = JSON.parse(jsonData);
+            window.adaptiveScanLog = state.adaptiveScanLog || [];
+            window.classifierEvolution = {
+                stats: state.classifierStats || {},
+                mutations: state.classifierMutations || {},
+                report: function() {
+                    console.log("🧬 Classifier Evolution Stats:", this.stats);
+                    console.log("🧪 Mutation Scoring:", this.mutations);
+                    return { stats: this.stats, mutations: this.mutations };
+                },
+                recordResult: window.classifierEvolution.recordResult
+            };
+            window.resolverClassifierLoader = {
+                classifiers: state.classifiers || [],
+                registerClassifier: resolverClassifierLoader.registerClassifier,
+                runClassifiers: resolverClassifierLoader.runClassifiers
+            };
+            console.log("✅ Adaptive Brain Imported Successfully.");
+        } catch (err) {
+            console.error("❌ Failed to import adaptive brain:", err);
+        }
+    }
+};
+
+// ================================
+// Phase 32 — Multi-Device Merge Engine
+// ================================
+
+window.adaptiveMergeEngine = {
+    merge: function(incomingState) {
+        if (!incomingState) {
+            console.error("❌ No incoming state provided for merge.");
+            return;
+        }
+
+        // Merge adaptiveScanLog
+        const localLog = window.adaptiveScanLog || [];
+        const mergedLog = [...localLog];
+
+        incomingState.adaptiveScanLog.forEach(remoteEntry => {
+            if (!localLog.some(localEntry => localEntry.input === remoteEntry.input && localEntry.timestamp === remoteEntry.timestamp)) {
+                mergedLog.push(remoteEntry);
+            }
+        });
+
+        window.adaptiveScanLog = mergedLog;
+
+        // Merge classifier stats
+        for (const [classifier, stats] of Object.entries(incomingState.classifierStats || {})) {
+            if (!window.classifierEvolution.stats[classifier]) {
+                window.classifierEvolution.stats[classifier] = { hits: 0, misses: 0 };
+            }
+            window.classifierEvolution.stats[classifier].hits += stats.hits;
+            window.classifierEvolution.stats[classifier].misses += stats.misses;
+        }
+
+        // Merge classifier mutations
+        for (const [classifier, mutation] of Object.entries(incomingState.classifierMutations || {})) {
+            if (!window.classifierEvolution.mutations[classifier]) {
+                window.classifierEvolution.mutations[classifier] = { score: mutation.score };
+            } else {
+                const localScore = window.classifierEvolution.mutations[classifier].score;
+                window.classifierEvolution.mutations[classifier].score = (localScore + mutation.score) / 2;
+            }
+        }
+
+        // Merge classifiers (avoid duplicates)
+        const localClassifiers = window.resolverClassifierLoader.classifiers || [];
+        incomingState.classifiers.forEach(remoteClassifier => {
+            const duplicate = localClassifiers.some(local => local.name === remoteClassifier.name);
+            if (!duplicate) {
+                resolverClassifierLoader.registerClassifier(
+                    remoteClassifier.name,
+                    remoteClassifier.pattern,
+                    eval(remoteClassifier.resolverFunction)
+                );
+            }
+        });
+
+        console.log("🧬 Multi-Device Merge Complete");
+    }
+};
+// ================================
+// Phase 33 — Conflict Resolution & Consensus Engine
+// ================================
+
+window.adaptiveConsensusEngine = {
+    resolveConflicts: function() {
+        const conflictingClassifiers = [];
+
+        for (const [name, mutation] of Object.entries(window.classifierEvolution.mutations)) {
+            if (mutation.score >= 0.3 && mutation.score <= 0.5) {
+                conflictingClassifiers.push({ name, score: mutation.score });
+            }
+        }
+
+        if (conflictingClassifiers.length === 0) {
+            console.log("✅ No conflicts detected. System stable.");
+            return;
+        }
+
+        conflictingClassifiers.forEach(conflict => {
+            console.warn(`⚠ Classifier '${conflict.name}' has borderline confidence (${conflict.score}). Manual review recommended.`);
+        });
+
+        console.log("🧬 Conflict Resolution Complete. Review borderline classifiers if necessary.");
+    }
+};
+// ================================
+// Phase 34 — Autonomous Classifier Refinement Engine
+// ================================
+
+window.classifierRefinementEngine = {
+    refine: function() {
+        const mutations = window.classifierEvolution.mutations || {};
+
+        for (const [classifier, mutation] of Object.entries(mutations)) {
+            if (mutation.score >= 0.3 && mutation.score <= 0.5) {
+                const adjustment = 0.02;
+                const historical = window.classifierEvolution.stats[classifier] || { hits: 0, misses: 0 };
+
+                if (historical.hits >= historical.misses) {
+                    mutation.score += adjustment;
+                    console.log(`🧬 Refinement: Boosted ${classifier} to ${mutation.score.toFixed(3)}`);
+                } else {
+                    mutation.score -= adjustment;
+                    console.log(`🧬 Refinement: Reduced ${classifier} to ${mutation.score.toFixed(3)}`);
+                }
+
+                // Clamp boundaries
+                mutation.score = Math.max(0.0, Math.min(1.0, mutation.score));
+            }
+        }
+
+        console.log("🧬 Classifier Refinement Pass Complete.");
+    },
+
+    autoLoop: function() {
+        setInterval(() => {
+            this.refine();
+        }, 30000); // Run every 30 seconds
+        console.log("🧬 Autonomous Classifier Refinement Engine Online");
+    }
+};
+
+// Auto-start refinement loop
+window.classifierRefinementEngine.autoLoop();
+
+// ================================
+// Phase 35 — Long-Term Memory Compression Engine
+// ================================
+
+window.adaptiveCompressionEngine = {
+    compress: function() {
+        const log = window.adaptiveScanLog || [];
+        const retentionThreshold = 500; // Keep last 500 scans
+
+        if (log.length <= retentionThreshold) {
+            console.log("🧬 Compression not required. Log size is healthy.");
+            return;
+        }
+
+        const compressedLog = log.slice(log.length - retentionThreshold);
+        window.adaptiveScanLog = compressedLog;
+
+        console.log(`🧬 Adaptive Scan Log Compressed — Retained last ${retentionThreshold} scans.`);
+    },
+
+    autoLoop: function() {
+        setInterval(() => {
+            this.compress();
+        }, 300000); // Check every 5 minutes
+        console.log("🧬 Long-Term Memory Compression Engine Online");
+    }
+};
+
+// Auto-start compression loop
+window.adaptiveCompressionEngine.autoLoop();
+
+// ================================
+// Phase 36 — Predictive Resolver Forecasting Engine
+// ================================
+
+window.predictiveForecastEngine = {
+    forecast: function() {
+        const log = window.adaptiveScanLog || [];
+        const predictions = {};
+
+        log.forEach(entry => {
+            if (entry.input.length > 12) {
+                const prefixLength = entry.input.length - 12;
+                predictions[prefixLength] = (predictions[prefixLength] || 0) + 1;
+            }
+        });
+
+        const sorted = Object.entries(predictions)
+            .map(([length, count]) => ({ prefixLength: parseInt(length), count }))
+            .sort((a, b) => b.count - a.count);
+
+        const probableNext = sorted[0];
+        console.log("🧬 Forecast Prediction:", probableNext);
+
+        return probableNext;
+    },
+
+    recommendClassifier: function() {
+        const prediction = this.forecast();
+        if (!prediction) {
+            console.warn("⚠ No sufficient data for prediction.");
+            return;
+        }
+
+        const detectedPrefixLength = prediction.prefixLength;
+        const pattern = new RegExp(`^(\\d{${detectedPrefixLength}})(\\d{12})$`);
+
+        console.log(`🧬 Recommended Classifier Pattern: Prefix Length ${detectedPrefixLength} → ${pattern}`);
+        return pattern;
+    }
+};
+
+// ================================
+// Phase 39 — Field Audit Snapshot Engine
+// ================================
+
+window.fieldAuditEngine = {
+    generateSnapshot: function() {
+        const adaptiveState = window.adaptiveSyncEngine.export();
+        const itemLinkMap = JSON.parse(localStorage.getItem("itemLinkMap") || "{}");
+
+        const snapshot = {
+            timestamp: new Date().toISOString(),
+            adaptiveBrain: JSON.parse(adaptiveState),
+            itemMappings: itemLinkMap
+        };
+
+        console.log("🧬 Field Audit Snapshot Generated:", snapshot);
+        return snapshot;
+    },
+
+    exportSnapshot: function() {
+        const snapshot = this.generateSnapshot();
+        const exportData = JSON.stringify(snapshot, null, 2);
+        console.log("🧬 Field Audit Export Ready:", exportData);
+        return exportData;
+    }
+};
