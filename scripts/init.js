@@ -15,7 +15,6 @@ import {
   refreshAccessToken,
   saveSessionToDropbox,
   loadSessionFromDropbox,
-  listDropboxSessions,
   loadSelectedDropboxSession
 } from './dropbox.js';
 import { displayAppVersion } from './version.js';
@@ -37,13 +36,11 @@ window.InventoryApp = {
   handleToggleDevDashboard,
 
   // Dropbox
-  syncAllMapsToDropbox,
-  restoreAllMapsFromDropbox,
+  syncAllMapsFromDropbox,
+  restoreAllMapsToDropbox,
   refreshAccessToken,
   saveSessionToDropbox,
   loadSessionFromDropbox,
-  listDropboxSessions,
-  loadSelectedDropboxSession,
 };
 
 // DOMContentLoaded lifecycle manager
