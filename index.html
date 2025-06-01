@@ -168,24 +168,30 @@
             </div>
           </div>
 
-          <!-- Place On-Hand Counts UI block here -->
-          <h2>On-Hand Counts</h2>
-          <div class="onhand-button-wrapper">
-            <button id="uploadDropboxFile">📤 Load from Dropbox</button>
-          </div>
-          <input type="file" id="onHandFileInput" accept=".txt,.csv" style="display:none;" />
-          <div style="display: flex; flex-direction: column; align-items: center; margin-top: 10px;">
-            <textarea id="onHandInput" style="width: 90%; max-width: 720px; min-height: 150px;" placeholder="Example: 10021789: 5"></textarea>
-            <div id="onHandSaveStatus" style="color: limegreen; font-size: 0.9em; margin-top: 5px; text-align: left; width: 90%; max-width: 720px;">
-            </div>
-          </div>
       </section>
 
       <section id="exportTools" class="tab-section panel-glow" role="tabpanel" aria-label="Export Tools">
         <h2>Export Tools</h2>
+        <button id="exportDeltaReportBtn">📊 Export Delta Report</button>
         <button id="downloadToExcelBtn">⬇️ Download Excel</button>
         <button id="exportAuditLog">📤 Export Audit Log</button>
         <button id="resetAuditLog">🗑️ Reset Audit Log</button>
+
+        <!-- Audit History Panel Controls -->
+        <button id="viewAuditHistoryBtn">📜 View Audit History</button>
+        <button id="uploadArchiveBtn">☁️ Upload Archive to Cloud</button>
+        <button id="downloadArchiveBtn">☁️ Restore Archive from Cloud</button>
+
+        <div id="auditHistoryPanel" class="hidden panel-glow" style="margin-top: 15px; padding: 10px; background-color: #222; border: 1px solid #555; border-radius: 5px;">
+          <h3>📜 Audit History</h3>
+          <select id="auditHistorySelect" style="width: 100%; margin-bottom: 10px;">
+            <option value="">Select archived audit...</option>
+          </select>
+          <div style="display: flex; gap: 8px;">
+            <button id="loadSelectedAuditBtn">📂 Load</button>
+            <button id="deleteSelectedAuditBtn">🗑️ Delete</button>
+          </div>
+        </div>
       </section>
 
       <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">

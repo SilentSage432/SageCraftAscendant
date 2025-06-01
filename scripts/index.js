@@ -23,7 +23,4 @@ document.addEventListener('DOMContentLoaded', () => {
   setupReportButton();
   setupMoreOptionsToggle();
   setupTemplateExportButton();
-
-  window.liveCounts = window.liveCounts || {};
-  window.updateLiveTable = updateLiveTable;
 });

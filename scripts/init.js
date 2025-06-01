@@ -33,14 +33,7 @@ window.InventoryApp = {
   handleConfirmEdit,
   handleCancelEdit,
   handleCloseSummary,
-  handleToggleDevDashboard,
-
-  // Dropbox
-  syncAllMapsFromDropbox,
-  restoreAllMapsToDropbox,
-  refreshAccessToken,
-  saveSessionToDropbox,
-  loadSessionFromDropbox,
+  handleToggleDevDashboard
 };
 
 // DOMContentLoaded lifecycle manager

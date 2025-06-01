@@ -27,8 +27,28 @@ export function handleScanInput(scanCode) {
                     });
                     window.liveTableManager.renderTable();
                 }
-            } else {
-                console.log("🧬 No Item Link found for UPC:", extractedUPC, "Triggering Item Link Modal...");
+            }
+            // Live Table Sync Hook — predictive resolver fallback
+            else {
+                // Inject Live Table Sync: Check predictive resolver during fallback
+                const predictive = window.predictiveResolverEngine?.applyPredictiveMappingWithAggression(scanCode);
+                if (predictive) {
+                    console.log("🧬 Predictive Aggression applied during fallback scan.");
+                    if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+                        window.liveTableManager.addRow({
+                            itemNumber: predictive.mapping.item,
+                            upc: predictive.upc,
+                            count: 1,
+                            category: predictive.mapping.category || 'Unassigned',
+                            location: '',
+                            previous: '',
+                            delta: ''
+                        });
+                        window.liveTableManager.renderTable();
+                    }
+                    return;  // Fully handled at this stage
+                }
+                // Force Item Link Modal if no mapping or predictive resolution was found
                 if (window.itemLinkModalManager && typeof window.itemLinkModalManager.promptForLink === 'function') {
                     window.itemLinkModalManager.promptForLink(extractedUPC);
                 }
@@ -42,6 +62,37 @@ export function handleScanInput(scanCode) {
 
 function extractUPC(scanCode) {
     let code = scanCode.trim();
+    // Phase 55.5 — Predictive Resolver Hook Injection
+    if (window.predictiveResolverEngine) {
+        const predictive = window.predictiveResolverEngine.applyPredictiveMapping(code);
+        if (predictive) {
+            console.log("🧬 Predictive Resolver successfully applied mapping.");
+            const scanSessionLog = window.scanSessionLog || [];
+            const adaptiveLog = window.adaptiveScanLog || [];
+            const scanResult = { raw: scanCode, phase: "Predictive", extracted: predictive.upc };
+            const adaptiveRecord = { input: scanCode, resolvedPhase: "Predictive", upc: predictive.upc, timestamp: new Date().toISOString() };
+
+            scanSessionLog.push(scanResult);
+            adaptiveLog.push(adaptiveRecord);
+            window.scanSessionLog = scanSessionLog;
+            window.adaptiveScanLog = adaptiveLog;
+
+            // Trigger live table insert immediately
+            if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+                window.liveTableManager.addRow({
+                    itemNumber: predictive.mapping.item,
+                    upc: predictive.upc,
+                    count: 1,
+                    category: predictive.mapping.category || 'Unassigned',
+                    location: '',
+                    previous: '',
+                    delta: ''
+                });
+                window.liveTableManager.renderTable();
+            }
+            return predictive.upc;
+        }
+    }
     if (!/^\d+$/.test(code)) {
         console.warn("⚠️ Non-numeric scan detected. Skipping resolver.");
         return null;
@@ -768,3 +819,290 @@ window.selfAuditEngine = {
 
 // Activate audit loop on startup
 window.selfAuditEngine.autoLoop();
+
+// ================================
+// Phase 55 — Predictive Resolver Expansion
+// ================================
+
+window.predictiveResolverEngine = {
+    analyzeMappingPatterns: function() {
+        const memory = window.itemLinkStorage?.loadMemory() || { mappings: {} };
+        const prefixStats = {};
+
+        for (const upc of Object.keys(memory.mappings)) {
+            if (upc.length > 12) {
+                const prefixLength = upc.length - 12;
+                prefixStats[prefixLength] = (prefixStats[prefixLength] || 0) + 1;
+            }
+        }
+
+        const summary = Object.entries(prefixStats)
+            .map(([length, count]) => ({ prefixLength: parseInt(length), count }))
+            .sort((a, b) => b.count - a.count);
+
+        console.log("🧬 Predictive Resolver Mapping Summary:", summary);
+        return summary;
+    },
+
+    suggestLikelyUPC: function(scanCode) {
+        const summary = this.analyzeMappingPatterns();
+        if (!summary || summary.length === 0) {
+            console.warn("⚠ No historical mapping data available for prediction.");
+            return null;
+        }
+
+        const likelyPrefixLength = summary[0].prefixLength;
+        const regex = new RegExp(`^(\\d{${likelyPrefixLength}})?(\\d{12})$`);
+        const match = scanCode.match(regex);
+        if (match) {
+            const predictedUPC = match[2];
+            console.log(`🧬 Predictive Resolver extracted UPC: ${predictedUPC}`);
+            return predictedUPC;
+        }
+
+        return null;
+    },
+
+    applyPredictiveMapping: function(scanCode) {
+        const prediction = this.suggestLikelyUPC(scanCode);
+        if (!prediction) {
+            return null;
+        }
+
+        const mapping = window.itemLinkStorage?.getMapping(prediction);
+        if (mapping) {
+            console.log("🧬 Predictive Resolver Auto-Recalled:", mapping);
+            return { upc: prediction, mapping };
+        }
+        return null;
+    },
+
+    /**
+     * Apply predictive mapping only if confidence meets/exceeds threshold.
+     * @param {string} scanCode
+     * @param {number} confidenceThreshold - value between 0 and 1 (default 0.7)
+     * @returns {{upc: string, mapping: object}|null}
+     */
+    applyPredictiveMappingWithConfidence: function(scanCode, confidenceThreshold = 0.7) {
+        const prediction = this.suggestLikelyUPC(scanCode);
+        if (!prediction) {
+            return null;
+        }
+
+        const mapping = window.itemLinkStorage?.getMapping(prediction);
+        if (!mapping) {
+            return null;
+        }
+
+        // Simple confidence estimation based on mapping history size
+        const memory = window.itemLinkStorage?.loadMemory() || { mappings: {} };
+        const totalMappings = Object.keys(memory.mappings).length;
+        const prefixLength = prediction.length - 12;
+        const prefixStats = this.analyzeMappingPatterns();
+        const prefixRecord = prefixStats.find(p => p.prefixLength === prefixLength);
+        const ratio = prefixRecord ? (prefixRecord.count / totalMappings) : 0;
+
+        if (ratio >= confidenceThreshold) {
+            console.log(`🧬 Predictive Resolver passed confidence threshold (${(ratio*100).toFixed(2)}%).`);
+            return { upc: prediction, mapping };
+        } else {
+            console.log(`🧬 Predictive Resolver below confidence threshold (${(ratio*100).toFixed(2)}%), skipping.`);
+            return null;
+        }
+    },
+
+    autoLearnNewMappings: function() {
+        console.log("🧬 Predictive Resolver Learning Online.");
+        setInterval(() => {
+            this.analyzeMappingPatterns();
+        }, 600000); // Re-analyze every 10 minutes
+    },
+
+    // ===== Phase 56 — Predictive Evolution Engine Expansion =====
+    evolvePatterns: function() {
+        console.log("🧬 Predictive Evolution Engine Online.");
+
+        setInterval(() => {
+            const log = window.adaptiveScanLog || [];
+            const prefixStats = {};
+
+            log.forEach(entry => {
+                if (entry.input.length > 12) {
+                    const prefixLength = entry.input.length - 12;
+                    prefixStats[prefixLength] = (prefixStats[prefixLength] || 0) + 1;
+                }
+            });
+
+            const sorted = Object.entries(prefixStats)
+                .map(([length, count]) => ({ prefixLength: parseInt(length), count }))
+                .sort((a, b) => b.count - a.count);
+
+            if (sorted.length > 0) {
+                const topPrefix = sorted[0];
+                window.predictiveResolverEngine.currentPreferredPrefix = topPrefix.prefixLength;
+                console.log(`🧬 Predictive Evolution Updated Preferred Prefix Length → ${topPrefix.prefixLength}`);
+            } else {
+                console.warn("🧬 Predictive Evolution found no usable adaptive data.");
+            }
+        }, 300000); // Recalculate every 5 minutes
+    },
+
+    // Phase 58 — Predictive Risk Management Layer
+    aggressionMode: 'Balanced',
+
+    aggressionThresholds: {
+        'Conservative': 0.9,
+        'Balanced': 0.7,
+        'Aggressive': 0.5
+    },
+
+    setAggressionMode: function(mode) {
+        if (this.aggressionThresholds.hasOwnProperty(mode)) {
+            this.aggressionMode = mode;
+            console.log(`🧬 Aggression Mode set to '${mode}' — Threshold: ${this.aggressionThresholds[mode] * 100}%`);
+        } else {
+            console.warn(`⚠ Unknown aggression mode '${mode}'.`);
+        }
+    },
+
+    applyPredictiveMappingWithAggression: function(scanCode) {
+        const threshold = this.aggressionThresholds[this.aggressionMode] || 0.7;
+        return this.applyPredictiveMappingWithConfidence(scanCode, threshold);
+    },
+
+    // ===== Phase 59 — Predictive Override Prompts Engine =====
+    applyPredictiveMappingWithOverride: function(scanCode) {
+        const prediction = this.suggestLikelyUPC(scanCode);
+        if (!prediction) {
+            return null;
+        }
+
+        const mapping = window.itemLinkStorage?.getMapping(prediction);
+        if (!mapping) {
+            return null;
+        }
+
+        const memory = window.itemLinkStorage?.loadMemory() || { mappings: {} };
+        const totalMappings = Object.keys(memory.mappings).length;
+        const prefixLength = prediction.length - 12;
+        const prefixStats = this.analyzeMappingPatterns();
+        const prefixRecord = prefixStats.find(p => p.prefixLength === prefixLength);
+        const ratio = prefixRecord ? (prefixRecord.count / totalMappings) : 0;
+
+        // If high confidence, apply automatically
+        if (ratio >= 0.7) {
+            console.log(`🧬 Predictive Resolver auto-accepted (confidence ${(ratio*100).toFixed(1)}%)`);
+            return { upc: prediction, mapping };
+        }
+
+        // If borderline confidence, trigger override prompt
+        if (ratio >= 0.5) {
+            console.log(`🧬 Predictive Resolver borderline (${(ratio*100).toFixed(1)}%) — prompting for confirmation.`);
+
+            if (window.itemLinkModalManager?.promptForOverride) {
+                window.itemLinkModalManager.promptForOverride(prediction, mapping, ratio);
+            }
+
+            return null; // Await user response
+        }
+
+        console.log(`🧬 Predictive Resolver rejected (confidence ${(ratio*100).toFixed(1)}%)`);
+        return null;
+    }
+};
+
+// Activate predictive learning loop
+window.predictiveResolverEngine.autoLearnNewMappings();
+
+// Activate evolution loop
+window.predictiveResolverEngine.evolvePatterns();
+
+// ================================
+// Phase 57 — Predictive Audit Overlay Engine
+// ================================
+
+window.predictiveAuditEngine = {
+    renderAuditOverlay: function() {
+        const containerId = 'predictiveAuditOverlay';
+        let overlay = document.getElementById(containerId);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = containerId;
+            overlay.style.position = 'fixed';
+            overlay.style.top = '10px';
+            overlay.style.right = '10px';
+            overlay.style.padding = '12px';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            overlay.style.color = '#0f0';
+            overlay.style.fontFamily = 'monospace';
+            overlay.style.fontSize = '12px';
+            overlay.style.zIndex = '9999';
+            overlay.style.border = '1px solid lime';
+            document.body.appendChild(overlay);
+        }
+
+        const summary = window.predictiveResolverEngine.analyzeMappingPatterns();
+        const totalMappings = Object.keys(window.itemLinkStorage?.loadMemory()?.mappings || {}).length;
+        const displayLines = summary.map(s => {
+            const ratio = (s.count / totalMappings * 100).toFixed(1);
+            return `Prefix ${s.prefixLength}: ${s.count} (${ratio}%)`;
+        });
+
+        overlay.innerHTML = `<b>Predictive Resolver Audit</b><br/>Mappings: ${totalMappings}<br/>` + displayLines.join('<br/>');
+    },
+
+    startAuditLoop: function() {
+        console.log("🧬 Predictive Audit Overlay Engine Online");
+        setInterval(() => {
+            this.renderAuditOverlay();
+        }, 5000); // Update every 5 seconds
+    }
+};
+
+// Auto-start audit overlay on load
+window.predictiveAuditEngine.startAuditLoop();
+
+// ================================
+// Phase 57 — Predictive Audit Overlay Engine
+// ================================
+
+window.predictiveAuditEngine = {
+    renderAuditOverlay: function() {
+        const containerId = 'predictiveAuditOverlay';
+        let overlay = document.getElementById(containerId);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = containerId;
+            overlay.style.position = 'fixed';
+            overlay.style.top = '10px';
+            overlay.style.right = '10px';
+            overlay.style.padding = '12px';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            overlay.style.color = '#0f0';
+            overlay.style.fontFamily = 'monospace';
+            overlay.style.fontSize = '12px';
+            overlay.style.zIndex = '9999';
+            overlay.style.border = '1px solid lime';
+            document.body.appendChild(overlay);
+        }
+
+        const summary = window.predictiveResolverEngine.analyzeMappingPatterns();
+        const totalMappings = Object.keys(window.itemLinkStorage?.loadMemory()?.mappings || {}).length;
+        const displayLines = summary.map(s => {
+            const ratio = (s.count / totalMappings * 100).toFixed(1);
+            return `Prefix ${s.prefixLength}: ${s.count} (${ratio}%)`;
+        });
+
+        overlay.innerHTML = `<b>Predictive Resolver Audit</b><br/>Mappings: ${totalMappings}<br/>` + displayLines.join('<br/>');
+    },
+
+    startAuditLoop: function() {
+        console.log("🧬 Predictive Audit Overlay Engine Online");
+        setInterval(() => {
+            this.renderAuditOverlay();
+        }, 5000); // Update every 5 seconds
+    }
+};
+
+// Auto-start audit overlay on load
+window.predictiveAuditEngine.startAuditLoop();

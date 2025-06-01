@@ -28,6 +28,19 @@ window.itemLinkStorage = {
         };
         this.saveMemory(memory);
         console.log(`🧬 Item mapping saved: UPC ${upc} → Lowe's Item ${itemNumber} [${category}]`);
+        if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+            window.liveTableManager.addRow({
+                itemNumber: itemNumber,
+                upc: upc,
+                count: 1,
+                category: category || 'Unassigned',
+                location: '',
+                previous: '',
+                delta: ''
+            });
+            console.log("📊 Live table row inserted automatically (from core saveMapping hook).");
+            window.liveTableManager.renderTable();
+        }
     },
 
     getMapping: function(upc) {
@@ -138,6 +151,31 @@ window.itemLinkModalManager = {
             option.textContent = cat;
             categorySelect.appendChild(option);
         });
+    },
+
+    promptForOverride: function(upc, mapping, confidence) {
+        this.currentUPC = upc;
+
+        const message = `Predictive Mapping Suggestion:\n\nUPC: ${upc}\nMapped Lowe's Item: ${mapping.item}\nCategory: ${mapping.category}\nConfidence: ${(confidence * 100).toFixed(1)}%\n\nAccept this mapping?`;
+
+        if (confirm(message)) {
+            window.itemLinkStorage.saveMapping(upc, mapping.item, mapping.category);
+            if (window.liveTableManager && typeof window.liveTableManager.addRow === 'function') {
+                window.liveTableManager.addRow({
+                    itemNumber: mapping.item,
+                    upc: upc,
+                    count: 1,
+                    category: mapping.category || 'Unassigned',
+                    location: '',
+                    previous: '',
+                    delta: ''
+                });
+                console.log("📊 Predictive mapping manually approved and inserted.");
+                window.liveTableManager.renderTable();
+            }
+        } else {
+            console.log("⚠ Predictive mapping manually rejected by user.");
+        }
     }
 };
 

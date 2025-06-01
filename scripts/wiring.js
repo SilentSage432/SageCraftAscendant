@@ -194,6 +194,68 @@ function wireAllButtons() {
     runFinalIntegrityAuditBtn: () => window.runFinalIntegrityAudit(),
     runFullSystemAuditBtn: () => window.runFullSystemAudit(),
     // ---- END ADDITIVE ENTRIES ----
+    exportDeltaReportBtn: () => window.exportTools.exportDeltaReport(),
+    // === Audit History Panel Buttons ===
+    viewAuditHistoryBtn: () => {
+      const panel = document.getElementById('auditHistoryPanel');
+      if (!panel) return;
+
+      const select = document.getElementById('auditHistorySelect');
+      if (!select) return;
+
+      // Clear previous options
+      select.innerHTML = '<option value="">Select archived audit...</option>';
+
+      const audits = window.auditArchive.listAudits();
+      audits.forEach(timestamp => {
+        const option = document.createElement('option');
+        option.value = timestamp;
+        option.textContent = timestamp;
+        select.appendChild(option);
+      });
+
+      panel.classList.toggle('hidden');
+    },
+    loadSelectedAuditBtn: () => {
+      const select = document.getElementById('auditHistorySelect');
+      const selected = select.value;
+      if (!selected) {
+        alert("Please select an audit to load.");
+        return;
+      }
+
+      const data = window.auditArchive.loadAudit(selected);
+      if (!data) {
+        alert("Audit not found.");
+        return;
+      }
+
+      const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `DeltaAudit_${selected}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+    deleteSelectedAuditBtn: () => {
+      const select = document.getElementById('auditHistorySelect');
+      const selected = select.value;
+      if (!selected) {
+        alert("Please select an audit to delete.");
+        return;
+      }
+
+      if (confirm(`Are you sure you want to delete audit: ${selected}?`)) {
+        window.auditArchive.deleteAudit(selected);
+        alert("Audit deleted.");
+        document.getElementById('viewAuditHistoryBtn').click();
+      }
+    },
+    // === Cloud Archive Sync Buttons ===
+    uploadArchiveBtn: () => window.cloudArchiveSync.uploadArchive(),
+    downloadArchiveBtn: () => window.cloudArchiveSync.downloadArchive(),
   };
 
   Object.entries(buttonMap).forEach(([btnId, handler]) => {
