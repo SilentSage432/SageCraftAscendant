@@ -360,3 +360,74 @@ function exportExceptionsCSV() {
 // 🌐 Expose exception functions globally for wiring.js
 window.refreshExceptions = refreshExceptions;
 window.exportExceptionsCSV = exportExceptionsCSV;
+
+// 🔬 Phase 75 — Audit Progress Dashboard Logic
+
+function refreshProgress() {
+  const data = JSON.parse(localStorage.getItem("rotationData") || "{}");
+  const tbody = document.querySelector('#progressTable tbody');
+  tbody.innerHTML = '';
+
+  if (!data || Object.keys(data).length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No progress data loaded</td></tr>';
+    return;
+  }
+
+  Object.entries(data).forEach(([category, info]) => {
+    const interval = info.interval || 30;
+    const lastDate = new Date(info.date);
+    const isValid = !isNaN(lastDate.getTime());
+    const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
+
+    const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+    const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+    const overdue = nextDue && new Date() > nextDue;
+    const status = overdue ? '🚩 Overdue' : '✅ On Schedule';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${category}</td>
+      <td>${lastAuditedText}</td>
+      <td>${nextDueText}</td>
+      <td>${status}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportProgressCSV() {
+  const data = JSON.parse(localStorage.getItem("rotationData") || "{}");
+  if (!data || Object.keys(data).length === 0) {
+    showToast("No progress data to export.");
+    return;
+  }
+
+  let csv = "Category,Last Audited,Next Due,Status\n";
+
+  Object.entries(data).forEach(([category, info]) => {
+    const interval = info.interval || 30;
+    const lastDate = new Date(info.date);
+    const isValid = !isNaN(lastDate.getTime());
+    const lastAuditedText = isValid ? lastDate.toLocaleDateString() : 'Not Set';
+
+    const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+    const nextDueText = nextDue ? nextDue.toLocaleDateString() : 'N/A';
+
+    const overdue = nextDue && new Date() > nextDue;
+    const status = overdue ? 'Overdue' : 'On Schedule';
+
+    csv += `${category},${lastAuditedText},${nextDueText},${status}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'AuditProgress.csv');
+  link.click();
+}
+
+// 🌐 Expose progress functions globally for wiring.js
+window.refreshProgress = refreshProgress;
+window.exportProgressCSV = exportProgressCSV;

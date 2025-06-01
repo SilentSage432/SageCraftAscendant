@@ -39,6 +39,7 @@
     <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
     <button id="navDeltaBtn" class="tablink nav-icon" data-target="deltaAnalyzer" title="Delta Analyzer" aria-label="Delta Analyzer">🧮</button>
     <button id="navExceptionBtn" class="tablink nav-icon" data-target="exceptionManager" title="Exception Manager" aria-label="Exception Manager">🚩</button>
+    <button id="navProgressBtn" class="tablink nav-icon" data-target="progressDashboard" title="Audit Progress" aria-label="Audit Progress">📅</button>
   </div>
 
   <header class="topbar mystic-header" role="banner">
@@ -269,6 +270,32 @@
             </thead>
             <tbody>
               <tr><td colspan="6" style="text-align:center; color:#888;">No exceptions loaded</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Phase 75 — Audit Progress Dashboard -->
+      <section id="progressDashboard" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Progress Dashboard">
+        <h2>📅 Audit Progress Dashboard</h2>
+
+        <div class="progress-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
+          <button id="refreshProgressBtn">🔄 Refresh Progress</button>
+          <button id="exportProgressBtn">📥 Export Progress to CSV</button>
+        </div>
+
+        <div id="progressTableWrapper" style="max-height: 400px; overflow-y: auto; border: 1px solid #555; border-radius: 5px;">
+          <table id="progressTable" style="width:100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Last Audited</th>
+                <th>Next Due</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4" style="text-align:center; color:#888;">No progress data loaded</td></tr>
             </tbody>
           </table>
         </div>

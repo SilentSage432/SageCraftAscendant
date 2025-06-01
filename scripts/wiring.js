@@ -128,6 +128,7 @@ const buttonMap = {
     navVaultBtn: () => window.switchTab('vault'),
     navDeltaBtn: () => window.switchTab('deltaAnalyzer'),
     navExceptionBtn: () => window.switchTab('exceptionManager'),
+    navProgressBtn: () => window.switchTab('progressDashboard'),
     purgeLocalStorageBtn: () => window.purgeLocalStorage(),
     refreshAuditLogBtn: () => window.refreshAuditLog(),
     refreshFieldLog: () => renderFieldLog(),
@@ -207,6 +208,9 @@ const buttonMap = {
     // === Exception Manager Buttons ===
     refreshExceptionsBtn: () => window.refreshExceptions(),
     exportExceptionsBtn: () => window.exportExceptionsCSV(),
+    // === Progress Dashboard Buttons ===
+    refreshProgressBtn: () => window.refreshProgress(),
+    exportProgressBtn: () => window.exportProgressCSV(),
     // === Session Manager Wiring ===
     refreshSessionList: () => {
       const tbody = document.getElementById("sessionManagerTableBody");
