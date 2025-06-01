@@ -85,6 +85,9 @@ if (exportBtn) {
   });
 }
 
+// ===============================
+// Phase 19.5 — Resolver Bootstrap Linker Injection
+
 // Full global exposure for master wiring stability
 function wireAllButtons() {
   console.log("Wiring process starting...");
@@ -209,6 +212,92 @@ function wireAllButtons() {
   console.log("Wiring process complete.");
 }
 window.wireAllButtons = wireAllButtons;
+
+// ===============================
+// Add Item Modal — Phase 2.5 Auto-Population Stability Patch
+
+
+function addItemModal(scannedValue = '') {
+  // Always fully rebuild modal for clean state
+  const existingModal = document.getElementById('addItemModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'addItemModal';
+  modal.style.position = 'fixed';
+  modal.style.top = '50%';
+  modal.style.left = '50%';
+  modal.style.transform = 'translate(-50%, -50%)';
+  modal.style.background = '#fff';
+  modal.style.padding = '20px';
+  modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+  modal.style.zIndex = '9999';
+  modal.style.borderRadius = '8px';
+  modal.innerHTML = `
+    <h3>Add New Item</h3>
+    <label>Scanned Value:</label><br>
+    <input type="text" id="scannedValueInput" style="width:100%;padding:8px;margin-bottom:10px;" value="${scannedValue}"><br>
+    <button id="saveItemBtn">Save</button>
+    <button id="cancelItemBtn" style="margin-left:10px;">Cancel</button>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById('saveItemBtn').onclick = () => {
+    const inputVal = document.getElementById('scannedValueInput').value.trim();
+    console.log("Saved Item:", inputVal);
+    alert("✅ Item Saved: " + inputVal);
+    modal.remove();
+  };
+
+  document.getElementById('cancelItemBtn').onclick = () => {
+    modal.remove();
+  };
+}
+
+window.addItemModal = addItemModal;
+
+// ===============================
+// Smart Scan Classifier + Auto Prompt
+
+// Phase 19.5 — Bootstrap Synchronization Injection
+
+document.addEventListener("scanResolverReady", () => {
+  window.handleScanInput = window.scanResolver.handleScanInput;
+  console.log("✅ Scan Resolver fully linked to handleScanInput.");
+
+  (function bootstrapGlobalSync() {
+    function checkResolver() {
+      if (window.scanResolver && typeof window.scanResolver.handleScanInput === 'function') {
+        window.handleScanInput = window.scanResolver.handleScanInput;
+        console.log("✅ Scan Resolver fully linked to handleScanInput (Global Stabilizer).");
+      } else {
+        console.warn("⏳ Waiting for scanResolver (Global Stabilizer)...");
+        setTimeout(checkResolver, 200);
+      }
+    }
+    checkResolver();
+  })();
+});
+
+// ===============================
+// Global Scan Capture Hook
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    const activeInput = document.activeElement;
+    if (activeInput && activeInput.tagName === 'INPUT') {
+      const scannedValue = activeInput.value.trim();
+      if (scannedValue) {
+        console.log("Auto-captured scan:", scannedValue);
+        handleScanInput(scannedValue);
+        activeInput.value = '';
+        activeInput.focus();  // maintain live scanning focus
+      }
+    }
+  }
+});
 
 // ===============================
 // Global Tab Controller — Floating Nav Logic
