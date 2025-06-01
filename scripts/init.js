@@ -13,14 +13,10 @@ import {
   syncAllMapsToDropbox,
   restoreAllMapsFromDropbox,
   refreshAccessToken,
-  getDropboxAccessToken,
   saveSessionToDropbox,
   loadSessionFromDropbox,
   listDropboxSessions,
-  loadSelectedDropboxSession,
-  beginDropboxLogin,
-  handleDropboxCallback,
-  initDropbox
+  loadSelectedDropboxSession
 } from './dropbox.js';
 import { displayAppVersion } from './version.js';
 
@@ -44,14 +40,10 @@ window.InventoryApp = {
   syncAllMapsToDropbox,
   restoreAllMapsFromDropbox,
   refreshAccessToken,
-  getDropboxAccessToken,
   saveSessionToDropbox,
   loadSessionFromDropbox,
   listDropboxSessions,
   loadSelectedDropboxSession,
-  beginDropboxLogin,
-  handleDropboxCallback,
-  initDropbox,
 };
 
 // DOMContentLoaded lifecycle manager

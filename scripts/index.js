@@ -1,12 +1,5 @@
 import { createToast, updateMapStatusDisplay, restoreFocusToEntry, setupMoreOptionsToggle, updateLiveTable } from './ui.js';
 import { initAudit } from './audit.js';
-import { initDropbox } from './dropbox.js';
-import {
-  beginDropboxLogin,
-  handleDropboxCallback,
-  generateCodeVerifier,
-  generateCodeChallenge
-} from './dropbox.js';
 import './scan.js';
 import { initESL } from './esl.js';
 import { initSessionTools } from './session.js';
@@ -21,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   initAudit();
-  initDropbox();
   initScan();
   initESL();
   initSessionTools();
