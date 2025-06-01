@@ -219,6 +219,7 @@ const buttonMap = {
     },
     runDeltaAnalysis: () => window.performDeltaAnalysis(),
     exportDeltaCSV: () => window.exportMergedDeltaCSV(),
+    feedLongTermMemoryBtn: () => window.feedLongTermMemory(),
     // === Exception Manager Buttons ===
     refreshExceptionsBtn: () => window.refreshExceptions(),
     exportExceptionsBtn: () => window.exportExceptionsCSV(),
@@ -229,6 +230,37 @@ const buttonMap = {
     exportDeltaReportBtn: () => window.exportDeltaReport(),
     exportExceptionsReportBtn: () => window.exportExceptionsReport(),
     exportProgressReportBtn: () => window.exportProgressReport(),
+    exportAllReportsBtn: () => window.exportAllReports(),
+    generateForecastBtn: () => {
+      const summary = window.generateForecastSummary();
+      if (summary) {
+        window.renderForecastSummaryTable(summary);
+      }
+    },
+    generateHeuristicBtn: () => {
+      const heuristics = window.generateHeuristicWeights();
+      if (heuristics) {
+        window.renderHeuristicTable(heuristics);
+      }
+    },
+    generateRiskBtn: () => {
+      const riskData = window.generateAnomalyRiskScores();
+      if (riskData) {
+        window.renderRiskFactorTable(riskData);
+      }
+    },
+    generateRecommendationsBtn: () => {
+      const recommendations = window.generateAuditRecommendations();
+      if (recommendations) {
+        window.renderAuditRecommendationsTable(recommendations);
+      }
+    },
+    generateHistoricalTrendBtn: () => {
+      const summary = window.generateHistoricalTrendSummary();
+      if (summary) {
+        window.renderHistoricalTrendDashboard(summary);
+      }
+    },
     // === Master Export Hub Buttons ===
     exportAllSessionsBtn: () => window.exportAllSessions(),
     exportAllMappingsBtn: () => window.exportAllMappings(),
@@ -501,6 +533,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Phase 86 — Restore Exceptions State
   if (window.restoreExceptionsState) {
     window.restoreExceptionsState();
+  }
+
+  // Phase 90 — Restore Forecast Summary
+  const savedForecast = localStorage.getItem('lastForecastSummary');
+  if (savedForecast && window.renderForecastSummaryTable) {
+    try {
+      const parsedForecast = JSON.parse(savedForecast);
+      window.renderForecastSummaryTable(parsedForecast);
+      console.log("🔄 Forecast summary restored.");
+    } catch (err) {
+      console.warn("⚠️ Failed to parse stored forecast summary:", err);
+    }
   }
 });
 

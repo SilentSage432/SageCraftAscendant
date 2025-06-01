@@ -766,3 +766,365 @@ window.restoreExceptionsState = function() {
     console.warn("⚠️ Failed to parse stored exceptions:", err);
   }
 };
+
+// 🔬 Phase 88 — Predictive Delta Forecast Engine
+
+window.generateForecastSummary = function() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available for forecasting.");
+    return;
+  }
+
+  let shrinkTotal = 0;
+  let swellTotal = 0;
+  const shrinkItems = {};
+  const swellItems = {};
+
+  deltas.forEach(entry => {
+    if (entry.delta < 0) {
+      shrinkTotal += Math.abs(entry.delta);
+      shrinkItems[entry.item] = (shrinkItems[entry.item] || 0) + Math.abs(entry.delta);
+    }
+    if (entry.delta > 0) {
+      swellTotal += entry.delta;
+      swellItems[entry.item] = (swellItems[entry.item] || 0) + entry.delta;
+    }
+  });
+
+  const sortedShrink = Object.entries(shrinkItems).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const sortedSwell = Object.entries(swellItems).sort((a,b) => b[1]-a[1]).slice(0,5);
+
+  console.log("🔮 Forecast Summary:");
+  console.log("Total Shrink:", shrinkTotal);
+  console.log("Total Swell:", swellTotal);
+  console.log("Top Shrink Items:", sortedShrink);
+  console.log("Top Swell Items:", sortedSwell);
+
+  const summary = {
+    shrinkTotal,
+    swellTotal,
+    topShrink: sortedShrink,
+    topSwell: sortedSwell
+  };
+  // Phase 90 — Persist Forecast Summary
+  localStorage.setItem("lastForecastSummary", JSON.stringify({
+    shrinkTotal,
+    swellTotal,
+    topShrink: sortedShrink,
+    topSwell: sortedSwell
+  }));
+  return summary;
+};
+
+
+// 🔬 Phase 89 — Forecast UI Table Engine
+
+window.renderForecastSummaryTable = function(summary) {
+  const container = document.getElementById('forecastSummaryContainer');
+  container.innerHTML = '';
+
+  if (!summary) {
+    container.innerHTML = '<div style="color:#aaa;">No forecast data available.</div>';
+    return;
+  }
+
+  const summaryDiv = document.createElement('div');
+  summaryDiv.innerHTML = `
+    <h3>📊 Forecast Summary</h3>
+    <p><strong>Total Shrink:</strong> ${summary.shrinkTotal}</p>
+    <p><strong>Total Swell:</strong> ${summary.swellTotal}</p>
+  `;
+  container.appendChild(summaryDiv);
+
+  const shrinkTable = document.createElement('table');
+  shrinkTable.className = 'forecast-table';
+  shrinkTable.innerHTML = `
+    <thead><tr><th colspan="2">Top Shrink Items</th></tr></thead>
+    <tbody>${summary.topShrink.map(([item, qty]) => `<tr><td>${item}</td><td>${qty}</td></tr>`).join('')}</tbody>
+  `;
+  container.appendChild(shrinkTable);
+
+  const swellTable = document.createElement('table');
+  swellTable.className = 'forecast-table';
+  swellTable.innerHTML = `
+    <thead><tr><th colspan="2">Top Swell Items</th></tr></thead>
+    <tbody>${summary.topSwell.map(([item, qty]) => `<tr><td>${item}</td><td>${qty}</td></tr>`).join('')}</tbody>
+  `;
+  container.appendChild(swellTable);
+};
+
+// 🔬 Phase 91 — Predictive Heuristic Learning Engine
+
+window.generateHeuristicWeights = function() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available for heuristic analysis.");
+    return;
+  }
+
+  const weights = {};
+
+  deltas.forEach(entry => {
+    if (!weights[entry.item]) {
+      weights[entry.item] = { shrink: 0, swell: 0, total: 0 };
+    }
+    if (entry.delta < 0) {
+      weights[entry.item].shrink += 1;
+    }
+    if (entry.delta > 0) {
+      weights[entry.item].swell += 1;
+    }
+    weights[entry.item].total += 1;
+  });
+
+  const sorted = Object.entries(weights).sort((a, b) => b[1].total - a[1].total);
+  console.log("🔬 Heuristic Weights Generated:", sorted);
+
+  return sorted;
+};
+
+// 🔬 Phase 91.3 — Heuristic Table Renderer
+
+window.renderHeuristicTable = function(heuristics) {
+  const container = document.getElementById('heuristicSummaryContainer');
+  container.innerHTML = '';
+
+  if (!heuristics || heuristics.length === 0) {
+    container.innerHTML = '<div style="color:#aaa;">No heuristic data available.</div>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'forecast-table';
+  table.innerHTML = `
+    <thead><tr><th>Item #</th><th>Shrink Hits</th><th>Swell Hits</th><th>Total Hits</th></tr></thead>
+    <tbody>${heuristics.map(([item, counts]) => `
+      <tr>
+        <td>${item}</td>
+        <td>${counts.shrink}</td>
+        <td>${counts.swell}</td>
+        <td>${counts.total}</td>
+      </tr>
+    `).join('')}</tbody>
+  `;
+
+  container.appendChild(table);
+};
+
+// 🔬 Phase 92.1 — Intelligent Anomaly Risk Scoring Engine
+
+window.generateAnomalyRiskScores = function() {
+  const heuristics = window.generateHeuristicWeights();
+  if (!heuristics || heuristics.length === 0) {
+    showToast("No heuristic data available for risk scoring.");
+    return;
+  }
+
+  const riskTable = heuristics.map(([item, counts]) => {
+    const score = (counts.shrink * 3) + (counts.swell * 1); // Weighted scoring formula
+    let riskLevel = 'Low';
+    if (score >= 10) riskLevel = 'Critical';
+    else if (score >= 7) riskLevel = 'High';
+    else if (score >= 4) riskLevel = 'Moderate';
+
+    return {
+      item,
+      shrinkHits: counts.shrink,
+      swellHits: counts.swell,
+      totalHits: counts.total,
+      score,
+      riskLevel
+    };
+  });
+
+  console.log("🚩 Risk Factor Table Generated:", riskTable);
+  return riskTable;
+};
+
+// 🔬 Phase 92.2 — Risk Table Renderer
+
+window.renderRiskFactorTable = function(riskData) {
+  const container = document.getElementById('riskFactorContainer');
+  container.innerHTML = '';
+
+  if (!riskData || riskData.length === 0) {
+    container.innerHTML = '<div style="color:#aaa;">No risk data available.</div>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'forecast-table';
+  table.innerHTML = `
+    <thead><tr><th>Item #</th><th>Shrink Hits</th><th>Swell Hits</th><th>Score</th><th>Risk Level</th></tr></thead>
+    <tbody>${riskData.map(row => `
+      <tr>
+        <td>${row.item}</td>
+        <td>${row.shrinkHits}</td>
+        <td>${row.swellHits}</td>
+        <td>${row.score}</td>
+        <td style="font-weight:bold; color:${getRiskColor(row.riskLevel)}">${row.riskLevel}</td>
+      </tr>
+    `).join('')}</tbody>
+  `;
+
+  container.appendChild(table);
+};
+
+// 🔬 Risk Color Helper
+function getRiskColor(level) {
+  switch(level) {
+    case 'Critical': return '#ff3333';
+    case 'High': return '#ff9900';
+    case 'Moderate': return '#ffcc00';
+    default: return '#33cc33';
+  }
+}
+
+// 🔬 Phase 93.1 — AI-Powered Audit Target Recommendation Engine
+
+window.generateAuditRecommendations = function() {
+  const riskData = window.generateAnomalyRiskScores();
+  if (!riskData || riskData.length === 0) {
+    showToast("No risk data available for recommendations.");
+    return;
+  }
+
+  const recommendations = riskData.map(row => {
+    let priority = 'Low';
+    let note = 'Normal monitoring';
+
+    if (row.riskLevel === 'Critical') {
+      priority = 'Immediate';
+      note = 'Urgent re-audit required';
+    } else if (row.riskLevel === 'High') {
+      priority = 'High';
+      note = 'Schedule high-priority audit';
+    } else if (row.riskLevel === 'Moderate') {
+      priority = 'Medium';
+      note = 'Add to upcoming rotation';
+    }
+
+    return {
+      item: row.item,
+      category: row.category || '-',
+      location: row.location || '-',
+      riskLevel: row.riskLevel,
+      priority,
+      note
+    };
+  });
+
+  console.log("🎯 Audit Recommendations Generated:", recommendations);
+  return recommendations;
+};
+
+// 🔬 Phase 93.2 — Audit Recommendation Table Renderer
+
+window.renderAuditRecommendationsTable = function(recommendations) {
+  const container = document.getElementById('auditRecommendationsContainer');
+  container.innerHTML = '';
+
+  if (!recommendations || recommendations.length === 0) {
+    container.innerHTML = '<div style="color:#aaa;">No audit recommendations available.</div>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'forecast-table';
+  table.innerHTML = `
+    <thead><tr><th>Item #</th><th>Category</th><th>Location</th><th>Risk</th><th>Priority</th><th>Recommendation</th></tr></thead>
+    <tbody>${recommendations.map(row => `
+      <tr>
+        <td>${row.item}</td>
+        <td>${row.category}</td>
+        <td>${row.location}</td>
+        <td style="font-weight:bold; color:${getRiskColor(row.riskLevel)}">${row.riskLevel}</td>
+        <td>${row.priority}</td>
+        <td>${row.note}</td>
+      </tr>
+    `).join('')}</tbody>
+  `;
+
+  container.appendChild(table);
+};
+
+// 🔬 Phase 94.1 — Long-Term Learning Memory Engine
+
+window.feedLongTermMemory = function() {
+  const deltas = window.auditArchive?.lastDeltaResults;
+  if (!deltas || deltas.length === 0) {
+    showToast("No delta data available to feed long-term memory.");
+    return;
+  }
+
+  const memory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+
+  deltas.forEach(entry => {
+    if (!memory[entry.item]) {
+      memory[entry.item] = { shrink: 0, swell: 0, total: 0 };
+    }
+    if (entry.delta < 0) {
+      memory[entry.item].shrink += Math.abs(entry.delta);
+    }
+    if (entry.delta > 0) {
+      memory[entry.item].swell += entry.delta;
+    }
+    memory[entry.item].total += Math.abs(entry.delta);
+  });
+
+  localStorage.setItem("longTermHeuristicMemory", JSON.stringify(memory));
+  console.log("📚 Long-term memory updated:", memory);
+  showToast("Long-term learning memory updated.");
+};
+
+// 🔬 Phase 95.1 — Historical Trend Aggregation Engine
+
+window.generateHistoricalTrendSummary = function() {
+  const memory = JSON.parse(localStorage.getItem("longTermHeuristicMemory") || "{}");
+  if (!memory || Object.keys(memory).length === 0) {
+    showToast("No long-term memory data available.");
+    return;
+  }
+
+  let shrinkTotal = 0;
+  let swellTotal = 0;
+  let totalActivity = 0;
+
+  Object.values(memory).forEach(record => {
+    shrinkTotal += record.shrink;
+    swellTotal += record.swell;
+    totalActivity += record.total;
+  });
+
+  const summary = {
+    shrinkTotal,
+    swellTotal,
+    totalActivity
+  };
+
+  console.log("📈 Historical Trend Summary:", summary);
+  return summary;
+};
+
+
+// 🔬 Phase 95.2 — Historical Trend Renderer
+
+window.renderHistoricalTrendDashboard = function(summary) {
+  const container = document.getElementById('historicalTrendContainer');
+  container.innerHTML = '';
+
+  if (!summary) {
+    container.innerHTML = '<div style="color:#aaa;">No historical data available.</div>';
+    return;
+  }
+
+  const summaryDiv = document.createElement('div');
+  summaryDiv.innerHTML = `
+    <h3>📊 Historical Trend Dashboard</h3>
+    <p><strong>Total Shrink:</strong> ${summary.shrinkTotal}</p>
+    <p><strong>Total Swell:</strong> ${summary.swellTotal}</p>
+    <p><strong>Total Audit Activity:</strong> ${summary.totalActivity}</p>
+  `;
+  container.appendChild(summaryDiv);
+};
