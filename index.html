@@ -25,6 +25,20 @@
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
 </head>
   <style>
+    #aiHudOverlay {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #1b1b2f;
+      border: 2px solid #9933ff;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
+      font-family: monospace;
+      color: #fff;
+      z-index: 10000;
+      width: 260px;
+    }
     /* Desktop Drawer Toggle Button Default */
     #drawerToggleBtn {
       position: fixed;
@@ -185,14 +199,6 @@
     <button id="drawerToggleBtn" style="margin-left: 10px; font-size: 18px; padding: 4px 8px;">☰ Menu</button>
   </header>
 
-  <!-- Phase 131.7 — Predictive HUD Overlay -->
-  <div id="aiHudOverlay">
-    <h3 style="margin:0 0 10px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
-    <div id="hudRisk" style="margin-bottom: 6px;">Risk: <span>Loading...</span></div>
-    <div id="hudForecast" style="margin-bottom: 6px;">Forecast: <span>Loading...</span></div>
-    <div id="hudAnomaly" style="margin-bottom: 6px;">Anomalies: <span>Loading...</span></div>
-    <div id="hudDrift" style="margin-bottom: 6px;">Drift: <span>Loading...</span></div>
-  </div>
 
   <!-- Phase 125.8 — Predictive Overlay Remover -->
   <style>
@@ -959,6 +965,59 @@
     const selected = categorySelect.options[categorySelect.selectedIndex].text;
     activeCategoryDisplay.textContent = `🧭 Active Category: ${selected}`;
   });
+</script>
+  <div id="brainDockButton" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10001;
+    background: #1b1b2f;
+    border: 2px solid #9933ff;
+    border-radius: 50%;
+    padding: 12px;
+    box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  ">
+    🧠
+  </div>
+</script>
+</script>
+<!-- Phase 200.7 — Predictive HUD Isolation Container -->
+<div id="brainDockHudPanel" style="
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    background: #1b1b2f;
+    border: 2px solid #9933ff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
+    font-family: monospace;
+    color: #fff;
+    z-index: 10000;
+    width: 280px;
+    transition: all 0.3s ease;
+    display: none;
+  ">
+    <h3 style="margin:0 0 10px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
+    <div id="hudRisk" style="margin-bottom: 6px;">Risk: <span>Loading...</span></div>
+    <div id="hudForecast" style="margin-bottom: 6px;">Forecast: <span>Loading...</span></div>
+    <div id="hudAnomaly" style="margin-bottom: 6px;">Anomalies: <span>Loading...</span></div>
+    <div id="hudDrift" style="margin-bottom: 6px;">Drift: <span>Loading...</span></div>
+</div>
+<script>
+const predictiveHud = document.getElementById("brainDockHudPanel");
+const brainDockBtn = document.getElementById("brainDockButton");
+
+if (predictiveHud && brainDockBtn) {
+  let hudVisible = false;
+
+  brainDockBtn.addEventListener("click", () => {
+    hudVisible = !hudVisible;
+    predictiveHud.style.display = hudVisible ? "block" : "none";
+  });
+}
 </script>
 </script>
 <!-- DOM Sync Audit Utility -->

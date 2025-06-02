@@ -2556,3 +2556,157 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sync risk to memory every 10 seconds
   setInterval(syncRiskToSentinelMemory, 10000);
 });
+// ===============================
+// Phase 200.8 — Predictive HUD Data Sync Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  function syncPredictiveHUD() {
+    const resolverContent = document.getElementById("resolverContent");
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+    const hudRisk = document.querySelector("#hudRisk span");
+    const hudForecast = document.querySelector("#hudForecast span");
+    const hudAnomaly = document.querySelector("#hudAnomaly span");
+    const hudDrift = document.querySelector("#hudDrift span");
+
+    if (!resolverContent || !forecastContainer || !anomalyContainer || !hudRisk || !hudForecast || !hudAnomaly || !hudDrift) {
+      console.warn("⚠ HUD containers not fully available for sync.");
+      return;
+    }
+
+    hudRisk.innerText = resolverContent.innerText || "N/A";
+    hudForecast.innerText = forecastContainer.innerText || "N/A";
+    hudAnomaly.innerText = anomalyContainer.innerText || "N/A";
+
+    const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.();
+    if (!forecastMemory || forecastMemory.length < 10) {
+      hudDrift.innerText = "Insufficient Data";
+      return;
+    }
+
+    const recentStates = forecastMemory.slice(-10).map(mem => mem.state);
+    const stableCount = recentStates.filter(state => state.includes("Stable")).length;
+    const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
+
+    let driftAssessment = "🟢 Stable";
+    if (volatileCount >= 5) {
+      driftAssessment = "🔴 Severe Drift";
+    } else if (volatileCount >= 3) {
+      driftAssessment = "🟠 Mild Drift";
+    } else if (stableCount >= 8) {
+      driftAssessment = "🟢 Highly Stable";
+    }
+    hudDrift.innerText = driftAssessment;
+  }
+
+  setInterval(syncPredictiveHUD, 3000);
+});
+// ===============================
+// Phase 200.9 — Router Log Memory Sync Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  function syncRouterMemoryHUD() {
+    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
+    if (!routerLog || routerLog.length < 10) {
+      console.log("🧠 Router Memory: Insufficient data points.");
+      return;
+    }
+
+    const forecastCount = routerLog.filter(e => e.signalType === "forecast").length;
+    const anomalyCount = routerLog.filter(e => e.signalType === "anomaly").length;
+    const riskCount = routerLog.filter(e => e.signalType === "risk").length;
+
+    console.log(`🧠 Router Log Summary → Forecast: ${forecastCount}, Anomalies: ${anomalyCount}, Risks: ${riskCount}`);
+  }
+
+  setInterval(syncRouterMemoryHUD, 15000);
+});
+// ===============================
+// Phase 200.10 — Neural Forecast Memory Cortex Expansion
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralForecastMemoryCortex = (function() {
+    let forecastHistory = [];
+
+    function ingestForecastMemory() {
+      const forecastContainer = document.getElementById("forecastSignalsContainer");
+      if (!forecastContainer) return;
+
+      const currentForecast = forecastContainer.innerText || "N/A";
+      const timestamp = new Date().toISOString();
+
+      forecastHistory.push({ timestamp, state: currentForecast });
+
+      if (forecastHistory.length > 500) {
+        forecastHistory.shift();
+      }
+
+      console.log("🧠 Neural Forecast Cortex Updated:", forecastHistory);
+    }
+
+    function getForecastHistory() {
+      return forecastHistory;
+    }
+
+    function exportForecastHistory() {
+      const blob = new Blob([JSON.stringify(forecastHistory, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ForecastMemory_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    return {
+      ingestForecastMemory,
+      getForecastHistory,
+      exportForecastHistory
+    };
+  })();
+
+  setInterval(window.NeuralForecastMemoryCortex.ingestForecastMemory, 7000);
+});
+// ===============================
+// Phase 200.11 — Multi-Dimensional Cortex Fusion Layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.CortexFusionEngine = (function() {
+    function analyzeUnifiedState() {
+      const forecastMemory = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+      const routerLog = window.PredictiveSignalRouter?.getRouterLog?.() || [];
+      const telemetryLog = window.TelemetryLogger?.getTelemetryLog?.() || [];
+
+      const totalForecasts = forecastMemory.length;
+      const totalSignals = routerLog.length;
+      const totalTelemetry = telemetryLog.length;
+
+      let stabilityScore = 100;
+
+      if (totalSignals > 100) stabilityScore -= 10;
+      if (totalTelemetry > 150) stabilityScore -= 10;
+
+      const recentForecasts = forecastMemory.slice(-10).map(f => f.state);
+      const volatilityCount = recentForecasts.filter(state => state.match(/Volatile|Regression|Surge/)).length;
+      stabilityScore -= volatilityCount * 5;
+
+      stabilityScore = Math.max(0, stabilityScore);
+      console.log(`🧬 Cortex Fusion Stability Score: ${stabilityScore}%`);
+
+      return {
+        forecasts: totalForecasts,
+        signals: totalSignals,
+        telemetry: totalTelemetry,
+        stability: stabilityScore
+      };
+    }
+
+    return { analyzeUnifiedState };
+  })();
+
+  // Periodic analysis pass
+  setInterval(() => {
+    const snapshot = window.CortexFusionEngine.analyzeUnifiedState();
+    console.log("📊 Unified Cortex Snapshot:", snapshot);
+  }, 15000);
+});
