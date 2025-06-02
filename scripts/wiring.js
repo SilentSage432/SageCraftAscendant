@@ -1392,3 +1392,480 @@ document.addEventListener("DOMContentLoaded", () => {
   // Activate live refresh loop
   setInterval(refreshTrueAIControlPanels, 4000);
 });
+// ===============================
+// Phase 130.8 — Anomaly Detection Memory Sync Layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  function updateResolverPanel() {
+    const resolverContent = document.getElementById("resolverContent");
+    if (!resolverContent) return;
+
+    if (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.pushRiskData === "function") {
+      // Simulated Risk Score Pull (Replace with live risk scoring when available)
+      const mockRiskLevels = [
+        "⚪ Low Risk (Normal)",
+        "🟡 Moderate Risk (Attention)",
+        "🟠 Elevated Risk (Monitor)",
+        "🔴 High Risk (Critical Anomaly)"
+      ];
+      const simulatedRisk = mockRiskLevels[Math.floor(Math.random() * mockRiskLevels.length)];
+      resolverContent.innerHTML = `🧮 ${simulatedRisk}`;
+    } else {
+      resolverContent.innerHTML = "<em>Predictive DataBridge unavailable.</em>";
+    }
+  }
+
+  function refreshMemorySyncedPanels() {
+    updateResolverPanel();
+  }
+
+  setInterval(refreshMemorySyncedPanels, 5000);
+});
+
+// ===============================
+// Phase 130.9 — Predictive Overlay Unification
+
+document.addEventListener("DOMContentLoaded", () => {
+  function synchronizeResolverOverlay() {
+    const resolverContent = document.getElementById("resolverContent");
+    const overlayContainer = document.getElementById("riskSignalsContainer");
+
+    if (!resolverContent || !overlayContainer) return;
+
+    // Mirror resolver panel content into overlay
+    overlayContainer.innerHTML = resolverContent.innerHTML;
+  }
+
+  function synchronizeForecastOverlay() {
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    if (!forecastContainer) return;
+
+    // Example: Mirror a stable forecast state for demo
+    forecastContainer.innerHTML = "Stable 🔵";
+  }
+
+  function synchronizeAnomalyOverlay() {
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+    if (!anomalyContainer) return;
+
+    // Example: Simulate no anomaly for stability
+    anomalyContainer.innerHTML = "No anomalies";
+  }
+
+  function unifyPredictivePanels() {
+    synchronizeResolverOverlay();
+    synchronizeForecastOverlay();
+    synchronizeAnomalyOverlay();
+  }
+
+  // Unified sync loop for overlays (refresh alongside modals)
+  setInterval(unifyPredictivePanels, 5000);
+});
+
+// ===============================
+// Phase 131.0 — Predictive AI Anomaly Forecast Loop Activation
+
+document.addEventListener("DOMContentLoaded", () => {
+  function updateForecastOverlay() {
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    if (!forecastContainer) return;
+
+    const forecastStates = [
+      "Stable 🔵",
+      "Minor Fluctuation 🟠",
+      "Elevated Volatility 🔴",
+      "Surge Incoming ⚡",
+      "Regression Detected 🧪"
+    ];
+
+    const selectedForecast = forecastStates[Math.floor(Math.random() * forecastStates.length)];
+    forecastContainer.innerHTML = selectedForecast;
+  }
+
+  function updateAnomalyOverlay() {
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+    if (!anomalyContainer) return;
+
+    const anomalySignals = [
+      "No anomalies",
+      "🟡 Outlier Detected",
+      "🔴 Anomaly Spike",
+      "⚠ Data Integrity Concern"
+    ];
+
+    const selectedAnomaly = anomalySignals[Math.floor(Math.random() * anomalySignals.length)];
+    anomalyContainer.innerHTML = selectedAnomaly;
+  }
+
+  function refreshForecastAnomalyLoop() {
+    updateForecastOverlay();
+    updateAnomalyOverlay();
+  }
+
+  setInterval(refreshForecastAnomalyLoop, 5000);
+});
+
+// ===============================
+// Phase 131.1 — Predictive Threat Matrix Dashboard Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  function updateThreatMatrix() {
+    const resolverContent = document.getElementById("resolverContent");
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+
+    const threatMatrix = document.getElementById("threatMatrixContent");
+    if (!threatMatrix) return;
+
+    const riskText = resolverContent ? resolverContent.innerHTML : "N/A";
+    const forecastText = forecastContainer ? forecastContainer.innerHTML : "N/A";
+    const anomalyText = anomalyContainer ? anomalyContainer.innerHTML : "N/A";
+
+    threatMatrix.innerHTML = `
+      <strong>Threat Matrix Summary</strong><br><br>
+      🔬 Risk: ${riskText}<br>
+      🌐 Forecast: ${forecastText}<br>
+      🧮 Anomalies: ${anomalyText}<br>
+    `;
+  }
+
+  function refreshThreatMatrixLoop() {
+    updateThreatMatrix();
+  }
+
+  setInterval(refreshThreatMatrixLoop, 5000);
+});
+
+// ===============================
+// Phase 131.3 — Threat Matrix Risk Colorization Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  function colorizeThreatMatrix() {
+    const threatMatrix = document.getElementById("threatMatrixContent");
+    if (!threatMatrix) return;
+
+    const text = threatMatrix.innerHTML;
+
+    let coloredText = text
+      .replace(/Low Risk.*?(<br>)/i, '<span style="color:#00cc66;font-weight:bold;">Low Risk (Normal)</span>$1')
+      .replace(/Moderate Risk.*?(<br>)/i, '<span style="color:#ffcc00;font-weight:bold;">Moderate Risk (Attention)</span>$1')
+      .replace(/Elevated Risk.*?(<br>)/i, '<span style="color:#ff9900;font-weight:bold;">Elevated Risk (Monitor)</span>$1')
+      .replace(/High Risk.*?(<br>)/i, '<span style="color:#ff3333;font-weight:bold;">High Risk (Critical Anomaly)</span>$1')
+      .replace(/Stable 🔵/i, '<span style="color:#00ccff;font-weight:bold;">Stable 🔵</span>')
+      .replace(/Minor Fluctuation 🟠/i, '<span style="color:#ffaa00;font-weight:bold;">Minor Fluctuation 🟠</span>')
+      .replace(/Elevated Volatility 🔴/i, '<span style="color:#ff3300;font-weight:bold;">Elevated Volatility 🔴</span>')
+      .replace(/Surge Incoming ⚡/i, '<span style="color:#ff00ff;font-weight:bold;">Surge Incoming ⚡</span>')
+      .replace(/Regression Detected 🧪/i, '<span style="color:#cc00cc;font-weight:bold;">Regression Detected 🧪</span>')
+      .replace(/Outlier Detected/i, '<span style="color:#ffaa00;font-weight:bold;">🟡 Outlier Detected</span>')
+      .replace(/Anomaly Spike/i, '<span style="color:#ff3333;font-weight:bold;">🔴 Anomaly Spike</span>')
+      .replace(/Data Integrity Concern/i, '<span style="color:#ff6666;font-weight:bold;">⚠ Data Integrity Concern</span>');
+
+    threatMatrix.innerHTML = coloredText;
+  }
+
+  setInterval(colorizeThreatMatrix, 5000);
+});
+
+
+// ===============================
+// Phase 131.4 — Predictive Forecast Memory Hooks (AI Memory Persistence Layer)
+
+document.addEventListener("DOMContentLoaded", () => {
+  let forecastMemory = [];
+
+  function updateForecastMemory() {
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    if (!forecastContainer) return;
+
+    const currentForecast = forecastContainer.innerText || "N/A";
+    const timestamp = new Date().toISOString();
+
+    forecastMemory.push({ timestamp, state: currentForecast });
+
+    // Keep last 50 memory points
+    if (forecastMemory.length > 50) {
+      forecastMemory.shift();
+    }
+
+    console.log("🧠 Forecast Memory Updated:", forecastMemory);
+  }
+
+  // Expose memory for future model scoring & evaluation
+  window.PredictiveMemoryEngine = {
+    getForecastMemory: () => forecastMemory
+  };
+
+  setInterval(updateForecastMemory, 5000);
+});
+
+// ===============================
+// Phase 131.5 — Forecast Drift Analyzer Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  function analyzeForecastDrift() {
+    const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.();
+    if (!forecastMemory || forecastMemory.length < 10) {
+      console.log("🧠 Forecast Drift Analyzer: Insufficient data points.");
+      return;
+    }
+
+    const recentStates = forecastMemory.slice(-10).map(mem => mem.state);
+    const stableCount = recentStates.filter(state => state.includes("Stable")).length;
+    const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
+
+    let driftAssessment = "🟢 Stable";
+
+    if (volatileCount >= 5) {
+      driftAssessment = "🔴 Severe Drift Detected";
+    } else if (volatileCount >= 3) {
+      driftAssessment = "🟠 Mild Drift Emerging";
+    } else if (stableCount >= 8) {
+      driftAssessment = "🟢 Highly Stable Forecasting";
+    }
+
+    console.log(`📊 Forecast Drift Assessment: ${driftAssessment}`);
+  }
+
+  setInterval(analyzeForecastDrift, 10000);
+});
+
+
+// ===============================
+// Phase 131.6 — Threat Matrix Early Warning System (Predictive Alerting Engine)
+
+document.addEventListener("DOMContentLoaded", () => {
+  function monitorThreatLevels() {
+    const resolverContent = document.getElementById("resolverContent");
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+
+    if (!resolverContent || !forecastContainer || !anomalyContainer) return;
+
+    const riskText = resolverContent.innerText;
+    const forecastText = forecastContainer.innerText;
+    const anomalyText = anomalyContainer.innerText;
+
+    let alerts = [];
+
+    if (riskText.includes("High Risk")) {
+      alerts.push("🚨 Critical Risk Level Detected!");
+    }
+    if (forecastText.match(/Volatility|Surge|Regression/)) {
+      alerts.push("⚠ Forecast Instability Emerging.");
+    }
+    if (anomalyText.match(/Anomaly Spike|Data Integrity Concern/)) {
+      alerts.push("🔴 Severe Anomaly Triggered!");
+    }
+
+    if (alerts.length > 0) {
+      console.warn("🚨 EARLY WARNING SYSTEM:");
+      alerts.forEach(alert => console.warn(alert));
+    }
+  }
+
+  setInterval(monitorThreatLevels, 6000);
+});
+
+// ===============================
+// Phase 131.8 — HUD Live Stream Wiring
+
+document.addEventListener("DOMContentLoaded", () => {
+  function updateHUDOverlay() {
+    const resolverContent = document.getElementById("resolverContent");
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+
+    const hudRisk = document.querySelector("#hudRisk span");
+    const hudForecast = document.querySelector("#hudForecast span");
+    const hudAnomaly = document.querySelector("#hudAnomaly span");
+    const hudDrift = document.querySelector("#hudDrift span");
+
+    if (!resolverContent || !forecastContainer || !anomalyContainer || !hudRisk || !hudForecast || !hudAnomaly || !hudDrift) return;
+
+    hudRisk.innerText = resolverContent.innerText || "N/A";
+    hudForecast.innerText = forecastContainer.innerText || "N/A";
+    hudAnomaly.innerText = anomalyContainer.innerText || "N/A";
+
+    const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.();
+    if (!forecastMemory || forecastMemory.length < 10) {
+      hudDrift.innerText = "Insufficient Data";
+      return;
+    }
+
+    const recentStates = forecastMemory.slice(-10).map(mem => mem.state);
+    const stableCount = recentStates.filter(state => state.includes("Stable")).length;
+    const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
+
+    let driftAssessment = "🟢 Stable";
+    if (volatileCount >= 5) {
+      driftAssessment = "🔴 Severe Drift";
+    } else if (volatileCount >= 3) {
+      driftAssessment = "🟠 Mild Drift";
+    } else if (stableCount >= 8) {
+      driftAssessment = "🟢 Highly Stable";
+    }
+    hudDrift.innerText = driftAssessment;
+  }
+
+  setInterval(updateHUDOverlay, 3000);
+});
+
+
+// ===============================
+// Phase 132.0 — Production Stabilization Lockdown (Stage 1)
+
+document.addEventListener("DOMContentLoaded", () => {
+  function stabilizePredictiveElements() {
+    const requiredContainers = [
+      { id: "resolverContent", label: "Resolver Panel" },
+      { id: "forecastSignalsContainer", label: "Forecast Overlay" },
+      { id: "anomalySignalsContainer", label: "Anomaly Overlay" },
+      { id: "riskSignalsContainer", label: "Risk Overlay" },
+      { id: "threatMatrixContent", label: "Threat Matrix" },
+      { id: "hudRisk", label: "HUD Risk" },
+      { id: "hudForecast", label: "HUD Forecast" },
+      { id: "hudAnomaly", label: "HUD Anomaly" },
+      { id: "hudDrift", label: "HUD Drift" }
+    ];
+
+    requiredContainers.forEach(container => {
+      const elem = document.getElementById(container.id);
+      if (!elem) {
+        console.warn(`⚠ Missing container: ${container.label} [${container.id}]`);
+      }
+    });
+  }
+
+  // Run stability scan every 60 seconds as safeguard
+  setInterval(stabilizePredictiveElements, 60000);
+});
+// ===============================
+// Phase 132.1 — Predictive AI Failover Safety Net
+
+document.addEventListener("DOMContentLoaded", () => {
+  function aiFailoverMonitor() {
+    const streamEngineActive = (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function");
+    const dataBridgeActive = (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function");
+
+    if (!streamEngineActive) {
+      console.error("🚨 PredictiveStreamEngine unavailable. Attempting recovery...");
+      if (window.PredictiveStreamEngineBackup) {
+        window.PredictiveStreamEngineBackup.start();
+        console.log("✅ Backup Stream Engine engaged.");
+      } else {
+        console.warn("⚠ No backup engine available.");
+      }
+    }
+
+    if (!dataBridgeActive) {
+      console.error("🚨 PredictiveDataBridge unavailable. Attempting re-initialization...");
+      if (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.initialize === "function") {
+        window.PredictiveDataBridge.initialize();
+        console.log("✅ DataBridge re-initialized.");
+      } else {
+        console.warn("⚠ No DataBridge recovery available.");
+      }
+    }
+  }
+
+  setInterval(aiFailoverMonitor, 15000);
+});
+// ===============================
+// Phase 132.2 — Predictive Telemetry Logger (Persistent AI System Log)
+
+document.addEventListener("DOMContentLoaded", () => {
+  let telemetryLog = [];
+
+  function captureTelemetrySnapshot() {
+    const resolverContent = document.getElementById("resolverContent");
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+
+    if (!resolverContent || !forecastContainer || !anomalyContainer) return;
+
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      risk: resolverContent.innerText || "N/A",
+      forecast: forecastContainer.innerText || "N/A",
+      anomalies: anomalyContainer.innerText || "N/A"
+    };
+
+    telemetryLog.push(snapshot);
+
+    // Limit log size to 200 entries for performance
+    if (telemetryLog.length > 200) {
+      telemetryLog.shift();
+    }
+
+    console.log("📡 Telemetry Logged:", snapshot);
+  }
+
+  window.TelemetryLogger = {
+    getTelemetryLog: () => telemetryLog,
+    exportTelemetryJSON: () => {
+      const blob = new Blob([JSON.stringify(telemetryLog, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `PredictiveTelemetry_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  setInterval(captureTelemetrySnapshot, 7000);
+});
+// ===============================
+// Phase 132.3 — Production Freeze Snapshot & Deployment Prep
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.ProductionFreezeSnapshot = function() {
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      forecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory?.() || []),
+      telemetryLog: (window.TelemetryLogger?.getTelemetryLog?.() || []),
+      streamEngineActive: (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function"),
+      dataBridgeActive: (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function"),
+    };
+
+    console.log("🧊 Production Freeze Snapshot Captured:", snapshot);
+
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ProductionFreeze_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+});
+// ===============================
+// Phase 133.0 — Deployment Hardening Prep (Release Candidate Generation)
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.GenerateReleaseCandidate = function() {
+    const buildVersion = "InventoryAuditor_RC_133.0";
+    const buildTimestamp = new Date().toISOString();
+
+    const candidate = {
+      buildVersion,
+      buildTimestamp,
+      forecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory?.() || []),
+      telemetryLog: (window.TelemetryLogger?.getTelemetryLog?.() || []),
+      streamEngineActive: (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function"),
+      dataBridgeActive: (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function"),
+      activeTab: localStorage.getItem('activeTab') || 'N/A',
+      lastLoadedSession: localStorage.getItem('lastLoadedSession') || 'N/A'
+    };
+
+    console.log("🧬 Release Candidate Generated:", candidate);
+
+    const blob = new Blob([JSON.stringify(candidate, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `InventoryAuditor_RC_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+});

@@ -185,6 +185,27 @@
     <button id="drawerToggleBtn" style="margin-left: 10px; font-size: 18px; padding: 4px 8px;">☰ Menu</button>
   </header>
 
+  <!-- Phase 131.7 — Predictive HUD Overlay -->
+  <div id="aiHudOverlay" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(30,30,30,0.95);
+    padding: 15px 20px;
+    border: 2px solid #9900cc;
+    border-radius: 10px;
+    color: #fff;
+    z-index: 99999;
+    font-family: monospace;
+    font-size: 0.95em;
+    box-shadow: 0 0 20px #9900cc;">
+    <h3 style="margin:0 0 10px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
+    <div id="hudRisk" style="margin-bottom: 6px;">Risk: <span>Loading...</span></div>
+    <div id="hudForecast" style="margin-bottom: 6px;">Forecast: <span>Loading...</span></div>
+    <div id="hudAnomaly" style="margin-bottom: 6px;">Anomalies: <span>Loading...</span></div>
+    <div id="hudDrift" style="margin-bottom: 6px;">Drift: <span>Loading...</span></div>
+  </div>
+
   <!-- Phase 125.8 — Predictive Overlay Remover -->
   <style>
     #diagnosticOverlay, #dropboxStatusOverlay {
@@ -736,6 +757,11 @@
       <div id="resolverContent" style="margin-top:15px;">
         <!-- Future resolver data will be injected here -->
       </div>
+      
+      <div id="threatMatrixContent" style="margin-top: 25px; padding: 15px; background: #222; border: 1px solid #555; border-radius: 5px; font-family: monospace; font-size: 0.95em; color: #fff;">
+        <!-- Threat matrix summary will be injected here -->
+      </div>
+      
       <div style="text-align:center;margin-top:15px;">
         <button id="closeResolverBtn">❌ Close</button>
       </div>
