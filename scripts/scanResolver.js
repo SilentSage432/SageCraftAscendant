@@ -1065,9 +1065,6 @@ window.predictiveAuditEngine = {
     }
 };
 
-// Auto-start audit overlay on load
-window.predictiveAuditEngine.startAuditLoop();
-
 // ================================
 // Phase 57 — Predictive Audit Overlay Engine
 // ================================
@@ -1109,6 +1106,3 @@ window.predictiveAuditEngine = {
         }, 5000); // Update every 5 seconds
     }
 };
-
-// Auto-start audit overlay on load
-window.predictiveAuditEngine.startAuditLoop();

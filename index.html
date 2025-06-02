@@ -69,6 +69,7 @@
         padding: 6px;
       }
 
+
       #drawerNavButtons button {
         font-size: 12px !important;
         padding: 6px 4px !important;
@@ -91,12 +92,48 @@
         font-size: 12px;
         margin-bottom: 8px;
       }
+
+      /* Overlay repositioning for mobile: diagnostic and dropbox overlays to bottom right */
+      #diagnosticOverlay, #dropboxStatusOverlay {
+        right: 10px !important;
+        top: auto !important;
+        bottom: 10px !important;
+      }
     }
 
     #mapPromptOverlay {
       display: none !important;
     }
+    /* Utility Hub Button Normalization — Fully Corrected */
+    #utilityHub button {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 100% !important;
+      box-sizing: border-box !important;
+      font-size: 1em !important;
+      padding: 14px 0 !important;
+      margin: 0 auto 12px auto !important;
+      text-align: center !important;
+    }
+
+    /* Phase 122.6.2 — Utility Hub Responsive Refinement */
+    @media (min-width: 601px) {
+      #utilityHub button {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 1.1em !important;
+        padding: 16px 0 !important;
+        margin: 0 auto 14px auto !important;
+        text-align: center !important;
+      }
+    }
+
   </style>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body class="dark-theme electric-fantasy">
   <!-- Phase 80 — Command Drawer Scaffold -->
@@ -122,6 +159,17 @@
       <button id="navReportingBtn" class="tablink nav-icon" data-target="reportingHub" title="Reporting Hub" aria-label="Reporting Hub">🖨️</button>
       <button id="navMasterExportBtn" class="tablink nav-icon" data-target="masterExportHub" title="Master Export Hub" aria-label="Master Export Hub">📦</button>
 
+      <!-- Utility Hub -->
+      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧰 Utility Hub</div>
+      <button id="navUtilityHubBtn" class="tablink nav-icon" data-target="utilityHub" title="Utility Hub" aria-label="Utility Hub">🛠️</button>
+
+      <!-- Control Panels -->
+      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧭 Control Panels</div>
+      <button id="navDiagnosticsBtn" class="tablink nav-icon" aria-label="Diagnostics Panel">📊</button>
+      <button id="navResolverBtn" class="tablink nav-icon" aria-label="Resolver Panel">🧮</button>
+      <button id="navDropboxBtn" class="tablink nav-icon" aria-label="Dropbox Panel">☁️</button>
+      <button id="navDevToolsBtn" class="tablink nav-icon" aria-label="Developer Tools Panel">🧪</button>
+
     </div>
   </div>
 
@@ -137,45 +185,16 @@
     <button id="drawerToggleBtn" style="margin-left: 10px; font-size: 18px; padding: 4px 8px;">☰ Menu</button>
   </header>
 
+  <!-- Phase 125.8 — Predictive Overlay Remover -->
+  <style>
+    #diagnosticOverlay, #dropboxStatusOverlay {
+      display: none !important;
+    }
+  </style>
+
   <main class="container neon-container" role="main">
     <div class="mobile-wrapper">
       <div class="fantasy-wrapper electric-vibe">
-        <div id="diagnosticOverlay" style="
-          position: absolute;
-          top: 80px;
-          right: 20px;
-          z-index: 99998;
-          width: auto;
-          min-width: 140px;
-          padding: 8px;
-          background: rgba(0, 0, 0, 0.7);
-          border: 2px solid #00ffff;
-          border-radius: 8px;
-          color: #fff;
-          font-family: monospace;
-          font-size: 0.75em;
-          opacity: 0.85;
-          pointer-events: none;">
-          🛡 Diagnostics: Active
-        </div>
-        <div id="dropboxStatusOverlay" style="
-          position: absolute;
-          top: 130px;
-          right: 20px;
-          z-index: 99998;
-          width: auto;
-          min-width: 160px;
-          padding: 8px;
-          background: rgba(0, 0, 0, 0.7);
-          border: 2px solid #ffaa00;
-          border-radius: 8px;
-          color: #fff;
-          font-family: monospace;
-          font-size: 0.75em;
-          opacity: 0.85;
-          pointer-events: none;">
-          ☁️ Dropbox: Checking...
-        </div>
       <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
         <h2>Live Counts</h2>
         <div class="active-status-bar">
@@ -256,43 +275,6 @@
 
           <div class="scan-buttons">
             <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
-            <button id="moreOptionsBtn" aria-expanded="false" aria-controls="advancedControls">⚙️ More Options</button>
-          </div>
-
-
-          <div id="advancedControls" class="hidden" aria-hidden="true">
-            <!-- Auto Scan Mode -->
-            <label id="manualModeToggle">
-              <input type="checkbox" id="manualToggle" checked />
-              Auto-Scan Mode
-            </label>
-
-            <!-- Group 1: Import / Export -->
-            <div class="grouped-buttons">
-              <button id="toggleImportExport" aria-expanded="false" aria-controls="importExportControls">
-                📂 Import/Export Options
-              </button>
-              <div id="importExportControls" class="hidden" aria-hidden="true">
-                <div class="grouped-buttons">
-                  <button id="exportBtn">📤 Export Bay Locations</button>
-                  <button id="importBtn">📥 Import Bay Locations</button>
-                  <button id="exportUPCBtn">📤 Export UPC Mappings</button>
-                  <button id="importUPCBtn">📥 Import UPC Mappings</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Group 2: Maintenance Tools -->
-            <div class="grouped-buttons">
-              <button id="clearHistoryBtn">🧹 Clear History</button>
-              <button id="clearSnapshotsBtn">🗑️ Clear Snapshots</button>
-            </div>
-
-            <!-- Group 3: Data Views -->
-            <div class="grouped-buttons">
-              <button id="viewSnapshotsBtn">📂 View Archive Snapshots</button>
-              <button id="viewTrends">📈 View Trends</button>
-            </div>
           </div>
 
         <h3>🧬 Merge Session Archives</h3>
@@ -436,6 +418,7 @@
           <button id="generateForecastBtn" style="width: 100%;">🔮 Generate Forecast Summary</button>
           <button id="generateHeuristicBtn" style="width: 100%;">🔬 Generate Heuristic Summary</button>
           <button id="generateRiskBtn" style="width: 100%;">🚩 Generate Risk Factor Table</button>
+          <button id="generatePatternSignalsBtn" style="width: 100%;">🧬 Generate Pattern Signals</button>
           <button id="generatePatternSignalsBtn">🧬 Generate Pattern Signals</button>
           <button id="generateMasterAuditReportBtn" style="width: 100%;">📋 Generate Master Audit Report</button>
           <button id="renderControlRoomDashboardBtn" style="width: 100%;">🧭 Open AI Control Room</button>
@@ -484,6 +467,22 @@
 
         <div style="color:#aaa; font-size:0.9em;">
           This Master Export System consolidates all available datasets for complete audit archiving, external backups, or migration pipelines.
+        </div>
+      </section>
+
+      <section id="utilityHub" class="tab-section panel-glow" role="tabpanel" aria-label="Utility Hub">
+        <h2>🛠️ Utility Hub</h2>
+        <div class="utility-controls" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <button id="exportBayMappings">📤 Export Bay Mappings</button>
+          <button id="importBayMappings">📥 Import Bay Mappings</button>
+          <button id="exportUPCBtn">📤 Export UPC Map</button>
+          <button id="importUPCBtn">📥 Import UPC Map</button>
+          <button id="clearHistoryBtn">🧹 Clear History</button>
+          <button id="clearSnapshotsBtn">🧹 Clear Snapshots</button>
+          <button id="viewTrendsBtn">📈 View Trends</button>
+          <button id="exportFieldLog">📥 Export Field Logs</button>
+          <button id="syncDropboxMapsBtn">🔄 Sync Dropbox Maps</button>
+          <button id="restoreDropboxMapsBtn">📂 Restore Dropbox Maps</button>
         </div>
       </section>
 
@@ -558,6 +557,13 @@
       </section>
 
       <section id="tools" class="tab-section panel-glow" role="tabpanel" aria-label="Settings">
+      <!-- Advanced Tools Panel -->
+      <section id="advancedTools" class="tab-section panel-glow" role="tabpanel" aria-label="Advanced Tools">
+        <h2>🧰 Advanced Tools</h2>
+        <div style="color:#aaa; font-size:0.9em;">
+          Full access to system tools, maintenance utilities, mapping controls, and internal log managers.
+        </div>
+      </section>
         <h2>Settings</h2>
         <div class="settings-group">
           <h3>🖼 Appearance</h3>
@@ -656,6 +662,8 @@
       </section>
       </div>
     </div>
+
+
   </main>
 
 <!-- Modal for unknown item prompt -->
@@ -705,6 +713,60 @@
   })();
   </script>
 
+
+  <!-- Phase 130.1 — Control Tower Modals -->
+
+  <!-- Diagnostics Modal -->
+  <div id="diagnosticsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="diagnosticsTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;max-height:80%;overflow:auto;">
+      <h3 id="diagnosticsTitle">📊 Diagnostics Panel</h3>
+      <div id="diagnosticsContent" style="margin-top:15px;">
+        <!-- Future diagnostics data will be injected here -->
+      </div>
+      <div style="text-align:center;margin-top:15px;">
+        <button id="closeDiagnosticsBtn">❌ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resolver Modal -->
+  <div id="resolverModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resolverTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;max-height:80%;overflow:auto;">
+      <h3 id="resolverTitle">🧮 Resolver Engine</h3>
+      <div id="resolverContent" style="margin-top:15px;">
+        <!-- Future resolver data will be injected here -->
+      </div>
+      <div style="text-align:center;margin-top:15px;">
+        <button id="closeResolverBtn">❌ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dropbox Modal -->
+  <div id="dropboxModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dropboxTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;max-height:80%;overflow:auto;">
+      <h3 id="dropboxTitle">☁️ Dropbox Control</h3>
+      <div id="dropboxContent" style="margin-top:15px;">
+        <!-- Future dropbox status data will be injected here -->
+      </div>
+      <div style="text-align:center;margin-top:15px;">
+        <button id="closeDropboxBtn">❌ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dev Tools Modal -->
+  <div id="devToolsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="devToolsTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;max-height:80%;overflow:auto;">
+      <h3 id="devToolsTitle">🧪 Developer Tools</h3>
+      <div id="devToolsContent" style="margin-top:15px;">
+        <!-- Future developer tools UI will be injected here -->
+      </div>
+      <div style="text-align:center;margin-top:15px;">
+        <button id="closeDevToolsBtn">❌ Close</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast container -->
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; align-items: center;"></div>
@@ -839,6 +901,7 @@
   <script type="module" src="scripts/ui.js?v=2.0.1"></script>
   <!-- Main script -->
   <script type="module" src="scripts/index.js?v=2.0.2"></script>
+  <script type="module" src="scripts/rotationEngine.js?v=1.0.0"></script>
   <!-- Main App Scripts -->
 
   <!-- Modular App Bootloader -->
@@ -1047,6 +1110,7 @@ window.addEventListener('resize', () => {
     drawerToggleBtn.style.left = `${drawerWidth + 10}px`;
   }
 });
+
 </script>
 </body>
   <!-- Item Link Modal Injection -->

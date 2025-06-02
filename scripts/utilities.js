@@ -125,3 +125,77 @@ window.exportFullSystemSnapshot = function() {
   
   showToast("📦 Full system snapshot exported.");
 };
+
+// ===============================
+// Phase 125.3 — Predictive Engine Backend Scaffold
+// ===============================
+
+window.generateForecastSummary = function() {
+  const sessions = safeParse(localStorage.getItem("savedSessions"));
+  if (!sessions) {
+    showToast("⚠️ No sessions available.");
+    return null;
+  }
+
+  const summary = Object.entries(sessions).map(([sessionName, data]) => {
+    const totalItems = data.length;
+    const totalCount = data.reduce((sum, row) => sum + (row.count || 0), 0);
+    return {
+      session: sessionName,
+      items: totalItems,
+      total: totalCount
+    };
+  });
+
+  return summary;
+};
+
+window.renderForecastSummaryTable = function(summary) {
+  let output = "<h4>📊 Forecast Summary</h4><table border='1' cellpadding='6'><tr><th>Session</th><th>Items</th><th>Total Count</th></tr>";
+  summary.forEach(row => {
+    output += `<tr><td>${row.session}</td><td>${row.items}</td><td>${row.total}</td></tr>`;
+  });
+  output += "</table>";
+  const container = document.getElementById("predictiveContent");
+  if (container) container.innerHTML = output;
+};
+
+// Placeholder cluster engine
+window.generateForecastClusters = function() {
+  const dummyClusters = [
+    { cluster: "A", weight: 123 },
+    { cluster: "B", weight: 87 },
+    { cluster: "C", weight: 211 }
+  ];
+  return dummyClusters;
+};
+
+window.renderForecastClustersTable = function(clusters) {
+  let output = "<h4>🧮 Forecast Clusters</h4><table border='1' cellpadding='6'><tr><th>Cluster</th><th>Weight</th></tr>";
+  clusters.forEach(row => {
+    output += `<tr><td>${row.cluster}</td><td>${row.weight}</td></tr>`;
+  });
+  output += "</table>";
+  const container = document.getElementById("predictiveContent");
+  if (container) container.innerHTML = output;
+};
+
+// Placeholder pattern signals
+window.generatePatternSignals = function() {
+  const dummySignals = [
+    { signal: "Spike Detected", strength: 72 },
+    { signal: "Anomaly Dip", strength: 33 },
+    { signal: "Volatility", strength: 59 }
+  ];
+  return dummySignals;
+};
+
+window.renderPatternSignalsTable = function(signals) {
+  let output = "<h4>🧬 Pattern Signals</h4><table border='1' cellpadding='6'><tr><th>Signal</th><th>Strength</th></tr>";
+  signals.forEach(row => {
+    output += `<tr><td>${row.signal}</td><td>${row.strength}</td></tr>`;
+  });
+  output += "</table>";
+  const container = document.getElementById("predictiveContent");
+  if (container) container.innerHTML = output;
+};

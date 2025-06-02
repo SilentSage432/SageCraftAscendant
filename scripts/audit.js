@@ -1355,5 +1355,51 @@ window.runAISelfOptimizer = function() {
   showToast(`AI Optimizer complete — ${adjustments} items balanced.`);
 };
 
-// 🌐 Expose Rotation Engine Audit globally
+
+// 🔬 Phase 120 — Rotation Engine Audit Deployment
+
+function runRotationEngineAudit() {
+  console.group("🔄 Running Rotation Engine Audit...");
+
+  try {
+    const rotationData = JSON.parse(localStorage.getItem("rotationData") || "{}");
+    if (!rotationData || Object.keys(rotationData).length === 0) {
+      showToast("⚠ No rotation data found.");
+      console.warn("No rotation data found.");
+      return;
+    }
+
+    const overdueList = [];
+
+    Object.entries(rotationData).forEach(([category, info]) => {
+      const interval = info.interval || 30;
+      const lastDate = new Date(info.date);
+      const isValid = !isNaN(lastDate.getTime());
+      const nextDue = isValid ? new Date(lastDate.getTime() + interval * 86400000) : null;
+      const overdue = nextDue && new Date() > nextDue;
+
+      if (overdue) {
+        overdueList.push({
+          category,
+          lastAudited: isValid ? lastDate.toLocaleDateString() : 'Not Set',
+          nextDue: nextDue ? nextDue.toLocaleDateString() : 'N/A'
+        });
+      }
+    });
+
+    if (overdueList.length === 0) {
+      showToast("✅ All categories on schedule.");
+      console.log("All categories on schedule.");
+    } else {
+      console.warn("🚩 Overdue Categories Detected:", overdueList);
+      alert(`${overdueList.length} overdue categories found.\nSee console for details.`);
+    }
+  } catch (err) {
+    console.error("❌ Rotation Engine Audit failed:", err);
+  }
+
+  console.groupEnd();
+}
+
+// 🌐 Expose Rotation Engine globally
 window.runRotationEngineAudit = runRotationEngineAudit;

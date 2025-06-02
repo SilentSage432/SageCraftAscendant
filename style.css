@@ -1,3 +1,32 @@
+/* --- Phase 128.3.5 — Global Drawer Sync --- */
+
+:root {
+  --drawer-width: 320px;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--drawer-width);
+  height: 100%;
+  transform: translateX(calc(-1 * var(--drawer-width)));
+  transition: transform 0.3s ease;
+  z-index: 9999;
+}
+
+.control-drawer {
+  background: linear-gradient(to bottom, #2a0845, #4e2a84);
+}
+
+/* Predictive Drawer now inherits all positioning and width from .drawer.
+   Only background and box-shadow remain. */
+.predictive-drawer {
+  background: linear-gradient(to bottom, #1e1e3f, #120f2a);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  overflow-y: auto;
+}
 --- Active Bay Status Styles ---
 .active-bay-status {
   display: flex;
@@ -2157,7 +2186,7 @@ input, select {
   pointer-events: none;
   transition: right 0.3s ease;
 }
-# --- Drawer Toggle Hamburger Button Fix ---
+#Drawer Toggle Hamburger Button Fix ---
 #drawerToggleBtn {
   position: fixed;
   top: 20px;
@@ -2186,5 +2215,174 @@ input, select {
     width: 36px;
     height: 36px;
     font-size: 18px;
+  }
+}
+/* --- Phase 125.7 — Predictive Drawer Button Stabilizer --- */
+#predictiveDrawerToggle {
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 100000 !important;
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 18px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff) !important;
+  color: #fff !important;
+  border: 2px solid #8a2be2 !important;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066 !important;
+  transition: all 0.3s ease !important;
+}
+
+#predictiveDrawerToggle:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6) !important;
+}
+/* --- Phase 127.9 — Predictive Drawer Handle Styling --- */
+/* --- Phase 128.3.1 — Blade Edge Handle Refinement --- */
+.predictive-handle {
+  position: fixed;
+  top: 30%;
+  left: 0;
+  width: 2px;
+  height: 80px;
+  background: rgba(138, 43, 226, 0.25);
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  z-index: 99999;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.predictive-handle:hover {
+  width: 8px;
+  background: rgba(182, 102, 241, 0.75);
+  box-shadow: 0 0 6px #b666f1;
+}
+/* predictive-drawer positioning/width/transition now handled by .drawer */
+
+.predictive-panel {
+  background: rgba(60, 30, 90, 0.85);
+  border: 1px solid #8f3aff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
+  color: #f0e6ff;
+  text-shadow: 0 0 4px #8f3aff;
+}
+
+.predictive-panel h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .predictive-panel {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  .predictive-panel h4 {
+    font-size: 1rem;
+  }
+}
+
+/* --- Phase 128.3.7 — Drawer Shadow Isolation --- */
+.drawer-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--drawer-width);
+  height: 100%;
+  overflow: hidden;
+  z-index: 9998;
+  pointer-events: none; /* drawer handles interaction */
+}
+/* --- Phase 128.3.9 — Total Drawer Purification --- */
+
+.drawer {
+  position: fixed;
+  top: 0;
+  width: var(--drawer-width);
+  height: 100%;
+  transition: transform 0.3s ease;
+  z-index: 9999;
+  will-change: transform;
+  overflow-y: auto;
+}
+
+.control-drawer {
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(to bottom, #2a0845, #4e2a84);
+}
+
+.predictive-drawer {
+  right: 0;
+  transform: translateX(100%);
+  background: linear-gradient(to bottom, #1e1e3f, #120f2a);
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.drawer.open {
+  transform: translateX(0) !important;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  background: #1e1e1e;
+  padding: 20px 30px;
+  border-radius: 10px;
+  color: #fff;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  font-family: monospace;
+}
+
+.modal h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.modal button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modal button:hover {
+  background: #555;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    max-width: 95%;
+    padding: 15px;
   }
 }
