@@ -1869,3 +1869,223 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 });
+// ===============================
+// Phase 134.0 — Operator Utility Enhancements: Release Candidate Export Console
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) {
+    console.warn("⚠ Operator Console Panel not found. Skipping Phase 134.0 UI injection.");
+    return;
+  }
+
+  const exportBtn = document.createElement("button");
+  exportBtn.textContent = "📦 Generate Release Candidate";
+  exportBtn.style.margin = "10px";
+  exportBtn.style.padding = "12px 18px";
+  exportBtn.style.backgroundColor = "#5522aa";
+  exportBtn.style.color = "#fff";
+  exportBtn.style.fontWeight = "bold";
+  exportBtn.style.border = "none";
+  exportBtn.style.borderRadius = "6px";
+  exportBtn.style.cursor = "pointer";
+  exportBtn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
+  exportBtn.style.transition = "all 0.3s ease-in-out";
+
+  exportBtn.addEventListener("mouseenter", () => {
+    exportBtn.style.backgroundColor = "#6633cc";
+  });
+  exportBtn.addEventListener("mouseleave", () => {
+    exportBtn.style.backgroundColor = "#5522aa";
+  });
+
+  exportBtn.addEventListener("click", () => {
+    if (typeof window.GenerateReleaseCandidate === "function") {
+      window.GenerateReleaseCandidate();
+      console.log("✅ Release Candidate Export initiated.");
+    } else {
+      alert("🚫 Release Candidate function not available.");
+    }
+  });
+
+  operatorPanel.appendChild(exportBtn);
+});
+
+
+// ===============================
+// Phase 134.3 — Operator Console Expansion: Telemetry Export, System Audit & Full Snapshot
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+
+  function createOperatorButton(label, color, handler) {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.style.margin = "10px";
+    btn.style.padding = "12px 18px";
+    btn.style.backgroundColor = color;
+    btn.style.color = "#fff";
+    btn.style.fontWeight = "bold";
+    btn.style.border = "none";
+    btn.style.borderRadius = "6px";
+    btn.style.cursor = "pointer";
+    btn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
+    btn.style.transition = "all 0.3s ease-in-out";
+
+    btn.addEventListener("mouseenter", () => {
+      btn.style.opacity = 0.8;
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.opacity = 1;
+    });
+
+    btn.addEventListener("click", handler);
+    operatorPanel.appendChild(btn);
+  }
+
+  // Telemetry Export
+  createOperatorButton("📊 Export Telemetry", "#cc6600", () => {
+    if (window.TelemetryLogger?.exportTelemetryJSON) {
+      window.TelemetryLogger.exportTelemetryJSON();
+    } else {
+      alert("Telemetry export function not available.");
+    }
+  });
+
+  // Full System Snapshot
+  createOperatorButton("📋 Export Full Snapshot", "#339966", () => {
+    if (window.ProductionFreezeSnapshot) {
+      window.ProductionFreezeSnapshot();
+    } else {
+      alert("Snapshot export function not available.");
+    }
+  });
+
+  // System Audit Diagnostics
+  createOperatorButton("🧮 Run System Audit", "#993399", () => {
+    console.clear();
+    console.log("🛡️ Running Full System Audit...");
+    runWireAudit();
+    runForensicSweep();
+    console.log("✅ System Audit Complete.");
+  });
+});
+// ===============================
+// Phase 134.4 — Operator Console Inspector Module
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+
+  const inspector = document.createElement("div");
+  inspector.style.marginTop = "20px";
+  inspector.style.padding = "10px";
+  inspector.style.backgroundColor = "#222";
+  inspector.style.border = "1px solid #333";
+  inspector.style.borderRadius = "6px";
+  inspector.style.color = "#ccc";
+  inspector.style.fontSize = "0.9em";
+  inspector.style.fontFamily = "monospace";
+  inspector.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
+
+  const buttons = operatorPanel.querySelectorAll("button");
+  const total = buttons.length;
+
+  let listHTML = `<strong>🧭 Operator Console Inspector:</strong><br>Total Tools: ${total}<br><ul>`;
+  buttons.forEach(btn => {
+    const label = btn.textContent.trim();
+    const bgColor = btn.style.backgroundColor;
+    listHTML += `<li>${label} — <span style="color:${bgColor};">${bgColor}</span></li>`;
+  });
+  listHTML += "</ul>";
+
+  inspector.innerHTML = listHTML;
+  operatorPanel.appendChild(inspector);
+});
+// ===============================
+// Phase 134.5 — Operator Console Refresh Trigger
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.refreshOperatorConsole = function() {
+    console.log("🔄 Refreshing Operator Console...");
+
+    const operatorPanel = document.getElementById("operatorConsolePanel");
+    if (!operatorPanel) {
+      console.warn("⚠ Operator Console Panel not found.");
+      return;
+    }
+
+    // Remove all existing buttons (except inspector div)
+    operatorPanel.querySelectorAll("button").forEach(btn => btn.remove());
+
+    // Re-invoke existing injection phases manually
+    if (typeof window.GenerateReleaseCandidate === "function") {
+      const exportBtn = document.createElement("button");
+      exportBtn.textContent = "📦 Generate Release Candidate";
+      exportBtn.style.margin = "10px";
+      exportBtn.style.padding = "12px 18px";
+      exportBtn.style.backgroundColor = "#5522aa";
+      exportBtn.style.color = "#fff";
+      exportBtn.style.fontWeight = "bold";
+      exportBtn.style.border = "none";
+      exportBtn.style.borderRadius = "6px";
+      exportBtn.style.cursor = "pointer";
+      exportBtn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
+      exportBtn.style.transition = "all 0.3s ease-in-out";
+
+      exportBtn.addEventListener("click", () => window.GenerateReleaseCandidate());
+      operatorPanel.appendChild(exportBtn);
+    }
+
+    // Rebuild Phase 134.3 buttons
+    if (window.TelemetryLogger?.exportTelemetryJSON) {
+      const telemetryBtn = document.createElement("button");
+      telemetryBtn.textContent = "📊 Export Telemetry";
+      telemetryBtn.style.margin = "10px";
+      telemetryBtn.style.padding = "12px 18px";
+      telemetryBtn.style.backgroundColor = "#cc6600";
+      telemetryBtn.style.color = "#fff";
+      telemetryBtn.style.fontWeight = "bold";
+      telemetryBtn.style.border = "none";
+      telemetryBtn.style.borderRadius = "6px";
+      telemetryBtn.style.cursor = "pointer";
+      telemetryBtn.addEventListener("click", () => window.TelemetryLogger.exportTelemetryJSON());
+      operatorPanel.appendChild(telemetryBtn);
+    }
+
+    if (window.ProductionFreezeSnapshot) {
+      const snapshotBtn = document.createElement("button");
+      snapshotBtn.textContent = "📋 Export Full Snapshot";
+      snapshotBtn.style.margin = "10px";
+      snapshotBtn.style.padding = "12px 18px";
+      snapshotBtn.style.backgroundColor = "#339966";
+      snapshotBtn.style.color = "#fff";
+      snapshotBtn.style.fontWeight = "bold";
+      snapshotBtn.style.border = "none";
+      snapshotBtn.style.borderRadius = "6px";
+      snapshotBtn.style.cursor = "pointer";
+      snapshotBtn.addEventListener("click", () => window.ProductionFreezeSnapshot());
+      operatorPanel.appendChild(snapshotBtn);
+    }
+
+    const auditBtn = document.createElement("button");
+    auditBtn.textContent = "🧮 Run System Audit";
+    auditBtn.style.margin = "10px";
+    auditBtn.style.padding = "12px 18px";
+    auditBtn.style.backgroundColor = "#993399";
+    auditBtn.style.color = "#fff";
+    auditBtn.style.fontWeight = "bold";
+    auditBtn.style.border = "none";
+    auditBtn.style.borderRadius = "6px";
+    auditBtn.style.cursor = "pointer";
+    auditBtn.addEventListener("click", () => {
+      console.clear();
+      console.log("🛡️ Running Full System Audit...");
+      runWireAudit();
+      runForensicSweep();
+      console.log("✅ System Audit Complete.");
+    });
+    operatorPanel.appendChild(auditBtn);
+  };
+});

@@ -687,6 +687,25 @@
 
   </main>
 
+  <!-- Phase 134.1 — Operator Console Panel Injection -->
+  <div id="operatorConsolePanel" style="
+    background: #1b1b2f;
+    border: 2px solid #553399;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 40px auto;
+    width: 90%;
+    max-width: 900px;
+    font-family: monospace;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(85, 51, 153, 0.8);
+  ">
+    <h2 style="margin-bottom: 20px; color: #cc99ff;">🛠 Operator Console</h2>
+    <div id="operatorTools" style="display: flex; flex-wrap: wrap; gap: 20px;">
+      <!-- Buttons will be dynamically injected here -->
+    </div>
+  </div>
+
 <!-- Modal for unknown item prompt -->
   <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
@@ -1124,6 +1143,16 @@ drawerToggleBtn.addEventListener('click', () => {
   const drawerWidth = getDrawerWidth();
   commandDrawer.style.left = drawerOpen ? '0px' : `-${drawerWidth}px`;
   drawerToggleBtn.style.left = drawerOpen ? `${drawerWidth + 10}px` : '10px';
+
+  // NEW HUD OFFSET SYNC LOGIC (Phase 134.2)
+  const hudOverlay = document.getElementById("aiHudOverlay");
+  if (hudOverlay) {
+    if (drawerOpen) {
+      hudOverlay.style.right = `${drawerWidth + 30}px`;  // Push HUD to the right
+    } else {
+      hudOverlay.style.right = `20px`;  // Return HUD to default position
+    }
+  }
 });
 
 window.addEventListener('resize', () => {
