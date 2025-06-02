@@ -34,6 +34,225 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         window.NeuralForecastMemoryCortex.injectForecastRecord(entry);
+        // === Forecast Cortex Seeding - Phase 202.0
+        if (!window.ForecastSeedCortex) {
+          window.ForecastSeedCortex = { seeds: [] };
+        }
+        const forecastSeed = {
+          timestamp: entry.timestamp,
+          itemNumber: entry.itemNumber,
+          onHandUnits: entry.onHandUnits,
+          division: entry.division
+        };
+        window.ForecastSeedCortex.seeds.push(forecastSeed);
+        // Phase 202.1 — Rolling Memory Builder
+        if (!window.ForecastRollingMemory) {
+          window.ForecastRollingMemory = [];
+        }
+        window.ForecastRollingMemory.push(forecastSeed);
+        if (window.ForecastRollingMemory.length > 1000) {
+          window.ForecastRollingMemory.shift();  // keep memory window at 1000 entries
+        }
+        console.log("🧠 Rolling Forecast Memory Updated:", window.ForecastRollingMemory.length);
+        console.log("🌱 Forecast Cortex Seed Injected:", forecastSeed);
+
+        // Phase 202.2 — Rotational Trend Extractor
+        if (!window.RotationalTrendMap) {
+          window.RotationalTrendMap = {};
+        }
+
+        const key = `${entry.itemNumber}::${entry.division}`;
+        if (!window.RotationalTrendMap[key]) {
+          window.RotationalTrendMap[key] = {
+            itemNumber: entry.itemNumber,
+            division: entry.division,
+            scanTimestamps: []
+          };
+        }
+        window.RotationalTrendMap[key].scanTimestamps.push(entry.timestamp);
+
+        // Keep only latest 50 scan points per item/division combo
+        if (window.RotationalTrendMap[key].scanTimestamps.length > 50) {
+          window.RotationalTrendMap[key].scanTimestamps.shift();
+        }
+
+        console.log(`🔄 Trend Rotation Updated for ${key}: ${window.RotationalTrendMap[key].scanTimestamps.length} scans`);
+
+        // Phase 202.3 — Rotational Drift Sentinel
+        if (!window.RotationalDriftSentinel) {
+          window.RotationalDriftSentinel = {};
+        }
+
+        const rotationData = window.RotationalTrendMap[key].scanTimestamps;
+        const driftThreshold = 10; // Adjustable sensitivity
+
+        if (rotationData.length >= 5) {
+          const recentScans = rotationData.slice(-5).map(ts => new Date(ts).getTime());
+          const intervals = [];
+
+          for (let i = 1; i < recentScans.length; i++) {
+            intervals.push(recentScans[i] - recentScans[i - 1]);
+          }
+
+          const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+
+          if (!window.RotationalDriftSentinel[key]) {
+            window.RotationalDriftSentinel[key] = { avgInterval, anomalyCount: 0 };
+          } else {
+            const prevAvg = window.RotationalDriftSentinel[key].avgInterval;
+            const drift = Math.abs(avgInterval - prevAvg) / prevAvg;
+
+            if (drift > 0.25) {
+              window.RotationalDriftSentinel[key].anomalyCount++;
+              console.warn(`⚠ Drift Detected for ${key}: Δ${(drift * 100).toFixed(1)}%`);
+            }
+
+            // Adaptive smoothing
+            window.RotationalDriftSentinel[key].avgInterval = (prevAvg * 0.8) + (avgInterval * 0.2);
+          }
+        }
+
+        // Phase 202.4 — Cross-Division Comparative Mapper
+        if (!window.CrossDivisionMap) {
+          window.CrossDivisionMap = {};
+        }
+
+        Object.values(window.RotationalTrendMap).forEach(entryObj => {
+          const divKey = entryObj.division;
+          if (!window.CrossDivisionMap[divKey]) {
+            window.CrossDivisionMap[divKey] = { totalScans: 0, items: {} };
+          }
+
+          const itemKey = entryObj.itemNumber;
+          const itemScanCount = entryObj.scanTimestamps.length;
+
+          window.CrossDivisionMap[divKey].totalScans += 1;
+          window.CrossDivisionMap[divKey].items[itemKey] = itemScanCount;
+        });
+
+        console.log("🌐 Cross-Division Map Updated:", window.CrossDivisionMap);
+
+        // Phase 202.5 — Multi-Axis Correlation Sentinel
+        if (!window.MultiAxisCorrelation) {
+          window.MultiAxisCorrelation = {};
+        }
+
+        Object.entries(window.CrossDivisionMap).forEach(([divisionKey, divData]) => {
+          const totalScans = divData.totalScans;
+          const itemKeys = Object.keys(divData.items);
+
+          itemKeys.forEach(itemKey => {
+            const scanCount = divData.items[itemKey];
+            const scanRatio = scanCount / totalScans;
+
+            if (!window.MultiAxisCorrelation[itemKey]) {
+              window.MultiAxisCorrelation[itemKey] = {};
+            }
+
+            window.MultiAxisCorrelation[itemKey][divisionKey] = scanRatio;
+          });
+        });
+
+        console.log("🧮 Multi-Axis Correlation Updated:", window.MultiAxisCorrelation);
+
+        // Phase 202.6 — Predictive Memory Archiver
+        if (!window.PredictiveMemoryArchive) {
+          window.PredictiveMemoryArchive = [];
+        }
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          multiAxisCorrelation: JSON.parse(JSON.stringify(window.MultiAxisCorrelation)),
+          rotationalDrift: JSON.parse(JSON.stringify(window.RotationalDriftSentinel)),
+          crossDivisionMap: JSON.parse(JSON.stringify(window.CrossDivisionMap))
+        };
+
+        window.PredictiveMemoryArchive.push(snapshot);
+
+        // Limit archive to last 500 snapshots to preserve memory
+        if (window.PredictiveMemoryArchive.length > 500) {
+          window.PredictiveMemoryArchive.shift();
+        }
+
+        console.log("📦 Predictive Memory Archive Snapshot Captured:", snapshot);
+
+        // Phase 202.7 — Temporal Forecast Comparator
+        if (!window.TemporalForecastComparator) {
+          window.TemporalForecastComparator = [];
+        }
+
+        function computeDriftScore(current, previous) {
+          let score = 0;
+          const keys = Object.keys(current);
+          keys.forEach(itemKey => {
+            const divKeys = Object.keys(current[itemKey] || {});
+            divKeys.forEach(divKey => {
+              const curRatio = current[itemKey][divKey] || 0;
+              const prevRatio = (previous[itemKey]?.[divKey]) || 0;
+              score += Math.abs(curRatio - prevRatio);
+            });
+          });
+          return score;
+        }
+
+        if (window.PredictiveMemoryArchive.length > 1) {
+          const latest = window.PredictiveMemoryArchive[window.PredictiveMemoryArchive.length - 1];
+          const previous = window.PredictiveMemoryArchive[window.PredictiveMemoryArchive.length - 2];
+
+          const driftScore = computeDriftScore(latest.multiAxisCorrelation, previous.multiAxisCorrelation);
+
+          window.TemporalForecastComparator.push({
+            timestamp: latest.timestamp,
+            driftScore: driftScore.toFixed(4)
+          });
+
+          console.log("🔬 Temporal Drift Comparison:", driftScore.toFixed(4));
+        }
+
+        // Phase 202.8 — Predictive Delta Memory Chain
+        if (!window.ForecastDeltaMemoryChain) {
+          window.ForecastDeltaMemoryChain = [];
+        }
+
+        const deltaSnapshot = {
+          timestamp: new Date().toISOString(),
+          driftScore: (window.TemporalForecastComparator?.slice(-1)[0]?.driftScore) || "0.0000",
+          totalSeeds: window.ForecastSeedCortex?.seeds?.length || 0,
+          rollingWindow: window.ForecastRollingMemory?.length || 0,
+          totalArchiveSnapshots: window.PredictiveMemoryArchive?.length || 0
+        };
+
+        window.ForecastDeltaMemoryChain.push(deltaSnapshot);
+
+        // Limit chain size to last 1000 deltas for performance
+        if (window.ForecastDeltaMemoryChain.length > 1000) {
+          window.ForecastDeltaMemoryChain.shift();
+        }
+
+        console.log("🔗 Delta Memory Chain Updated:", deltaSnapshot);
+
+        // Phase 202.9 — Forecast Drift Heatmap Seed
+        if (!window.ForecastDriftHeatmap) {
+          window.ForecastDriftHeatmap = [];
+        }
+
+        const heatmapSnapshot = {
+          timestamp: new Date().toISOString(),
+          driftScore: parseFloat(deltaSnapshot.driftScore),
+          rotationalDriftCount: Object.keys(window.RotationalDriftSentinel || {}).length,
+          multiAxisKeys: Object.keys(window.MultiAxisCorrelation || {}).length,
+          crossDivisionKeys: Object.keys(window.CrossDivisionMap || {}).length
+        };
+
+        window.ForecastDriftHeatmap.push(heatmapSnapshot);
+
+        // Keep only last 500 heatmap points for efficiency
+        if (window.ForecastDriftHeatmap.length > 500) {
+          window.ForecastDriftHeatmap.shift();
+        }
+
+        console.log("🌡 Forecast Drift Heatmap Updated:", heatmapSnapshot);
+
         injectedCount++;
       });
 
