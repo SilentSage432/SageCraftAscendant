@@ -1855,6 +1855,52 @@ window.addEventListener('resize', () => {
 });
 
 </script>
+<!-- Phase 201.15 — Neural Visual Sync Bootstrap -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralVisualSync = {
+    refreshLiveTableFromCortex() {
+      const liveScanTableBody = document.getElementById("liveScanTableBody");
+      if (!liveScanTableBody) return;
+
+      const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+      if (cortex.length === 0) {
+        liveScanTableBody.innerHTML = `
+          <tr id="placeholderRow">
+            <td colspan="7" style="text-align: center; color: #888;">No items scanned yet</td>
+          </tr>
+        `;
+        return;
+      }
+
+      liveScanTableBody.innerHTML = "";
+      cortex.forEach(record => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${record.itemNumber}</td>
+          <td>${record.onHandUnits}</td>
+          <td>${record.division}</td>
+          <td>Forecast</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        `;
+        liveScanTableBody.appendChild(row);
+      });
+    }
+  };
+
+  // Attach to global Cortex injection (if available)
+  if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+    window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+      window.NeuralVisualSync.refreshLiveTableFromCortex();
+    });
+  }
+
+  // Initial refresh on page load
+  window.NeuralVisualSync.refreshLiveTableFromCortex();
+});
+</script>
 </body>
   <!-- Item Link Modal Injection -->
   <div id="itemLinkModalContainer" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="itemLinkTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">

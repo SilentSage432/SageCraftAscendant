@@ -1,3 +1,162 @@
+// ===============================
+// Phase 201.17 — Neural Intake Bootstrap Injector
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralIntakeEngine = {
+    parseIntakeFile(fileContent) {
+      try {
+        const data = JSON.parse(fileContent);
+        if (!Array.isArray(data)) {
+          alert("Intake file format invalid — expecting an array.");
+          return [];
+        }
+        return data;
+      } catch (err) {
+        alert("Failed to parse intake file: " + err);
+        return [];
+      }
+    },
+
+    injectIntakeRecords(records) {
+      if (!window.NeuralForecastMemoryCortex || typeof window.NeuralForecastMemoryCortex.injectForecastRecord !== "function") {
+        alert("Neural Cortex not available.");
+        return;
+      }
+
+      let injectedCount = 0;
+
+      records.forEach(record => {
+        const entry = {
+          timestamp: new Date().toISOString(),
+          itemNumber: record.itemNumber || record.ItemNumber || "Unknown",
+          onHandUnits: record.onHandUnits || record.OnHand || 0,
+          division: record.division || record.Category || "Uncategorized"
+        };
+
+        window.NeuralForecastMemoryCortex.injectForecastRecord(entry);
+        injectedCount++;
+      });
+
+      alert(`✅ Neural Intake Complete: ${injectedCount} records injected.`);
+    }
+  };
+
+  console.log("🧪 Neural Intake Engine Initialized.");
+});
+
+// ===============================
+// Phase 201.18 — Neural Intake File Loader UI Injector
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) {
+    console.warn("⚠ Operator Console Panel not found. Skipping Neural Intake File Loader UI.");
+    return;
+  }
+
+  const intakeLabel = document.createElement("label");
+  intakeLabel.textContent = "📂 Load Neural Intake File:";
+  intakeLabel.style.display = "block";
+  intakeLabel.style.marginTop = "20px";
+  intakeLabel.style.color = "#fff";
+  intakeLabel.style.fontWeight = "bold";
+  operatorPanel.appendChild(intakeLabel);
+
+  const intakeInput = document.createElement("input");
+  intakeInput.type = "file";
+  intakeInput.accept = ".json";
+  intakeInput.style.margin = "10px 0";
+  intakeInput.style.padding = "8px";
+  intakeInput.style.borderRadius = "4px";
+  operatorPanel.appendChild(intakeInput);
+
+  const intakeBtn = document.createElement("button");
+  intakeBtn.textContent = "🚀 Inject Intake Data";
+  intakeBtn.style.padding = "10px 16px";
+  intakeBtn.style.backgroundColor = "#0077cc";
+  intakeBtn.style.color = "#fff";
+  intakeBtn.style.fontWeight = "bold";
+  intakeBtn.style.border = "none";
+  intakeBtn.style.borderRadius = "6px";
+  intakeBtn.style.cursor = "pointer";
+  intakeBtn.style.boxShadow = "0 0 6px rgba(255,255,255,0.2)";
+  intakeBtn.style.transition = "all 0.3s ease-in-out";
+  operatorPanel.appendChild(intakeBtn);
+
+  intakeBtn.addEventListener("click", () => {
+    const file = intakeInput.files[0];
+    if (!file) {
+      alert("Please select an intake file first.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const contents = e.target.result;
+      const records = window.NeuralIntakeEngine.parseIntakeFile(contents);
+      if (records.length > 0) {
+        // Phase 201.19 — Intake Format Inspector: Validate before injection
+        if (typeof window.NeuralIntakeEngine.validateIntakeStructure === "function") {
+          window.NeuralIntakeEngine.validateIntakeStructure(records);
+        }
+        window.NeuralIntakeEngine.injectIntakeRecords(records);
+      }
+    };
+    reader.readAsText(file);
+  });
+});
+
+// ===============================
+// Phase 201.19 — Neural Intake Format Inspector Injector
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralIntakeEngine.validateIntakeStructure = function(records) {
+    let validCount = 0;
+    let invalidCount = 0;
+
+    records.forEach(record => {
+      const hasItem = record.itemNumber || record.ItemNumber;
+      const hasOnHand = (record.onHandUnits !== undefined || record.OnHand !== undefined);
+      const hasDivision = record.division || record.Category;
+
+      if (hasItem && hasOnHand && hasDivision) {
+        validCount++;
+      } else {
+        invalidCount++;
+      }
+    });
+
+    console.log(`🧪 Intake Format Inspection Complete — Valid: ${validCount} | Invalid: ${invalidCount}`);
+
+    if (invalidCount > 0) {
+      alert(`⚠ Warning: ${invalidCount} invalid records detected. These will be skipped during intake.`);
+    }
+  };
+
+  console.log("✅ Neural Intake Format Inspector Activated");
+});
+// ===============================
+// Phase 201.16 — Neural Cortex → Wiring Bridge Injector
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Verify Cortex exists
+  if (!window.NeuralForecastMemoryCortex || typeof window.NeuralForecastMemoryCortex.addInjectionHook !== "function") {
+    console.warn("⚠ Neural Cortex Injection Hook not available.");
+    return;
+  }
+
+  // Attach live Cortex→Visual Sync bridge
+  window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+    if (window.NeuralVisualSync && typeof window.NeuralVisualSync.refreshLiveTableFromCortex === "function") {
+      window.NeuralVisualSync.refreshLiveTableFromCortex();
+      console.log("🔄 Live Table Synced to Neural Cortex");
+    } else {
+      console.warn("⚠ NeuralVisualSync not available for live table refresh.");
+    }
+  });
+
+  console.log("✅ Phase 201.16 — Neural Cortex → Visual Sync Bridge Activated");
+});
 
 // ===============================
 // Phase 128.3.5 — Global Drawer Controller Injection
