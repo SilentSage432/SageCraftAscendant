@@ -698,7 +698,36 @@
     <div id="operatorTools" style="display: flex; flex-wrap: wrap; gap: 20px;">
       <!-- Buttons will be dynamically injected here -->
     </div>
+    <!-- Static Drift Visualizer Button -->
+    <button id="launchDriftVisualizerBtn" style="
+      padding: 12px 18px;
+      font-size: 1em;
+      font-family: monospace;
+      background: #2a003f;
+      color: #fff;
+      border: 2px solid #9933ff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    ">
+      📈 Forecast Drift Visualizer
+    </button>
   </div>
+<!-- Bind Drift Visualizer Button -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const launchDriftBtn = document.getElementById("launchDriftVisualizerBtn");
+  if (launchDriftBtn) {
+    launchDriftBtn.addEventListener("click", () => {
+      if (typeof window.renderForecastDriftChart === "function") {
+        window.renderForecastDriftChart();
+      } else {
+        alert("Drift Visualizer not available.");
+      }
+    });
+  }
+});
+</script>
 
 <!-- Modal for unknown item prompt -->
   <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
@@ -985,27 +1014,46 @@
 </script>
 <!-- Phase 200.7 — Predictive HUD Isolation Container -->
 <div id="brainDockHudPanel" style="
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    background: #1b1b2f;
-    border: 2px solid #9933ff;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
-    font-family: monospace;
-    color: #fff;
-    z-index: 10000;
-    width: 280px;
-    transition: all 0.3s ease;
-    display: none;
-  ">
-    <h3 style="margin:0 0 10px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
-    <div id="hudRisk" style="margin-bottom: 6px;">Risk: <span>Loading...</span></div>
-    <div id="hudForecast" style="margin-bottom: 6px;">Forecast: <span>Loading...</span></div>
-    <div id="hudAnomaly" style="margin-bottom: 6px;">Anomalies: <span>Loading...</span></div>
-    <div id="hudDrift" style="margin-bottom: 6px;">Drift: <span>Loading...</span></div>
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: linear-gradient(145deg, #1b1b2f, #2a003f);
+  border: 2px solid #9933ff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 0 25px rgba(153, 51, 255, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.05);
+  font-family: monospace;
+  color: #fff;
+  z-index: 10000;
+  width: 280px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: none;
+">
+  <h3 style="margin:0 0 12px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
+  <div id="hudRisk" style="margin-bottom: 8px;">Risk: <span>Loading...</span></div>
+  <div id="hudForecast" style="margin-bottom: 8px;">Forecast: <span>Loading...</span></div>
+  <div id="hudAnomaly" style="margin-bottom: 8px;">Anomalies: <span>Loading...</span></div>
+  <div id="hudDrift" style="margin-bottom: 8px;">Drift: <span>Loading...</span></div>
 </div>
+
+<!-- Phase 200.13 — Forecast Drift Visualizer -->
+<div id="forecastDriftModal" style="
+  display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+  background:rgba(0,0,0,0.85); z-index:10001; justify-content:center; align-items:center;
+">
+  <div style="
+    background:#1e1e2f; padding:20px; border-radius:12px;
+    max-width:90%; max-height:80%; overflow:auto;
+    box-shadow:0 0 20px rgba(153, 51, 255, 0.9);
+  ">
+    <h3 style="text-align:center; color:#cc66ff;">📈 Forecast Drift Visualizer</h3>
+    <canvas id="forecastDriftChart" width="400" height="250"></canvas>
+    <div style="text-align:center; margin-top:15px;">
+      <button id="closeDriftChartBtn">❌ Close</button>
+    </div>
+  </div>
+</div>
+</script>
 <script>
 const predictiveHud = document.getElementById("brainDockHudPanel");
 const brainDockBtn = document.getElementById("brainDockButton");
@@ -1018,6 +1066,57 @@ if (predictiveHud && brainDockBtn) {
     predictiveHud.style.display = hudVisible ? "block" : "none";
   });
 }
+</script>
+
+<!-- Forecast Drift Visualizer Logic -->
+<script>
+// Forecast Drift Visualizer Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const driftModal = document.getElementById("forecastDriftModal");
+  const closeDriftBtn = document.getElementById("closeDriftChartBtn");
+
+  closeDriftBtn.addEventListener("click", () => {
+    driftModal.style.display = "none";
+  });
+
+  window.renderForecastDriftChart = () => {
+    driftModal.style.display = "flex";
+
+    const ctx = document.getElementById("forecastDriftChart").getContext("2d");
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+
+    const labels = cortex.map(f => f.timestamp.slice(11, 19));
+    const states = cortex.map(f => {
+      if (f.state.match(/Stable/i)) return 1;
+      if (f.state.match(/Volatile|Surge|Regression/i)) return -1;
+      return 0;
+    });
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Stability",
+          data: states,
+          fill: false,
+          borderColor: "#cc66ff",
+          tension: 0.3,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            min: -1.5,
+            max: 1.5,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    });
+  };
+});
 </script>
 </script>
 <!-- DOM Sync Audit Utility -->
