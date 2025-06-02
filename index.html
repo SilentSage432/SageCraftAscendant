@@ -1033,6 +1033,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
 <!-- Phase 201.9 — Predictive Health Composite Index -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1078,6 +1079,65 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("operatorTools").appendChild(healthIndexBtn);
+});
+</script>
+
+<!-- Phase 201.10 — Live Intake Sync Injector -->
+<script>
+// Phase 201.10 — Live Intake Sync Injector
+document.addEventListener("DOMContentLoaded", () => {
+  const scanInput = document.getElementById("scanInput");
+  const liveQty = document.getElementById("liveQty");
+  const categorySelect = document.getElementById("categorySelect");
+  const addLiveItemBtn = document.getElementById("addLiveItem");
+  const liveScanTableBody = document.getElementById("liveScanTableBody");
+
+  function updateLiveTable(itemNumber, qty, category) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${itemNumber}</td>
+      <td>${qty}</td>
+      <td>${category}</td>
+      <td>Live</td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+    `;
+    if (document.getElementById("placeholderRow")) {
+      liveScanTableBody.innerHTML = ""; // Clear placeholder if first entry
+    }
+    liveScanTableBody.appendChild(row);
+  }
+
+  addLiveItemBtn.addEventListener("click", () => {
+    const itemNumber = scanInput.value.trim();
+    const qty = parseInt(liveQty.value);
+    const category = categorySelect.value;
+
+    if (!itemNumber || isNaN(qty) || qty <= 0) {
+      alert("Please enter valid item and quantity.");
+      return;
+    }
+
+    const forecastEntry = {
+      timestamp: new Date().toISOString(),
+      itemNumber: itemNumber,
+      division: category,
+      onHandUnits: qty,
+      cycleCountUnits: 0,
+      shrinkUnits: 0,
+      itdSalesUnits: 0,
+      stabilityHint: "Stable"
+    };
+
+    if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+      window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+    }
+
+    updateLiveTable(itemNumber, qty, category);
+    scanInput.value = "";
+    scanInput.focus();
+  });
 });
 </script>
 
