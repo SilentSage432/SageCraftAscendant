@@ -1215,9 +1215,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-<!-- Phase 201.12 — Modal Multi-Type Completion Sync Injector -->
+<!-- Phase 201.13 — Unified Modal Completion Sync Injector -->
 <script>
-// Phase 201.12 — Modal Multi-Type Completion Sync Injector
+// Phase 201.13 — Unified Modal Completion Sync Injector
 document.addEventListener("DOMContentLoaded", () => {
   const scanInput = document.getElementById("scanInput");
   const liveQty = document.getElementById("liveQty");
@@ -1258,38 +1258,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     updateLiveTable(itemNumber, qty, category);
-    scanInput.value = "";
-    scanInput.focus();
+    setTimeout(() => {
+      scanInput.value = "";
+      scanInput.focus();
+    }, 50);
   }
 
-  // Wire into all modal completion buttons
-  const modalBtnProduct = document.getElementById("modalBtnProduct");
-  const modalBtnESL = document.getElementById("modalBtnESL");
-  const modalBtnLocation = document.getElementById("modalBtnLocation");
+  // Attach modal buttons once for all modes:
+  const bindModalButton = (btnId) => {
+    const button = document.getElementById(btnId);
+    button?.addEventListener("click", () => {
+      const itemNumber = prompt("Enter Lowe's Item #");
+      const qty = parseInt(liveQty.value);
+      const category = categorySelect.value;
+      if (!itemNumber) return;
+      handleModalComplete(itemNumber, category, qty);
+    });
+  };
 
-  modalBtnProduct?.addEventListener("click", () => {
-    const itemNumber = prompt("Enter Lowe's Item #");
-    const qty = parseInt(liveQty.value);
-    const category = categorySelect.value;
-    if (!itemNumber) return;
-    handleModalComplete(itemNumber, category, qty);
-  });
-
-  modalBtnESL?.addEventListener("click", () => {
-    const itemNumber = prompt("Enter Lowe's Item #");
-    const qty = parseInt(liveQty.value);
-    const category = categorySelect.value;
-    if (!itemNumber) return;
-    handleModalComplete(itemNumber, category, qty);
-  });
-
-  modalBtnLocation?.addEventListener("click", () => {
-    const itemNumber = prompt("Enter Lowe's Item #");
-    const qty = parseInt(liveQty.value);
-    const category = categorySelect.value;
-    if (!itemNumber) return;
-    handleModalComplete(itemNumber, category, qty);
-  });
+  bindModalButton("modalBtnProduct");
+  bindModalButton("modalBtnESL");
+  bindModalButton("modalBtnLocation");
 });
 </script>
 
