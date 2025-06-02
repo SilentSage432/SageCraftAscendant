@@ -712,6 +712,21 @@
     ">
       📈 Forecast Drift Visualizer
     </button>
+    <!-- Phase 201.2 — Neural Intake Uploader -->
+    <input type="file" id="neuralIntakeFile" accept=".xlsx,.xls" style="display:none;" />
+    <button id="launchNeuralIntakeBtn" style="
+      padding: 12px 18px;
+      font-size: 1em;
+      font-family: monospace;
+      background: #003366;
+      color: #fff;
+      border: 2px solid #00ccff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    ">
+      🧠 Upload Intake Report
+    </button>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
@@ -726,6 +741,145 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+});
+</script>
+<!-- Phase 201.2 — Neural Intake Uploader binding -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const intakeBtn = document.getElementById("launchNeuralIntakeBtn");
+  const intakeFile = document.getElementById("neuralIntakeFile");
+
+  if (intakeBtn && intakeFile) {
+    intakeBtn.addEventListener("click", () => intakeFile.click());
+    intakeFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (window.NeuralDataIntake?.parseUploadedFile) {
+        window.NeuralDataIntake.parseUploadedFile(file);
+      } else {
+        alert("Neural Intake system unavailable.");
+      }
+    });
+  }
+});
+</script>
+
+
+<!-- Phase 201.3 — Intake Pipeline Integration -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const intakeBtn = document.getElementById("launchNeuralIntakeBtn");
+  const intakeFile = document.getElementById("neuralIntakeFile");
+
+  if (intakeBtn && intakeFile) {
+    intakeBtn.addEventListener("click", () => intakeFile.click());
+    intakeFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (window.NeuralDataIntake?.parseUploadedFile) {
+        window.NeuralDataIntake.parseUploadedFile(file);
+
+        // After successful parse, inject report directly into Cortex
+        setTimeout(() => {
+          const parsed = window.NeuralDataIntake.getParsedReports();
+          if (!parsed || parsed.length === 0) {
+            console.warn("Neural Intake: No parsed data found.");
+            return;
+          }
+
+          // Example: Inject intake signals into Cortex Forecast Memory
+          parsed.forEach(row => {
+            const forecastEntry = {
+              timestamp: new Date().toISOString(),
+              itemNumber: row.itemNumber,
+              division: row.division,
+              onHandUnits: row.onHandUnits,
+              cycleCountUnits: row.cycleCountUnits,
+              shrinkUnits: row.shrinkUnits,
+              itdSalesUnits: row.itdSalesUnits,
+              stabilityHint: (row.shrinkUnits > 0 || row.cycleCountUnits !== 0) ? "Volatile" : "Stable"
+            };
+
+            if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+              window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+            }
+          });
+
+          console.log("🧠 Neural Cortex successfully injected with live intake data.");
+        }, 500);
+      } else {
+        alert("Neural Intake system unavailable.");
+      }
+    });
+  }
+});
+</script>
+
+<!-- Phase 201.4 — Neural Intake Validation Diagnostics -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const validateIntakeBtn = document.createElement("button");
+  validateIntakeBtn.textContent = "🧪 Validate Neural Intake";
+  validateIntakeBtn.style.padding = "12px 18px";
+  validateIntakeBtn.style.fontSize = "1em";
+  validateIntakeBtn.style.fontFamily = "monospace";
+  validateIntakeBtn.style.background = "#660033";
+  validateIntakeBtn.style.color = "#fff";
+  validateIntakeBtn.style.border = "2px solid #ff6699";
+  validateIntakeBtn.style.borderRadius = "8px";
+  validateIntakeBtn.style.cursor = "pointer";
+  validateIntakeBtn.style.transition = "all 0.3s ease";
+
+  validateIntakeBtn.addEventListener("click", () => {
+    const parsed = window.NeuralDataIntake?.getParsedReports();
+    if (!parsed || parsed.length === 0) {
+      alert("⚠ No parsed reports loaded.");
+      return;
+    }
+
+    let sample = parsed.slice(0, 5);
+    console.log("🧠 Neural Intake Sample:", sample);
+    alert(`✅ Neural Intake contains ${parsed.length} rows. First 5 samples logged to console.`);
+  });
+
+  document.getElementById("operatorTools").appendChild(validateIntakeBtn);
+});
+</script>
+
+<!-- Phase 201.5 — Neural Cortex Session Memory Archiver -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const archiveIntakeBtn = document.createElement("button");
+  archiveIntakeBtn.textContent = "💾 Archive Neural Session";
+  archiveIntakeBtn.style.padding = "12px 18px";
+  archiveIntakeBtn.style.fontSize = "1em";
+  archiveIntakeBtn.style.fontFamily = "monospace";
+  archiveIntakeBtn.style.background = "#224466";
+  archiveIntakeBtn.style.color = "#fff";
+  archiveIntakeBtn.style.border = "2px solid #3399ff";
+  archiveIntakeBtn.style.borderRadius = "8px";
+  archiveIntakeBtn.style.cursor = "pointer";
+  archiveIntakeBtn.style.transition = "all 0.3s ease";
+
+  archiveIntakeBtn.addEventListener("click", () => {
+    const parsed = window.NeuralDataIntake?.getParsedReports();
+    if (!parsed || parsed.length === 0) {
+      alert("⚠ No parsed intake data available.");
+      return;
+    }
+
+    const archiveBlob = new Blob([JSON.stringify(parsed, null, 2)], { type: "application/json" });
+    const archiveUrl = URL.createObjectURL(archiveBlob);
+    const link = document.createElement("a");
+    link.href = archiveUrl;
+    link.download = `NeuralSession_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    link.click();
+    URL.revokeObjectURL(archiveUrl);
+
+    console.log("📦 Neural Session archived successfully.");
+  });
+
+  document.getElementById("operatorTools").appendChild(archiveIntakeBtn);
 });
 </script>
 
@@ -964,6 +1118,9 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <!-- External libraries -->
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS (xlsx parser) -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <!-- Toast system script -->
   <script type="module" src="scripts/ui.js?v=2.0.1"></script>

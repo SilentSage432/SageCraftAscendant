@@ -2710,3 +2710,100 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📊 Unified Cortex Snapshot:", snapshot);
   }, 15000);
 });
+// ===============================
+// Phase 200.15 — Neural Feedback Optimizer Layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralFeedbackOptimizer = (function() {
+    let optimizerLog = [];
+
+    function analyzeAndOptimize() {
+      const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.() || [];
+      if (forecastMemory.length < 15) {
+        console.log("⚠ Neural Optimizer: Insufficient forecast memory.");
+        return;
+      }
+
+      const recentStates = forecastMemory.slice(-15).map(mem => mem.state);
+      const stableCount = recentStates.filter(state => state.includes("Stable")).length;
+      const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
+      
+      const optimizationSignal = {
+        timestamp: new Date().toISOString(),
+        stableRatio: (stableCount / 15).toFixed(2),
+        volatileRatio: (volatileCount / 15).toFixed(2),
+        recommendedScanDepth: (volatileCount >= 7) ? "Deep Audit" : (volatileCount >= 3 ? "Normal Audit" : "Quick Audit"),
+        riskSensitivity: (volatileCount >= 5) ? "High Sensitivity" : "Standard"
+      };
+
+      optimizerLog.push(optimizationSignal);
+      if (optimizerLog.length > 100) {
+        optimizerLog.shift();
+      }
+
+      console.log("🧬 Neural Feedback Optimization Signal:", optimizationSignal);
+    }
+
+    function getOptimizerLog() {
+      return optimizerLog;
+    }
+
+    return { analyzeAndOptimize, getOptimizerLog };
+  })();
+
+  setInterval(() => {
+    window.NeuralFeedbackOptimizer.analyzeAndOptimize();
+  }, 20000);
+});
+// ===============================
+// Phase 201 — Neural Data Intake Scaffold (File Processor)
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.NeuralDataIntake = (function() {
+    let parsedReports = [];
+
+    function parseUploadedFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const data = event.target.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+          const normalized = jsonData.map(row => ({
+            region: row["Region"] || "",
+            district: row["District"] || "",
+            location: row["Location"] || "",
+            division: row["Merchandise Division"] || "",
+            productGroup: row["Product Group"] || "",
+            assortment: row["Assortment"] || "",
+            description: row["Item Description"] || "",
+            itemNumber: row["Item Number"] || "",
+            onHandUnits: parseInt(row["Yesterday Physical Inventory Units"] || 0),
+            damagedUnits: parseInt(row["Damaged Units"] || 0),
+            cycleCountUnits: parseInt(row["Cycle Count Units"] || 0),
+            shrinkUnits: parseInt(row["1st Previous Total Shrink Units"] || 0),
+            itdSalesUnits: parseInt(row["ITD Sales Units"] || 0),
+          }));
+
+          parsedReports = normalized;
+          console.log("📊 Neural Intake Parsed Report:", normalized);
+          alert(`✅ Report successfully parsed: ${normalized.length} items ingested.`);
+
+          // Future: feed into AI Cortex modules directly here
+        } catch (err) {
+          console.error("❌ Failed to parse file:", err);
+          alert("Error parsing file. Ensure format matches intake scaffold.");
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+
+    function getParsedReports() {
+      return parsedReports;
+    }
+
+    return { parseUploadedFile, getParsedReports };
+  })();
+});
