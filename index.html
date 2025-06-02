@@ -1154,6 +1154,145 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   </div>
 
+<!-- Phase 201.11 — Modal Completion Sync Injector -->
+<script>
+// Phase 201.11 — Modal Completion Sync Injector
+document.addEventListener("DOMContentLoaded", () => {
+  const scanInput = document.getElementById("scanInput");
+  const liveQty = document.getElementById("liveQty");
+  const categorySelect = document.getElementById("categorySelect");
+  const liveScanTableBody = document.getElementById("liveScanTableBody");
+
+  function updateLiveTable(itemNumber, qty, category) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${itemNumber}</td>
+      <td>${qty}</td>
+      <td>${category}</td>
+      <td>Live</td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+    `;
+    if (document.getElementById("placeholderRow")) {
+      liveScanTableBody.innerHTML = "";
+    }
+    liveScanTableBody.appendChild(row);
+  }
+
+  function handleModalComplete(itemNumber, category, qty = 1) {
+    const forecastEntry = {
+      timestamp: new Date().toISOString(),
+      itemNumber: itemNumber,
+      division: category,
+      onHandUnits: qty,
+      cycleCountUnits: 0,
+      shrinkUnits: 0,
+      itdSalesUnits: 0,
+      stabilityHint: "Stable"
+    };
+
+    if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+      window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+    }
+
+    updateLiveTable(itemNumber, qty, category);
+    scanInput.value = "";
+    scanInput.focus();
+  }
+
+  // Wire into your modal completion buttons (example for Product button)
+  const modalBtnProduct = document.getElementById("modalBtnProduct");
+  modalBtnProduct?.addEventListener("click", () => {
+    const itemNumber = prompt("Enter Lowe's Item #");
+    const qty = parseInt(liveQty.value);
+    const category = categorySelect.value;
+    if (!itemNumber) return;
+    handleModalComplete(itemNumber, category, qty);
+  });
+
+  // Repeat for ESL and Bay if needed with same handler logic
+});
+</script>
+
+<!-- Phase 201.12 — Modal Multi-Type Completion Sync Injector -->
+<script>
+// Phase 201.12 — Modal Multi-Type Completion Sync Injector
+document.addEventListener("DOMContentLoaded", () => {
+  const scanInput = document.getElementById("scanInput");
+  const liveQty = document.getElementById("liveQty");
+  const categorySelect = document.getElementById("categorySelect");
+  const liveScanTableBody = document.getElementById("liveScanTableBody");
+
+  function updateLiveTable(itemNumber, qty, category) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${itemNumber}</td>
+      <td>${qty}</td>
+      <td>${category}</td>
+      <td>Live</td>
+      <td>—</td>
+      <td>—</td>
+      <td>—</td>
+    `;
+    if (document.getElementById("placeholderRow")) {
+      liveScanTableBody.innerHTML = "";
+    }
+    liveScanTableBody.appendChild(row);
+  }
+
+  function handleModalComplete(itemNumber, category, qty = 1) {
+    const forecastEntry = {
+      timestamp: new Date().toISOString(),
+      itemNumber: itemNumber,
+      division: category,
+      onHandUnits: qty,
+      cycleCountUnits: 0,
+      shrinkUnits: 0,
+      itdSalesUnits: 0,
+      stabilityHint: "Stable"
+    };
+
+    if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+      window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+    }
+
+    updateLiveTable(itemNumber, qty, category);
+    scanInput.value = "";
+    scanInput.focus();
+  }
+
+  // Wire into all modal completion buttons
+  const modalBtnProduct = document.getElementById("modalBtnProduct");
+  const modalBtnESL = document.getElementById("modalBtnESL");
+  const modalBtnLocation = document.getElementById("modalBtnLocation");
+
+  modalBtnProduct?.addEventListener("click", () => {
+    const itemNumber = prompt("Enter Lowe's Item #");
+    const qty = parseInt(liveQty.value);
+    const category = categorySelect.value;
+    if (!itemNumber) return;
+    handleModalComplete(itemNumber, category, qty);
+  });
+
+  modalBtnESL?.addEventListener("click", () => {
+    const itemNumber = prompt("Enter Lowe's Item #");
+    const qty = parseInt(liveQty.value);
+    const category = categorySelect.value;
+    if (!itemNumber) return;
+    handleModalComplete(itemNumber, category, qty);
+  });
+
+  modalBtnLocation?.addEventListener("click", () => {
+    const itemNumber = prompt("Enter Lowe's Item #");
+    const qty = parseInt(liveQty.value);
+    const category = categorySelect.value;
+    if (!itemNumber) return;
+    handleModalComplete(itemNumber, category, qty);
+  });
+});
+</script>
+
   <!-- Trend Modal -->
   <div id="trendsModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
     <div style="background:#fff; padding:20px; border-radius:8px; max-width:90%; max-height:80%; overflow:auto;">
