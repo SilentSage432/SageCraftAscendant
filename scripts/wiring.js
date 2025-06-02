@@ -253,6 +253,277 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("🌡 Forecast Drift Heatmap Updated:", heatmapSnapshot);
 
+        // Phase 203.0 — Drift Heatmap Visual Engine Activation
+        if (!window.ForecastDriftVisualizer) {
+          window.ForecastDriftVisualizer = function renderHeatmap() {
+            const container = document.getElementById("forecastDriftHeatmap");
+            if (!container) {
+              console.warn("⚠ Heatmap container not found.");
+              return;
+            }
+
+            const heatmap = window.ForecastDriftHeatmap || [];
+            if (!heatmap.length) {
+              container.innerHTML = "<em>No heatmap data available.</em>";
+              return;
+            }
+
+            const rows = heatmap.map((point, index) => {
+              const intensity = Math.min(1, point.driftScore / 5);
+              const color = `rgba(255, ${Math.floor(255 * (1 - intensity))}, ${Math.floor(255 * (1 - intensity))}, 0.8)`;
+              return `
+                <div style="width: 100%; padding: 4px; background-color: ${color}; margin-bottom: 2px; border-radius: 4px;">
+                  <strong>${index + 1}</strong> — Δ ${point.driftScore.toFixed(4)}
+                </div>
+              `;
+            }).reverse();
+
+            container.innerHTML = rows.join('');
+          };
+        }
+
+        // Phase 203.1 — Drift Heatmap Auto-Refresh Loop
+        if (!window.ForecastDriftHeatmapLoop) {
+          window.ForecastDriftHeatmapLoop = setInterval(() => {
+            if (typeof window.ForecastDriftVisualizer === "function") {
+              window.ForecastDriftVisualizer();
+            }
+          }, 5000);
+          console.log("🌡 Drift Heatmap Auto-Refresh Loop Activated");
+        }
+
+        // Phase 203.2 — Drift Volatility Signal Stabilizer
+        if (!window.DriftVolatilityStabilizer) {
+          window.DriftVolatilityStabilizer = function stabilizeHeatmap() {
+            const heatmap = window.ForecastDriftHeatmap || [];
+            if (!heatmap.length) return;
+
+            for (let i = 1; i < heatmap.length; i++) {
+              const prev = heatmap[i - 1].driftScore;
+              const curr = heatmap[i].driftScore;
+              const diff = Math.abs(curr - prev);
+
+              if (diff > 2) {
+                // Apply soft clamp to extreme spikes
+                heatmap[i].driftScore = parseFloat((prev + (curr - prev) * 0.3).toFixed(4));
+              }
+            }
+
+            console.log("🌊 Drift Heatmap Stabilized");
+          };
+        }
+
+        window.DriftVolatilityStabilizer();
+
+        // Phase 203.3 — Forecast Stability Index (FSI) Core Seed
+        if (!window.ForecastStabilityIndex) {
+          window.ForecastStabilityIndex = [];
+        }
+
+        const fsiWindow = window.ForecastDriftHeatmap.slice(-50); // last 50 entries
+        if (fsiWindow.length >= 10) {
+          const driftValues = fsiWindow.map(pt => pt.driftScore);
+          const avgDrift = driftValues.reduce((a, b) => a + b, 0) / driftValues.length;
+          const maxDrift = Math.max(...driftValues);
+          const minDrift = Math.min(...driftValues);
+          const stabilityScore = 100 - (avgDrift * 10); // simple inverse scale
+
+          const fsiSnapshot = {
+            timestamp: new Date().toISOString(),
+            avgDrift: avgDrift.toFixed(4),
+            maxDrift: maxDrift.toFixed(4),
+            minDrift: minDrift.toFixed(4),
+            stabilityScore: stabilityScore.toFixed(2)
+          };
+
+          window.ForecastStabilityIndex.push(fsiSnapshot);
+
+          if (window.ForecastStabilityIndex.length > 500) {
+            window.ForecastStabilityIndex.shift();
+          }
+
+          console.log("📊 Forecast Stability Index Updated:", fsiSnapshot);
+        }
+
+        // Phase 203.4 — FSI Live Visual Panel Injection
+        if (!window.renderFSIPanel) {
+          window.renderFSIPanel = function renderFSI() {
+            const panel = document.getElementById("fsiPanel");
+            if (!panel) {
+              console.warn("⚠ FSI Panel container not found.");
+              return;
+            }
+
+            const fsiData = window.ForecastStabilityIndex || [];
+            if (!fsiData.length) {
+              panel.innerHTML = "<em>No FSI data available yet.</em>";
+              return;
+            }
+
+            const latest = fsiData[fsiData.length - 1];
+            panel.innerHTML = `
+              <div style="padding: 10px; background-color: #222; border-radius: 8px; color: #fff;">
+                <strong>Forecast Stability Index</strong><br><br>
+                Stability Score: ${latest.stabilityScore}<br>
+                Avg Drift: ${latest.avgDrift}<br>
+                Max Drift: ${latest.maxDrift}<br>
+                Min Drift: ${latest.minDrift}
+              </div>
+            `;
+          };
+        }
+
+        // Phase 203.5 — FSI Auto-Refresh Loop Engine
+        if (!window.ForecastStabilityIndexLoop) {
+          window.ForecastStabilityIndexLoop = setInterval(() => {
+            if (typeof window.renderFSIPanel === "function") {
+              window.renderFSIPanel();
+            }
+          }, 5000);
+          console.log("📊 FSI Auto-Refresh Loop Activated");
+        }
+
+        // Phase 203.6 — Multi-Axis Memory Interlinker Core
+        if (!window.MultiAxisMemoryInterlinker) {
+          window.MultiAxisMemoryInterlinker = function interlinkMemory() {
+            const driftHeatmap = window.ForecastDriftHeatmap || [];
+            const fsiData = window.ForecastStabilityIndex || [];
+
+            if (!driftHeatmap.length || !fsiData.length) {
+              console.warn("🧩 Interlinker skipped — insufficient data.");
+              return;
+            }
+
+            const linkedMemory = driftHeatmap.map((driftPoint, idx) => {
+              const correspondingFSI = fsiData[idx] || fsiData[fsiData.length - 1];
+              return {
+                timestamp: driftPoint.timestamp,
+                driftScore: driftPoint.driftScore,
+                stabilityScore: parseFloat(correspondingFSI.stabilityScore),
+                combinedIndex: (100 - Math.abs(driftPoint.driftScore * 10 - parseFloat(correspondingFSI.stabilityScore))).toFixed(2)
+              };
+            });
+
+            window.MultiAxisLinkedMemory = linkedMemory.slice(-100);  // keep last 100 interlinked points
+            console.log("🔗 Multi-Axis Memory Interlinker Updated:", window.MultiAxisLinkedMemory);
+          };
+        }
+
+        window.MultiAxisMemoryInterlinker();
+
+        // Phase 203.7 — Interlinked Memory Drift Visualizer Seed
+        if (!window.renderInterlinkedMemoryPanel) {
+          window.renderInterlinkedMemoryPanel = function renderInterlinkedMemory() {
+            const container = document.getElementById("interlinkedMemoryPanel");
+            if (!container) {
+              console.warn("⚠ Interlinked Memory Panel container not found.");
+              return;
+            }
+
+            const linkedData = window.MultiAxisLinkedMemory || [];
+            if (!linkedData.length) {
+              container.innerHTML = "<em>No interlinked memory data available yet.</em>";
+              return;
+            }
+
+            const rows = linkedData.map((entry, index) => {
+              const colorIntensity = Math.min(1, Math.abs(entry.combinedIndex - 100) / 50);
+              const bgColor = `rgba(${Math.floor(255 * colorIntensity)}, ${Math.floor(255 * (1 - colorIntensity))}, 0, 0.8)`;
+              return `
+                <div style="width: 100%; padding: 4px; background-color: ${bgColor}; margin-bottom: 2px; border-radius: 4px;">
+                  <strong>${index + 1}</strong> — CI: ${entry.combinedIndex}
+                </div>
+              `;
+            }).reverse();
+
+            container.innerHTML = rows.join('');
+          };
+        }
+
+        window.renderInterlinkedMemoryPanel();
+        console.log("🔬 Interlinked Memory Drift Visualizer Render Complete");
+
+        // Phase 203.8 — Memory Anomaly Cluster Mapper
+        if (!window.MemoryAnomalyClusterMapper) {
+          window.MemoryAnomalyClusterMapper = function mapAnomalyClusters() {
+            const linkedData = window.MultiAxisLinkedMemory || [];
+            if (!linkedData.length) {
+              console.warn("🧬 No linked memory data for cluster mapping.");
+              return;
+            }
+
+            const clusters = [];
+            let currentCluster = null;
+            const CLUSTER_THRESHOLD = 20; // Sensitivity dial
+
+            linkedData.forEach(entry => {
+              const ci = parseFloat(entry.combinedIndex);
+              if (ci < (100 - CLUSTER_THRESHOLD)) {
+                if (!currentCluster) {
+                  currentCluster = { start: entry.timestamp, points: [] };
+                }
+                currentCluster.points.push(entry);
+              } else {
+                if (currentCluster) {
+                  currentCluster.end = entry.timestamp;
+                  clusters.push(currentCluster);
+                  currentCluster = null;
+                }
+              }
+            });
+
+            if (currentCluster) {
+              currentCluster.end = linkedData[linkedData.length - 1].timestamp;
+              clusters.push(currentCluster);
+            }
+
+            window.AnomalyClusters = clusters;
+            console.log("📊 Memory Anomaly Clusters Mapped:", window.AnomalyClusters);
+          };
+        }
+
+        window.MemoryAnomalyClusterMapper();
+
+        // Phase 203.9 — Cluster Visual Telemetry Seed
+        if (!window.renderAnomalyClustersPanel) {
+          window.renderAnomalyClustersPanel = function renderClusters() {
+            const panel = document.getElementById("anomalyClustersPanel");
+            if (!panel) {
+              console.warn("⚠ Anomaly Clusters Panel container not found.");
+              return;
+            }
+
+            const clusters = window.AnomalyClusters || [];
+            if (!clusters.length) {
+              panel.innerHTML = "<em>No anomaly clusters detected yet.</em>";
+              return;
+            }
+
+            const rows = clusters.map((cluster, idx) => {
+              const size = cluster.points.length;
+              const duration = (new Date(cluster.end).getTime() - new Date(cluster.start).getTime()) / 1000;
+              return `
+                <div style="width: 100%; padding: 6px; background-color: #993333; margin-bottom: 4px; border-radius: 4px; color: #fff;">
+                  <strong>Cluster ${idx + 1}</strong><br>
+                  Duration: ${duration.toFixed(1)} sec<br>
+                  Points: ${size}
+                </div>
+              `;
+            }).reverse();
+
+            panel.innerHTML = rows.join('');
+          };
+        }
+
+        window.renderAnomalyClustersPanel();
+        console.log("🧬 Anomaly Cluster Visual Telemetry Rendered");
+
+        window.renderFSIPanel();
+        console.log("📊 FSI Live Visual Panel Rendered");
+
+        window.ForecastDriftVisualizer();
+        console.log("🌡 Drift Heatmap Visual Render Complete");
+
         injectedCount++;
       });
 
