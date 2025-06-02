@@ -2388,3 +2388,171 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(refreshCapacityMonitor, 4000);
 });
+// ===============================
+// Phase 200 — Sentinel Memory Sync Core Activation
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.SentinelMemoryCore = (function() {
+    const MAX_HISTORY = 1000;
+
+    let memoryArchive = {
+      forecasts: [],
+      anomalies: [],
+      risks: [],
+      vendorSignals: []
+    };
+
+    function logForecast(state) {
+      const entry = { timestamp: new Date().toISOString(), state };
+      memoryArchive.forecasts.push(entry);
+      trimMemory();
+    }
+
+    function logAnomaly(state) {
+      const entry = { timestamp: new Date().toISOString(), state };
+      memoryArchive.anomalies.push(entry);
+      trimMemory();
+    }
+
+    function logRisk(state) {
+      const entry = { timestamp: new Date().toISOString(), state };
+      memoryArchive.risks.push(entry);
+      trimMemory();
+    }
+
+    function logVendorSignal(vendorId, signal) {
+      const entry = { timestamp: new Date().toISOString(), vendorId, signal };
+      memoryArchive.vendorSignals.push(entry);
+      trimMemory();
+    }
+
+    function getFullMemory() {
+      return memoryArchive;
+    }
+
+    function exportMemorySnapshot() {
+      const snapshot = JSON.stringify(memoryArchive, null, 2);
+      const blob = new Blob([snapshot], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `SentinelMemory_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function trimMemory() {
+      Object.keys(memoryArchive).forEach(key => {
+        if (memoryArchive[key].length > MAX_HISTORY) {
+          memoryArchive[key] = memoryArchive[key].slice(-MAX_HISTORY);
+        }
+      });
+    }
+
+    return {
+      logForecast,
+      logAnomaly,
+      logRisk,
+      logVendorSignal,
+      getFullMemory,
+      exportMemorySnapshot
+    };
+  })();
+
+  console.log("🧠 Sentinel Memory Core Initialized.");
+});
+// ===============================
+// Phase 200.1 — Predictive HUD Adaptive Slide System
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hud = document.getElementById("predictiveHUD");
+  if (!hud) {
+    console.warn("⚠ PredictiveHUD element not found — skipping adaptive slide injection.");
+    return;
+  }
+
+  // Inject HUD slide logic globally
+  window.nudgeHUD = function(position) {
+    if (position === 'down') {
+      hud.style.transform = 'translateY(220px)';
+    } else {
+      hud.style.transform = 'translateY(0)';
+    }
+  };
+
+  // Ensure smooth CSS transition for HUD
+  hud.style.transition = "transform 0.5s ease-in-out";
+});
+
+// Patch into Drawer Controller
+if (window.DrawerEngineController) {
+  const originalOpen = window.DrawerEngineController.openControlDrawer;
+  const originalClose = window.DrawerEngineController.closeControlDrawer;
+
+  window.DrawerEngineController.openControlDrawer = function() {
+    originalOpen();
+    if (window.nudgeHUD) window.nudgeHUD('down');
+  };
+
+  window.DrawerEngineController.closeControlDrawer = function() {
+    originalClose();
+    if (window.nudgeHUD) window.nudgeHUD('reset');
+  };
+}
+// ===============================
+// Phase 200.2 — Forecast Signal Memory Sync Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  function syncForecastToSentinelMemory() {
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    if (!forecastContainer) return;
+
+    const forecastState = forecastContainer.innerText || "N/A";
+
+    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logForecast === "function") {
+      window.SentinelMemoryCore.logForecast(forecastState);
+      console.log("🧠 Sentinel Memory Synced Forecast:", forecastState);
+    }
+  }
+
+  // Sync forecast to memory every 10 seconds
+  setInterval(syncForecastToSentinelMemory, 10000);
+});
+// ===============================
+// Phase 200.3 — Anomaly Signal Memory Sync Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  function syncAnomalyToSentinelMemory() {
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+    if (!anomalyContainer) return;
+
+    const anomalyState = anomalyContainer.innerText || "N/A";
+
+    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logAnomaly === "function") {
+      window.SentinelMemoryCore.logAnomaly(anomalyState);
+      console.log("🧠 Sentinel Memory Synced Anomaly:", anomalyState);
+    }
+  }
+
+  // Sync anomaly to memory every 10 seconds
+  setInterval(syncAnomalyToSentinelMemory, 10000);
+});
+// ===============================
+// Phase 200.4 — Risk Signal Memory Sync Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  function syncRiskToSentinelMemory() {
+    const riskContainer = document.getElementById("riskSignalsContainer");
+    if (!riskContainer) return;
+
+    const riskState = riskContainer.innerText || "N/A";
+
+    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logRisk === "function") {
+      window.SentinelMemoryCore.logRisk(riskState);
+      console.log("🧠 Sentinel Memory Synced Risk:", riskState);
+    }
+  }
+
+  // Sync risk to memory every 10 seconds
+  setInterval(syncRiskToSentinelMemory, 10000);
+});
