@@ -2089,3 +2089,302 @@ document.addEventListener("DOMContentLoaded", () => {
     operatorPanel.appendChild(auditBtn);
   };
 });
+// ===============================
+// Phase 135.5 — Dropbox Predictive Sync Recalibration
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Predictive Dropbox Connection Monitor
+  function checkDropboxPredictiveStatus() {
+    const predictiveDropbox = document.getElementById("predictiveDropboxStatus");
+    if (!predictiveDropbox) return;
+
+    let dropboxConnected = false;
+    if (typeof window.isDropboxConnected === "function") {
+      try {
+        dropboxConnected = window.isDropboxConnected();
+      } catch (err) {
+        console.warn("⚠ Dropbox connection check failed:", err);
+      }
+    }
+    predictiveDropbox.innerHTML = dropboxConnected ? "☁️ Connected" : "☁️ Offline";
+    predictiveDropbox.style.color = dropboxConnected ? "#00cc66" : "#ff4444";
+  }
+
+  // Auto-trigger initial Dropbox sync health check
+  setTimeout(checkDropboxPredictiveStatus, 500);
+
+  // Schedule periodic re-validation every 15 seconds
+  setInterval(checkDropboxPredictiveStatus, 15000);
+});
+// ===============================
+// Phase 135.6 — Predictive Health Beacon Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  function predictiveHealthBeacon() {
+    const streamEngineActive = (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function");
+    const dataBridgeActive = (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function");
+    const telemetryAvailable = (window.TelemetryLogger && typeof window.TelemetryLogger.getTelemetryLog === "function");
+
+    const beacon = {
+      timestamp: new Date().toISOString(),
+      streamEngineActive,
+      dataBridgeActive,
+      telemetryAvailable,
+      totalForecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory()?.length || 0),
+      totalTelemetryLogs: (window.TelemetryLogger?.getTelemetryLog()?.length || 0)
+    };
+
+    console.log("📡 Predictive Health Beacon:", beacon);
+  }
+
+  setInterval(predictiveHealthBeacon, 20000);
+});
+// ===============================
+// Phase 136.0 — Predictive Signal Router Core Bootstrap
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.PredictiveSignalRouter = (function() {
+    let routerLog = [];
+
+    function ingestSignal(signalType, payload) {
+      const entry = {
+        timestamp: new Date().toISOString(),
+        signalType,
+        payload
+      };
+      routerLog.push(entry);
+      if (routerLog.length > 300) {
+        routerLog.shift();  // keep log manageable
+      }
+      console.log("🔀 Signal Routed:", entry);
+    }
+
+    function routeForecast(forecastData) {
+      ingestSignal("forecast", forecastData);
+    }
+
+    function routeAnomaly(anomalyData) {
+      ingestSignal("anomaly", anomalyData);
+    }
+
+    function routeRisk(riskData) {
+      ingestSignal("risk", riskData);
+    }
+
+    function getRouterLog() {
+      return routerLog;
+    }
+
+    function clearRouterLog() {
+      routerLog = [];
+    }
+
+    return {
+      routeForecast,
+      routeAnomaly,
+      routeRisk,
+      getRouterLog,
+      clearRouterLog
+    };
+  })();
+
+  console.log("🔧 Predictive Signal Router Core initialized.");
+});
+// ===============================
+// Phase 136.1 — Signal Router Live Feed Wiring
+
+document.addEventListener("DOMContentLoaded", () => {
+  function liveRouterIngest() {
+    const forecastContainer = document.getElementById("forecastSignalsContainer");
+    const anomalyContainer = document.getElementById("anomalySignalsContainer");
+    const resolverContent = document.getElementById("resolverContent");
+
+    if (!forecastContainer || !anomalyContainer || !resolverContent) return;
+
+    const forecastText = forecastContainer.innerText || "N/A";
+    const anomalyText = anomalyContainer.innerText || "N/A";
+    const riskText = resolverContent.innerText || "N/A";
+
+    if (window.PredictiveSignalRouter) {
+      window.PredictiveSignalRouter.routeForecast(forecastText);
+      window.PredictiveSignalRouter.routeAnomaly(anomalyText);
+      window.PredictiveSignalRouter.routeRisk(riskText);
+    }
+  }
+
+  setInterval(liveRouterIngest, 5000);
+});
+// ===============================
+// Phase 136.2 — Signal Router Telemetry Visualizer
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+
+  const routerVisualizer = document.createElement("div");
+  routerVisualizer.id = "routerTelemetryVisualizer";
+  routerVisualizer.style.marginTop = "20px";
+  routerVisualizer.style.padding = "10px";
+  routerVisualizer.style.backgroundColor = "#111";
+  routerVisualizer.style.border = "1px solid #444";
+  routerVisualizer.style.borderRadius = "6px";
+  routerVisualizer.style.color = "#ccc";
+  routerVisualizer.style.fontSize = "0.85em";
+  routerVisualizer.style.fontFamily = "monospace";
+  routerVisualizer.style.maxHeight = "250px";
+  routerVisualizer.style.overflowY = "auto";
+  routerVisualizer.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
+  routerVisualizer.innerHTML = "<strong>🔀 Predictive Signal Router Feed:</strong><br>";
+
+  operatorPanel.appendChild(routerVisualizer);
+
+  function refreshRouterVisualizer() {
+    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
+    if (!routerLog || routerLog.length === 0) {
+      routerVisualizer.innerHTML = "<em>No signals routed yet.</em>";
+      return;
+    }
+
+    let logHTML = "<strong>🔀 Predictive Signal Router Feed:</strong><br><ul style='padding-left:18px;'>";
+    routerLog.slice(-15).reverse().forEach(entry => {
+      logHTML += `<li>[${entry.signalType.toUpperCase()}] ${entry.payload}</li>`;
+    });
+    logHTML += "</ul>";
+    routerVisualizer.innerHTML = logHTML;
+  }
+
+  setInterval(refreshRouterVisualizer, 4000);
+});
+// ===============================
+// Phase 136.3 — Operator Console Router Diagnostic Controls
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+});
+
+  function createRouterControl(label, color, handler) {
+    const btn = document.createElement("button");
+    btn.textContent = label;
+    btn.style.margin = "8px";
+    btn.style.padding = "10px 16px";
+    btn.style.backgroundColor = color;
+    btn.style.color = "#fff";
+    btn.style.fontWeight = "bold";
+    btn.style.border = "none";
+    btn.style.borderRadius = "6px";
+    btn.style.cursor = "pointer";
+    btn.style.boxShadow = "0 0 6px rgba(255,255,255,0.2)";
+    btn.style.transition = "all 0.3s ease-in-out";
+
+    btn.addEventListener("mouseenter", () => {
+      btn.style.opacity = 0.8;
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.opacity = 1;
+    });
+
+    btn.addEventListener("click", handler);
+    operatorPanel.appendChild(btn);
+  }
+
+// ===============================
+// Phase 136.4 — Predictive Signal Router Export Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+
+  const exportBtn = document.createElement("button");
+  exportBtn.textContent = "📤 Export Router Log";
+  exportBtn.style.margin = "8px";
+  exportBtn.style.padding = "10px 16px";
+  exportBtn.style.backgroundColor = "#338833";
+  exportBtn.style.color = "#fff";
+  exportBtn.style.fontWeight = "bold";
+  exportBtn.style.border = "none";
+  exportBtn.style.borderRadius = "6px";
+  exportBtn.style.cursor = "pointer";
+  exportBtn.style.boxShadow = "0 0 6px rgba(255,255,255,0.2)";
+  exportBtn.style.transition = "all 0.3s ease-in-out";
+
+  exportBtn.addEventListener("mouseenter", () => {
+    exportBtn.style.opacity = 0.8;
+  });
+  exportBtn.addEventListener("mouseleave", () => {
+    exportBtn.style.opacity = 1;
+  });
+
+  exportBtn.addEventListener("click", () => {
+    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
+    if (!routerLog || routerLog.length === 0) {
+      alert("No router signals to export.");
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(routerLog, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `RouterLog_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  operatorPanel.appendChild(exportBtn);
+});
+
+// ===============================
+// Phase 136.5 — Post-Bootstrap Button Wiring Re-Sync Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    console.log("🔧 Post-Bootstrap Wiring Re-Sync Triggered...");
+    if (typeof window.wireAllButtons === "function") {
+      window.wireAllButtons();
+      console.log("✅ Button Wiring Fully Re-Synchronized.");
+    } else {
+      console.warn("⚠ wireAllButtons function not found.");
+    }
+  }, 2000);
+});
+
+// ===============================
+// Phase 136.6 — Router Capacity Monitor
+
+document.addEventListener("DOMContentLoaded", () => {
+  const operatorPanel = document.getElementById("operatorConsolePanel");
+  if (!operatorPanel) return;
+
+  const capacityMonitor = document.createElement("div");
+  capacityMonitor.id = "routerCapacityMonitor";
+  capacityMonitor.style.marginTop = "20px";
+  capacityMonitor.style.padding = "10px";
+  capacityMonitor.style.backgroundColor = "#222";
+  capacityMonitor.style.border = "1px solid #333";
+  capacityMonitor.style.borderRadius = "6px";
+  capacityMonitor.style.color = "#ccc";
+  capacityMonitor.style.fontSize = "0.85em";
+  capacityMonitor.style.fontFamily = "monospace";
+  capacityMonitor.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
+  operatorPanel.appendChild(capacityMonitor);
+
+  function refreshCapacityMonitor() {
+    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
+    const capacity = routerLog ? routerLog.length : 0;
+    const percent = Math.min(100, ((capacity / 300) * 100).toFixed(1));
+    let color = "#00cc66";
+    if (percent >= 75) color = "#ffaa00";
+    if (percent >= 90) color = "#ff3333";
+
+    capacityMonitor.innerHTML = `
+      <strong>📊 Router Buffer Usage:</strong><br>
+      <div style="background:#444;width:100%;height:20px;border-radius:4px;overflow:hidden;">
+        <div style="background:${color};width:${percent}%;height:100%;"></div>
+      </div>
+      <div>${capacity} / 300 signals (${percent}%)</div>
+    `;
+  }
+
+  setInterval(refreshCapacityMonitor, 4000);
+});

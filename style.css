@@ -2386,3 +2386,30 @@ input, select {
     padding: 15px;
   }
 }
+/* --- Phase 135.0 — Predictive HUD Bottom Relocation --- */
+#aiHudOverlay {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 99999 !important;
+  background: rgba(40, 20, 60, 0.9);
+  border: 2px solid #8f3aff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 0 18px rgba(160, 82, 255, 0.4);
+  font-family: monospace;
+  color: #f0e6ff;
+  font-size: 0.85rem;
+  max-width: 220px;
+  text-align: left;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(4px);
+}
+
+#aiHudOverlay h4 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  text-align: center;
+  color: #d6bbff;
+  text-shadow: 0 0 4px #8f3aff;
+}
