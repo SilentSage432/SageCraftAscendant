@@ -883,6 +883,204 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<!-- Phase 201.6 — Neural Session Replay Engine -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const replayFileInput = document.createElement("input");
+  replayFileInput.type = "file";
+  replayFileInput.accept = ".json";
+  replayFileInput.style.display = "none";
+  document.body.appendChild(replayFileInput);
+
+  const replayBtn = document.createElement("button");
+  replayBtn.textContent = "🔄 Replay Neural Session";
+  replayBtn.style.padding = "12px 18px";
+  replayBtn.style.fontSize = "1em";
+  replayBtn.style.fontFamily = "monospace";
+  replayBtn.style.background = "#333300";
+  replayBtn.style.color = "#fff";
+  replayBtn.style.border = "2px solid #cccc00";
+  replayBtn.style.borderRadius = "8px";
+  replayBtn.style.cursor = "pointer";
+  replayBtn.style.transition = "all 0.3s ease";
+
+  replayBtn.addEventListener("click", () => replayFileInput.click());
+
+  replayFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      try {
+        const replayData = JSON.parse(event.target.result);
+        if (!Array.isArray(replayData) || replayData.length === 0) {
+          alert("Invalid neural session file.");
+          return;
+        }
+
+        // Replay into Cortex Forecast Memory
+        replayData.forEach(row => {
+          const forecastEntry = {
+            timestamp: new Date().toISOString(),
+            itemNumber: row.itemNumber,
+            division: row.division,
+            onHandUnits: row.onHandUnits,
+            cycleCountUnits: row.cycleCountUnits,
+            shrinkUnits: row.shrinkUnits,
+            itdSalesUnits: row.itdSalesUnits,
+            stabilityHint: (row.shrinkUnits > 0 || row.cycleCountUnits !== 0) ? "Volatile" : "Stable"
+          };
+
+          if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+            window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+          }
+        });
+
+        alert(`✅ Neural session replay complete: ${replayData.length} records re-injected.`);
+        console.log("🔄 Neural Session Replay Injected:", replayData);
+      } catch (err) {
+        console.error("❌ Failed to replay neural session:", err);
+        alert("Error loading neural session file.");
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById("operatorTools").appendChild(replayBtn);
+});
+</script>
+
+<!-- Phase 201.7 — Neural Intake Growth Visualizer -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const growthBtn = document.createElement("button");
+  growthBtn.textContent = "📊 View Neural Growth";
+  growthBtn.style.padding = "12px 18px";
+  growthBtn.style.fontSize = "1em";
+  growthBtn.style.fontFamily = "monospace";
+  growthBtn.style.background = "#004422";
+  growthBtn.style.color = "#fff";
+  growthBtn.style.border = "2px solid #33cc66";
+  growthBtn.style.borderRadius = "8px";
+  growthBtn.style.cursor = "pointer";
+  growthBtn.style.transition = "all 0.3s ease";
+
+  growthBtn.addEventListener("click", () => {
+    const parsed = window.NeuralDataIntake?.getParsedReports();
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.();
+    const sessionTotal = parsed?.length || 0;
+    const cortexTotal = cortex?.length || 0;
+
+    let message = `🧠 Neural Growth Stats:\n\n`;
+    message += `Current Intake Session: ${sessionTotal} rows\n`;
+    message += `Forecast Cortex Memory: ${cortexTotal} forecast records\n`;
+    message += `\nCortex Stability: ${cortexTotal > 0 ? "ACTIVE" : "IDLE"}`;
+
+    alert(message);
+  });
+
+  document.getElementById("operatorTools").appendChild(growthBtn);
+});
+</script>
+
+
+<!-- Phase 201.8 — Neural Stability Advisor Engine -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const stabilityBtn = document.createElement("button");
+  stabilityBtn.textContent = "⚖️ Neural Stability Check";
+  stabilityBtn.style.padding = "12px 18px";
+  stabilityBtn.style.fontSize = "1em";
+  stabilityBtn.style.fontFamily = "monospace";
+  stabilityBtn.style.background = "#330066";
+  stabilityBtn.style.color = "#fff";
+  stabilityBtn.style.border = "2px solid #cc66ff";
+  stabilityBtn.style.borderRadius = "8px";
+  stabilityBtn.style.cursor = "pointer";
+  stabilityBtn.style.transition = "all 0.3s ease";
+
+  stabilityBtn.addEventListener("click", () => {
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.();
+    if (!cortex || cortex.length === 0) {
+      alert("⚠ Cortex memory is empty.");
+      return;
+    }
+
+    let total = cortex.length;
+    let stable = cortex.filter(f => f.stabilityHint === "Stable").length;
+    let volatile = total - stable;
+    let volatilityRate = ((volatile / total) * 100).toFixed(1);
+
+    let message = `🧠 Neural Stability Check:\n\n`;
+    message += `Total Forecast Records: ${total}\n`;
+    message += `Stable Records: ${stable}\n`;
+    message += `Volatile Records: ${volatile}\n`;
+    message += `Volatility Rate: ${volatilityRate}%\n\n`;
+
+    if (volatilityRate > 30) {
+      message += "⚠ High volatility detected.\nConsider deeper review or fresh session ingestion.";
+    } else if (volatilityRate > 15) {
+      message += "🌀 Moderate volatility detected.\nMonitor closely.";
+    } else {
+      message += "✅ Cortex stability is strong and healthy.";
+    }
+
+    alert(message);
+  });
+
+  document.getElementById("operatorTools").appendChild(stabilityBtn);
+});
+</script>
+
+<!-- Phase 201.9 — Predictive Health Composite Index -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const healthIndexBtn = document.createElement("button");
+  healthIndexBtn.textContent = "📊 Predictive Health Index";
+  healthIndexBtn.style.padding = "12px 18px";
+  healthIndexBtn.style.fontSize = "1em";
+  healthIndexBtn.style.fontFamily = "monospace";
+  healthIndexBtn.style.background = "#661111";
+  healthIndexBtn.style.color = "#fff";
+  healthIndexBtn.style.border = "2px solid #ff4444";
+  healthIndexBtn.style.borderRadius = "8px";
+  healthIndexBtn.style.cursor = "pointer";
+  healthIndexBtn.style.transition = "all 0.3s ease";
+
+  healthIndexBtn.addEventListener("click", () => {
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+    const parsed = window.NeuralDataIntake?.getParsedReports() || [];
+    const volatility = cortex.filter(f => f.stabilityHint === "Volatile").length;
+    const stable = cortex.length - volatility;
+    const total = cortex.length;
+
+    const stabilityScore = total > 0 ? (stable / total) * 100 : 0;
+    const dataVolumeScore = Math.min((parsed.length / 1000) * 100, 100);
+    const volatilityPenalty = Math.min((volatility / total) * 100, 100);
+    const compositeScore = Math.max(Math.min(((stabilityScore * 0.6) + (dataVolumeScore * 0.3) - (volatilityPenalty * 0.1)), 100), 0).toFixed(1);
+
+    let message = `🧮 Predictive Health Composite Index\n\n`;
+    message += `Total Forecast Records: ${total}\n`;
+    message += `Stable: ${stable}, Volatile: ${volatility}\n`;
+    message += `Intake Records: ${parsed.length}\n\n`;
+    message += `📊 Composite Health Index: ${compositeScore}%\n`;
+
+    if (compositeScore >= 90) {
+      message += "✅ Excellent System Integrity.";
+    } else if (compositeScore >= 70) {
+      message += "🌀 Acceptable, some volatility present.";
+    } else {
+      message += "⚠️ Degraded — consider retraining intake sessions.";
+    }
+
+    alert(message);
+  });
+
+  document.getElementById("operatorTools").appendChild(healthIndexBtn);
+});
+</script>
+
 <!-- Modal for unknown item prompt -->
   <div id="customModal" role="dialog" aria-modal="true" aria-labelledby="modalPromptText" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
     <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
