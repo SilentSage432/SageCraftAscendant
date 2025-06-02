@@ -484,47 +484,375 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.MemoryAnomalyClusterMapper();
 
-        // Phase 203.9 — Cluster Visual Telemetry Seed
-        if (!window.renderAnomalyClustersPanel) {
-          window.renderAnomalyClustersPanel = function renderClusters() {
-            const panel = document.getElementById("anomalyClustersPanel");
-            if (!panel) {
-              console.warn("⚠ Anomaly Clusters Panel container not found.");
-              return;
-            }
-
-            const clusters = window.AnomalyClusters || [];
-            if (!clusters.length) {
-              panel.innerHTML = "<em>No anomaly clusters detected yet.</em>";
-              return;
-            }
-
-            const rows = clusters.map((cluster, idx) => {
-              const size = cluster.points.length;
-              const duration = (new Date(cluster.end).getTime() - new Date(cluster.start).getTime()) / 1000;
-              return `
-                <div style="width: 100%; padding: 6px; background-color: #993333; margin-bottom: 4px; border-radius: 4px; color: #fff;">
-                  <strong>Cluster ${idx + 1}</strong><br>
-                  Duration: ${duration.toFixed(1)} sec<br>
-                  Points: ${size}
-                </div>
-              `;
-            }).reverse();
-
-            panel.innerHTML = rows.join('');
-          };
-        }
-
-        window.renderAnomalyClustersPanel();
-        console.log("🧬 Anomaly Cluster Visual Telemetry Rendered");
-
         window.renderFSIPanel();
         console.log("📊 FSI Live Visual Panel Rendered");
 
         window.ForecastDriftVisualizer();
         console.log("🌡 Drift Heatmap Visual Render Complete");
 
+        // Phase 203.9 — Cluster Visual Telemetry Seed
+        // (Cluster telemetry block would be here)
+
+        // Phase 204.0.0 — Navigation Self-Regulator Bootstrap
+        if (!window.NeuralNavigationCortex) {
+          window.NeuralNavigationCortex = (function() {
+            const validTabs = [
+              'about', 'audit', 'count', 'inventory', 'tools',
+              'vault', 'deltaAnalyzer', 'exceptionManager',
+              'progressDashboard', 'reportingHub', 'masterExportHub', 'utilityHub'
+            ];
+
+            function activateTab(target) {
+              if (!validTabs.includes(target)) {
+                console.warn(`⚠ Nav Cortex: Invalid tab target: ${target}`);
+                alert(`⛔ Unknown navigation target: ${target}`);
+                return;
+              }
+              console.log(`🧭 Neural Nav Cortex directing to: ${target}`);
+              window.switchTab(target);
+            }
+
+            function interceptLegacyButtons() {
+              const legacyButtons = document.querySelectorAll('.tablink');
+              legacyButtons.forEach(btn => {
+                const target = btn.dataset.target;
+                if (target) {
+                  btn.removeEventListener('click', btn.onclick);
+                  btn.onclick = () => activateTab(target);
+                  btn.setAttribute('listener-attached', 'true');
+                }
+              });
+            }
+
+            function bootstrap() {
+              interceptLegacyButtons();
+              console.log("🧬 Neural Nav Cortex fully linked.");
+            }
+
+            return { activateTab, bootstrap };
+          })();
+
+          window.NeuralNavigationCortex.bootstrap();
+        }
+
+        // Phase 204.1.0 — Deep Navigation State Memory Injection
+        if (!window.NavStateMemoryCore) {
+          window.NavStateMemoryCore = (function() {
+            let stateLog = [];
+
+            function logNavigation(target) {
+              const timestamp = new Date().toISOString();
+              stateLog.push({ timestamp, target });
+              if (stateLog.length > 500) {
+                stateLog.shift();
+              }
+              localStorage.setItem("navStateMemory", JSON.stringify(stateLog));
+              console.log(`📅 NavStateMemory → ${target} logged at ${timestamp}`);
+            }
+
+            function restoreLastState() {
+              const saved = localStorage.getItem("navStateMemory");
+              if (saved) {
+                stateLog = JSON.parse(saved);
+                const last = stateLog[stateLog.length - 1];
+                if (last && last.target) {
+                  console.log(`🔄 Restoring last nav state: ${last.target}`);
+                  if (window.NeuralNavigationCortex) {
+                    window.NeuralNavigationCortex.activateTab(last.target);
+                  } else {
+                    window.switchTab(last.target);
+                  }
+                }
+              }
+            }
+
+            function initHook() {
+              const legacyButtons = document.querySelectorAll('.tablink');
+              legacyButtons.forEach(btn => {
+                const target = btn.dataset.target;
+                if (target) {
+                  btn.addEventListener("click", () => logNavigation(target));
+                }
+              });
+            }
+
+            return { logNavigation, restoreLastState, initHook };
+          })();
+
+          window.NavStateMemoryCore.initHook();
+          window.NavStateMemoryCore.restoreLastState();
+        }
+
         injectedCount++;
+
+        // Phase 204.2.0 — Predictive Navigation Memory Optimizer
+        if (!window.NavStateOptimizer) {
+          window.NavStateOptimizer = (function() {
+            let optimizationLog = [];
+
+            function analyzePatterns() {
+              const saved = localStorage.getItem("navStateMemory");
+              if (!saved) return;
+
+              const stateLog = JSON.parse(saved);
+              const counts = {};
+
+              stateLog.forEach(entry => {
+                counts[entry.target] = (counts[entry.target] || 0) + 1;
+              });
+
+              const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+              optimizationLog = sorted.map(([target, count]) => ({ target, count }));
+              localStorage.setItem("navStateOptimized", JSON.stringify(optimizationLog));
+              console.log("🧮 Nav State Optimization Calculated:", optimizationLog);
+            }
+
+            function displayOptimizationReport() {
+              const panel = document.getElementById("navOptimizationPanel");
+              if (!panel) {
+                console.warn("⚠ Optimization Panel container not found.");
+                return;
+              }
+
+              if (!optimizationLog.length) {
+                panel.innerHTML = "<em>No navigation optimization data available yet.</em>";
+                return;
+              }
+
+              const rows = optimizationLog.map(opt => {
+                return `<div style="margin-bottom: 6px; color: #fff;">
+                  ${opt.target}: ${opt.count} visits
+                </div>`;
+              });
+
+              panel.innerHTML = rows.join('');
+            }
+
+            function optimizeHook() {
+              analyzePatterns();
+              displayOptimizationReport();
+            }
+
+            return { optimizeHook };
+          })();
+
+          window.NavStateOptimizer.optimizeHook();
+        }
+
+        // Phase 204.3.0 — Self-Healing Navigation Redirector
+        if (!window.NavRedirectorCore) {
+          window.NavRedirectorCore = (function() {
+            function suggestBestRedirect(invalidTarget) {
+              const saved = localStorage.getItem("navStateOptimized");
+              if (!saved) {
+                alert(`Unknown navigation target: ${invalidTarget}`);
+                return;
+              }
+
+              const optimized = JSON.parse(saved);
+              if (!optimized.length) {
+                alert(`Unknown navigation target: ${invalidTarget}`);
+                return;
+              }
+
+              const [top] = optimized;
+              if (top && top.target) {
+                const suggestion = confirm(`⛔ Target "${invalidTarget}" not found.\n\nRedirect to "${top.target}" instead?`);
+                if (suggestion) {
+                  if (window.NeuralNavigationCortex) {
+                    window.NeuralNavigationCortex.activateTab(top.target);
+                  } else {
+                    window.switchTab(top.target);
+                  }
+                }
+              } else {
+                alert(`Unknown navigation target: ${invalidTarget}`);
+              }
+            }
+
+            function patchNavCortex() {
+              if (!window.NeuralNavigationCortex) return;
+
+              const originalActivate = window.NeuralNavigationCortex.activateTab;
+              window.NeuralNavigationCortex.activateTab = function(target) {
+                const validTabs = [
+                  'about', 'audit', 'count', 'inventory', 'tools',
+                  'vault', 'deltaAnalyzer', 'exceptionManager',
+                  'progressDashboard', 'reportingHub', 'masterExportHub', 'utilityHub'
+                ];
+
+                if (!validTabs.includes(target)) {
+                  console.warn(`⚠ Self-Healing Redirect: ${target}`);
+                  suggestBestRedirect(target);
+                } else {
+                  originalActivate(target);
+                }
+              };
+            }
+
+            return { patchNavCortex };
+          })();
+
+          window.NavRedirectorCore.patchNavCortex();
+        }
+
+        // Phase 204.4.0 — Neuro-Adaptive Tab Prioritization
+        if (!window.NeuroAdaptiveTabCore) {
+          window.NeuroAdaptiveTabCore = (function() {
+            let priorityCache = [];
+
+            function refreshPriorities() {
+              const saved = localStorage.getItem("navStateOptimized");
+              if (!saved) return;
+
+              const optimized = JSON.parse(saved);
+              if (!optimized.length) return;
+
+              priorityCache = optimized.map((entry, idx) => ({
+                target: entry.target,
+                score: entry.count + (optimized.length - idx)
+              }));
+
+              console.log("🧠 Adaptive Priorities Refreshed:", priorityCache);
+            }
+
+            function getTopPriority() {
+              if (!priorityCache.length) refreshPriorities();
+              return priorityCache[0]?.target || null;
+            }
+
+            function applyBias() {
+              const navButtons = document.querySelectorAll('.tablink');
+              if (!navButtons.length) return;
+
+              navButtons.forEach(btn => {
+                const target = btn.dataset.target;
+                const match = priorityCache.find(entry => entry.target === target);
+                if (match) {
+                  const weight = match.score;
+                  btn.style.outline = `2px solid rgba(255, 215, 0, ${Math.min(1, weight / 10)})`;
+                } else {
+                  btn.style.outline = "none";
+                }
+              });
+
+              console.log("🎯 Neuro-Adaptive Visual Bias Applied");
+            }
+
+            function initialize() {
+              refreshPriorities();
+              applyBias();
+            }
+
+            return { initialize, refreshPriorities, applyBias, getTopPriority };
+          })();
+
+          window.NeuroAdaptiveTabCore.initialize();
+        }
+
+        // Phase 204.5.0 — Cognitive Weight Reinforcement Engine
+        if (!window.CognitiveReinforcer) {
+          window.CognitiveReinforcer = (function() {
+            let reinforcementMap = {};
+
+            function applyReinforcement() {
+              const saved = localStorage.getItem("navStateOptimized");
+              if (!saved) return;
+
+              const optimized = JSON.parse(saved);
+              optimized.forEach(entry => {
+                const existing = reinforcementMap[entry.target] || 0;
+                const bonus = Math.floor(entry.count / 10);
+                reinforcementMap[entry.target] = existing + bonus;
+              });
+
+              localStorage.setItem("navReinforcementMemory", JSON.stringify(reinforcementMap));
+              console.log("🧠 Cognitive Reinforcement Applied:", reinforcementMap);
+            }
+
+            function applyVisualEnhancement() {
+              const navButtons = document.querySelectorAll('.tablink');
+              if (!navButtons.length) return;
+
+              navButtons.forEach(btn => {
+                const target = btn.dataset.target;
+                const boost = reinforcementMap[target] || 0;
+                if (boost > 0) {
+                  btn.style.boxShadow = `0 0 ${boost * 2}px rgba(255, 215, 0, 0.7)`;
+                }
+              });
+
+              console.log("🌟 Cognitive Visual Reinforcement Applied");
+            }
+
+            function initialize() {
+              applyReinforcement();
+              applyVisualEnhancement();
+            }
+
+            return { initialize };
+          })();
+
+          window.CognitiveReinforcer.initialize();
+        }
+
+        // Phase 204.6.0 — Dynamic Habit Mutation Engine
+        if (!window.DynamicHabitMutator) {
+          window.DynamicHabitMutator = (function() {
+            function performMutation() {
+              const saved = localStorage.getItem("navStateOptimized");
+              const reinforcement = localStorage.getItem("navReinforcementMemory");
+              if (!saved || !reinforcement) return;
+
+              const optimized = JSON.parse(saved);
+              const reinforcementMap = JSON.parse(reinforcement);
+              if (!optimized.length) return;
+
+              const mutatedOrder = optimized
+                .map(entry => {
+                  const bonus = reinforcementMap[entry.target] || 0;
+                  return { target: entry.target, score: entry.count + bonus };
+                })
+                .sort((a, b) => b.score - a.score);
+
+              localStorage.setItem("navDynamicOrder", JSON.stringify(mutatedOrder));
+              console.log("🧬 Habit Mutation Applied:", mutatedOrder);
+            }
+
+            function rearrangeNavUI() {
+              const navContainer = document.getElementById("navButtonCluster");
+              if (!navContainer) {
+                console.warn("⚠ navButtonCluster not found.");
+                return;
+              }
+
+              const savedOrder = localStorage.getItem("navDynamicOrder");
+              if (!savedOrder) return;
+
+              const mutatedOrder = JSON.parse(savedOrder);
+              const allButtons = [...navContainer.querySelectorAll('.tablink')];
+
+              mutatedOrder.forEach(entry => {
+                const btn = allButtons.find(b => b.dataset.target === entry.target);
+                if (btn) {
+                  navContainer.appendChild(btn);
+                }
+              });
+
+              console.log("🔄 Navigation UI Mutated");
+            }
+
+            function initialize() {
+              performMutation();
+              rearrangeNavUI();
+            }
+
+            return { initialize };
+          })();
+
+          window.DynamicHabitMutator.initialize();
+        }
       });
 
       alert(`✅ Neural Intake Complete: ${injectedCount} records injected.`);
@@ -2282,1177 +2610,4 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===============================
 // Phase 131.6 — Threat Matrix Early Warning System (Predictive Alerting Engine)
 
-document.addEventListener("DOMContentLoaded", () => {
-  function monitorThreatLevels() {
-    const resolverContent = document.getElementById("resolverContent");
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-
-    if (!resolverContent || !forecastContainer || !anomalyContainer) return;
-
-    const riskText = resolverContent.innerText;
-    const forecastText = forecastContainer.innerText;
-    const anomalyText = anomalyContainer.innerText;
-
-    let alerts = [];
-
-    if (riskText.includes("High Risk")) {
-      alerts.push("🚨 Critical Risk Level Detected!");
-    }
-    if (forecastText.match(/Volatility|Surge|Regression/)) {
-      alerts.push("⚠ Forecast Instability Emerging.");
-    }
-    if (anomalyText.match(/Anomaly Spike|Data Integrity Concern/)) {
-      alerts.push("🔴 Severe Anomaly Triggered!");
-    }
-
-    if (alerts.length > 0) {
-      console.warn("🚨 EARLY WARNING SYSTEM:");
-      alerts.forEach(alert => console.warn(alert));
-    }
-  }
-
-  setInterval(monitorThreatLevels, 6000);
-});
-
-// ===============================
-// Phase 131.8 — HUD Live Stream Wiring
-
-document.addEventListener("DOMContentLoaded", () => {
-  function updateHUDOverlay() {
-    const resolverContent = document.getElementById("resolverContent");
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-
-    const hudRisk = document.querySelector("#hudRisk span");
-    const hudForecast = document.querySelector("#hudForecast span");
-    const hudAnomaly = document.querySelector("#hudAnomaly span");
-    const hudDrift = document.querySelector("#hudDrift span");
-
-    if (!resolverContent || !forecastContainer || !anomalyContainer || !hudRisk || !hudForecast || !hudAnomaly || !hudDrift) return;
-
-    hudRisk.innerText = resolverContent.innerText || "N/A";
-    hudForecast.innerText = forecastContainer.innerText || "N/A";
-    hudAnomaly.innerText = anomalyContainer.innerText || "N/A";
-
-    const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.();
-    if (!forecastMemory || forecastMemory.length < 10) {
-      hudDrift.innerText = "Insufficient Data";
-      return;
-    }
-
-    const recentStates = forecastMemory.slice(-10).map(mem => mem.state);
-    const stableCount = recentStates.filter(state => state.includes("Stable")).length;
-    const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
-
-    let driftAssessment = "🟢 Stable";
-    if (volatileCount >= 5) {
-      driftAssessment = "🔴 Severe Drift";
-    } else if (volatileCount >= 3) {
-      driftAssessment = "🟠 Mild Drift";
-    } else if (stableCount >= 8) {
-      driftAssessment = "🟢 Highly Stable";
-    }
-    hudDrift.innerText = driftAssessment;
-  }
-
-  setInterval(updateHUDOverlay, 3000);
-});
-
-
-// ===============================
-// Phase 132.0 — Production Stabilization Lockdown (Stage 1)
-
-document.addEventListener("DOMContentLoaded", () => {
-  function stabilizePredictiveElements() {
-    const requiredContainers = [
-      { id: "resolverContent", label: "Resolver Panel" },
-      { id: "forecastSignalsContainer", label: "Forecast Overlay" },
-      { id: "anomalySignalsContainer", label: "Anomaly Overlay" },
-      { id: "riskSignalsContainer", label: "Risk Overlay" },
-      { id: "threatMatrixContent", label: "Threat Matrix" },
-      { id: "hudRisk", label: "HUD Risk" },
-      { id: "hudForecast", label: "HUD Forecast" },
-      { id: "hudAnomaly", label: "HUD Anomaly" },
-      { id: "hudDrift", label: "HUD Drift" }
-    ];
-
-    requiredContainers.forEach(container => {
-      const elem = document.getElementById(container.id);
-      if (!elem) {
-        console.warn(`⚠ Missing container: ${container.label} [${container.id}]`);
-      }
-    });
-  }
-
-  // Run stability scan every 60 seconds as safeguard
-  setInterval(stabilizePredictiveElements, 60000);
-});
-// ===============================
-// Phase 132.1 — Predictive AI Failover Safety Net
-
-document.addEventListener("DOMContentLoaded", () => {
-  function aiFailoverMonitor() {
-    const streamEngineActive = (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function");
-    const dataBridgeActive = (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function");
-
-    if (!streamEngineActive) {
-      console.error("🚨 PredictiveStreamEngine unavailable. Attempting recovery...");
-      if (window.PredictiveStreamEngineBackup) {
-        window.PredictiveStreamEngineBackup.start();
-        console.log("✅ Backup Stream Engine engaged.");
-      } else {
-        console.warn("⚠ No backup engine available.");
-      }
-    }
-
-    if (!dataBridgeActive) {
-      console.error("🚨 PredictiveDataBridge unavailable. Attempting re-initialization...");
-      if (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.initialize === "function") {
-        window.PredictiveDataBridge.initialize();
-        console.log("✅ DataBridge re-initialized.");
-      } else {
-        console.warn("⚠ No DataBridge recovery available.");
-      }
-    }
-  }
-
-  setInterval(aiFailoverMonitor, 15000);
-});
-// ===============================
-// Phase 132.2 — Predictive Telemetry Logger (Persistent AI System Log)
-
-document.addEventListener("DOMContentLoaded", () => {
-  let telemetryLog = [];
-
-  function captureTelemetrySnapshot() {
-    const resolverContent = document.getElementById("resolverContent");
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-
-    if (!resolverContent || !forecastContainer || !anomalyContainer) return;
-
-    const snapshot = {
-      timestamp: new Date().toISOString(),
-      risk: resolverContent.innerText || "N/A",
-      forecast: forecastContainer.innerText || "N/A",
-      anomalies: anomalyContainer.innerText || "N/A"
-    };
-
-    telemetryLog.push(snapshot);
-
-    // Limit log size to 200 entries for performance
-    if (telemetryLog.length > 200) {
-      telemetryLog.shift();
-    }
-
-    console.log("📡 Telemetry Logged:", snapshot);
-  }
-
-  window.TelemetryLogger = {
-    getTelemetryLog: () => telemetryLog,
-    exportTelemetryJSON: () => {
-      const blob = new Blob([JSON.stringify(telemetryLog, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `PredictiveTelemetry_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-  };
-
-  setInterval(captureTelemetrySnapshot, 7000);
-});
-// ===============================
-// Phase 132.3 — Production Freeze Snapshot & Deployment Prep
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.ProductionFreezeSnapshot = function() {
-    const snapshot = {
-      timestamp: new Date().toISOString(),
-      forecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory?.() || []),
-      telemetryLog: (window.TelemetryLogger?.getTelemetryLog?.() || []),
-      streamEngineActive: (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function"),
-      dataBridgeActive: (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function"),
-    };
-
-    console.log("🧊 Production Freeze Snapshot Captured:", snapshot);
-
-    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ProductionFreeze_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-});
-// ===============================
-// Phase 133.0 — Deployment Hardening Prep (Release Candidate Generation)
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.GenerateReleaseCandidate = function() {
-    const buildVersion = "InventoryAuditor_RC_133.0";
-    const buildTimestamp = new Date().toISOString();
-
-    const candidate = {
-      buildVersion,
-      buildTimestamp,
-      forecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory?.() || []),
-      telemetryLog: (window.TelemetryLogger?.getTelemetryLog?.() || []),
-      streamEngineActive: (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function"),
-      dataBridgeActive: (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function"),
-      activeTab: localStorage.getItem('activeTab') || 'N/A',
-      lastLoadedSession: localStorage.getItem('lastLoadedSession') || 'N/A'
-    };
-
-    console.log("🧬 Release Candidate Generated:", candidate);
-
-    const blob = new Blob([JSON.stringify(candidate, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `InventoryAuditor_RC_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-});
-// ===============================
-// Phase 134.0 — Operator Utility Enhancements: Release Candidate Export Console
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) {
-    console.warn("⚠ Operator Console Panel not found. Skipping Phase 134.0 UI injection.");
-    return;
-  }
-
-  const exportBtn = document.createElement("button");
-  exportBtn.textContent = "📦 Generate Release Candidate";
-  exportBtn.style.margin = "10px";
-  exportBtn.style.padding = "12px 18px";
-  exportBtn.style.backgroundColor = "#5522aa";
-  exportBtn.style.color = "#fff";
-  exportBtn.style.fontWeight = "bold";
-  exportBtn.style.border = "none";
-  exportBtn.style.borderRadius = "6px";
-  exportBtn.style.cursor = "pointer";
-  exportBtn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
-  exportBtn.style.transition = "all 0.3s ease-in-out";
-
-  exportBtn.addEventListener("mouseenter", () => {
-    exportBtn.style.backgroundColor = "#6633cc";
-  });
-  exportBtn.addEventListener("mouseleave", () => {
-    exportBtn.style.backgroundColor = "#5522aa";
-  });
-
-  exportBtn.addEventListener("click", () => {
-    if (typeof window.GenerateReleaseCandidate === "function") {
-      window.GenerateReleaseCandidate();
-      console.log("✅ Release Candidate Export initiated.");
-    } else {
-      alert("🚫 Release Candidate function not available.");
-    }
-  });
-
-  operatorPanel.appendChild(exportBtn);
-});
-
-
-// ===============================
-// Phase 134.3 — Operator Console Expansion: Telemetry Export, System Audit & Full Snapshot
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-
-  function createOperatorButton(label, color, handler) {
-    const btn = document.createElement("button");
-    btn.textContent = label;
-    btn.style.margin = "10px";
-    btn.style.padding = "12px 18px";
-    btn.style.backgroundColor = color;
-    btn.style.color = "#fff";
-    btn.style.fontWeight = "bold";
-    btn.style.border = "none";
-    btn.style.borderRadius = "6px";
-    btn.style.cursor = "pointer";
-    btn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
-    btn.style.transition = "all 0.3s ease-in-out";
-
-    btn.addEventListener("mouseenter", () => {
-      btn.style.opacity = 0.8;
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.opacity = 1;
-    });
-
-    btn.addEventListener("click", handler);
-    operatorPanel.appendChild(btn);
-  }
-
-  // Telemetry Export
-  createOperatorButton("📊 Export Telemetry", "#cc6600", () => {
-    if (window.TelemetryLogger?.exportTelemetryJSON) {
-      window.TelemetryLogger.exportTelemetryJSON();
-    } else {
-      alert("Telemetry export function not available.");
-    }
-  });
-
-  // Full System Snapshot
-  createOperatorButton("📋 Export Full Snapshot", "#339966", () => {
-    if (window.ProductionFreezeSnapshot) {
-      window.ProductionFreezeSnapshot();
-    } else {
-      alert("Snapshot export function not available.");
-    }
-  });
-
-  // System Audit Diagnostics
-  createOperatorButton("🧮 Run System Audit", "#993399", () => {
-    console.clear();
-    console.log("🛡️ Running Full System Audit...");
-    runWireAudit();
-    runForensicSweep();
-    console.log("✅ System Audit Complete.");
-  });
-});
-// ===============================
-// Phase 134.4 — Operator Console Inspector Module
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-
-  const inspector = document.createElement("div");
-  inspector.style.marginTop = "20px";
-  inspector.style.padding = "10px";
-  inspector.style.backgroundColor = "#222";
-  inspector.style.border = "1px solid #333";
-  inspector.style.borderRadius = "6px";
-  inspector.style.color = "#ccc";
-  inspector.style.fontSize = "0.9em";
-  inspector.style.fontFamily = "monospace";
-  inspector.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
-
-  const buttons = operatorPanel.querySelectorAll("button");
-  const total = buttons.length;
-
-  let listHTML = `<strong>🧭 Operator Console Inspector:</strong><br>Total Tools: ${total}<br><ul>`;
-  buttons.forEach(btn => {
-    const label = btn.textContent.trim();
-    const bgColor = btn.style.backgroundColor;
-    listHTML += `<li>${label} — <span style="color:${bgColor};">${bgColor}</span></li>`;
-  });
-  listHTML += "</ul>";
-
-  inspector.innerHTML = listHTML;
-  operatorPanel.appendChild(inspector);
-});
-// ===============================
-// Phase 134.5 — Operator Console Refresh Trigger
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.refreshOperatorConsole = function() {
-    console.log("🔄 Refreshing Operator Console...");
-
-    const operatorPanel = document.getElementById("operatorConsolePanel");
-    if (!operatorPanel) {
-      console.warn("⚠ Operator Console Panel not found.");
-      return;
-    }
-
-    // Remove all existing buttons (except inspector div)
-    operatorPanel.querySelectorAll("button").forEach(btn => btn.remove());
-
-    // Re-invoke existing injection phases manually
-    if (typeof window.GenerateReleaseCandidate === "function") {
-      const exportBtn = document.createElement("button");
-      exportBtn.textContent = "📦 Generate Release Candidate";
-      exportBtn.style.margin = "10px";
-      exportBtn.style.padding = "12px 18px";
-      exportBtn.style.backgroundColor = "#5522aa";
-      exportBtn.style.color = "#fff";
-      exportBtn.style.fontWeight = "bold";
-      exportBtn.style.border = "none";
-      exportBtn.style.borderRadius = "6px";
-      exportBtn.style.cursor = "pointer";
-      exportBtn.style.boxShadow = "0 0 10px rgba(255,255,255,0.3)";
-      exportBtn.style.transition = "all 0.3s ease-in-out";
-
-      exportBtn.addEventListener("click", () => window.GenerateReleaseCandidate());
-      operatorPanel.appendChild(exportBtn);
-    }
-
-    // Rebuild Phase 134.3 buttons
-    if (window.TelemetryLogger?.exportTelemetryJSON) {
-      const telemetryBtn = document.createElement("button");
-      telemetryBtn.textContent = "📊 Export Telemetry";
-      telemetryBtn.style.margin = "10px";
-      telemetryBtn.style.padding = "12px 18px";
-      telemetryBtn.style.backgroundColor = "#cc6600";
-      telemetryBtn.style.color = "#fff";
-      telemetryBtn.style.fontWeight = "bold";
-      telemetryBtn.style.border = "none";
-      telemetryBtn.style.borderRadius = "6px";
-      telemetryBtn.style.cursor = "pointer";
-      telemetryBtn.addEventListener("click", () => window.TelemetryLogger.exportTelemetryJSON());
-      operatorPanel.appendChild(telemetryBtn);
-    }
-
-    if (window.ProductionFreezeSnapshot) {
-      const snapshotBtn = document.createElement("button");
-      snapshotBtn.textContent = "📋 Export Full Snapshot";
-      snapshotBtn.style.margin = "10px";
-      snapshotBtn.style.padding = "12px 18px";
-      snapshotBtn.style.backgroundColor = "#339966";
-      snapshotBtn.style.color = "#fff";
-      snapshotBtn.style.fontWeight = "bold";
-      snapshotBtn.style.border = "none";
-      snapshotBtn.style.borderRadius = "6px";
-      snapshotBtn.style.cursor = "pointer";
-      snapshotBtn.addEventListener("click", () => window.ProductionFreezeSnapshot());
-      operatorPanel.appendChild(snapshotBtn);
-    }
-
-    const auditBtn = document.createElement("button");
-    auditBtn.textContent = "🧮 Run System Audit";
-    auditBtn.style.margin = "10px";
-    auditBtn.style.padding = "12px 18px";
-    auditBtn.style.backgroundColor = "#993399";
-    auditBtn.style.color = "#fff";
-    auditBtn.style.fontWeight = "bold";
-    auditBtn.style.border = "none";
-    auditBtn.style.borderRadius = "6px";
-    auditBtn.style.cursor = "pointer";
-    auditBtn.addEventListener("click", () => {
-      console.clear();
-      console.log("🛡️ Running Full System Audit...");
-      runWireAudit();
-      runForensicSweep();
-      console.log("✅ System Audit Complete.");
-    });
-    operatorPanel.appendChild(auditBtn);
-  };
-});
-// ===============================
-// Phase 135.5 — Dropbox Predictive Sync Recalibration
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Predictive Dropbox Connection Monitor
-  function checkDropboxPredictiveStatus() {
-    const predictiveDropbox = document.getElementById("predictiveDropboxStatus");
-    if (!predictiveDropbox) return;
-
-    let dropboxConnected = false;
-    if (typeof window.isDropboxConnected === "function") {
-      try {
-        dropboxConnected = window.isDropboxConnected();
-      } catch (err) {
-        console.warn("⚠ Dropbox connection check failed:", err);
-      }
-    }
-    predictiveDropbox.innerHTML = dropboxConnected ? "☁️ Connected" : "☁️ Offline";
-    predictiveDropbox.style.color = dropboxConnected ? "#00cc66" : "#ff4444";
-  }
-
-  // Auto-trigger initial Dropbox sync health check
-  setTimeout(checkDropboxPredictiveStatus, 500);
-
-  // Schedule periodic re-validation every 15 seconds
-  setInterval(checkDropboxPredictiveStatus, 15000);
-});
-// ===============================
-// Phase 135.6 — Predictive Health Beacon Injection
-
-document.addEventListener("DOMContentLoaded", () => {
-  function predictiveHealthBeacon() {
-    const streamEngineActive = (window.PredictiveStreamEngine && typeof window.PredictiveStreamEngine.start === "function");
-    const dataBridgeActive = (window.PredictiveDataBridge && typeof window.PredictiveDataBridge.connectAIModels === "function");
-    const telemetryAvailable = (window.TelemetryLogger && typeof window.TelemetryLogger.getTelemetryLog === "function");
-
-    const beacon = {
-      timestamp: new Date().toISOString(),
-      streamEngineActive,
-      dataBridgeActive,
-      telemetryAvailable,
-      totalForecastMemory: (window.PredictiveMemoryEngine?.getForecastMemory()?.length || 0),
-      totalTelemetryLogs: (window.TelemetryLogger?.getTelemetryLog()?.length || 0)
-    };
-
-    console.log("📡 Predictive Health Beacon:", beacon);
-  }
-
-  setInterval(predictiveHealthBeacon, 20000);
-});
-// ===============================
-// Phase 136.0 — Predictive Signal Router Core Bootstrap
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.PredictiveSignalRouter = (function() {
-    let routerLog = [];
-
-    function ingestSignal(signalType, payload) {
-      const entry = {
-        timestamp: new Date().toISOString(),
-        signalType,
-        payload
-      };
-      routerLog.push(entry);
-      if (routerLog.length > 300) {
-        routerLog.shift();  // keep log manageable
-      }
-      console.log("🔀 Signal Routed:", entry);
-    }
-
-    function routeForecast(forecastData) {
-      ingestSignal("forecast", forecastData);
-    }
-
-    function routeAnomaly(anomalyData) {
-      ingestSignal("anomaly", anomalyData);
-    }
-
-    function routeRisk(riskData) {
-      ingestSignal("risk", riskData);
-    }
-
-    function getRouterLog() {
-      return routerLog;
-    }
-
-    function clearRouterLog() {
-      routerLog = [];
-    }
-
-    return {
-      routeForecast,
-      routeAnomaly,
-      routeRisk,
-      getRouterLog,
-      clearRouterLog
-    };
-  })();
-
-  console.log("🔧 Predictive Signal Router Core initialized.");
-});
-// ===============================
-// Phase 136.1 — Signal Router Live Feed Wiring
-
-document.addEventListener("DOMContentLoaded", () => {
-  function liveRouterIngest() {
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-    const resolverContent = document.getElementById("resolverContent");
-
-    if (!forecastContainer || !anomalyContainer || !resolverContent) return;
-
-    const forecastText = forecastContainer.innerText || "N/A";
-    const anomalyText = anomalyContainer.innerText || "N/A";
-    const riskText = resolverContent.innerText || "N/A";
-
-    if (window.PredictiveSignalRouter) {
-      window.PredictiveSignalRouter.routeForecast(forecastText);
-      window.PredictiveSignalRouter.routeAnomaly(anomalyText);
-      window.PredictiveSignalRouter.routeRisk(riskText);
-    }
-  }
-
-  setInterval(liveRouterIngest, 5000);
-});
-// ===============================
-// Phase 136.2 — Signal Router Telemetry Visualizer
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-
-  const routerVisualizer = document.createElement("div");
-  routerVisualizer.id = "routerTelemetryVisualizer";
-  routerVisualizer.style.marginTop = "20px";
-  routerVisualizer.style.padding = "10px";
-  routerVisualizer.style.backgroundColor = "#111";
-  routerVisualizer.style.border = "1px solid #444";
-  routerVisualizer.style.borderRadius = "6px";
-  routerVisualizer.style.color = "#ccc";
-  routerVisualizer.style.fontSize = "0.85em";
-  routerVisualizer.style.fontFamily = "monospace";
-  routerVisualizer.style.maxHeight = "250px";
-  routerVisualizer.style.overflowY = "auto";
-  routerVisualizer.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
-  routerVisualizer.innerHTML = "<strong>🔀 Predictive Signal Router Feed:</strong><br>";
-
-  operatorPanel.appendChild(routerVisualizer);
-
-  function refreshRouterVisualizer() {
-    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
-    if (!routerLog || routerLog.length === 0) {
-      routerVisualizer.innerHTML = "<em>No signals routed yet.</em>";
-      return;
-    }
-
-    let logHTML = "<strong>🔀 Predictive Signal Router Feed:</strong><br><ul style='padding-left:18px;'>";
-    routerLog.slice(-15).reverse().forEach(entry => {
-      logHTML += `<li>[${entry.signalType.toUpperCase()}] ${entry.payload}</li>`;
-    });
-    logHTML += "</ul>";
-    routerVisualizer.innerHTML = logHTML;
-  }
-
-  setInterval(refreshRouterVisualizer, 4000);
-});
-// ===============================
-// Phase 136.3 — Operator Console Router Diagnostic Controls
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-});
-
-  function createRouterControl(label, color, handler) {
-    const btn = document.createElement("button");
-    btn.textContent = label;
-    btn.style.margin = "8px";
-    btn.style.padding = "10px 16px";
-    btn.style.backgroundColor = color;
-    btn.style.color = "#fff";
-    btn.style.fontWeight = "bold";
-    btn.style.border = "none";
-    btn.style.borderRadius = "6px";
-    btn.style.cursor = "pointer";
-    btn.style.boxShadow = "0 0 6px rgba(255,255,255,0.2)";
-    btn.style.transition = "all 0.3s ease-in-out";
-
-    btn.addEventListener("mouseenter", () => {
-      btn.style.opacity = 0.8;
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.opacity = 1;
-    });
-
-    btn.addEventListener("click", handler);
-    operatorPanel.appendChild(btn);
-  }
-
-// ===============================
-// Phase 136.4 — Predictive Signal Router Export Engine
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-
-  const exportBtn = document.createElement("button");
-  exportBtn.textContent = "📤 Export Router Log";
-  exportBtn.style.margin = "8px";
-  exportBtn.style.padding = "10px 16px";
-  exportBtn.style.backgroundColor = "#338833";
-  exportBtn.style.color = "#fff";
-  exportBtn.style.fontWeight = "bold";
-  exportBtn.style.border = "none";
-  exportBtn.style.borderRadius = "6px";
-  exportBtn.style.cursor = "pointer";
-  exportBtn.style.boxShadow = "0 0 6px rgba(255,255,255,0.2)";
-  exportBtn.style.transition = "all 0.3s ease-in-out";
-
-  exportBtn.addEventListener("mouseenter", () => {
-    exportBtn.style.opacity = 0.8;
-  });
-  exportBtn.addEventListener("mouseleave", () => {
-    exportBtn.style.opacity = 1;
-  });
-
-  exportBtn.addEventListener("click", () => {
-    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
-    if (!routerLog || routerLog.length === 0) {
-      alert("No router signals to export.");
-      return;
-    }
-
-    const blob = new Blob([JSON.stringify(routerLog, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `RouterLog_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  operatorPanel.appendChild(exportBtn);
-});
-
-// ===============================
-// Phase 136.5 — Post-Bootstrap Button Wiring Re-Sync Injection
-
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    console.log("🔧 Post-Bootstrap Wiring Re-Sync Triggered...");
-    if (typeof window.wireAllButtons === "function") {
-      window.wireAllButtons();
-      console.log("✅ Button Wiring Fully Re-Synchronized.");
-    } else {
-      console.warn("⚠ wireAllButtons function not found.");
-    }
-  }, 2000);
-});
-
-// ===============================
-// Phase 136.6 — Router Capacity Monitor
-
-document.addEventListener("DOMContentLoaded", () => {
-  const operatorPanel = document.getElementById("operatorConsolePanel");
-  if (!operatorPanel) return;
-
-  const capacityMonitor = document.createElement("div");
-  capacityMonitor.id = "routerCapacityMonitor";
-  capacityMonitor.style.marginTop = "20px";
-  capacityMonitor.style.padding = "10px";
-  capacityMonitor.style.backgroundColor = "#222";
-  capacityMonitor.style.border = "1px solid #333";
-  capacityMonitor.style.borderRadius = "6px";
-  capacityMonitor.style.color = "#ccc";
-  capacityMonitor.style.fontSize = "0.85em";
-  capacityMonitor.style.fontFamily = "monospace";
-  capacityMonitor.style.boxShadow = "0 0 10px rgba(255,255,255,0.1)";
-  operatorPanel.appendChild(capacityMonitor);
-
-  function refreshCapacityMonitor() {
-    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
-    const capacity = routerLog ? routerLog.length : 0;
-    const percent = Math.min(100, ((capacity / 300) * 100).toFixed(1));
-    let color = "#00cc66";
-    if (percent >= 75) color = "#ffaa00";
-    if (percent >= 90) color = "#ff3333";
-
-    capacityMonitor.innerHTML = `
-      <strong>📊 Router Buffer Usage:</strong><br>
-      <div style="background:#444;width:100%;height:20px;border-radius:4px;overflow:hidden;">
-        <div style="background:${color};width:${percent}%;height:100%;"></div>
-      </div>
-      <div>${capacity} / 300 signals (${percent}%)</div>
-    `;
-  }
-
-  setInterval(refreshCapacityMonitor, 4000);
-});
-// ===============================
-// Phase 200 — Sentinel Memory Sync Core Activation
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.SentinelMemoryCore = (function() {
-    const MAX_HISTORY = 1000;
-
-    let memoryArchive = {
-      forecasts: [],
-      anomalies: [],
-      risks: [],
-      vendorSignals: []
-    };
-
-    function logForecast(state) {
-      const entry = { timestamp: new Date().toISOString(), state };
-      memoryArchive.forecasts.push(entry);
-      trimMemory();
-    }
-
-    function logAnomaly(state) {
-      const entry = { timestamp: new Date().toISOString(), state };
-      memoryArchive.anomalies.push(entry);
-      trimMemory();
-    }
-
-    function logRisk(state) {
-      const entry = { timestamp: new Date().toISOString(), state };
-      memoryArchive.risks.push(entry);
-      trimMemory();
-    }
-
-    function logVendorSignal(vendorId, signal) {
-      const entry = { timestamp: new Date().toISOString(), vendorId, signal };
-      memoryArchive.vendorSignals.push(entry);
-      trimMemory();
-    }
-
-    function getFullMemory() {
-      return memoryArchive;
-    }
-
-    function exportMemorySnapshot() {
-      const snapshot = JSON.stringify(memoryArchive, null, 2);
-      const blob = new Blob([snapshot], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `SentinelMemory_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function trimMemory() {
-      Object.keys(memoryArchive).forEach(key => {
-        if (memoryArchive[key].length > MAX_HISTORY) {
-          memoryArchive[key] = memoryArchive[key].slice(-MAX_HISTORY);
-        }
-      });
-    }
-
-    return {
-      logForecast,
-      logAnomaly,
-      logRisk,
-      logVendorSignal,
-      getFullMemory,
-      exportMemorySnapshot
-    };
-  })();
-
-  console.log("🧠 Sentinel Memory Core Initialized.");
-});
-// ===============================
-// Phase 200.1 — Predictive HUD Adaptive Slide System
-
-document.addEventListener("DOMContentLoaded", () => {
-  const hud = document.getElementById("predictiveHUD");
-  if (!hud) {
-    console.warn("⚠ PredictiveHUD element not found — skipping adaptive slide injection.");
-    return;
-  }
-
-  // Inject HUD slide logic globally
-  window.nudgeHUD = function(position) {
-    if (position === 'down') {
-      hud.style.transform = 'translateY(220px)';
-    } else {
-      hud.style.transform = 'translateY(0)';
-    }
-  };
-
-  // Ensure smooth CSS transition for HUD
-  hud.style.transition = "transform 0.5s ease-in-out";
-});
-
-// Patch into Drawer Controller
-if (window.DrawerEngineController) {
-  const originalOpen = window.DrawerEngineController.openControlDrawer;
-  const originalClose = window.DrawerEngineController.closeControlDrawer;
-
-  window.DrawerEngineController.openControlDrawer = function() {
-    originalOpen();
-    if (window.nudgeHUD) window.nudgeHUD('down');
-  };
-
-  window.DrawerEngineController.closeControlDrawer = function() {
-    originalClose();
-    if (window.nudgeHUD) window.nudgeHUD('reset');
-  };
-}
-// ===============================
-// Phase 200.2 — Forecast Signal Memory Sync Injection
-
-document.addEventListener("DOMContentLoaded", () => {
-  function syncForecastToSentinelMemory() {
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    if (!forecastContainer) return;
-
-    const forecastState = forecastContainer.innerText || "N/A";
-
-    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logForecast === "function") {
-      window.SentinelMemoryCore.logForecast(forecastState);
-      console.log("🧠 Sentinel Memory Synced Forecast:", forecastState);
-    }
-  }
-
-  // Sync forecast to memory every 10 seconds
-  setInterval(syncForecastToSentinelMemory, 10000);
-});
-// ===============================
-// Phase 200.3 — Anomaly Signal Memory Sync Injection
-
-document.addEventListener("DOMContentLoaded", () => {
-  function syncAnomalyToSentinelMemory() {
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-    if (!anomalyContainer) return;
-
-    const anomalyState = anomalyContainer.innerText || "N/A";
-
-    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logAnomaly === "function") {
-      window.SentinelMemoryCore.logAnomaly(anomalyState);
-      console.log("🧠 Sentinel Memory Synced Anomaly:", anomalyState);
-    }
-  }
-
-  // Sync anomaly to memory every 10 seconds
-  setInterval(syncAnomalyToSentinelMemory, 10000);
-});
-// ===============================
-// Phase 200.4 — Risk Signal Memory Sync Injection
-
-document.addEventListener("DOMContentLoaded", () => {
-  function syncRiskToSentinelMemory() {
-    const riskContainer = document.getElementById("riskSignalsContainer");
-    if (!riskContainer) return;
-
-    const riskState = riskContainer.innerText || "N/A";
-
-    if (window.SentinelMemoryCore && typeof window.SentinelMemoryCore.logRisk === "function") {
-      window.SentinelMemoryCore.logRisk(riskState);
-      console.log("🧠 Sentinel Memory Synced Risk:", riskState);
-    }
-  }
-
-  // Sync risk to memory every 10 seconds
-  setInterval(syncRiskToSentinelMemory, 10000);
-});
-// ===============================
-// Phase 200.8 — Predictive HUD Data Sync Engine
-
-document.addEventListener("DOMContentLoaded", () => {
-  function syncPredictiveHUD() {
-    const resolverContent = document.getElementById("resolverContent");
-    const forecastContainer = document.getElementById("forecastSignalsContainer");
-    const anomalyContainer = document.getElementById("anomalySignalsContainer");
-    const hudRisk = document.querySelector("#hudRisk span");
-    const hudForecast = document.querySelector("#hudForecast span");
-    const hudAnomaly = document.querySelector("#hudAnomaly span");
-    const hudDrift = document.querySelector("#hudDrift span");
-
-    if (!resolverContent || !forecastContainer || !anomalyContainer || !hudRisk || !hudForecast || !hudAnomaly || !hudDrift) {
-      console.warn("⚠ HUD containers not fully available for sync.");
-      return;
-    }
-
-    hudRisk.innerText = resolverContent.innerText || "N/A";
-    hudForecast.innerText = forecastContainer.innerText || "N/A";
-    hudAnomaly.innerText = anomalyContainer.innerText || "N/A";
-
-    const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.();
-    if (!forecastMemory || forecastMemory.length < 10) {
-      hudDrift.innerText = "Insufficient Data";
-      return;
-    }
-
-    const recentStates = forecastMemory.slice(-10).map(mem => mem.state);
-    const stableCount = recentStates.filter(state => state.includes("Stable")).length;
-    const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
-
-    let driftAssessment = "🟢 Stable";
-    if (volatileCount >= 5) {
-      driftAssessment = "🔴 Severe Drift";
-    } else if (volatileCount >= 3) {
-      driftAssessment = "🟠 Mild Drift";
-    } else if (stableCount >= 8) {
-      driftAssessment = "🟢 Highly Stable";
-    }
-    hudDrift.innerText = driftAssessment;
-  }
-
-  setInterval(syncPredictiveHUD, 3000);
-});
-// ===============================
-// Phase 200.9 — Router Log Memory Sync Engine
-
-document.addEventListener("DOMContentLoaded", () => {
-  function syncRouterMemoryHUD() {
-    const routerLog = window.PredictiveSignalRouter?.getRouterLog?.();
-    if (!routerLog || routerLog.length < 10) {
-      console.log("🧠 Router Memory: Insufficient data points.");
-      return;
-    }
-
-    const forecastCount = routerLog.filter(e => e.signalType === "forecast").length;
-    const anomalyCount = routerLog.filter(e => e.signalType === "anomaly").length;
-    const riskCount = routerLog.filter(e => e.signalType === "risk").length;
-
-    console.log(`🧠 Router Log Summary → Forecast: ${forecastCount}, Anomalies: ${anomalyCount}, Risks: ${riskCount}`);
-  }
-
-  setInterval(syncRouterMemoryHUD, 15000);
-});
-// ===============================
-// Phase 200.10 — Neural Forecast Memory Cortex Expansion
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.NeuralForecastMemoryCortex = (function() {
-    let forecastHistory = [];
-
-    function ingestForecastMemory() {
-      const forecastContainer = document.getElementById("forecastSignalsContainer");
-      if (!forecastContainer) return;
-
-      const currentForecast = forecastContainer.innerText || "N/A";
-      const timestamp = new Date().toISOString();
-
-      forecastHistory.push({ timestamp, state: currentForecast });
-
-      if (forecastHistory.length > 500) {
-        forecastHistory.shift();
-      }
-
-      console.log("🧠 Neural Forecast Cortex Updated:", forecastHistory);
-    }
-
-    function getForecastHistory() {
-      return forecastHistory;
-    }
-
-    function exportForecastHistory() {
-      const blob = new Blob([JSON.stringify(forecastHistory, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `ForecastMemory_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    return {
-      ingestForecastMemory,
-      getForecastHistory,
-      exportForecastHistory
-    };
-  })();
-
-  setInterval(window.NeuralForecastMemoryCortex.ingestForecastMemory, 7000);
-});
-// ===============================
-// Phase 200.11 — Multi-Dimensional Cortex Fusion Layer
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.CortexFusionEngine = (function() {
-    function analyzeUnifiedState() {
-      const forecastMemory = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
-      const routerLog = window.PredictiveSignalRouter?.getRouterLog?.() || [];
-      const telemetryLog = window.TelemetryLogger?.getTelemetryLog?.() || [];
-
-      const totalForecasts = forecastMemory.length;
-      const totalSignals = routerLog.length;
-      const totalTelemetry = telemetryLog.length;
-
-      let stabilityScore = 100;
-
-      if (totalSignals > 100) stabilityScore -= 10;
-      if (totalTelemetry > 150) stabilityScore -= 10;
-
-      const recentForecasts = forecastMemory.slice(-10).map(f => f.state);
-      const volatilityCount = recentForecasts.filter(state => state.match(/Volatile|Regression|Surge/)).length;
-      stabilityScore -= volatilityCount * 5;
-
-      stabilityScore = Math.max(0, stabilityScore);
-      console.log(`🧬 Cortex Fusion Stability Score: ${stabilityScore}%`);
-
-      return {
-        forecasts: totalForecasts,
-        signals: totalSignals,
-        telemetry: totalTelemetry,
-        stability: stabilityScore
-      };
-    }
-
-    return { analyzeUnifiedState };
-  })();
-
-  // Periodic analysis pass
-  setInterval(() => {
-    const snapshot = window.CortexFusionEngine.analyzeUnifiedState();
-    console.log("📊 Unified Cortex Snapshot:", snapshot);
-  }, 15000);
-});
-// ===============================
-// Phase 200.15 — Neural Feedback Optimizer Layer
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.NeuralFeedbackOptimizer = (function() {
-    let optimizerLog = [];
-
-    function analyzeAndOptimize() {
-      const forecastMemory = window.PredictiveMemoryEngine?.getForecastMemory?.() || [];
-      if (forecastMemory.length < 15) {
-        console.log("⚠ Neural Optimizer: Insufficient forecast memory.");
-        return;
-      }
-
-      const recentStates = forecastMemory.slice(-15).map(mem => mem.state);
-      const stableCount = recentStates.filter(state => state.includes("Stable")).length;
-      const volatileCount = recentStates.filter(state => state.match(/Volatility|Surge|Regression/)).length;
-      
-      const optimizationSignal = {
-        timestamp: new Date().toISOString(),
-        stableRatio: (stableCount / 15).toFixed(2),
-        volatileRatio: (volatileCount / 15).toFixed(2),
-        recommendedScanDepth: (volatileCount >= 7) ? "Deep Audit" : (volatileCount >= 3 ? "Normal Audit" : "Quick Audit"),
-        riskSensitivity: (volatileCount >= 5) ? "High Sensitivity" : "Standard"
-      };
-
-      optimizerLog.push(optimizationSignal);
-      if (optimizerLog.length > 100) {
-        optimizerLog.shift();
-      }
-
-      console.log("🧬 Neural Feedback Optimization Signal:", optimizationSignal);
-    }
-
-    function getOptimizerLog() {
-      return optimizerLog;
-    }
-
-    return { analyzeAndOptimize, getOptimizerLog };
-  })();
-
-  setInterval(() => {
-    window.NeuralFeedbackOptimizer.analyzeAndOptimize();
-  }, 20000);
-});
-// ===============================
-// Phase 201 — Neural Data Intake Scaffold (File Processor)
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.NeuralDataIntake = (function() {
-    let parsedReports = [];
-
-    function parseUploadedFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        try {
-          const data = event.target.result;
-          const workbook = XLSX.read(data, { type: 'binary' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-
-          const normalized = jsonData.map(row => ({
-            region: row["Region"] || "",
-            district: row["District"] || "",
-            location: row["Location"] || "",
-            division: row["Merchandise Division"] || "",
-            productGroup: row["Product Group"] || "",
-            assortment: row["Assortment"] || "",
-            description: row["Item Description"] || "",
-            itemNumber: row["Item Number"] || "",
-            onHandUnits: parseInt(row["Yesterday Physical Inventory Units"] || 0),
-            damagedUnits: parseInt(row["Damaged Units"] || 0),
-            cycleCountUnits: parseInt(row["Cycle Count Units"] || 0),
-            shrinkUnits: parseInt(row["1st Previous Total Shrink Units"] || 0),
-            itdSalesUnits: parseInt(row["ITD Sales Units"] || 0),
-          }));
-
-          parsedReports = normalized;
-          console.log("📊 Neural Intake Parsed Report:", normalized);
-          alert(`✅ Report successfully parsed: ${normalized.length} items ingested.`);
-
-          // Future: feed into AI Cortex modules directly here
-        } catch (err) {
-          console.error("❌ Failed to parse file:", err);
-          alert("Error parsing file. Ensure format matches intake scaffold.");
-        }
-      };
-      reader.readAsBinaryString(file);
-    }
-
-    function getParsedReports() {
-      return parsedReports;
-    }
-
-    return { parseUploadedFile, getParsedReports };
-  })();
-});
+<truncated__content/>
