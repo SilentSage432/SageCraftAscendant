@@ -1093,6 +1093,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const liveScanTableBody = document.getElementById("liveScanTableBody");
 
   function updateLiveTable(itemNumber, qty, category) {
+    const liveScanTableBody = document.getElementById("liveScanTableBody");
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${itemNumber}</td>
@@ -1103,8 +1104,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>—</td>
       <td>—</td>
     `;
-    if (document.getElementById("placeholderRow")) {
-      liveScanTableBody.innerHTML = ""; // Clear placeholder if first entry
+    const placeholder = document.getElementById("placeholderRow");
+    if (placeholder) {
+      liveScanTableBody.innerHTML = "";
     }
     liveScanTableBody.appendChild(row);
   }
@@ -1132,9 +1134,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
       window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+      // Also update the live table after successful injection
+      updateLiveTable(itemNumber, qty, category);
     }
-
-    updateLiveTable(itemNumber, qty, category);
     scanInput.value = "";
     scanInput.focus();
   });
@@ -1164,6 +1166,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const liveScanTableBody = document.getElementById("liveScanTableBody");
 
   function updateLiveTable(itemNumber, qty, category) {
+    const liveScanTableBody = document.getElementById("liveScanTableBody");
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${itemNumber}</td>
@@ -1174,7 +1177,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>—</td>
       <td>—</td>
     `;
-    if (document.getElementById("placeholderRow")) {
+    const placeholder = document.getElementById("placeholderRow");
+    if (placeholder) {
       liveScanTableBody.innerHTML = "";
     }
     liveScanTableBody.appendChild(row);
@@ -1194,9 +1198,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
       window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+      // Also update the live table after successful injection
+      updateLiveTable(itemNumber, qty, category);
     }
-
-    updateLiveTable(itemNumber, qty, category);
     scanInput.value = "";
     scanInput.focus();
   }
