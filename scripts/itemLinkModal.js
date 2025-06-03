@@ -119,38 +119,54 @@ window.itemLinkModalManager = {
     },
 
     wireModal: function() {
-        document.getElementById("saveItemLinkBtn").onclick = () => this.saveLink();
-        document.getElementById("cancelItemLinkBtn").onclick = () => this.closeModal();
-
+        const saveBtn = document.getElementById("saveItemLinkBtn");
+        const cancelBtn = document.getElementById("cancelItemLinkBtn");
         const categorySelect = document.getElementById("itemLinkCategory");
-        const categories = [
-            "Laundry",
-            "Fridges & Freezers",
-            "Ranges",
-            "Dishwashers",
-            "Wall Ovens",
-            "Cooktops",
-            "OTR Microwaves",
-            "Microwaves (Countertop)",
-            "Vent Hoods",
-            "Beverage & Wine Coolers",
-            "Cabinets",
-            "Countertops",
-            "Interior Doors",
-            "Exterior Doors",
-            "Storm Doors",
-            "Windows",
-            "Commodity Moulding",
-            "Other / Misc"
-        ];
 
-        categorySelect.innerHTML = "";
-        categories.forEach(cat => {
-            const option = document.createElement("option");
-            option.value = cat;
-            option.textContent = cat;
-            categorySelect.appendChild(option);
-        });
+        if (saveBtn) {
+            saveBtn.onclick = () => this.saveLink();
+        } else {
+            console.warn("⚠ saveItemLinkBtn not found in DOM. Skipping save button wiring.");
+        }
+
+        if (cancelBtn) {
+            cancelBtn.onclick = () => this.closeModal();
+        } else {
+            console.warn("⚠ cancelItemLinkBtn not found in DOM. Skipping cancel button wiring.");
+        }
+
+        if (categorySelect) {
+            const categories = [
+                "Laundry",
+                "Fridges & Freezers",
+                "Ranges",
+                "Dishwashers",
+                "Wall Ovens",
+                "Cooktops",
+                "OTR Microwaves",
+                "Microwaves (Countertop)",
+                "Vent Hoods",
+                "Beverage & Wine Coolers",
+                "Cabinets",
+                "Countertops",
+                "Interior Doors",
+                "Exterior Doors",
+                "Storm Doors",
+                "Windows",
+                "Commodity Moulding",
+                "Other / Misc"
+            ];
+
+            categorySelect.innerHTML = "";
+            categories.forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat;
+                option.textContent = cat;
+                categorySelect.appendChild(option);
+            });
+        } else {
+            console.warn("⚠ itemLinkCategory select not found in DOM. Skipping category population.");
+        }
     },
 
     promptForOverride: function(upc, mapping, confidence) {
