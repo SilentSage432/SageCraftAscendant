@@ -6,6 +6,7 @@ import { initSessionTools } from './session.js';
 import './events.js';
 import { renderTrendChart, setupTrendModalToggle } from './charts.js';
 import { setupReportButton, setupTemplateExportButton } from './report.js';
+import { initializePredictiveCortex } from './predictiveCortex.js';
 
 console.log("✅ index.js is running");
 
@@ -23,4 +24,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setupReportButton();
   setupMoreOptionsToggle();
   setupTemplateExportButton();
+  initializePredictiveCortex();
 });

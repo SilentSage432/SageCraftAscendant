@@ -24,179 +24,20 @@
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
 </head>
-  <style>
-    #aiHudOverlay {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background: #1b1b2f;
-      border: 2px solid #9933ff;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
-      font-family: monospace;
-      color: #fff;
-      z-index: 10000;
-      width: 260px;
-    }
-    /* Desktop Drawer Toggle Button Default */
-    #drawerToggleBtn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      padding: 8px 12px;
-      font-size: 18px;
-      z-index: 10000;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      box-shadow: 0 0 10px #000;
-    }
-
-    /* Responsive Command Drawer Styling */
-    #commandDrawer {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100vh;
-      background: #1e1e2f;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-      transition: left 0.3s ease;
-      z-index: 9999;
-      overflow-y: auto;
-      padding: 10px;
-    }
-
-    @media (max-width: 1024px) {
-      #commandDrawer {
-        width: 200px;
-        left: -200px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      #commandDrawer {
-        width: 120px;
-        left: -120px;
-        padding: 6px;
-      }
-
-
-      #drawerNavButtons button {
-        font-size: 12px !important;
-        padding: 6px 4px !important;
-      }
-
-      #drawerToggleBtn {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        padding: 5px 10px;
-        font-size: 16px;
-        width: auto !important;
-        height: auto !important;
-        display: inline-block !important;
-        max-width: 50px;
-        z-index: 10000;
-      }
-
-      #commandDrawer h3 {
-        font-size: 12px;
-        margin-bottom: 8px;
-      }
-
-      /* Overlay repositioning for mobile: diagnostic and dropbox overlays to bottom right */
-      #diagnosticOverlay, #dropboxStatusOverlay {
-        right: 10px !important;
-        top: auto !important;
-        bottom: 10px !important;
-      }
-    }
-
-    #mapPromptOverlay {
-      display: none !important;
-    }
-    /* Utility Hub Button Normalization — Fully Corrected */
-    #utilityHub button {
-      display: block !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      min-width: 100% !important;
-      box-sizing: border-box !important;
-      font-size: 1em !important;
-      padding: 14px 0 !important;
-      margin: 0 auto 12px auto !important;
-      text-align: center !important;
-    }
-
-    /* Phase 122.6.2 — Utility Hub Responsive Refinement */
-    @media (min-width: 601px) {
-      #utilityHub button {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 100% !important;
-        box-sizing: border-box !important;
-        font-size: 1.1em !important;
-        padding: 16px 0 !important;
-        margin: 0 auto 14px auto !important;
-        text-align: center !important;
-      }
-    }
-
-  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body class="dark-theme electric-fantasy">
-  <!-- Phase 80 — Command Drawer Scaffold -->
-  <div id="commandDrawer">
-    <h3 style="color: #fff; font-family: monospace;">📂 Navigation</h3>
-    <div id="drawerNavButtons" style="display: flex; flex-direction: column; gap: 10px; margin-top: 40px;">
 
-      <!-- Audit Modules -->
-      <div style="color: #fff; font-family: monospace; margin-bottom: 5px;">📊 Audit Modules</div>
-      <button id="navCountBtn" class="tablink nav-icon active" data-target="count" title="Count Mode" aria-pressed="true" aria-label="Count Mode">🔢</button>
-      <button id="navVaultBtn" class="tablink nav-icon" data-target="vault" title="Session Vault" aria-label="Session Vault">📂</button>
-      <button id="navToolsBtn" class="tablink nav-icon" data-target="tools" title="Tools & Settings" aria-label="Tools & Settings">🧬</button>
 
-      <!-- Analysis -->
-      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧮 Analysis</div>
-      <button id="navAuditBtn" class="tablink nav-icon" data-target="audit" title="Audit Reports" aria-label="Audit Reports">📊</button>
-      <button id="navDeltaBtn" class="tablink nav-icon" data-target="deltaAnalyzer" title="Delta Analyzer" aria-label="Delta Analyzer">🧮</button>
-      <button id="navExceptionBtn" class="tablink nav-icon" data-target="exceptionManager" title="Exception Manager" aria-label="Exception Manager">🚩</button>
-      <button id="navProgressBtn" class="tablink nav-icon" data-target="progressDashboard" title="Audit Progress" aria-label="Audit Progress">📅</button>
+  <!-- ORBITAL HUD v2.5 — Structural Purification -->
+  <div class="orbital-dock" id="orbitalHudPanel"></div>
 
-      <!-- Reporting -->
-      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">📤 Reporting</div>
-      <button id="navReportingBtn" class="tablink nav-icon" data-target="reportingHub" title="Reporting Hub" aria-label="Reporting Hub">🖨️</button>
-      <button id="navMasterExportBtn" class="tablink nav-icon" data-target="masterExportHub" title="Master Export Hub" aria-label="Master Export Hub">📦</button>
-
-      <!-- Utility Hub -->
-      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧰 Utility Hub</div>
-      <button id="navUtilityHubBtn" class="tablink nav-icon" data-target="utilityHub" title="Utility Hub" aria-label="Utility Hub">🛠️</button>
-
-      <!-- Control Panels -->
-      <div style="color: #fff; font-family: monospace; margin: 10px 0 5px 0;">🧭 Control Panels</div>
-      <button id="navDiagnosticsBtn" class="tablink nav-icon" aria-label="Diagnostics Panel">📊</button>
-      <button id="navResolverBtn" class="tablink nav-icon" aria-label="Resolver Panel">🧮</button>
-      <button id="navDropboxBtn" class="tablink nav-icon" aria-label="Dropbox Panel">☁️</button>
-      <button id="navDevToolsBtn" class="tablink nav-icon" aria-label="Developer Tools Panel">🧪</button>
-
-    </div>
-  </div>
-
-  <!-- Drawer Toggle Button -->
-  <!-- Removed floating drawer toggle button -->
-  <!-- Floating navigation for main tabs -->
 
   <header class="topbar mystic-header" role="banner">
     <div class="logo-banner">
       <img src="icon/icon-1280.png" alt="Inventory Auditor Logo" class="logo-icon" />
       <h1 class="logo-title">Inventory Auditor</h1>
     </div>
-    <button id="drawerToggleBtn" style="margin-left: 10px; font-size: 18px; padding: 4px 8px;">☰ Menu</button>
   </header>
 
 
@@ -1789,45 +1630,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- Wiring.js - global load -->
   <script src="scripts/wiring.js"></script>
+  <!-- Orbital Controller -->
+  <script src="scripts/orbitalController.js"></script>
 
 </div>
 
 <script>
-// Drawer toggle and drawer logic
-let drawerOpen = false;
+// Neural Orbital Button Master Wiring Injection — Phase 7000.1
+document.addEventListener("DOMContentLoaded", () => {
+  const hudMap = {
+    hudAuditModules: "#count",
+    hudAnalysis: "#deltaAnalyzer",
+    hudReporting: "#reportingHub",
+    hudUtility: "#utilityHub",
+    hudControl: "#tools",
+    hudMasterExport: "#masterExportHub",
+    hudSessionManager: "#sessionManager",
+    hudMappingManager: "#mappings",
+    hudAdvancedTools: "#advancedTools",
+    hudAuditRotation: "#audit",
+    hudConfigPanel: "#configPanel",
+    hudOperatorConsole: "#operatorConsolePanel",
+    hudDiagnostics: "#diagnosticsModal",
+    hudDropbox: "#dropboxModal"
+  };
 
-function getDrawerWidth() {
-  if (window.innerWidth <= 600) return 120;
-  if (window.innerWidth <= 1024) return 200;
-  return 250;
-}
-
-drawerToggleBtn.style.transition = 'left 0.3s ease';
-
-drawerToggleBtn.addEventListener('click', () => {
-  drawerOpen = !drawerOpen;
-  // Dynamically adjust z-index for hamburger/drawer button
-  if (drawerOpen) {
-    drawerToggleBtn.style.zIndex = '5000';
-  } else {
-    drawerToggleBtn.style.zIndex = '10000';
-  }
-  const drawerWidth = getDrawerWidth();
-  commandDrawer.style.left = drawerOpen ? '0px' : `-${drawerWidth}px`;
-  drawerToggleBtn.style.left = drawerOpen ? `${drawerWidth + 10}px` : '10px';
+  document.querySelectorAll(".orbital-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = hudMap[btn.id];
+      if (target) {
+        const panel = document.querySelector(target);
+        if (panel) {
+          panel.scrollIntoView({ behavior: "smooth" });
+        } else {
+          console.warn(`Target panel '${target}' not found for button '${btn.id}'`);
+        }
+      }
+    });
+  });
 });
+</script>
 
-window.addEventListener('resize', () => {
-  const drawerWidth = getDrawerWidth();
-  if (!drawerOpen) {
-    commandDrawer.style.left = `-${drawerWidth}px`;
-    drawerToggleBtn.style.left = '10px';
-  } else {
-    commandDrawer.style.left = '0px';
-    drawerToggleBtn.style.left = `${drawerWidth + 10}px`;
-  }
+<script>
+// Neural Orbital Command Core Injection — Total Stabilization
+window.addEventListener("load", () => {
+  const hudMap = {
+    hudAuditModules: "#count",
+    hudAnalysis: "#deltaAnalyzer",
+    hudReporting: "#reportingHub",
+    hudUtility: "#utilityHub",
+    hudControl: "#tools",
+    hudMasterExport: "#masterExportHub",
+    hudSessionManager: "#sessionManager",
+    hudMappingManager: "#mappings",
+    hudAdvancedTools: "#advancedTools",
+    hudAuditRotation: "#audit",
+    hudConfigPanel: "#configPanel",
+    hudOperatorConsole: "#operatorConsolePanel",
+    hudDiagnostics: "#diagnosticsModal",
+    hudDropbox: "#dropboxModal"
+  };
+
+  // Fully detach prior listeners before re-wiring clean
+  document.querySelectorAll(".orbital-btn").forEach(btn => {
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+  });
+
+  document.querySelectorAll(".orbital-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = hudMap[btn.id];
+      if (target) {
+        const panel = document.querySelector(target);
+        if (panel) {
+          panel.scrollIntoView({ behavior: "smooth" });
+        } else {
+          console.warn(`⚠ Target panel '${target}' not found for button '${btn.id}'`);
+        }
+      }
+    });
+  });
+
+  console.log("✅ Neural Orbital Command Core fully engaged.");
 });
-
 </script>
 <!-- Phase 201.15 — Neural Visual Sync Bootstrap (Upgraded Phase 700.2) -->
 <script>

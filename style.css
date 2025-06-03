@@ -1,7 +1,17 @@
 /* --- Phase 128.3.5 — Global Drawer Sync --- */
 
 :root {
-  --drawer-width: 320px;
+  --bg-dark: #0a0f1a;
+  --plasma-cyan: #00ffe7;
+  --neural-purple: #8a2be2;
+  --synaptic-spark: #ffb347;
+  --danger-red: #ff4d4d;
+  --accent-primary: var(--neural-purple);
+  --accent-secondary: var(--plasma-cyan);
+  --highlight-esl: var(--synaptic-spark);
+  --text-main: #f0e6ff;
+  --text-muted: #bbbbd1;
+  --neural-glow: rgba(138, 43, 226, 0.4);
 }
 
 .drawer {
@@ -22,10 +32,15 @@
 /* Predictive Drawer now inherits all positioning and width from .drawer.
    Only background and box-shadow remain. */
 .predictive-drawer {
-  background: linear-gradient(to bottom, #1e1e3f, #120f2a);
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  right: 0;
+  transform: translateX(100%);
+  background: rgba(20, 10, 30, 0.9);
+  box-shadow: -4px 0 18px var(--neural-glow), -6px 0 24px rgba(0, 0, 0, 0.5);
+  border-left: 2px solid var(--accent-primary);
+  padding: 24px;
   overflow-y: auto;
+  backdrop-filter: blur(6px);
+  transition: all 0.4s ease;
 }
 --- Active Bay Status Styles ---
 .active-bay-status {
@@ -91,14 +106,6 @@ tbody tr:nth-child(even):not(.match):not(.over):not(.under) {
   justify-content: center !important;
   text-align: center !important;
   width: 100% !important;
-}
-
-.import-export-group button {
-  width: 100%;
-  max-width: 300px;
-  margin: 6px auto !important;
-  display: block !important;
-  text-align: center !important;
 }
 
 h1, h2, h3 {
@@ -385,15 +392,6 @@ section {
   text-align: center;
 }
 
-.import-export-group button {
-  width: auto;
-  max-width: 300px;
-  min-width: 200px;
-  text-align: center;
-  margin: 0 auto;
-  display: inline-block;
-}
-
 /* --- Align Add Item under Input --- */
 
 #addLiveItem {
@@ -442,24 +440,6 @@ section {
   margin-top: 16px;
 }
 
-.grouped-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.grouped-buttons button {
-  flex: 0 1 auto;
-  min-width: 160px;
-  max-width: 240px;
-  padding: 10px 14px;
-  font-size: 14px;
-  text-align: center;
-  white-space: nowrap;
-}
-
 /* --- Toast Prompt Styles ---*/
 
 .toast-message {
@@ -483,28 +463,18 @@ section {
 
 body {
   margin: 0;
-  background: linear-gradient(to right, #0f0f2c, #1a0b2e);
-  background-attachment: fixed;
   font-family: 'Cinzel', serif;
-  color: #f0e6ff;
+  color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
+  background: linear-gradient(160deg, var(--bg-dark), #050811 60%, #0a0f1a 100%);
+  background-attachment: fixed;
+  position: relative;
+  transition: background 1.5s ease;
 }
 
 
 /* --- Indigo Glow Enhancements --- */
-
-button {
-  background: var(--accent-primary);
-  color: var(--text-main);
-  font-weight: bold;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 0 10px var(--accent-primary), 0 0 20px #4b00b066;
-  transition: all 0.3s ease;
-}
 
 button:hover {
   background: var(--accent-secondary);
@@ -588,14 +558,6 @@ button:hover {
   margin-top: 10px;
 }
 
-/* --- Button Grid Responsive Layout --- */
-.button-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  align-items: center;
-}
 /* --- Bay Status Styles --- */
 .bay-status {
   font-weight: bold;
@@ -612,35 +574,6 @@ button:hover {
 .bay-status.inactive {
   background-color: #990000;
   color: white;
-}
-
-/* Unified button style for all grid buttons (export/import/clear/etc) */
-.button-grid button,
-#exportBtn,
-#importBtn,
-#clearStorageBtn,
-#exportUPCBtn,
-#importUPCBtn {
-  padding: 12px 16px;
-  font-size: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 300px;
-  margin: 6px auto !important;
-  display: block !important;
-  text-align: center !important;
-  border-radius: 6px;
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  color: white;
-  border: 1px solid #8a2be2;
-  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
-  transition: all 0.3s ease;
-}
-
-.button-grid button:hover {
-  background: linear-gradient(to right, #2575fc, #4b0082);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
 }
 
 #summaryBar {
@@ -670,13 +603,17 @@ textarea {
   margin: auto;
 }
 
+/* --- Neural Cortex Plasma Node Styling for .tab-section --- */
 .tab-section {
-  background: rgba(40, 20, 80, 0.7);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-  padding: 20px;
+  background: rgba(20, 10, 30, 0.9);
+  border: 2px solid var(--accent-primary);
+  box-shadow: 0 0 18px var(--neural-glow), 0 0 24px rgba(0,0,0,0.4);
+  border-radius: 16px;
+  padding: 24px;
   margin-top: 20px;
   display: none;
+  backdrop-filter: blur(6px);
+  transition: all 0.5s ease;
 }
 
 .tab-section.active {
@@ -831,10 +768,17 @@ body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('/icon/magic-overlay.png') repeat;
-  opacity: 0.015;
+  background: radial-gradient(circle, rgba(0,255,231,0.06), transparent 60%), url('/icon/magic-overlay.png') repeat;
+  opacity: 0.03;
   pointer-events: none;
   z-index: -1;
+  animation: plasmaPulse 20s infinite alternate ease-in-out;
+}
+
+@keyframes plasmaPulse {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.06; }
+  100% { opacity: 0.02; }
 }
 /* --- Logo Banner Styles --- */
 
@@ -1204,29 +1148,6 @@ button,
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(0, 191, 255, 0.4);
 }
-/* --- Settings Button Glow Style --- */
-
-.settings-button {
-  width: 100%;
-  max-width: 300px;
-  margin: 6px auto;
-  display: block;
-  text-align: center;
-  padding: 10px 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  color: white;
-  border: 1px solid #8a2be2;
-  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
-  transition: all 0.3s ease;
-}
-
-.settings-button:hover {
-  background: linear-gradient(to right, #2575fc, #4b0082);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
-}
 
 /* Special margin for the "Reset All Maps" button to visually separate it in advanced controls */
 .settings-button.reset-maps-btn {
@@ -1306,17 +1227,6 @@ tr[data-type="esl"] {
   #entryControls {
     flex-direction: column;
     align-items: center;
-  }
-
-  .button-grid button,
-  .grouped-buttons button,
-  .settings-button,
-  .import-export-group button,
-  button {
-    width: 100% !important;
-    max-width: 300px !important;
-    margin: 8px auto !important;
-    display: block;
   }
 
   h1, h2, h3 {
@@ -1424,12 +1334,6 @@ body::after {
 
 .toast-message {
   animation: fadeScaleIn 0.3s ease-out;
-}
-
-.grouped-buttons button:hover,
-.button-grid button:hover,
-.settings-button:hover {
-  animation: pulseGlow 1.2s ease-in-out infinite alternate;
 }
 /* Session Summary Modal */
 #sessionSummaryModal {
@@ -2187,36 +2091,6 @@ input, select {
   transition: right 0.3s ease;
 }
 #Drawer Toggle Hamburger Button Fix ---
-#drawerToggleBtn {
-  position: fixed;
-  top: 20px;
-  left: 10px;
-  z-index: 900;
-  width: 42px;
-  height: 42px;
-  font-size: 22px;
-  padding: 0;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
-  border: 2px solid #ff00ff;
-  box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff88;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: left 0.3s ease, z-index 0.3s ease;
-}
-
-/* Responsive tuning for mobile */
-@media (max-width: 600px) {
-  #drawerToggleBtn {
-    top: 16px;
-    left: 8px;
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
-}
 /* --- Phase 125.7 — Predictive Drawer Button Stabilizer --- */
 #predictiveDrawerToggle {
   position: fixed !important;
@@ -2349,15 +2223,18 @@ input, select {
 }
 
 .modal-content {
-  background: #1e1e1e;
-  padding: 20px 30px;
-  border-radius: 10px;
-  color: #fff;
+  background: rgba(20, 10, 30, 0.95);
+  padding: 24px 30px;
+  border-radius: 16px;
+  color: var(--text-main);
   max-width: 700px;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 24px var(--neural-glow), 0 0 40px rgba(160, 82, 255, 0.3);
   font-family: monospace;
+  border: 2px solid var(--accent-primary);
+  transition: all 0.5s ease;
+  backdrop-filter: blur(6px);
 }
 
 .modal h3 {
@@ -2412,4 +2289,258 @@ input, select {
   text-align: center;
   color: #d6bbff;
   text-shadow: 0 0 4px #8f3aff;
+}
+
+/* Cyclone Drawer Toggle Styles */
+#utilityHub button {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  box-sizing: border-box !important;
+  font-size: 1em !important;
+  padding: 14px 0 !important;
+  margin: 0 auto 12px auto !important;
+  text-align: center !important;
+}
+
+@media (min-width: 601px) {
+  #utilityHub button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 1.1em !important;
+    padding: 16px 0 !important;
+    margin: 0 auto 14px auto !important;
+    text-align: center !important;
+  }
+}
+/* Orbital HUD v2.1 — Unified Styling Bootstrap */
+
+/* Orbital HUD v2.2 — Unified Styling Bootstrap */
+/* Orbital HUD v4.1 — Plasma Glow Update */
+.orbital-btn {
+  all: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(27, 27, 47, 0.9), rgba(42, 0, 63, 0.85));
+  border: 2px solid var(--accent-primary);
+  box-shadow: 0 0 18px var(--accent-primary), inset 0 0 8px rgba(255, 255, 255, 0.05);
+  font-size: 26px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: monospace;
+  animation: hudBreathingPulse 6s ease-in-out infinite;
+}
+
+.orbital-btn:hover {
+  animation: hudHoverRipple 0.6s ease-in-out, hudBreathingPulse 6s ease-in-out infinite;
+  box-shadow: 0 0 25px var(--accent-secondary), 0 0 10px rgba(255, 255, 255, 0.1);
+}
+button,
+.button,
+.button-grid button,
+.grouped-buttons button,
+.import-export-group button,
+.settings-button {
+  all: unset;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+  padding: 14px 0;
+  font-size: 1rem;
+  font-family: 'Cinzel', serif;
+  color: var(--text-main);
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  cursor: pointer;
+  transition: all 0.3s ease, box-shadow 0.3s ease;
+  margin: 8px auto;
+}
+
+button:hover,
+.button:hover,
+.button-grid button:hover,
+.grouped-buttons button:hover,
+.import-export-group button:hover,
+.settings-button:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6), 0 0 25px rgba(147, 51, 234, 0.5);
+  transform: scale(1.05);
+}
+/* --- Neural Phase 6000.10 — Font & Typography Lockdown --- */
+
+html {
+  font-family: 'Cinzel', serif, Georgia, Times, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 6px #8f3aff;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 5px #8f3aff;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 4px #8f3aff;
+}
+
+p, label, span, td, th, button, input, select, textarea {
+  font-size: 1rem;
+}
+
+small {
+  font-size: 0.85rem;
+}
+/* --- Neural Phase 6000.11 — Global Spacing & Layout Harmonizer --- */
+
+:root {
+  --spacing-unit: 16px;
+  --section-padding: calc(var(--spacing-unit) * 1.5);
+  --block-gap: calc(var(--spacing-unit) * 1);
+  --inner-gap: calc(var(--spacing-unit) * 0.75);
+}
+
+.container,
+.tab-section,
+.scan-capsule,
+.section,
+.table-wrapper,
+.logo-banner,
+.modal-content {
+  padding: var(--section-padding);
+  margin-bottom: var(--block-gap);
+}
+
+.table-wrapper table {
+  margin-top: var(--block-gap);
+}
+
+h1, h2, h3, p, label {
+  margin-bottom: var(--inner-gap);
+}
+
+.button-grid,
+.grouped-buttons {
+  gap: var(--inner-gap);
+  margin-top: var(--block-gap);
+}
+h2, h3, p, label {
+  margin-bottom: var(--inner-gap);
+}
+
+.button-grid,
+.grouped-buttons {
+  gap: var(--inner-gap);
+  margin-top: var(--block-gap);
+}
+
+/* --- Neural Phase 7001.0 — Coreframe Structural Rebuild --- */
+
+.container.neural-core {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  position: relative;
+}
+
+.utility-hub, .operator-console, .session-controls {
+  width: 100%;
+  background: rgba(20, 10, 30, 0.96);
+  border: 2px solid var(--accent-primary);
+  border-radius: 16px;
+  box-shadow: 0 0 18px var(--neural-glow), 0 0 24px rgba(0,0,0,0.4);
+  padding: 32px;
+  backdrop-filter: blur(6px);
+  transition: all 0.5s ease;
+}
+
+.utility-hub h2, .operator-console h2, .session-controls h2 {
+  font-size: 1.8rem;
+  color: var(--text-main);
+  margin-bottom: 24px;
+  text-shadow: 0 0 6px #8f3aff;
+}
+
+.utility-hub .button-grid,
+.operator-console .button-grid,
+.session-controls .button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.utility-hub button,
+.operator-console button,
+.session-controls button {
+  max-width: 280px;
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-family: 'Cinzel', serif;
+  color: var(--text-main);
+  background: linear-gradient(145deg, #6c2fd1, #8f3aff);
+  border: 2px solid var(--accent-primary);
+  box-shadow: 0 0 10px #7a5cff, 0 0 20px #4b00b066;
+  transition: all 0.3s ease;
+}
+
+.utility-hub button:hover,
+.operator-console button:hover,
+.session-controls button:hover {
+  background: linear-gradient(to right, #2575fc, #4b0082);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6), 0 0 25px rgba(147, 51, 234, 0.5);
+  transform: scale(1.05);
+}
+
+/* --- Phase 7000.5 — Orbital Dock Absolute Float Stabilizer --- */
+
+.orbital-dock {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  max-width: 120px;
+}
+
+.orbital-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
 }
