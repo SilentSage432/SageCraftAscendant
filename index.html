@@ -1090,26 +1090,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const liveQty = document.getElementById("liveQty");
   const categorySelect = document.getElementById("categorySelect");
   const addLiveItemBtn = document.getElementById("addLiveItem");
-  const liveScanTableBody = document.getElementById("liveScanTableBody");
-
-  function updateLiveTable(itemNumber, qty, category) {
-    const liveScanTableBody = document.getElementById("liveScanTableBody");
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${itemNumber}</td>
-      <td>${qty}</td>
-      <td>${category}</td>
-      <td>Live</td>
-      <td>—</td>
-      <td>—</td>
-      <td>—</td>
-    `;
-    const placeholder = document.getElementById("placeholderRow");
-    if (placeholder) {
-      liveScanTableBody.innerHTML = "";
-    }
-    liveScanTableBody.appendChild(row);
-  }
 
   addLiveItemBtn.addEventListener("click", () => {
     const itemNumber = scanInput.value.trim();
@@ -1121,6 +1101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Phase 630.0 — Risk & Anomaly Signal Injection
     const forecastEntry = {
       timestamp: new Date().toISOString(),
       itemNumber: itemNumber,
@@ -1129,17 +1110,52 @@ document.addEventListener("DOMContentLoaded", () => {
       cycleCountUnits: 0,
       shrinkUnits: 0,
       itdSalesUnits: 0,
-      stabilityHint: "Stable"
+      stabilityHint: "Stable",
+      riskSignal: "🟢 Stable",
+      anomalySignal: "⚪ Unanalyzed"
     };
 
     if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
       window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
-      // Also update the live table after successful injection
-      updateLiveTable(itemNumber, qty, category);
     }
+
+    if (window.NeuralVisualSync?.refreshLiveTableFromCortex) {
+      window.NeuralVisualSync.refreshLiveTableFromCortex();
+    }
+
     scanInput.value = "";
     scanInput.focus();
   });
+});
+</script>
+
+<!-- Phase 630.1 — Neural Anomaly Analyzer Engine -->
+<script>
+// Phase 630.1 — Neural Anomaly Analyzer Engine
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+    window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+      const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+      if (cortex.length === 0) return;
+
+      // Calculate category frequency map
+      const categoryCounts = {};
+      cortex.forEach(f => {
+        categoryCounts[f.division] = (categoryCounts[f.division] || 0) + 1;
+      });
+
+      // Apply anomaly signals based on category dominance
+      cortex.forEach(f => {
+        const total = cortex.length;
+        const categoryFreq = categoryCounts[f.division] || 0;
+        if (categoryFreq > (total * 0.5)) {
+          f.anomalySignal = "🟠 Anomaly: Category Surge";
+        } else {
+          f.anomalySignal = "🟢 No Anomaly";
+        }
+      });
+    });
+  }
 });
 </script>
 
@@ -1157,95 +1173,16 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
 <!-- Phase 201.11 — Modal Completion Sync Injector -->
-<script>
-// Phase 201.11 — Modal Completion Sync Injector
-document.addEventListener("DOMContentLoaded", () => {
-  const scanInput = document.getElementById("scanInput");
-  const liveQty = document.getElementById("liveQty");
-  const categorySelect = document.getElementById("categorySelect");
-  const liveScanTableBody = document.getElementById("liveScanTableBody");
-
-  function updateLiveTable(itemNumber, qty, category) {
-    const liveScanTableBody = document.getElementById("liveScanTableBody");
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${itemNumber}</td>
-      <td>${qty}</td>
-      <td>${category}</td>
-      <td>Live</td>
-      <td>—</td>
-      <td>—</td>
-      <td>—</td>
-    `;
-    const placeholder = document.getElementById("placeholderRow");
-    if (placeholder) {
-      liveScanTableBody.innerHTML = "";
-    }
-    liveScanTableBody.appendChild(row);
-  }
-
-  function handleModalComplete(itemNumber, category, qty = 1) {
-    const forecastEntry = {
-      timestamp: new Date().toISOString(),
-      itemNumber: itemNumber,
-      division: category,
-      onHandUnits: qty,
-      cycleCountUnits: 0,
-      shrinkUnits: 0,
-      itdSalesUnits: 0,
-      stabilityHint: "Stable"
-    };
-
-    if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
-      window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
-      // Also update the live table after successful injection
-      updateLiveTable(itemNumber, qty, category);
-    }
-    scanInput.value = "";
-    scanInput.focus();
-  }
-
-  // Wire into your modal completion buttons (example for Product button)
-  const modalBtnProduct = document.getElementById("modalBtnProduct");
-  modalBtnProduct?.addEventListener("click", () => {
-    const itemNumber = prompt("Enter Lowe's Item #");
-    const qty = parseInt(liveQty.value);
-    const category = categorySelect.value;
-    if (!itemNumber) return;
-    handleModalComplete(itemNumber, category, qty);
-  });
-
-  // Repeat for ESL and Bay if needed with same handler logic
-});
-</script>
-
 <!-- Phase 201.13 — Unified Modal Completion Sync Injector -->
 <script>
-// Phase 201.13 — Unified Modal Completion Sync Injector
+// Unified Cortex-only Modal Completion Sync Injector
 document.addEventListener("DOMContentLoaded", () => {
   const scanInput = document.getElementById("scanInput");
   const liveQty = document.getElementById("liveQty");
   const categorySelect = document.getElementById("categorySelect");
-  const liveScanTableBody = document.getElementById("liveScanTableBody");
-
-  function updateLiveTable(itemNumber, qty, category) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${itemNumber}</td>
-      <td>${qty}</td>
-      <td>${category}</td>
-      <td>Live</td>
-      <td>—</td>
-      <td>—</td>
-      <td>—</td>
-    `;
-    if (document.getElementById("placeholderRow")) {
-      liveScanTableBody.innerHTML = "";
-    }
-    liveScanTableBody.appendChild(row);
-  }
 
   function handleModalComplete(itemNumber, category, qty = 1) {
+    // Phase 630.0 — Risk & Anomaly Signal Injection
     const forecastEntry = {
       timestamp: new Date().toISOString(),
       itemNumber: itemNumber,
@@ -1254,18 +1191,21 @@ document.addEventListener("DOMContentLoaded", () => {
       cycleCountUnits: 0,
       shrinkUnits: 0,
       itdSalesUnits: 0,
-      stabilityHint: "Stable"
+      stabilityHint: "Stable",
+      riskSignal: "🟢 Stable",
+      anomalySignal: "⚪ Unanalyzed"
     };
 
     if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
       window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
     }
 
-    updateLiveTable(itemNumber, qty, category);
-    setTimeout(() => {
-      scanInput.value = "";
-      scanInput.focus();
-    }, 50);
+    if (window.NeuralVisualSync?.refreshLiveTableFromCortex) {
+      window.NeuralVisualSync.refreshLiveTableFromCortex();
+    }
+
+    scanInput.value = "";
+    scanInput.focus();
   }
 
   // Attach modal buttons once for all modes:
@@ -1542,6 +1482,56 @@ document.addEventListener("DOMContentLoaded", () => {
     activeCategoryDisplay.textContent = `🧭 Active Category: ${selected}`;
   });
 </script>
+
+<!-- Phase 600.0 — Predictive HUD Deep Linkage Bootstrap -->
+<script>
+// Phase 600.0 — Predictive HUD Deep Linkage Bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  function updatePredictiveHUD() {
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+    const total = cortex.length;
+
+    const hudRisk = document.querySelector("#hudRisk span");
+    const hudForecast = document.querySelector("#hudForecast span");
+    const hudAnomaly = document.querySelector("#hudAnomaly span");
+    const hudDrift = document.querySelector("#hudDrift span");
+
+    if (total === 0) {
+      hudRisk.textContent = "No data";
+      hudForecast.textContent = "No data";
+      hudAnomaly.textContent = "No data";
+      hudDrift.textContent = "Idle";
+      return;
+    }
+
+    const volatility = cortex.filter(f => f.stabilityHint === "Volatile").length;
+    const stable = total - volatility;
+    const volatilityRate = ((volatility / total) * 100).toFixed(1);
+    const uniqueCategories = [...new Set(cortex.map(f => f.division))];
+
+    // Simple Anomaly Detector: if any category occurs unusually often
+    const categoryCounts = {};
+    cortex.forEach(f => {
+      categoryCounts[f.division] = (categoryCounts[f.division] || 0) + 1;
+    });
+    const maxCategory = Object.values(categoryCounts).reduce((a, b) => Math.max(a, b), 0);
+    const anomalyFlag = maxCategory > (total * 0.5) ? "Elevated" : "Nominal";
+
+    hudRisk.textContent = `${volatilityRate}% Volatile`;
+    hudForecast.textContent = `${total} records`;
+    hudAnomaly.textContent = anomalyFlag;
+    hudDrift.textContent = "Sync OK";
+  }
+
+  // Initial HUD update on page load
+  updatePredictiveHUD();
+
+  // Hook into Cortex injection to refresh HUD after each change
+  if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+    window.NeuralForecastMemoryCortex.addInjectionHook(updatePredictiveHUD);
+  }
+});
+</script>
   <div id="brainDockButton" style="
     position: fixed;
     bottom: 20px;
@@ -1669,49 +1659,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- DOM Sync Audit Utility -->
 <script type="module">
 
-// DOM Sync Audit Utility
-window.extractAllButtonIds = function () {
-  const buttons = document.querySelectorAll('button');
-  const ids = Array.from(buttons).map(btn => btn.id || '(no id)');
-  console.log('[DOM SYNC] Total buttons found:', ids.length);
-  console.log('[DOM SYNC] Button ID list:', ids);
-  return ids;
-};
-
-// --- Ghost Modal Detection and Healing ---
-function checkForGhostModals() {
-  // Example: Add more modal ids as needed
-  const modalIds = [
-    'customModal',
-    'editModal',
-    'summaryModal',
-    'addItemModal',
-    'trendsModal'
-  ];
-  modalIds.forEach(id => {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    // Condition: Modal is visually shown but should be hidden (ghost)
-    if (modal.style.display !== 'none' && modal.classList.contains('hidden')) {
-      // Ghost modal detected
-      logFieldEvent("GhostModalDetected", { modalId: id });
-      // Auto-heal: forcibly hide modal
-      modal.style.display = 'none';
-      modal.classList.remove('hidden');
-      logFieldEvent("GhostModalHealed", { modalId: id });
-    }
-    // Condition: Modal is hidden but has no 'hidden' class (possible ghost)
-    if (modal.style.display === 'none' && !modal.classList.contains('hidden') && id !== 'trendsModal') {
-      logFieldEvent("GhostModalDetected", { modalId: id });
-      // Auto-heal: ensure hidden class is applied
-      modal.classList.add('hidden');
-      logFieldEvent("GhostModalHealed", { modalId: id });
-    }
-    // Add other ghost modal detection heuristics as needed
-  });
-}
-// Run every 3 seconds
-setInterval(checkForGhostModals, 3000);
+</script>
 </script>
 </div>
 
@@ -1936,41 +1884,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- Phase 500.3 — Neural Live Table Cortex Sync Engine -->
   <script>
-  // Phase 500.3 — Neural Live Table Cortex Sync Engine
+  // Phase 500.3 — Neural Live Table Cortex Sync Engine (Upgraded Risk Signal Rendering)
   document.addEventListener("DOMContentLoaded", () => {
     window.NeuralLiveTableSync = {
-      refresh() {
-        const liveScanTableBody = document.getElementById("liveScanTableBody");
-        if (!liveScanTableBody) return;
+  refresh() {
+    const liveScanTableBody = document.getElementById("liveScanTableBody");
+    if (!liveScanTableBody) return;
 
-        const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
 
-        if (cortex.length === 0) {
-          liveScanTableBody.innerHTML = `
-            <tr id="placeholderRow">
-              <td colspan="7" style="text-align: center; color: #888;">No items scanned yet</td>
-            </tr>
-          `;
-          return;
-        }
+    if (cortex.length === 0) {
+      liveScanTableBody.innerHTML = `
+        <tr id="placeholderRow">
+          <td colspan="7" style="text-align: center; color: #888;">No items scanned yet</td>
+        </tr>
+      `;
+      return;
+    }
 
-        liveScanTableBody.innerHTML = "";
-        cortex.forEach(record => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${record.itemNumber}</td>
-            <td>${record.onHandUnits}</td>
-            <td>${record.division}</td>
-            <td>Forecast</td>
-            <td>—</td>
-            <td>—</td>
-            <td>—</td>
-          `;
-          liveScanTableBody.appendChild(row);
-        });
-      }
-    };
+    liveScanTableBody.innerHTML = "";
+    cortex.forEach(record => {
+      let riskColor = "#999";
+      if (record.riskSignal?.includes("🟢")) riskColor = "#00ff00";
+      if (record.riskSignal?.includes("🟠")) riskColor = "#ffaa00";
+      if (record.riskSignal?.includes("🔴")) riskColor = "#ff3333";
 
+      let anomalyColor = "#999";
+      if (record.anomalySignal?.includes("🟢")) anomalyColor = "#00ffcc";
+      if (record.anomalySignal?.includes("🟠")) anomalyColor = "#ff8800";
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${record.itemNumber}</td>
+        <td>${record.onHandUnits}</td>
+        <td>${record.division}</td>
+        <td style="color: ${riskColor}; font-weight: bold;">${record.riskSignal || "⚪ Unknown"}</td>
+        <td style="color: ${anomalyColor}; font-weight: bold;">${record.anomalySignal || "⚪ Unanalyzed"}</td>
+        <td>—</td>
+        <td>—</td>
+      `;
+      liveScanTableBody.appendChild(row);
+    });
+  }
+};
     // Attach refresh hook after each Cortex injection
     if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
       window.NeuralForecastMemoryCortex.addInjectionHook(() => {
