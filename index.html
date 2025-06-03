@@ -1901,44 +1901,84 @@ document.addEventListener("DOMContentLoaded", () => {
   window.NeuralVisualSync.refreshLiveTableFromCortex();
 });
 </script>
-</body>
-  <!-- Item Link Modal Injection -->
-  <div id="itemLinkModalContainer" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="itemLinkTitle" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:10000;">
-    <div style="background:#1e1e1e;padding:20px;border-radius:8px;color:white;max-width:90%;text-align:center;">
-      <h3 id="itemLinkTitle">🔗 Link Item to UPC</h3>
 
-      <label for="itemLinkItemNumber">Lowe's Item #:</label>
-      <input type="text" id="itemLinkItemNumber" style="margin: 5px 0;" placeholder="Enter Lowe's Item #..." />
+<!-- Phase 500.2 — Enhanced Neural Feed Hooks Injectio<truncated__content/>
 
-      <label for="itemLinkUpc">Resolved UPC:</label>
-      <input type="text" id="itemLinkUpc" style="margin: 5px 0;" readonly />
+<script>
+// Phase 500.5 — Cortex-to-Table Continuous Sync Engine
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+    // Attach only once to prevent redundant listeners
+    if (!window.__LiveTableSyncHookBound) {
+      window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+        if (window.NeuralLiveTableSync?.refresh) {
+          window.NeuralLiveTableSync.refresh();
+        }
+      });
+      window.__LiveTableSyncHookBound = true;
+    }
+  }
+});
+</script>
 
-      <label for="itemLinkCategory">Category:</label>
-      <select id="itemLinkCategory" style="margin: 5px 0;">
-        <option value="Laundry">Laundry</option>
-        <option value="Fridges & Freezers">Fridges & Freezers</option>
-        <option value="Ranges">Ranges</option>
-        <option value="Dishwashers">Dishwashers</option>
-        <option value="Wall Ovens">Wall Ovens</option>
-        <option value="Cooktops">Cooktops</option>
-        <option value="OTR Microwaves">OTR Microwaves</option>
-        <option value="Microwaves (Countertop)">Microwaves (Countertop)</option>
-        <option value="Vent Hoods">Vent Hoods</option>
-        <option value="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
-        <option value="Cabinets">Cabinets</option>
-        <option value="Countertops">Countertops</option>
-        <option value="Interior Doors">Interior Doors</option>
-        <option value="Exterior Doors">Exterior Doors</option>
-        <option value="Storm Doors">Storm Doors</option>
-        <option value="Windows">Windows</option>
-        <option value="Commodity Moulding">Commodity Moulding</option>
-        <option value="Other / Misc">Other / Misc</option>
-      </select>
+  <script>
+  // Phase 500.4 — Modal-to-LiveTable Resync Safety Net
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+      window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+        if (window.NeuralLiveTableSync?.refresh) {
+          window.NeuralLiveTableSync.refresh();
+        }
+      });
+    }
+  });
+  </script>
 
-      <div style="margin-top:15px;">
-        <button id="saveItemLinkBtn" role="button" aria-label="Save item link" style="margin:5px;">✅ Save Link</button>
-        <button id="cancelItemLinkBtn" role="button" aria-label="Cancel" style="margin:5px;">❌ Cancel</button>
-      </div>
-    </div>
-  </div>
-</html>
+  <!-- Phase 500.3 — Neural Live Table Cortex Sync Engine -->
+  <script>
+  // Phase 500.3 — Neural Live Table Cortex Sync Engine
+  document.addEventListener("DOMContentLoaded", () => {
+    window.NeuralLiveTableSync = {
+      refresh() {
+        const liveScanTableBody = document.getElementById("liveScanTableBody");
+        if (!liveScanTableBody) return;
+
+        const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+
+        if (cortex.length === 0) {
+          liveScanTableBody.innerHTML = `
+            <tr id="placeholderRow">
+              <td colspan="7" style="text-align: center; color: #888;">No items scanned yet</td>
+            </tr>
+          `;
+          return;
+        }
+
+        liveScanTableBody.innerHTML = "";
+        cortex.forEach(record => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${record.itemNumber}</td>
+            <td>${record.onHandUnits}</td>
+            <td>${record.division}</td>
+            <td>Forecast</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+          `;
+          liveScanTableBody.appendChild(row);
+        });
+      }
+    };
+
+    // Attach refresh hook after each Cortex injection
+    if (typeof window.NeuralForecastMemoryCortex?.addInjectionHook === "function") {
+      window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+        window.NeuralLiveTableSync.refresh();
+      });
+    }
+
+    // Perform initial refresh on page load
+    window.NeuralLiveTableSync.refresh();
+  });
+  </script>
