@@ -1,4 +1,1350 @@
 // ===============================
+// Optimization Phase 300.0 — Dynamic Learning Weighting Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧠 Optimization Core Phase 300.0 Initiated...");
+
+  if (!window.OptimizationWeightEngine) {
+    window.OptimizationWeightEngine = (function() {
+      let divisionWeights = {};
+
+      function analyzeDivisionFrequencies() {
+        const cortexSeeds = window.ForecastSeedCortex?.seeds || [];
+        cortexSeeds.forEach(record => {
+          const division = record.division || "Uncategorized";
+          divisionWeights[division] = (divisionWeights[division] || 0) + 1;
+        });
+        console.log("📊 Division Frequency Weights Updated:", divisionWeights);
+      }
+
+      function applyWeightBias() {
+        // We will use this for future bias adjustments in predictive weighting
+        const sorted = Object.entries(divisionWeights).sort((a, b) => b[1] - a[1]);
+        window.ActiveDivisionBias = sorted.map(([division, count]) => ({ division, count }));
+        console.log("🎯 Active Division Bias Calculated:", window.ActiveDivisionBias);
+      }
+
+      function runOptimizationCycle() {
+        analyzeDivisionFrequencies();
+        applyWeightBias();
+      }
+
+      return { runOptimizationCycle };
+    })();
+
+    // Trigger optimization cycle immediately after load
+    setTimeout(() => {
+      window.OptimizationWeightEngine.runOptimizationCycle();
+    }, 2500);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.2 — Drift Chain Adaptive Normalization
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧬 Optimization Core Phase 300.2 — Drift Chain Normalization Activated");
+
+  if (!window.DriftChainNormalizer) {
+    window.DriftChainNormalizer = (function() {
+      let normalizationPassCount = 0;
+
+      function normalizeDriftChain() {
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        if (!deltaChain.length) {
+          console.warn("⚠ No delta memory chain to normalize.");
+          return;
+        }
+
+        deltaChain.forEach(entry => {
+          const driftScore = parseFloat(entry.driftScore);
+          if (driftScore > 10) {
+            entry.driftScore = "10.0000";
+          } else if (driftScore < 0) {
+            entry.driftScore = "0.0000";
+          } else {
+            entry.driftScore = driftScore.toFixed(4);
+          }
+        });
+
+        normalizationPassCount++;
+        console.log(`🔄 Drift Chain Normalization Pass ${normalizationPassCount} complete.`);
+      }
+
+      function runNormalizationCycle() {
+        normalizeDriftChain();
+      }
+
+      return { runNormalizationCycle };
+    })();
+
+    setTimeout(() => {
+      window.DriftChainNormalizer.runNormalizationCycle();
+    }, 4000);
+  }
+});
+// ===============================
+// Optimization Phase 300.3 — Prediction Bias Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🎯 Optimization Core Phase 300.3 — Prediction Bias Engine Activated");
+
+  if (!window.PredictionBiasEngine) {
+    window.PredictionBiasEngine = (function() {
+      let biasModel = {};
+
+      function generateBiasModel() {
+        const biasSource = window.ActiveDivisionBias || [];
+        biasSource.forEach(entry => {
+          const { division, count } = entry;
+          const weight = count / (biasSource.length || 1);
+          biasModel[division] = parseFloat(weight.toFixed(4));
+        });
+
+        console.log("🧮 Prediction Bias Model Calculated:", biasModel);
+      }
+
+      function getDivisionBias(division) {
+        return biasModel[division] || 0;
+      }
+
+      return { generateBiasModel, getDivisionBias };
+    })();
+
+    setTimeout(() => {
+      window.PredictionBiasEngine.generateBiasModel();
+    }, 5000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.4 — Self-Auditing Cortex Watchdog
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧪 Optimization Core Phase 300.4 — Cortex Watchdog Activated");
+
+  if (!window.CortexWatchdogEngine) {
+    window.CortexWatchdogEngine = (function() {
+      function auditCortexMemory() {
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const memoryArchive = window.PredictiveMemoryArchive || [];
+        const driftHeatmap = window.ForecastDriftHeatmap || [];
+
+        let warnings = [];
+
+        if (deltaChain.length === 0) warnings.push("Delta Memory Chain is empty.");
+        if (memoryArchive.length === 0) warnings.push("Predictive Memory Archive is empty.");
+        if (driftHeatmap.length === 0) warnings.push("Drift Heatmap has no entries.");
+
+        if (deltaChain.length > 0 && driftHeatmap.length > 0) {
+          const latestDelta = parseFloat(deltaChain.slice(-1)[0].driftScore || "0");
+          const latestHeatmap = parseFloat(driftHeatmap.slice(-1)[0].driftScore || "0");
+          const deltaDiff = Math.abs(latestDelta - latestHeatmap);
+          if (deltaDiff > 1.0) {
+            warnings.push(`Potential Cortex sync drift detected: Δ ${deltaDiff.toFixed(4)}`);
+          }
+        }
+
+        if (warnings.length > 0) {
+          console.warn("🛑 Cortex Watchdog Alert:", warnings);
+        } else {
+          console.log("✅ Cortex Watchdog: All systems nominal.");
+        }
+      }
+
+      function runAudit() {
+        auditCortexMemory();
+      }
+
+      return { runAudit };
+    })();
+
+    setInterval(() => {
+      window.CortexWatchdogEngine.runAudit();
+    }, 7000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.5 — Predictive Integrity Assurance Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🛡 Optimization Core Phase 300.5 — Predictive Integrity Assurance Engine Activated");
+
+  if (!window.PredictiveIntegrityAssurance) {
+    window.PredictiveIntegrityAssurance = (function() {
+      function validateMemoryIntegrity() {
+        const seedCortex = window.ForecastSeedCortex?.seeds || [];
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const archive = window.PredictiveMemoryArchive || [];
+
+        let issues = [];
+
+        if (seedCortex.length > 0) {
+          const seedTimestamps = new Set(seedCortex.map(e => e.timestamp));
+          const duplicateSeeds = seedCortex.length - seedTimestamps.size;
+          if (duplicateSeeds > 0) {
+            issues.push(`${duplicateSeeds} duplicate seed timestamps found.`);
+          }
+        }
+
+        if (deltaChain.length > 0) {
+          const invalidScores = deltaChain.filter(e => isNaN(parseFloat(e.driftScore)));
+          if (invalidScores.length > 0) {
+            issues.push(`${invalidScores.length} invalid drift scores in Delta Chain.`);
+          }
+        }
+
+        if (archive.length > 0) {
+          const corruptedSnapshots = archive.filter(e => !e.timestamp || !e.multiAxisCorrelation);
+          if (corruptedSnapshots.length > 0) {
+            issues.push(`${corruptedSnapshots.length} corrupted archive snapshots.`);
+          }
+        }
+
+        if (issues.length > 0) {
+          console.warn("🚨 Predictive Integrity Violations:", issues);
+        } else {
+          console.log("✅ Predictive Integrity: All systems nominal.");
+        }
+      }
+
+      function runIntegrityAudit() {
+        validateMemoryIntegrity();
+      }
+
+      return { runIntegrityAudit };
+    })();
+
+    setInterval(() => {
+      window.PredictiveIntegrityAssurance.runIntegrityAudit();
+    }, 8000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.6 — Predictive Resilience Layer (Recovery Core)
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧬 Optimization Core Phase 300.6 — Predictive Resilience Recovery Core Activated");
+
+  if (!window.PredictiveResilienceCore) {
+    window.PredictiveResilienceCore = (function() {
+      function recoverMemoryFaults() {
+        const cortexSeeds = window.ForecastSeedCortex?.seeds || [];
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const archive = window.PredictiveMemoryArchive || [];
+
+        let recoveries = 0;
+
+        if (cortexSeeds.some(e => !e.timestamp)) {
+          cortexSeeds.forEach(e => {
+            if (!e.timestamp) {
+              e.timestamp = new Date().toISOString();
+              recoveries++;
+            }
+          });
+        }
+
+        if (deltaChain.some(e => !e.timestamp || isNaN(parseFloat(e.driftScore)))) {
+          deltaChain.forEach(e => {
+            if (!e.timestamp) {
+              e.timestamp = new Date().toISOString();
+              recoveries++;
+            }
+            if (isNaN(parseFloat(e.driftScore))) {
+              e.driftScore = "0.0000";
+              recoveries++;
+            }
+          });
+        }
+
+        if (archive.some(e => !e.timestamp)) {
+          archive.forEach(e => {
+            if (!e.timestamp) {
+              e.timestamp = new Date().toISOString();
+              recoveries++;
+            }
+          });
+        }
+
+        if (recoveries > 0) {
+          console.warn(`🛡 Predictive Resilience Engine: ${recoveries} memory repairs applied.`);
+        } else {
+          console.log("✅ Predictive Resilience: No faults detected.");
+        }
+      }
+
+      function runRecoveryCycle() {
+        recoverMemoryFaults();
+      }
+
+      return { runRecoveryCycle };
+    })();
+
+    setInterval(() => {
+      window.PredictiveResilienceCore.runRecoveryCycle();
+    }, 9000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.7 — Memory Drift Compression Core
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌀 Optimization Core Phase 300.7 — Memory Drift Compression Core Activated");
+
+  if (!window.MemoryDriftCompressor) {
+    window.MemoryDriftCompressor = (function() {
+      function compressDriftHistory() {
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+
+        if (deltaChain.length < 10) {
+          console.log("ℹ️ Insufficient drift chain length for compression.");
+          return;
+        }
+
+        const compressed = [];
+        const groupSize = 5;
+
+        for (let i = 0; i < deltaChain.length; i += groupSize) {
+          const group = deltaChain.slice(i, i + groupSize);
+          const avgDrift = group.reduce((sum, entry) => sum + parseFloat(entry.driftScore), 0) / group.length;
+
+          compressed.push({
+            timestamp: group[group.length - 1].timestamp,
+            compressedDrift: avgDrift.toFixed(4),
+            count: group.length
+          });
+        }
+
+        window.CompressedDriftChain = compressed;
+        console.log("📦 Drift Chain Compressed:", compressed);
+      }
+
+      return { compressDriftHistory };
+    })();
+
+    setInterval(() => {
+      window.MemoryDriftCompressor.compressDriftHistory();
+    }, 12000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.8 — Temporal Weight Stabilization Layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("⏳ Optimization Core Phase 300.8 — Temporal Weight Stabilizer Activated");
+
+  if (!window.TemporalWeightStabilizer) {
+    window.TemporalWeightStabilizer = (function() {
+      function applyTemporalStabilization() {
+        const seedCortex = window.ForecastSeedCortex?.seeds || [];
+
+        if (seedCortex.length < 20) {
+          console.log("ℹ️ Temporal Weight Stabilizer skipped — insufficient data.");
+          return;
+        }
+
+        const recentWindow = seedCortex.slice(-50);
+        const divisionTally = {};
+
+        recentWindow.forEach(entry => {
+          const division = entry.division || "Uncategorized";
+          divisionTally[division] = (divisionTally[division] || 0) + 1;
+        });
+
+        const stabilizedWeights = Object.entries(divisionTally).map(([division, count]) => {
+          const weight = count / recentWindow.length;
+          return { division, weight: parseFloat(weight.toFixed(4)) };
+        });
+
+        window.TemporalDivisionWeights = stabilizedWeights;
+        console.log("📊 Temporal Weights Stabilized:", stabilizedWeights);
+      }
+
+      return { applyTemporalStabilization };
+    })();
+
+    setInterval(() => {
+      window.TemporalWeightStabilizer.applyTemporalStabilization();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Optimization Phase 300.9 — Long-Term Neural Drift Pattern Logger
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("📈 Optimization Core Phase 300.9 — Long-Term Neural Drift Logger Activated");
+
+  if (!window.NeuralDriftLogger) {
+    window.NeuralDriftLogger = (function() {
+      function logDriftPatterns() {
+        const heatmap = window.ForecastDriftHeatmap || [];
+        const stabilityIndex = window.ForecastStabilityIndex || [];
+
+        if (heatmap.length < 25 || stabilityIndex.length < 25) {
+          console.log("ℹ️ Neural Drift Logger skipped — insufficient data.");
+          return;
+        }
+
+        const latestDrift = heatmap.slice(-25).map(e => e.driftScore);
+        const avgDrift = latestDrift.reduce((a, b) => a + b, 0) / latestDrift.length;
+        const maxDrift = Math.max(...latestDrift);
+        const minDrift = Math.min(...latestDrift);
+
+        const stabilitySlice = stabilityIndex.slice(-25);
+        const avgStability = stabilitySlice.reduce((a, b) => a + parseFloat(b.stabilityScore), 0) / stabilitySlice.length;
+
+        const driftPattern = {
+          timestamp: new Date().toISOString(),
+          avgDrift: avgDrift.toFixed(4),
+          maxDrift: maxDrift.toFixed(4),
+          minDrift: minDrift.toFixed(4),
+          avgStability: avgStability.toFixed(2)
+        };
+
+        if (!window.LongTermDriftPatterns) {
+          window.LongTermDriftPatterns = [];
+        }
+        window.LongTermDriftPatterns.push(driftPattern);
+        if (window.LongTermDriftPatterns.length > 250) {
+          window.LongTermDriftPatterns.shift();
+        }
+
+        console.log("📊 Long-Term Drift Pattern Logged:", driftPattern);
+      }
+
+      return { logDriftPatterns };
+    })();
+
+    setInterval(() => {
+      window.NeuralDriftLogger.logDriftPatterns();
+    }, 18000);
+  }
+});
+
+// ===============================
+// Phase 400.0 — Cognitive Growth Engine Activation
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌱 Phase 400.0 — Cognitive Growth Engine Initiated");
+
+  if (!window.CognitiveGrowthEngine) {
+    window.CognitiveGrowthEngine = (function() {
+      let expansionLog = [];
+
+      function monitorCognitiveExpansion() {
+        const cortexSeeds = window.ForecastSeedCortex?.seeds || [];
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const interlinkedMemory = window.MultiAxisLinkedMemory || [];
+
+        const seedCount = cortexSeeds.length;
+        const deltaCount = deltaChain.length;
+        const interlinkCount = interlinkedMemory.length;
+
+        const expansionSnapshot = {
+          timestamp: new Date().toISOString(),
+          seeds: seedCount,
+          deltas: deltaCount,
+          interlinks: interlinkCount,
+          neuralLoad: (seedCount + deltaCount + interlinkCount)
+        };
+
+        expansionLog.push(expansionSnapshot);
+        if (expansionLog.length > 250) {
+          expansionLog.shift();
+        }
+
+        window.CognitiveExpansionHistory = expansionLog;
+        console.log("🌐 Cognitive Expansion Snapshot:", expansionSnapshot);
+      }
+
+      function exportExpansionHistory() {
+        return expansionLog;
+      }
+
+      return { monitorCognitiveExpansion, exportExpansionHistory };
+    })();
+
+    setInterval(() => {
+      window.CognitiveGrowthEngine.monitorCognitiveExpansion();
+    }, 12000);
+  }
+});
+
+// ===============================
+// Phase 400.1 — Neural Load Balancer Injection
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("⚖️ Phase 400.1 — Neural Load Balancer Activated");
+
+  if (!window.NeuralLoadBalancer) {
+    window.NeuralLoadBalancer = (function() {
+      function evaluateLoadBalance() {
+        const cortexSeeds = window.ForecastSeedCortex?.seeds || [];
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const interlinkedMemory = window.MultiAxisLinkedMemory || [];
+
+        const loadSnapshot = {
+          timestamp: new Date().toISOString(),
+          seedLoad: cortexSeeds.length,
+          deltaLoad: deltaChain.length,
+          interlinkLoad: interlinkedMemory.length
+        };
+
+        const totalLoad = loadSnapshot.seedLoad + loadSnapshot.deltaLoad + loadSnapshot.interlinkLoad;
+        loadSnapshot.totalNeuralLoad = totalLoad;
+        loadSnapshot.healthIndex = (100000 / (totalLoad + 1)).toFixed(2);
+
+        if (!window.NeuralLoadBalanceHistory) {
+          window.NeuralLoadBalanceHistory = [];
+        }
+        window.NeuralLoadBalanceHistory.push(loadSnapshot);
+        if (window.NeuralLoadBalanceHistory.length > 250) {
+          window.NeuralLoadBalanceHistory.shift();
+        }
+
+        console.log("⚖️ Neural Load Balance Snapshot:", loadSnapshot);
+      }
+
+      return { evaluateLoadBalance };
+    })();
+
+    setInterval(() => {
+      window.NeuralLoadBalancer.evaluateLoadBalance();
+    }, 12000);
+  }
+});
+
+// ===============================
+// Phase 400.2 — Adaptive Stabilizer Bootstrap
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧩 Phase 400.2 — Adaptive Stabilizer Bootstrap Activated");
+
+  if (!window.AdaptiveStabilizerCore) {
+    window.AdaptiveStabilizerCore = (function() {
+      let stabilityLog = [];
+
+      function computeAdaptiveStability() {
+        const neuralLoadHistory = window.NeuralLoadBalanceHistory || [];
+        const cognitiveExpansion = window.CognitiveExpansionHistory || [];
+
+        if (neuralLoadHistory.length < 10 || cognitiveExpansion.length < 10) {
+          console.log("ℹ️ Adaptive Stabilizer skipped — insufficient historical data.");
+          return;
+        }
+
+        const recentLoad = neuralLoadHistory.slice(-20);
+        const recentExpansion = cognitiveExpansion.slice(-20);
+
+        const avgHealth = recentLoad.reduce((sum, e) => sum + parseFloat(e.healthIndex), 0) / recentLoad.length;
+        const avgExpansion = recentExpansion.reduce((sum, e) => sum + e.neuralLoad, 0) / recentExpansion.length;
+
+        const stabilityFactor = ((avgHealth * 0.7) + (100000 / (avgExpansion + 1)) * 0.3).toFixed(2);
+
+        stabilityLog.push({
+          timestamp: new Date().toISOString(),
+          stabilityFactor
+        });
+
+        if (stabilityLog.length > 250) {
+          stabilityLog.shift();
+        }
+
+        window.CognitiveStabilityHistory = stabilityLog;
+        console.log("🩺 Adaptive Stability Factor Logged:", stabilityLog[stabilityLog.length - 1]);
+      }
+
+      return { computeAdaptiveStability };
+    })();
+
+    setInterval(() => {
+      window.AdaptiveStabilizerCore.computeAdaptiveStability();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.3 — Early Drift Pattern Sentinel
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔎 Phase 400.3 — Early Drift Pattern Sentinel Activated");
+
+  if (!window.EarlyDriftPatternSentinel) {
+    window.EarlyDriftPatternSentinel = (function() {
+      let sentinelLog = [];
+
+      function scanDriftEarlyWarning() {
+        const driftChain = window.ForecastDeltaMemoryChain || [];
+
+        if (driftChain.length < 10) {
+          console.log("ℹ️ Early Drift Sentinel skipped — insufficient delta chain.");
+          return;
+        }
+
+        const recentDeltas = driftChain.slice(-20).map(e => parseFloat(e.driftScore));
+        const avgDrift = recentDeltas.reduce((a, b) => a + b, 0) / recentDeltas.length;
+        const volatility = Math.max(...recentDeltas) - Math.min(...recentDeltas);
+
+        const warningLevel = (() => {
+          if (avgDrift > 4.0 || volatility > 5.0) return "⚠️ Critical";
+          if (avgDrift > 2.5 || volatility > 3.0) return "⚠ Watch";
+          return "✅ Stable";
+        })();
+
+        const sentinelSnapshot = {
+          timestamp: new Date().toISOString(),
+          avgDrift: avgDrift.toFixed(4),
+          volatility: volatility.toFixed(4),
+          status: warningLevel
+        };
+
+        sentinelLog.push(sentinelSnapshot);
+        if (sentinelLog.length > 250) {
+          sentinelLog.shift();
+        }
+
+        window.EarlyDriftSentinelLog = sentinelLog;
+        console.log("🔎 Drift Early Warning Snapshot:", sentinelSnapshot);
+      }
+
+      return { scanDriftEarlyWarning };
+    })();
+
+    setInterval(() => {
+      window.EarlyDriftPatternSentinel.scanDriftEarlyWarning();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.4 — Dynamic Strain Adaptation Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌀 Phase 400.4 — Dynamic Strain Adaptation Engine Activated");
+
+  if (!window.DynamicStrainAdaptationEngine) {
+    window.DynamicStrainAdaptationEngine = (function() {
+      let strainLog = [];
+
+      function calculateStrainLevel() {
+        const loadHistory = window.NeuralLoadBalanceHistory || [];
+        const stabilityHistory = window.CognitiveStabilityHistory || [];
+
+        if (loadHistory.length < 10 || stabilityHistory.length < 10) {
+          console.log("ℹ️ Strain Adaptation skipped — insufficient data.");
+          return;
+        }
+
+        const recentLoad = loadHistory.slice(-20);
+        const recentStability = stabilityHistory.slice(-20);
+
+        const avgHealth = recentLoad.reduce((sum, e) => sum + parseFloat(e.healthIndex), 0) / recentLoad.length;
+        const avgStability = recentStability.reduce((sum, e) => sum + parseFloat(e.stabilityFactor), 0) / recentStability.length;
+
+        const strainIndex = ((100000 / (avgHealth + 1)) + (100 - avgStability)).toFixed(2);
+
+        let strainLevel = "Nominal";
+        if (strainIndex > 120) strainLevel = "Severe";
+        else if (strainIndex > 80) strainLevel = "Elevated";
+        else if (strainIndex > 50) strainLevel = "Moderate";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          strainIndex,
+          strainLevel
+        };
+
+        strainLog.push(snapshot);
+        if (strainLog.length > 250) {
+          strainLog.shift();
+        }
+
+        window.DynamicStrainHistory = strainLog;
+        console.log("🌀 Dynamic Strain Snapshot:", snapshot);
+      }
+
+      return { calculateStrainLevel };
+    })();
+
+    setInterval(() => {
+      window.DynamicStrainAdaptationEngine.calculateStrainLevel();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.5 — Memory Flexor Core Initialization
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔧 Phase 400.5 — Memory Flexor Core Activated");
+
+  if (!window.MemoryFlexorCore) {
+    window.MemoryFlexorCore = (function() {
+      let flexLog = [];
+
+      function performMemoryFlex() {
+        const seedCortex = window.ForecastSeedCortex?.seeds || [];
+        const deltaChain = window.ForecastDeltaMemoryChain || [];
+        const archive = window.PredictiveMemoryArchive || [];
+
+        const seedLen = seedCortex.length;
+        const deltaLen = deltaChain.length;
+        const archiveLen = archive.length;
+
+        const flexPressure = (seedLen * 0.5) + (deltaLen * 0.3) + (archiveLen * 0.2);
+        const elasticity = (100000 / (flexPressure + 1)).toFixed(2);
+
+        flexLog.push({
+          timestamp: new Date().toISOString(),
+          seedLen,
+          deltaLen,
+          archiveLen,
+          elasticity
+        });
+
+        if (flexLog.length > 250) {
+          flexLog.shift();
+        }
+
+        window.MemoryFlexorHistory = flexLog;
+        console.log("🔧 Memory Flexor Elasticity Snapshot:", flexLog[flexLog.length - 1]);
+      }
+
+      return { performMemoryFlex };
+    })();
+
+    setInterval(() => {
+      window.MemoryFlexorCore.performMemoryFlex();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.6 — Neuroplastic Flow Stabilizer
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌊 Phase 400.6 — Neuroplastic Flow Stabilizer Activated");
+
+  if (!window.NeuroplasticFlowStabilizer) {
+    window.NeuroplasticFlowStabilizer = (function() {
+      let flowLog = [];
+
+      function computeFlowStability() {
+        const flexorData = window.MemoryFlexorHistory || [];
+        const strainData = window.DynamicStrainHistory || [];
+
+        if (flexorData.length < 10 || strainData.length < 10) {
+          console.log("ℹ️ Neuroplastic Flow Stabilizer skipped — insufficient data.");
+          return;
+        }
+
+        const flexWindow = flexorData.slice(-20);
+        const strainWindow = strainData.slice(-20);
+
+        const avgElasticity = flexWindow.reduce((sum, e) => sum + parseFloat(e.elasticity), 0) / flexWindow.length;
+        const avgStrain = strainWindow.reduce((sum, e) => sum + parseFloat(e.strainIndex), 0) / strainWindow.length;
+
+        const flowScore = ((avgElasticity * 0.6) + (100000 / (avgStrain + 1)) * 0.4).toFixed(2);
+        let flowState = "Optimal";
+
+        if (flowScore < 40) flowState = "Critical";
+        else if (flowScore < 70) flowState = "Degraded";
+        else if (flowScore < 90) flowState = "Watch";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          avgElasticity: avgElasticity.toFixed(2),
+          avgStrain: avgStrain.toFixed(2),
+          flowScore,
+          flowState
+        };
+
+        flowLog.push(snapshot);
+        if (flowLog.length > 250) {
+          flowLog.shift();
+        }
+
+        window.NeuroplasticFlowHistory = flowLog;
+        console.log("🌊 Neuroplastic Flow Snapshot:", snapshot);
+      }
+
+      return { computeFlowStability };
+    })();
+
+    setInterval(() => {
+      window.NeuroplasticFlowStabilizer.computeFlowStability();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.7 — Recursive Meta-Elasticity Sentinel
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔄 Phase 400.7 — Recursive Meta-Elasticity Sentinel Activated");
+
+  if (!window.MetaElasticitySentinel) {
+    window.MetaElasticitySentinel = (function() {
+      let metaLog = [];
+
+      function evaluateMetaElasticity() {
+        const flowData = window.NeuroplasticFlowHistory || [];
+        const flexorData = window.MemoryFlexorHistory || [];
+
+        if (flowData.length < 10 || flexorData.length < 10) {
+          console.log("ℹ️ Meta-Elasticity Sentinel skipped — insufficient data.");
+          return;
+        }
+
+        const flowWindow = flowData.slice(-20);
+        const flexWindow = flexorData.slice(-20);
+
+        const avgFlowScore = flowWindow.reduce((sum, e) => sum + parseFloat(e.flowScore), 0) / flowWindow.length;
+        const avgElasticity = flexWindow.reduce((sum, e) => sum + parseFloat(e.elasticity), 0) / flexWindow.length;
+
+        const metaElasticityIndex = ((avgElasticity * 0.65) + (avgFlowScore * 0.35)).toFixed(2);
+        let metaState = "Stable";
+
+        if (metaElasticityIndex < 50) metaState = "Compromised";
+        else if (metaElasticityIndex < 75) metaState = "Tense";
+        else if (metaElasticityIndex >= 75) metaState = "Optimal";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          metaElasticityIndex,
+          metaState
+        };
+
+        metaLog.push(snapshot);
+        if (metaLog.length > 250) {
+          metaLog.shift();
+        }
+
+        window.MetaElasticityHistory = metaLog;
+        console.log("🔄 Meta-Elasticity Snapshot:", snapshot);
+      }
+
+      return { evaluateMetaElasticity };
+    })();
+
+    setInterval(() => {
+      window.MetaElasticitySentinel.evaluateMetaElasticity();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.8 — Elastic Drift Correction Heuristic
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧮 Phase 400.8 — Elastic Drift Correction Heuristic Activated");
+
+  if (!window.ElasticDriftCorrectionHeuristic) {
+    window.ElasticDriftCorrectionHeuristic = (function() {
+      let correctionLog = [];
+
+      function applyDriftCorrections() {
+        const metaElasticity = window.MetaElasticityHistory || [];
+        const deltaMemory = window.ForecastDeltaMemoryChain || [];
+
+        if (metaElasticity.length < 10 || deltaMemory.length < 10) {
+          console.log("ℹ️ Elastic Drift Correction skipped — insufficient data.");
+          return;
+        }
+
+        const recentMeta = metaElasticity.slice(-10);
+        const recentDelta = deltaMemory.slice(-10);
+
+        const avgMetaIndex = recentMeta.reduce((sum, e) => sum + parseFloat(e.metaElasticityIndex), 0) / recentMeta.length;
+        const avgDeltaDrift = recentDelta.reduce((sum, e) => sum + parseFloat(e.driftScore), 0) / recentDelta.length;
+
+        const correctionIndex = ((avgMetaIndex * 0.7) + ((100 - (avgDeltaDrift * 10)) * 0.3)).toFixed(2);
+        let correctionLevel = "Balanced";
+
+        if (correctionIndex < 50) correctionLevel = "High Correction Required";
+        else if (correctionIndex < 75) correctionLevel = "Moderate Correction";
+        else correctionLevel = "Stable";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          correctionIndex,
+          correctionLevel
+        };
+
+        correctionLog.push(snapshot);
+        if (correctionLog.length > 250) {
+          correctionLog.shift();
+        }
+
+        window.ElasticDriftCorrectionHistory = correctionLog;
+        console.log("🧮 Drift Correction Heuristic Snapshot:", snapshot);
+      }
+
+      return { applyDriftCorrections };
+    })();
+
+    setInterval(() => {
+      window.ElasticDriftCorrectionHeuristic.applyDriftCorrections();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.9 — Neuro-Elastic Tension Modulator
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("⚙️ Phase 400.9 — Neuro-Elastic Tension Modulator Activated");
+
+  if (!window.NeuroElasticTensionModulator) {
+    window.NeuroElasticTensionModulator = (function() {
+      let modulationLog = [];
+
+      function computeTensionModulation() {
+        const correctionData = window.ElasticDriftCorrectionHistory || [];
+        const metaElasticity = window.MetaElasticityHistory || [];
+
+        if (correctionData.length < 10 || metaElasticity.length < 10) {
+          console.log("ℹ️ Tension Modulator skipped — insufficient data.");
+          return;
+        }
+
+        const recentCorrection = correctionData.slice(-20);
+        const recentMeta = metaElasticity.slice(-20);
+
+        const avgCorrectionIndex = recentCorrection.reduce((sum, e) => sum + parseFloat(e.correctionIndex), 0) / recentCorrection.length;
+        const avgMetaElasticity = recentMeta.reduce((sum, e) => sum + parseFloat(e.metaElasticityIndex), 0) / recentMeta.length;
+
+        const tensionRatio = ((avgCorrectionIndex * 0.5) + (avgMetaElasticity * 0.5)).toFixed(2);
+        let tensionState = "Calibrated";
+
+        if (tensionRatio < 50) tensionState = "Strained";
+        else if (tensionRatio < 75) tensionState = "Under Load";
+        else tensionState = "Balanced";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          tensionRatio,
+          tensionState
+        };
+
+        modulationLog.push(snapshot);
+        if (modulationLog.length > 250) {
+          modulationLog.shift();
+        }
+
+        window.NeuroElasticTensionHistory = modulationLog;
+        console.log("⚙️ Neuro-Elastic Tension Snapshot:", snapshot);
+      }
+
+      return { computeTensionModulation };
+    })();
+
+    setInterval(() => {
+      window.NeuroElasticTensionModulator.computeTensionModulation();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.10 — Recursive Memory Torsion Dampener
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🌀 Phase 400.10 — Recursive Memory Torsion Dampener Activated");
+
+  if (!window.MemoryTorsionDampener) {
+    window.MemoryTorsionDampener = (function() {
+      let torsionLog = [];
+
+      function dampenTorsionOscillations() {
+        const tensionData = window.NeuroElasticTensionHistory || [];
+        const flexorData = window.MemoryFlexorHistory || [];
+
+        if (tensionData.length < 10 || flexorData.length < 10) {
+          console.log("ℹ️ Memory Torsion Dampener skipped — insufficient data.");
+          return;
+        }
+
+        const recentTension = tensionData.slice(-20);
+        const recentFlexor = flexorData.slice(-20);
+
+        const avgTension = recentTension.reduce((sum, e) => sum + parseFloat(e.tensionRatio), 0) / recentTension.length;
+        const avgElasticity = recentFlexor.reduce((sum, e) => sum + parseFloat(e.elasticity), 0) / recentFlexor.length;
+
+        const torsionStability = ((avgElasticity * 0.6) + (avgTension * 0.4)).toFixed(2);
+        let torsionState = "Stable";
+
+        if (torsionStability < 40) torsionState = "Critical";
+        else if (torsionStability < 65) torsionState = "Unstable";
+        else if (torsionStability < 85) torsionState = "Under Strain";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          torsionStability,
+          torsionState
+        };
+
+        torsionLog.push(snapshot);
+        if (torsionLog.length > 250) {
+          torsionLog.shift();
+        }
+
+        window.MemoryTorsionHistory = torsionLog;
+        console.log("🌀 Memory Torsion Stability Snapshot:", snapshot);
+      }
+
+      return { dampenTorsionOscillations };
+    })();
+
+    setInterval(() => {
+      window.MemoryTorsionDampener.dampenTorsionOscillations();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.11 — Recursive Drift Correction Core
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔁 Phase 400.11 — Recursive Drift Correction Core Activated");
+
+  if (!window.RecursiveDriftCorrectionCore) {
+    window.RecursiveDriftCorrectionCore = (function() {
+      let correctionHistory = [];
+
+      function runRecursiveCorrectionPass() {
+        const torsionData = window.MemoryTorsionHistory || [];
+        const deltaMemory = window.ForecastDeltaMemoryChain || [];
+
+        if (torsionData.length < 10 || deltaMemory.length < 10) {
+          console.log("ℹ️ Recursive Drift Correction skipped — insufficient data.");
+          return;
+        }
+
+        const recentTorsion = torsionData.slice(-20);
+        const recentDelta = deltaMemory.slice(-20);
+
+        const avgTorsionStability = recentTorsion.reduce((sum, e) => sum + parseFloat(e.torsionStability), 0) / recentTorsion.length;
+        const avgDeltaScore = recentDelta.reduce((sum, e) => sum + parseFloat(e.driftScore), 0) / recentDelta.length;
+
+        const driftCorrectionRatio = ((avgTorsionStability * 0.6) + ((100 - (avgDeltaScore * 10)) * 0.4)).toFixed(2);
+        let correctionState = "Stabilized";
+
+        if (driftCorrectionRatio < 40) correctionState = "Highly Unstable";
+        else if (driftCorrectionRatio < 65) correctionState = "Unstable";
+        else if (driftCorrectionRatio < 85) correctionState = "Watch";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          driftCorrectionRatio,
+          correctionState
+        };
+
+        correctionHistory.push(snapshot);
+        if (correctionHistory.length > 250) {
+          correctionHistory.shift();
+        }
+
+        window.RecursiveDriftCorrectionHistory = correctionHistory;
+        console.log("🔁 Recursive Drift Correction Snapshot:", snapshot);
+      }
+
+      return { runRecursiveCorrectionPass };
+    })();
+
+    setInterval(() => {
+      window.RecursiveDriftCorrectionCore.runRecursiveCorrectionPass();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.12 — Cortex Stability Governor
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧩 Phase 400.12 — Cortex Stability Governor Activated");
+
+  if (!window.CortexStabilityGovernor) {
+    window.CortexStabilityGovernor = (function() {
+      let governorHistory = [];
+
+      function regulateStability() {
+        const recursiveCorrection = window.RecursiveDriftCorrectionHistory || [];
+        const cognitiveStability = window.CognitiveStabilityHistory || [];
+
+        if (recursiveCorrection.length < 10 || cognitiveStability.length < 10) {
+          console.log("ℹ️ Cortex Stability Governor skipped — insufficient data.");
+          return;
+        }
+
+        const recentCorrection = recursiveCorrection.slice(-20);
+        const recentCognitive = cognitiveStability.slice(-20);
+
+        const avgCorrection = recentCorrection.reduce((sum, e) => sum + parseFloat(e.driftCorrectionRatio), 0) / recentCorrection.length;
+        const avgCognitive = recentCognitive.reduce((sum, e) => sum + parseFloat(e.stabilityFactor), 0) / recentCognitive.length;
+
+        const stabilityGovernorIndex = ((avgCorrection * 0.5) + (avgCognitive * 0.5)).toFixed(2);
+        let stabilityState = "Optimal";
+
+        if (stabilityGovernorIndex < 50) stabilityState = "Critical Instability";
+        else if (stabilityGovernorIndex < 70) stabilityState = "Elevated Instability";
+        else if (stabilityGovernorIndex < 85) stabilityState = "Moderate Load";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          stabilityGovernorIndex,
+          stabilityState
+        };
+
+        governorHistory.push(snapshot);
+        if (governorHistory.length > 250) {
+          governorHistory.shift();
+        }
+
+        window.CortexStabilityGovernorHistory = governorHistory;
+        console.log("🧩 Cortex Stability Snapshot:", snapshot);
+      }
+
+      return { regulateStability };
+    })();
+
+    setInterval(() => {
+      window.CortexStabilityGovernor.regulateStability();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.13 — Recursive Forecast Horizon Sentinel
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔭 Phase 400.13 — Recursive Forecast Horizon Sentinel Activated");
+
+  if (!window.ForecastHorizonSentinel) {
+    window.ForecastHorizonSentinel = (function() {
+      let horizonLog = [];
+
+      function analyzeForecastHorizon() {
+        const cortexExpansion = window.CognitiveExpansionHistory || [];
+        const cortexGovernor = window.CortexStabilityGovernorHistory || [];
+
+        if (cortexExpansion.length < 10 || cortexGovernor.length < 10) {
+          console.log("ℹ️ Forecast Horizon Sentinel skipped — insufficient data.");
+          return;
+        }
+
+        const recentExpansion = cortexExpansion.slice(-20);
+        const recentGovernor = cortexGovernor.slice(-20);
+
+        const avgNeuralLoad = recentExpansion.reduce((sum, e) => sum + e.neuralLoad, 0) / recentExpansion.length;
+        const avgGovernorIndex = recentGovernor.reduce((sum, e) => sum + parseFloat(e.stabilityGovernorIndex), 0) / recentGovernor.length;
+
+        const forecastHorizonIndex = ((avgGovernorIndex * 0.6) + ((100000 / (avgNeuralLoad + 1)) * 0.4)).toFixed(2);
+        let forecastState = "Extended Horizon";
+
+        if (forecastHorizonIndex < 50) forecastState = "Restricted";
+        else if (forecastHorizonIndex < 75) forecastState = "Narrowed";
+        else if (forecastHorizonIndex >= 75) forecastState = "Extended";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          forecastHorizonIndex,
+          forecastState
+        };
+
+        horizonLog.push(snapshot);
+        if (horizonLog.length > 250) {
+          horizonLog.shift();
+        }
+
+        window.ForecastHorizonHistory = horizonLog;
+        console.log("🔭 Forecast Horizon Snapshot:", snapshot);
+      }
+
+      return { analyzeForecastHorizon };
+    })();
+
+    setInterval(() => {
+      window.ForecastHorizonSentinel.analyzeForecastHorizon();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.14 — Neuroforecast Strain Compression Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧪 Phase 400.14 — Neuroforecast Strain Compression Engine Activated");
+
+  if (!window.NeuroforecastStrainCompressor) {
+    window.NeuroforecastStrainCompressor = (function() {
+      let compressionHistory = [];
+
+      function compressStrainData() {
+        const strainData = window.DynamicStrainHistory || [];
+        const forecastData = window.ForecastHorizonHistory || [];
+
+        if (strainData.length < 10 || forecastData.length < 10) {
+          console.log("ℹ️ Strain Compression skipped — insufficient data.");
+          return;
+        }
+
+        const recentStrain = strainData.slice(-25);
+        const recentForecast = forecastData.slice(-25);
+
+        const avgStrainIndex = recentStrain.reduce((sum, e) => sum + parseFloat(e.strainIndex), 0) / recentStrain.length;
+        const avgForecastHorizon = recentForecast.reduce((sum, e) => sum + parseFloat(e.forecastHorizonIndex), 0) / recentForecast.length;
+
+        const compressionIndex = ((avgForecastHorizon * 0.6) + ((100000 / (avgStrainIndex + 1)) * 0.4)).toFixed(2);
+        let compressionState = "Optimal";
+
+        if (compressionIndex < 50) compressionState = "Critical Compression";
+        else if (compressionIndex < 75) compressionState = "Constrained";
+        else compressionState = "Optimal";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          compressionIndex,
+          compressionState
+        };
+
+        compressionHistory.push(snapshot);
+        if (compressionHistory.length > 250) {
+          compressionHistory.shift();
+        }
+
+        window.ForecastStrainCompressionHistory = compressionHistory;
+        console.log("🧪 Forecast Strain Compression Snapshot:", snapshot);
+      }
+
+      return { compressStrainData };
+    })();
+
+    setInterval(() => {
+      window.NeuroforecastStrainCompressor.compressStrainData();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.15 — Horizon Drift Gatekeeper Initialization
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🚪 Phase 400.15 — Horizon Drift Gatekeeper Activated");
+
+  if (!window.HorizonDriftGatekeeper) {
+    window.HorizonDriftGatekeeper = (function() {
+      let gatekeeperLog = [];
+
+      function monitorDriftGates() {
+        const compressionData = window.ForecastStrainCompressionHistory || [];
+        const horizonData = window.ForecastHorizonHistory || [];
+
+        if (compressionData.length < 10 || horizonData.length < 10) {
+          console.log("ℹ️ Horizon Drift Gatekeeper skipped — insufficient data.");
+          return;
+        }
+
+        const recentCompression = compressionData.slice(-20);
+        const recentHorizon = horizonData.slice(-20);
+
+        const avgCompression = recentCompression.reduce((sum, e) => sum + parseFloat(e.compressionIndex), 0) / recentCompression.length;
+        const avgHorizon = recentHorizon.reduce((sum, e) => sum + parseFloat(e.forecastHorizonIndex), 0) / recentHorizon.length;
+
+        const gatekeeperIndex = ((avgCompression * 0.5) + (avgHorizon * 0.5)).toFixed(2);
+        let gateState = "Clear Passage";
+
+        if (gatekeeperIndex < 50) gateState = "High Risk Zone";
+        else if (gatekeeperIndex < 75) gateState = "Restricted Access";
+        else gateState = "Clear Passage";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          gatekeeperIndex,
+          gateState
+        };
+
+        gatekeeperLog.push(snapshot);
+        if (gatekeeperLog.length > 250) {
+          gatekeeperLog.shift();
+        }
+
+        window.HorizonDriftGatekeeperHistory = gatekeeperLog;
+        console.log("🚪 Horizon Drift Gatekeeper Snapshot:", snapshot);
+      }
+
+      return { monitorDriftGates };
+    })();
+
+    setInterval(() => {
+      window.HorizonDriftGatekeeper.monitorDriftGates();
+    }, 15000);
+  }
+});
+
+// ===============================
+// Phase 400.16 — Predictive Signal Clarity Engine
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔎 Phase 400.16 — Predictive Signal Clarity Engine Activated");
+
+  if (!window.PredictiveSignalClarityEngine) {
+    window.PredictiveSignalClarityEngine = (function() {
+      let clarityLog = [];
+
+      function evaluateSignalClarity() {
+        const gatekeeperData = window.HorizonDriftGatekeeperHistory || [];
+        const metaElasticity = window.MetaElasticityHistory || [];
+        const neuroElasticTension = window.NeuroElasticTensionHistory || [];
+
+        if (gatekeeperData.length < 10 || metaElasticity.length < 10 || neuroElasticTension.length < 10) {
+          console.log("ℹ️ Signal Clarity Engine skipped — insufficient data.");
+          return;
+        }
+
+        const recentGatekeeper = gatekeeperData.slice(-20);
+        const recentMeta = metaElasticity.slice(-20);
+        const recentTension = neuroElasticTension.slice(-20);
+
+        const avgGatekeeper = recentGatekeeper.reduce((sum, e) => sum + parseFloat(e.gatekeeperIndex), 0) / recentGatekeeper.length;
+        const avgMetaElasticity = recentMeta.reduce((sum, e) => sum + parseFloat(e.metaElasticityIndex), 0) / recentMeta.length;
+        const avgTension = recentTension.reduce((sum, e) => sum + parseFloat(e.tensionRatio), 0) / recentTension.length;
+
+        const clarityIndex = ((avgGatekeeper * 0.4) + (avgMetaElasticity * 0.4) + (avgTension * 0.2)).toFixed(2);
+        let clarityState = "Crystal Clear";
+
+        if (clarityIndex < 50) clarityState = "Foggy";
+        else if (clarityIndex < 75) clarityState = "Moderate Clarity";
+        else clarityState = "Crystal Clear";
+
+        const snapshot = {
+          timestamp: new Date().toISOString(),
+          clarityIndex,
+          clarityState
+        };
+
+        clarityLog.push(snapshot);
+        if (clarityLog.length > 250) {
+          clarityLog.shift();
+        }
+
+        window.SignalClarityHistory = clarityLog;
+        console.log("🔎 Predictive Signal Clarity Snapshot:", snapshot);
+      }
+
+      return { evaluateSignalClarity };
+    })();
+
+    setInterval(() => {
+      window.PredictiveSignalClarityEngine.evaluateSignalClarity();
+    }, 15000);
+  }
+});
+// ===============================
 // Phase 201.17 — Neural Intake Bootstrap Injector
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -2686,4 +4032,44 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   setInterval(analyzeForecastDrift, 10000);
+});
+// ===============================
+// Optimization Phase 300.1 — Adaptive Stability Auto-Tuner
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧪 Optimization Core Phase 300.1 — Stability Auto-Tuner Activated");
+
+  if (!window.StabilityAutoTuner) {
+    window.StabilityAutoTuner = (function() {
+      let smoothingFactor = 0.2;  // default smoothing factor
+
+      function tuneHeatmapDrift() {
+        const heatmap = window.ForecastDriftHeatmap || [];
+        if (!heatmap.length) return;
+
+        for (let i = 1; i < heatmap.length; i++) {
+          const previous = heatmap[i - 1].driftScore;
+          const current = heatmap[i].driftScore;
+          const delta = Math.abs(current - previous);
+
+          if (delta > 2.5) {
+            // Aggressive smoothing if spike detected
+            heatmap[i].driftScore = parseFloat((previous + (current - previous) * smoothingFactor).toFixed(4));
+          }
+        }
+
+        console.log("🌊 Stability Auto-Tuner pass complete.");
+      }
+
+      function runAutoTuner() {
+        tuneHeatmapDrift();
+      }
+
+      return { runAutoTuner };
+    })();
+
+    setTimeout(() => {
+      window.StabilityAutoTuner.runAutoTuner();
+    }, 3000);
+  }
 });
