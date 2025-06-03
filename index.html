@@ -767,6 +767,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- Phase 201.3 — Intake Pipeline Integration -->
 <script>
+// Upgraded drift-aware Neural Intake Pipeline Integration
 document.addEventListener("DOMContentLoaded", () => {
   const intakeBtn = document.getElementById("launchNeuralIntakeBtn");
   const intakeFile = document.getElementById("neuralIntakeFile");
@@ -779,7 +780,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (window.NeuralDataIntake?.parseUploadedFile) {
         window.NeuralDataIntake.parseUploadedFile(file);
 
-        // After successful parse, inject report directly into Cortex
+        // After successful parse, inject report directly into Cortex with drift-aware session ID
         setTimeout(() => {
           const parsed = window.NeuralDataIntake.getParsedReports();
           if (!parsed || parsed.length === 0) {
@@ -787,17 +788,42 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          // Example: Inject intake signals into Cortex Forecast Memory
+          // Generate session identifier based on timestamp
+          const intakeSessionId = `Intake_${new Date().toISOString().replace(/[:.]/g, '-')}`;
+
+          // Phase 700.4 — Neural Drift Threshold Optimizer Injection
+          if (!window.NeuralDriftThresholds) {
+            window.NeuralDriftThresholds = {};
+          }
           parsed.forEach(row => {
+            const category = row.division;
+            if (!window.NeuralDriftThresholds[category]) {
+              window.NeuralDriftThresholds[category] = { count: 0, sumVariance: 0 };
+            }
+            const previousQty = 0; // Starting point for learning (can expand later)
+            const variance = Math.abs(row.onHandUnits - previousQty);
+            window.NeuralDriftThresholds[category].count += 1;
+            window.NeuralDriftThresholds[category].sumVariance += variance;
+          });
+
+          parsed.forEach(row => {
+            const avgDriftThreshold = Math.max(
+              (window.NeuralDriftThresholds[row.division].sumVariance / window.NeuralDriftThresholds[row.division].count) * 0.25,
+              5
+            );
             const forecastEntry = {
               timestamp: new Date().toISOString(),
+              intakeSessionId: intakeSessionId,
               itemNumber: row.itemNumber,
               division: row.division,
               onHandUnits: row.onHandUnits,
               cycleCountUnits: row.cycleCountUnits,
               shrinkUnits: row.shrinkUnits,
               itdSalesUnits: row.itdSalesUnits,
-              stabilityHint: (row.shrinkUnits > 0 || row.cycleCountUnits !== 0) ? "Volatile" : "Stable"
+              stabilityHint: (row.shrinkUnits > 0 || row.cycleCountUnits !== 0) ? "Volatile" : "Stable",
+              riskSignal: "🟢 Stable",
+              anomalySignal: "⚪ Unanalyzed",
+              learnedDriftThreshold: avgDriftThreshold.toFixed(1)
             };
 
             if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
@@ -1803,7 +1829,7 @@ window.addEventListener('resize', () => {
 });
 
 </script>
-<!-- Phase 201.15 — Neural Visual Sync Bootstrap -->
+<!-- Phase 201.15 — Neural Visual Sync Bootstrap (Upgraded Phase 700.2) -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   window.NeuralVisualSync = {
@@ -1823,14 +1849,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       liveScanTableBody.innerHTML = "";
       cortex.forEach(record => {
+        let riskColor = "#999";
+        if (record.riskSignal?.includes("🟢")) riskColor = "#00ff00";
+        if (record.riskSignal?.includes("🟠")) riskColor = "#ffaa00";
+        if (record.riskSignal?.includes("🔴")) riskColor = "#ff3333";
+
+        let anomalyColor = "#999";
+        if (record.anomalySignal?.includes("🟢")) anomalyColor = "#00ffcc";
+        if (record.anomalySignal?.includes("🟠")) anomalyColor = "#ff8800";
+
+        let driftColor = "#999";
+        if (record.driftSignal?.includes("🟢")) driftColor = "#00ffff";
+        if (record.driftSignal?.includes("🟠")) driftColor = "#ff9900";
+
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${record.itemNumber}</td>
           <td>${record.onHandUnits}</td>
           <td>${record.division}</td>
-          <td>Forecast</td>
-          <td>—</td>
-          <td>—</td>
+          <td style="color: ${riskColor}; font-weight: bold;">${record.riskSignal || "⚪ Unknown"}</td>
+          <td style="color: ${anomalyColor}; font-weight: bold;">${record.anomalySignal || "⚪ Unanalyzed"}</td>
+          <td style="color: ${driftColor}; font-weight: bold;">${record.driftSignal || "⚪ Unscanned"}</td>
           <td>—</td>
         `;
         liveScanTableBody.appendChild(row);
@@ -1847,6 +1886,204 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial refresh on page load
   window.NeuralVisualSync.refreshLiveTableFromCortex();
+});
+// Phase 700.5 — Predictive Stability Forecaster Injection
+window.NeuralVisualSync.renderForecastRiskPanel = () => {
+  const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+  if (cortex.length === 0) {
+    alert("No Cortex data available.");
+    return;
+  }
+
+  const categoryMap = {};
+  cortex.forEach(record => {
+    const cat = record.division;
+    if (!categoryMap[cat]) {
+      categoryMap[cat] = { total: 0, drifted: 0, threshold: parseFloat(record.learnedDriftThreshold || 5) };
+    }
+    categoryMap[cat].total += 1;
+    if (record.driftSignal?.includes("🟠")) categoryMap[cat].drifted += 1;
+  });
+
+  const labels = Object.keys(categoryMap);
+  const projections = labels.map(cat => {
+    const data = categoryMap[cat];
+    const driftPct = (data.drifted / data.total) * 100;
+    const projectedRisk = driftPct > data.threshold ? "🚩 High Drift Risk" : "✅ Stable Forecast";
+    return { category: cat, driftPct: driftPct.toFixed(1), projectedRisk };
+  });
+
+  const modal = document.createElement("div");
+  modal.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:10001;";
+  modal.innerHTML = `
+    <div style="background:#1e1e2f;padding:20px;border-radius:12px;max-width:600px;max-height:80%;overflow:auto;">
+      <h3 style="color:#cc66ff;text-align:center;">🔮 Predictive Stability Forecast</h3>
+      <table style="width:100%;border-collapse:collapse;margin-top:20px;">
+        <thead>
+          <tr style="color:#aaa;">
+            <th style="text-align:left;">Category</th>
+            <th>Drift%</th>
+            <th>Forecast</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${projections.map(p => `
+            <tr>
+              <td style="color:#fff;">${p.category}</td>
+              <td style="color:#33ccff;text-align:center;">${p.driftPct}%</td>
+              <td style="color:${p.projectedRisk.includes('High') ? '#ff6666' : '#00ffcc'};text-align:center;">${p.projectedRisk}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div style="text-align:center;margin-top:15px;">
+        <button id="closeForecastRiskBtn">❌ Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("#closeForecastRiskBtn").addEventListener("click", () => document.body.removeChild(modal));
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const forecastBtn = document.createElement("button");
+  forecastBtn.textContent = "🔮 Predictive Stability Forecast";
+  forecastBtn.style.padding = "12px 18px";
+  forecastBtn.style.fontSize = "1em";
+  forecastBtn.style.fontFamily = "monospace";
+  forecastBtn.style.background = "#330066";
+  forecastBtn.style.color = "#fff";
+  forecastBtn.style.border = "2px solid #cc66ff";
+  forecastBtn.style.borderRadius = "8px";
+  forecastBtn.style.cursor = "pointer";
+  forecastBtn.style.transition = "all 0.3s ease";
+  forecastBtn.addEventListener("click", () => window.NeuralVisualSync.renderForecastRiskPanel());
+  document.getElementById("operatorTools").appendChild(forecastBtn);
+});
+</script>
+
+<!-- Phase 700.3 — Longitudinal Drift Visualizer Engine -->
+<script>
+// Phase 700.3 — Longitudinal Drift Visualizer Engine
+document.addEventListener("DOMContentLoaded", () => {
+  const driftBtn = document.createElement("button");
+  driftBtn.textContent = "📊 Longitudinal Drift Chart";
+  driftBtn.style.padding = "12px 18px";
+  driftBtn.style.fontSize = "1em";
+  driftBtn.style.fontFamily = "monospace";
+  driftBtn.style.background = "#112244";
+  driftBtn.style.color = "#fff";
+  driftBtn.style.border = "2px solid #3399ff";
+  driftBtn.style.borderRadius = "8px";
+  driftBtn.style.cursor = "pointer";
+  driftBtn.style.transition = "all 0.3s ease";
+
+  driftBtn.addEventListener("click", () => {
+    const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+    if (cortex.length === 0) {
+      alert("No cortex data loaded.");
+      return;
+    }
+
+    // Aggregate drift counts per session
+    const sessionMap = {};
+    cortex.forEach(record => {
+      const sessionId = record.intakeSessionId || "Legacy";
+      if (!sessionMap[sessionId]) sessionMap[sessionId] = { total: 0, drifted: 0 };
+      sessionMap[sessionId].total += 1;
+      if (record.driftSignal?.includes("🟠")) sessionMap[sessionId].drifted += 1;
+    });
+
+    const labels = Object.keys(sessionMap).sort();
+    const driftRates = labels.map(id => {
+      const data = sessionMap[id];
+      return ((data.drifted / data.total) * 100).toFixed(1);
+    });
+
+    // Build Chart modal dynamically
+    const modal = document.createElement("div");
+    modal.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:10001;";
+    modal.innerHTML = `
+      <div style="background:#1e1e2f;padding:20px;border-radius:12px;max-width:90%;max-height:80%;overflow:auto;">
+        <h3 style="color:#cc66ff;text-align:center;">📈 Longitudinal Drift Chart</h3>
+        <canvas id="longDriftChart" width="400" height="250"></canvas>
+        <div style="text-align:center;margin-top:15px;">
+          <button id="closeLongDriftBtn">❌ Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector("#closeLongDriftBtn").addEventListener("click", () => document.body.removeChild(modal));
+
+    const ctx = modal.querySelector("#longDriftChart").getContext("2d");
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "% Drift Detected",
+          data: driftRates,
+          borderColor: "#33ccff",
+          backgroundColor: "rgba(51, 204, 255, 0.2)",
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { min: 0, max: 100, ticks: { stepSize: 10 }, title: { display: true, text: "Drift %" } },
+          x: { title: { display: true, text: "Intake Sessions" } }
+        }
+      }
+    });
+  });
+
+  document.getElementById("operatorTools").appendChild(driftBtn);
+});
+</script>
+
+<!-- Phase 700.1 — Neural Drift Comparator Engine -->
+<script>
+// Phase 700.1 — Neural Drift Comparator Engine
+document.addEventListener("DOMContentLoaded", () => {
+  const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+  if (cortex.length < 2) return; // Need at least 2 sessions to compare
+
+  // Group forecast entries by session ID
+  const sessionMap = {};
+  cortex.forEach(record => {
+    const sessionId = record.intakeSessionId || "Legacy";
+    if (!sessionMap[sessionId]) sessionMap[sessionId] = [];
+    sessionMap[sessionId].push(record);
+  });
+
+  const sessionIds = Object.keys(sessionMap).sort();
+  if (sessionIds.length < 2) return; // No historical comparison possible yet
+
+  const latestSession = sessionMap[sessionIds[sessionIds.length - 1]];
+  const previousSession = sessionMap[sessionIds[sessionIds.length - 2]];
+
+  // Build lookup maps for fast comparison
+  const previousMap = {};
+  previousSession.forEach(entry => {
+    previousMap[entry.itemNumber] = entry.onHandUnits;
+  });
+
+  latestSession.forEach(entry => {
+    const priorQty = previousMap[entry.itemNumber] ?? entry.onHandUnits;
+    const variance = Math.abs(entry.onHandUnits - priorQty);
+    const variancePct = (variance / Math.max(priorQty, 1)) * 100;
+
+    if (variancePct > 20) {
+      entry.driftSignal = "🟠 Drift Detected";
+    } else {
+      entry.driftSignal = "🟢 No Drift";
+    }
+  });
+
+  console.log("✅ Neural Drift Comparator Engine executed.");
 });
 </script>
 
