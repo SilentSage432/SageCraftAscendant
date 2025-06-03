@@ -853,6 +853,144 @@ document.addEventListener("DOMContentLoaded", () => {
 
           window.DynamicHabitMutator.initialize();
         }
+
+        // Phase 204.7 — Neural Navigation Cortex Rewiring Pass
+        if (!window.NavCortexRewiringPass) {
+          window.NavCortexRewiringPass = (function() {
+            function rewireAllNavButtons() {
+              const navButtons = document.querySelectorAll('.tablink');
+              navButtons.forEach(btn => {
+                const target = btn.dataset.target;
+                if (!target) return;
+
+                btn.removeEventListener('click', btn._neuralNavHandler || (() => {}));
+                const handler = () => {
+                  if (window.NeuralNavigationCortex) {
+                    window.NeuralNavigationCortex.activateTab(target);
+                  } else {
+                    window.switchTab(target);
+                  }
+                  if (window.NavStateMemoryCore) {
+                    window.NavStateMemoryCore.logNavigation(target);
+                  }
+                };
+                btn.addEventListener('click', handler);
+                btn._neuralNavHandler = handler;
+              });
+
+              console.log("🔧 All nav buttons rewired to Neural Cortex");
+            }
+
+            return { rewireAllNavButtons };
+          })();
+
+          window.NavCortexRewiringPass.rewireAllNavButtons();
+        }
+
+// ===============================
+// Phase 204.8 — Neural Synaptic Rebinding Engine
+
+window.NeuralSynapticRebinder = (function() {
+  function fullSynapticPass() {
+    console.log("🧬 Initiating Neural Synaptic Rebinding Pass...");
+
+    const navButtons = document.querySelectorAll('.tablink');
+    navButtons.forEach(btn => {
+      const target = btn.dataset.target;
+      if (!target) return;
+
+      // Purge all previous handlers
+      const clone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(clone, btn);
+
+      clone.addEventListener('click', () => {
+        if (window.NeuralNavigationCortex) {
+          window.NeuralNavigationCortex.activateTab(target);
+        } else {
+          window.switchTab(target);
+        }
+        if (window.NavStateMemoryCore) {
+          window.NavStateMemoryCore.logNavigation(target);
+        }
+      });
+
+      console.log(`🧠 Synaptic binding complete for → ${target}`);
+    });
+
+    console.log("✅ Neural Synaptic Rebinding Complete");
+  }
+
+  return { fullSynapticPass };
+})();
+
+// Auto-trigger Synaptic Rebinding Pass on DOM fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if (window.NeuralSynapticRebinder && typeof window.NeuralSynapticRebinder.fullSynapticPass === 'function') {
+      window.NeuralSynapticRebinder.fullSynapticPass();
+    }
+  }, 1500);
+});
+
+// ===============================
+// Phase 204.10 — Cortex Synaptic Bootstrapping Stability Pass
+
+document.addEventListener("DOMContentLoaded", () => {
+  function fullCortexSynapticBootstrap() {
+    console.log("🚀 Cortex Synaptic Bootstrap Cycle Initiated");
+
+    if (window.NeuralSynapticRebinder && typeof window.NeuralSynapticRebinder.fullSynapticPass === 'function') {
+      window.NeuralSynapticRebinder.fullSynapticPass();
+      console.log("✅ Synaptic Rebinding Pass Complete");
+    } else {
+      console.warn("⚠ NeuralSynapticRebinder not available.");
+    }
+
+    if (window.NavCortexRewiringPass && typeof window.NavCortexRewiringPass.rewireAllNavButtons === 'function') {
+      window.NavCortexRewiringPass.rewireAllNavButtons();
+      console.log("✅ Cortex Nav Rewiring Pass Complete");
+    } else {
+      console.warn("⚠ NavCortexRewiringPass not available.");
+    }
+  }
+
+  setTimeout(fullCortexSynapticBootstrap, 2500);
+});
+
+// ===============================
+// Phase 204.9 — Live Cortex Table Channel Injection
+
+if (!window.NeuralVisualSync) {
+  window.NeuralVisualSync = {};
+}
+
+window.NeuralVisualSync.refreshLiveTableFromCortex = function() {
+  console.log("🔄 Live Cortex Table Channel Sync Initiated");
+
+  const liveTableBody = document.getElementById('liveTableBody');
+  if (!liveTableBody) {
+    console.warn("⚠ Live Table Body not found.");
+    return;
+  }
+
+  const cortexSeeds = window.ForecastSeedCortex?.seeds || [];
+
+  if (!cortexSeeds.length) {
+    liveTableBody.innerHTML = "<tr><td colspan='4' style='color: #aaa;'>No live cortex data.</td></tr>";
+    return;
+  }
+
+  const rows = cortexSeeds.slice().reverse().map((record, index) => {
+    return `<tr>
+      <td>${index + 1}</td>
+      <td>${record.itemNumber}</td>
+      <td>${record.division}</td>
+      <td>${record.onHandUnits}</td>
+    </tr>`;
+  });
+
+  liveTableBody.innerHTML = rows.join('');
+};
       });
 
       alert(`✅ Neural Intake Complete: ${injectedCount} records injected.`);
@@ -860,6 +998,39 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   console.log("🧪 Neural Intake Engine Initialized.");
+});
+
+// ===============================
+// Surgical Purge — Step 3 — Stability Reinforcement Pass
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🛡 Stability Reinforcement Pass Initiated...");
+
+  // Fully refresh button wiring
+  if (typeof window.wireAllButtons === "function") {
+    window.wireAllButtons();
+    console.log("✅ Button wiring synchronization complete.");
+  } else {
+    console.warn("⚠ wireAllButtons function not available.");
+  }
+
+  // Fully refresh neural visual sync bridge
+  if (window.NeuralForecastMemoryCortex && typeof window.NeuralForecastMemoryCortex.addInjectionHook === "function") {
+    window.NeuralForecastMemoryCortex.addInjectionHook(() => {
+      if (window.NeuralVisualSync && typeof window.NeuralVisualSync.refreshLiveTableFromCortex === "function") {
+        window.NeuralVisualSync.refreshLiveTableFromCortex();
+        console.log("🔄 Live Table fully resynchronized to Neural Cortex");
+      }
+    });
+  }
+
+  // Schedule delayed Cortex Visual Sync for safety
+  setTimeout(() => {
+    if (window.NeuralVisualSync && typeof window.NeuralVisualSync.refreshLiveTableFromCortex === "function") {
+      window.NeuralVisualSync.refreshLiveTableFromCortex();
+      console.log("🩺 Final Visual Sync Pass Complete");
+    }
+  }, 3000);
 });
 
 // ===============================
@@ -2019,95 +2190,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.populateForecastHistoryDropdown();
 });
 // ===============================
-// Phase 127.9 — Predictive Drawer Handle Toggle Injection
-
-const predictiveHandle = document.getElementById("predictiveDrawerHandle");
-const predictiveDrawer = document.getElementById("predictiveDrawer");
-
-if (predictiveHandle && predictiveDrawer) {
-  predictiveHandle.addEventListener("click", () => {
-    predictiveDrawer.classList.toggle("open");
-  });
-}
-
-// ===============================
-// Phase 128.1 — Predictive Overlay Hook Scaffolds
-
-window.injectAnomalySignals = function() {
-  const container = document.getElementById("anomalySignalsContainer");
-  if (!container) return;
-  container.innerHTML = "<em>[Anomaly Signals will populate here]</em>";
-};
-
-window.injectForecastSignals = function() {
-  const container = document.getElementById("forecastSignalsContainer");
-  if (!container) return;
-  container.innerHTML = "<em>[Forecast Signals will populate here]</em>";
-};
-
-window.injectRiskSignals = function() {
-  const container = document.getElementById("riskSignalsContainer");
-  if (!container) return;
-  container.innerHTML = "<em>[Risk Warnings will populate here]</em>";
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.injectAnomalySignals();
-  window.injectForecastSignals();
-  window.injectRiskSignals();
-});
-
-// ===============================
-// Phase 128.2 — Predictive Streaming Engine
-
-window.PredictiveStreamEngine = (function() {
-  const anomalyContainer = document.getElementById("anomalySignalsContainer");
-  const forecastContainer = document.getElementById("forecastSignalsContainer");
-  const riskContainer = document.getElementById("riskSignalsContainer");
-
-  function updateAnomalySignals() {
-    const mock = ["No anomalies", "🟡 Mild deviation", "🔴 Severe outlier detected"];
-    const signal = mock[Math.floor(Math.random() * mock.length)];
-    if (anomalyContainer) anomalyContainer.innerHTML = signal;
-  }
-
-  function updateForecastSignals() {
-    const mock = ["Stable 🔵", "Fluctuating 🟠", "Volatile 🔴"];
-    const forecast = mock[Math.floor(Math.random() * mock.length)];
-    if (forecastContainer) forecastContainer.innerHTML = forecast;
-  }
-
-  function updateRiskSignals() {
-    const mock = ["Low ⚪", "Moderate ⚠️", "High 🚨"];
-    const risk = mock[Math.floor(Math.random() * mock.length)];
-    if (riskContainer) riskContainer.innerHTML = risk;
-  }
-
-  function updateAllPanels() {
-    updateAnomalySignals();
-    updateForecastSignals();
-    updateRiskSignals();
-  }
-
-  let streamingInterval = null;
-
-  function start() {
-    if (streamingInterval) clearInterval(streamingInterval);
-    updateAllPanels();
-    streamingInterval = setInterval(updateAllPanels, 5000);
-    console.log("🔮 Predictive Stream Engine Activated");
-  }
-
-  function stop() {
-    if (streamingInterval) {
-      clearInterval(streamingInterval);
-      streamingInterval = null;
-      console.log("🛑 Predictive Stream Engine Paused");
-    }
-  }
-
-  return { start, stop };
-})();
 
 // ===============================
 // Phase 128.3 — Predictive AI DataBridge Scaffold
@@ -2605,9 +2687,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(analyzeForecastDrift, 10000);
 });
-
-
-// ===============================
-// Phase 131.6 — Threat Matrix Early Warning System (Predictive Alerting Engine)
-
-<truncated__content/>
