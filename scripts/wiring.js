@@ -1,5 +1,22 @@
-// === NavigationCore Global Bootstrap ===
+// === Phase 8000.2: NavigationCore Neutralization (optional) ===
 window.NavigationCore = (function() {
+  function bootstrapOrbitalAnchors() {
+    console.log("🧹 NavigationCore.bootstrapOrbitalAnchors() neutralized.");
+  }
+
+  function activateOrbitalRouterMesh() {
+    console.log("🧹 NavigationCore.activateOrbitalRouterMesh() neutralized.");
+  }
+
+  function dynamicPanelLoader() {
+    console.log("🧹 NavigationCore.dynamicPanelLoader() neutralized.");
+  }
+
+  return {
+    bootstrapOrbitalAnchors,
+    activateOrbitalRouterMesh,
+    dynamicPanelLoader
+  };
 })();
 
 // === Neural Orbital Anchor Registry Injection (Phase 26) ===
@@ -30,6 +47,15 @@ window.OrbitalAnchorRegistry = (function() {
     buildRegistry,
     getAnchor,
     listAnchors
+  };
+})();
+// === Phase 8000.2: Legacy Orbital Controller Neutralization ===
+window.OrbitalController = (function() {
+  function bootstrap() {
+    console.log("🧹 OrbitalController.bootstrap() neutralized — no legacy DOM injection executed.");
+  }
+  return {
+    bootstrap
   };
 })();
 
@@ -583,6 +609,46 @@ window.LegacyOrbitalScaffoldPurge = (function() {
   };
 
 })();
+// === Phase 8000.0: Neural Operator Command Bridge ===
+window.NeuralOperatorConsole = (function() {
+
+  function renderOperatorConsole() {
+    console.log("🧭 Rendering Operator Command Console...");
+
+    const existingPanel = document.getElementById("operatorConsolePanel");
+    if (existingPanel) {
+      console.warn("⚠ Operator Console Panel already exists.");
+      return;
+    }
+
+    const panel = document.createElement("section");
+    panel.id = "operatorConsolePanel";
+    panel.className = "panel tab-section panel-glow operator-console";
+
+    panel.innerHTML = `
+      <h2>🧭 Neural Operator Command Bridge</h2>
+      <div class="console-section">
+        <button onclick="NeuralAuditSentinel.auditWiring()">Run Audit Integrity Scan</button>
+        <button onclick="NeuralSelfHealingEngine.runSelfHealing()">Run Self-Healing Engine</button>
+        <button onclick="NeuralForecastEngine.clearForecast()">Clear Forecast History</button>
+        <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
+        <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
+      </div>
+      <div class="console-log">
+        <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
+      </div>
+    `;
+
+    document.body.appendChild(panel);
+    console.log("✅ Operator Command Console Deployed.");
+  }
+
+  return {
+    renderOperatorConsole
+  };
+
+})();
+window.NeuralOperatorConsole = NeuralOperatorConsole;
 // === Unified Neural Bootloader Stabilization ===
 
 // === Phase 39 Neural Mesh Activation ===
