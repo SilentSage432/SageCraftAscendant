@@ -881,3 +881,57 @@ document.addEventListener("DOMContentLoaded", () => {
     appendToConsole("⚠ " + args.join(' '));
   };
 })();
+// === Phase 8001.0: Neural Governance Core ===
+window.NeuralGovernanceCore = (function() {
+
+  const RISK_THRESHOLD = 10;
+  const DRIFT_THRESHOLD = 25;
+  const ERROR_THRESHOLD = 5;
+
+  function evaluateSystem() {
+    console.log("⚖ Running Neural Governance Evaluation...");
+
+    let actionTaken = false;
+
+    // 1️⃣ Forecast Risk Check
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    forecastMap.forEach(([targetId, activationCount]) => {
+      if (activationCount >= RISK_THRESHOLD) {
+        console.warn(`⚠ Governance Alert: High activation risk detected for '${targetId}'`);
+        NeuralSelfHealingEngine.runSelfHealing();
+        actionTaken = true;
+      }
+    });
+
+    // 2️⃣ Drift Metrics Check
+    const drift = NeuralDriftCore.getStatus();
+    if (drift.totalActivations >= DRIFT_THRESHOLD) {
+      console.warn("⚠ Governance Alert: Drift activation threshold exceeded.");
+      NeuralAuditSentinel.auditWiring();
+      actionTaken = true;
+    }
+
+    // 3️⃣ Error Count Check
+    if (drift.errorCount >= ERROR_THRESHOLD) {
+      console.error("❌ Governance Emergency: Excessive system errors detected.");
+      NeuralPanelSynthesis.synthesizePanels();
+      actionTaken = true;
+    }
+
+    if (!actionTaken) {
+      console.log("✅ Governance Pass: System stable.");
+    }
+  }
+
+  function startGovernanceLoop(intervalMs = 30000) {
+    console.log(`⚖ Neural Governance Loop Activated — scanning every ${intervalMs / 1000} seconds.`);
+    evaluateSystem();
+    setInterval(evaluateSystem, intervalMs);
+  }
+
+  return {
+    evaluateSystem,
+    startGovernanceLoop
+  };
+
+})();
