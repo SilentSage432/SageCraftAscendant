@@ -644,10 +644,102 @@ window.NeuralOperatorConsole = (function() {
   }
 
   return {
-    renderOperatorConsole
+    renderOperatorConsole,
+    renderLiveSystemStatus,
+    renderLiveSystemStatusUI,
+    startLiveRefresh,
+    stopLiveRefresh
   };
 
 })();
+// === Phase 8000.3: Neural Live Panel Synchronizer ===
+function renderLiveSystemStatus() {
+  console.log("🧬 Rendering Live System Status...");
+
+  // Orbit Status
+  const orbits = NeuralOrbitRegistry.listOrbits();
+  console.log("🪐 Registered Orbits:", orbits);
+
+  // Module Status
+  const modules = NeuralModuleRegistry.listModules();
+  console.log("🧩 Registered Modules:", modules);
+
+  // Anchor Status
+  const anchors = OrbitalAnchorRegistry.listAnchors();
+  console.log("📡 Registered Anchors:", anchors);
+
+  // Drift Status
+  const drift = NeuralDriftCore.getStatus();
+  console.log("🌌 Drift Metrics:", drift);
+
+  // Audit Status
+  NeuralAuditSentinel.auditWiring();
+}
+// === Phase 8000.4: Neural Operator Console UI Data Injection ===
+function renderLiveSystemStatusUI() {
+  console.log("🧭 Updating Operator Console UI with live system status...");
+
+  const panel = document.getElementById("operatorConsolePanel");
+  if (!panel) {
+    console.warn("⚠ Operator Console Panel not found.");
+    return;
+  }
+
+  // Create a live status container
+  let statusContainer = document.getElementById("neuralStatusContainer");
+  if (!statusContainer) {
+    statusContainer = document.createElement("div");
+    statusContainer.id = "neuralStatusContainer";
+    statusContainer.className = "console-live-status";
+    panel.appendChild(statusContainer);
+  } else {
+    statusContainer.innerHTML = ""; // Clear previous content
+  }
+
+  // Render Orbits
+  const orbits = NeuralOrbitRegistry.listOrbits();
+  const orbitBlock = document.createElement("div");
+  orbitBlock.innerHTML = `<h3>🪐 Registered Orbits: ${Object.keys(orbits).length}</h3>`;
+  statusContainer.appendChild(orbitBlock);
+
+  // Render Modules
+  const modules = NeuralModuleRegistry.listModules();
+  const moduleBlock = document.createElement("div");
+  moduleBlock.innerHTML = `<h3>🧩 Registered Modules: ${modules.length}</h3>`;
+  statusContainer.appendChild(moduleBlock);
+
+  // Render Anchors
+  const anchors = OrbitalAnchorRegistry.listAnchors();
+  const anchorBlock = document.createElement("div");
+  anchorBlock.innerHTML = `<h3>📡 Registered Anchors: ${anchors.length}</h3>`;
+  statusContainer.appendChild(anchorBlock);
+
+  // Render Drift Metrics
+  const drift = NeuralDriftCore.getStatus();
+  const driftBlock = document.createElement("div");
+  driftBlock.innerHTML = `<h3>🌌 Drift Metrics:</h3><p>Total Activations: ${drift.totalActivations}<br>Unique Panels: ${drift.uniquePanels.length}<br>Errors: ${drift.errorCount}</p>`;
+  statusContainer.appendChild(driftBlock);
+}
+// === Phase 8000.5: Live Refresh Synchronization Engine ===
+let refreshIntervalId = null;
+
+function startLiveRefresh(intervalMs = 10000) {
+  console.log(`🔄 Live Refresh Activated: Updating every ${intervalMs / 1000} seconds.`);
+  if (refreshIntervalId) {
+    clearInterval(refreshIntervalId);
+  }
+  renderLiveSystemStatusUI();
+  refreshIntervalId = setInterval(renderLiveSystemStatusUI, intervalMs);
+}
+
+function stopLiveRefresh() {
+  if (refreshIntervalId) {
+    clearInterval(refreshIntervalId);
+    console.log("⏹ Live Refresh Deactivated.");
+  } else {
+    console.log("ℹ Live Refresh was not active.");
+  }
+}
 window.NeuralOperatorConsole = NeuralOperatorConsole;
 // === Unified Neural Bootloader Stabilization ===
 
