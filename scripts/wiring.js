@@ -304,6 +304,285 @@ window.NeuralAutoHealingForecast = (function() {
     evaluateAllRisks
   };
 })();
+// === Phase 56: Neural Orbit Registry Core ===
+window.NeuralOrbitRegistry = (function() {
+  const orbits = {};
+
+  function registerOrbit(name, description, modules = []) {
+    if (orbits[name]) {
+      console.warn(`⚠ Orbit '${name}' is already registered.`);
+      return;
+    }
+    orbits[name] = {
+      description,
+      modules,
+      registeredAt: new Date().toISOString()
+    };
+    console.log(`🪐 Orbit Registered: ${name}`);
+  }
+
+  function listOrbits() {
+    console.table(orbits);
+    return orbits;
+  }
+
+  function getOrbit(name) {
+    return orbits[name] || null;
+  }
+
+  function clearOrbits() {
+    for (let key in orbits) {
+      delete orbits[key];
+    }
+    console.log("🧹 Orbit Registry Cleared.");
+  }
+
+  return {
+    registerOrbit,
+    listOrbits,
+    getOrbit,
+    clearOrbits
+  };
+})();
+// === Phase 57: Neural Module Loader Bootstrap ===
+window.NeuralModuleRegistry = (function() {
+  const modules = {};
+
+  function registerModule(name, initCallback) {
+    if (modules[name]) {
+      console.warn(`⚠ Module '${name}' is already registered.`);
+      return;
+    }
+    modules[name] = {
+      initialized: false,
+      initCallback
+    };
+    console.log(`🧩 Module Registered: ${name}`);
+  }
+
+  function initializeModule(name) {
+    const mod = modules[name];
+    if (!mod) {
+      console.warn(`⚠ Cannot initialize unknown module '${name}'.`);
+      return;
+    }
+    if (mod.initialized) {
+      console.log(`🔄 Module '${name}' already initialized.`);
+      return;
+    }
+    try {
+      mod.initCallback();
+      mod.initialized = true;
+      console.log(`✅ Module '${name}' initialized successfully.`);
+    } catch (err) {
+      console.error(`❌ Error initializing module '${name}':`, err);
+    }
+  }
+
+  function initializeAllModules() {
+    console.log("🧬 Initializing All Registered Modules...");
+    for (let name in modules) {
+      initializeModule(name);
+    }
+    console.log("✅ All Modules Initialized.");
+  }
+
+  function listModules() {
+    const keys = Object.keys(modules);
+    console.table(keys);
+    return keys;
+  }
+
+  return {
+    registerModule,
+    initializeModule,
+    initializeAllModules,
+    listModules
+  };
+})();
+// === Phase 58: Neural Module-Orbit Linker Bootstrap ===
+window.NeuralModuleOrbitLinker = (function() {
+  function linkModuleToOrbit(orbitName, moduleName) {
+    const orbit = NeuralOrbitRegistry.getOrbit(orbitName);
+    if (!orbit) {
+      console.warn(`⚠ Cannot link module. Orbit '${orbitName}' does not exist.`);
+      return;
+    }
+    if (!orbit.modules.includes(moduleName)) {
+      orbit.modules.push(moduleName);
+      console.log(`🔗 Linked module '${moduleName}' to orbit '${orbitName}'`);
+    } else {
+      console.log(`ℹ Module '${moduleName}' is already linked to orbit '${orbitName}'`);
+    }
+  }
+
+  function listModulesForOrbit(orbitName) {
+    const orbit = NeuralOrbitRegistry.getOrbit(orbitName);
+    if (!orbit) {
+      console.warn(`⚠ Orbit '${orbitName}' not found.`);
+      return [];
+    }
+    console.table(orbit.modules);
+    return orbit.modules;
+  }
+
+  function unlinkModuleFromOrbit(orbitName, moduleName) {
+    const orbit = NeuralOrbitRegistry.getOrbit(orbitName);
+    if (!orbit) {
+      console.warn(`⚠ Orbit '${orbitName}' not found.`);
+      return;
+    }
+    orbit.modules = orbit.modules.filter(m => m !== moduleName);
+    console.log(`❎ Unlinked module '${moduleName}' from orbit '${orbitName}'`);
+  }
+
+  return {
+    linkModuleToOrbit,
+    listModulesForOrbit,
+    unlinkModuleFromOrbit
+  };
+})();
+// === Phase 59: Neural Bootloader Expansion Engine ===
+window.NeuralBootloader = (function() {
+
+  function bootAllOrbits() {
+    console.log("🚀 Neural Bootloader Initiated...");
+
+    const allOrbits = NeuralOrbitRegistry.listOrbits();
+    const moduleNames = NeuralModuleRegistry.listModules();
+
+    for (const orbitName in allOrbits) {
+      const orbit = allOrbits[orbitName];
+      console.log(`🪐 Booting Orbit: ${orbitName}`);
+
+      if (Array.isArray(orbit.modules)) {
+        orbit.modules.forEach(moduleName => {
+          if (moduleNames.includes(moduleName)) {
+            console.log(`🔗 Booting Module '${moduleName}' in Orbit '${orbitName}'`);
+            NeuralModuleRegistry.initializeModule(moduleName);
+          } else {
+            console.warn(`⚠ Module '${moduleName}' linked to Orbit '${orbitName}' not found in registry.`);
+          }
+        });
+      } else {
+        console.warn(`⚠ Orbit '${orbitName}' has no valid modules list.`);
+      }
+    }
+
+    console.log("✅ Neural Bootloader Complete.");
+  }
+
+  return {
+    bootAllOrbits
+  };
+
+})();
+// === Phase 60: Neural Cortex Synchronization Engine ===
+window.NeuralCortexEngine = (function() {
+  const FORECAST_RISK_THRESHOLD = 10;  // Customize as your system grows
+  const SYNC_INTERVAL = 15000; // Run full cortex sync every 15 seconds
+
+  function runFullSync() {
+    console.log("🧠 Running Full Neural Cortex Synchronization...");
+
+    // 1️⃣ Forecast Risk Assessment
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    forecastMap.forEach(([targetId, activationCount]) => {
+      if (activationCount >= FORECAST_RISK_THRESHOLD) {
+        const panelId = `panel${targetId}`;
+        const panel = document.getElementById(panelId);
+        if (!panel) {
+          console.warn(`⚠ High-Risk Forecast: Panel '${targetId}' missing at ${activationCount} activations. Triggering self-healing...`);
+          NeuralPanelSynthesis.synthesizePanels();
+        }
+      }
+    });
+
+    // 2️⃣ Audit Sentinel Health Check
+    NeuralAuditSentinel.auditWiring();
+
+    // 3️⃣ Report Drift Status
+    const driftStatus = NeuralDriftCore.getStatus();
+    console.log("🌌 Drift Metrics:", driftStatus);
+
+    console.log("✅ Neural Cortex Synchronization Complete.");
+  }
+
+  function startCortexLoop() {
+    console.log("🧠 Neural Cortex Loop Activated.");
+    runFullSync(); // Run immediately on startup
+    setInterval(runFullSync, SYNC_INTERVAL);
+  }
+
+  return {
+    startCortexLoop
+  };
+})();
+// === Phase 7000.5: Neural Orbital Mesh Reconciliation ===
+window.NeuralOrbitalMeshReconciliation = (function() {
+
+  function validateOrbitalMesh() {
+    console.log("🧠 Running Orbital Mesh Reconciliation...");
+
+    const buttons = document.querySelectorAll(".orbital-btn");
+    let totalChecked = 0;
+    let missingPanels = 0;
+
+    buttons.forEach(btn => {
+      const target = btn.dataset.target;
+      totalChecked++;
+
+      if (!target) {
+        console.warn(`⚠ Orbital button missing data-target attribute`, btn);
+        missingPanels++;
+        return;
+      }
+
+      const targetPanel = document.querySelector(target);
+      if (!targetPanel) {
+        console.warn(`⚠ No DOM panel found for target '${target}'`);
+        missingPanels++;
+      }
+    });
+
+    console.log(`✅ Orbital Mesh Reconciliation Complete: ${totalChecked} buttons scanned, ${missingPanels} issues found.`);
+  }
+
+  return {
+    validateOrbitalMesh
+  };
+
+})();
+// === Phase 7000.6: Legacy Orbital Scaffold Purge ===
+window.LegacyOrbitalScaffoldPurge = (function() {
+
+  function purgeLegacyScaffolds() {
+    console.log("🧹 Running Legacy Orbital Scaffold Purge...");
+
+    const legacyButtons = Array.from(document.querySelectorAll('.orbital-btn')).filter(btn => {
+      const target = btn.dataset.target;
+      const id = btn.id;
+      return (!target || target.trim() === "") && id.startsWith("hud");
+    });
+
+    if (legacyButtons.length === 0) {
+      console.log("✅ No legacy orbital scaffolds found. Neural DOM is fully pure.");
+      return;
+    }
+
+    legacyButtons.forEach(btn => {
+      console.warn(`🗑 Removing legacy scaffold: ID='${btn.id}'`);
+      btn.remove();
+    });
+
+    console.log(`✅ Purge Complete: ${legacyButtons.length} legacy scaffold(s) removed.`);
+  }
+
+  return {
+    purgeLegacyScaffolds
+  };
+
+})();
 // === Unified Neural Bootloader Stabilization ===
 
 // === Phase 39 Neural Mesh Activation ===
