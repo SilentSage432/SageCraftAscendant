@@ -648,7 +648,9 @@ window.NeuralOperatorConsole = (function() {
     renderLiveSystemStatus,
     renderLiveSystemStatusUI,
     startLiveRefresh,
-    stopLiveRefresh
+    stopLiveRefresh,
+    startRecoveryLoop,
+    stopRecoveryLoop
   };
 
 })();
@@ -675,9 +677,9 @@ function renderLiveSystemStatus() {
   // Audit Status
   NeuralAuditSentinel.auditWiring();
 }
-// === Phase 8000.4: Neural Operator Console UI Data Injection ===
+// === Phase 8000.7: Unified Neural Operator Dashboard Optimization ===
 function renderLiveSystemStatusUI() {
-  console.log("🧭 Updating Operator Console UI with live system status...");
+  console.log("🧭 Updating Unified Neural Operator Dashboard...");
 
   const panel = document.getElementById("operatorConsolePanel");
   if (!panel) {
@@ -685,7 +687,6 @@ function renderLiveSystemStatusUI() {
     return;
   }
 
-  // Create a live status container
   let statusContainer = document.getElementById("neuralStatusContainer");
   if (!statusContainer) {
     statusContainer = document.createElement("div");
@@ -696,29 +697,60 @@ function renderLiveSystemStatusUI() {
     statusContainer.innerHTML = ""; // Clear previous content
   }
 
-  // Render Orbits
+  // Unified Orbits
   const orbits = NeuralOrbitRegistry.listOrbits();
   const orbitBlock = document.createElement("div");
-  orbitBlock.innerHTML = `<h3>🪐 Registered Orbits: ${Object.keys(orbits).length}</h3>`;
+  orbitBlock.innerHTML = `<h3>🪐 Orbits: ${Object.keys(orbits).length}</h3>`;
+  if (Object.keys(orbits).length > 0) {
+    const list = document.createElement("ul");
+    Object.keys(orbits).forEach(o => {
+      const li = document.createElement("li");
+      li.textContent = `${o} (${orbits[o].modules.length} modules)`;
+      list.appendChild(li);
+    });
+    orbitBlock.appendChild(list);
+  }
   statusContainer.appendChild(orbitBlock);
 
-  // Render Modules
+  // Unified Modules
   const modules = NeuralModuleRegistry.listModules();
   const moduleBlock = document.createElement("div");
-  moduleBlock.innerHTML = `<h3>🧩 Registered Modules: ${modules.length}</h3>`;
+  moduleBlock.innerHTML = `<h3>🧩 Modules: ${modules.length}</h3>`;
+  if (modules.length > 0) {
+    const list = document.createElement("ul");
+    modules.forEach(m => {
+      const li = document.createElement("li");
+      li.textContent = m;
+      list.appendChild(li);
+    });
+    moduleBlock.appendChild(list);
+  }
   statusContainer.appendChild(moduleBlock);
 
-  // Render Anchors
+  // Anchors
   const anchors = OrbitalAnchorRegistry.listAnchors();
   const anchorBlock = document.createElement("div");
-  anchorBlock.innerHTML = `<h3>📡 Registered Anchors: ${anchors.length}</h3>`;
+  anchorBlock.innerHTML = `<h3>📡 Anchors: ${anchors.length}</h3>`;
   statusContainer.appendChild(anchorBlock);
 
-  // Render Drift Metrics
+  // Drift Metrics
   const drift = NeuralDriftCore.getStatus();
   const driftBlock = document.createElement("div");
-  driftBlock.innerHTML = `<h3>🌌 Drift Metrics:</h3><p>Total Activations: ${drift.totalActivations}<br>Unique Panels: ${drift.uniquePanels.length}<br>Errors: ${drift.errorCount}</p>`;
+  driftBlock.innerHTML = `<h3>🌌 Drift:</h3><p>Activations: ${drift.totalActivations}<br>Unique Panels: ${drift.uniquePanels.length}<br>Errors: ${drift.errorCount}</p>`;
   statusContainer.appendChild(driftBlock);
+
+  // Forecast Risk Levels
+  const forecastMap = NeuralForecastEngine.getForecastReport();
+  const riskBlock = document.createElement("div");
+  riskBlock.innerHTML = `<h3>📊 Forecast Risks (Top 5):</h3>`;
+  const riskList = document.createElement("ul");
+  forecastMap.slice(0, 5).forEach(([panel, count]) => {
+    const li = document.createElement("li");
+    li.textContent = `${panel}: ${count} activations`;
+    riskList.appendChild(li);
+  });
+  riskBlock.appendChild(riskList);
+  statusContainer.appendChild(riskBlock);
 }
 // === Phase 8000.5: Live Refresh Synchronization Engine ===
 let refreshIntervalId = null;
@@ -739,6 +771,43 @@ function stopLiveRefresh() {
   } else {
     console.log("ℹ Live Refresh was not active.");
   }
+}
+// === Phase 8000.6: Neural Subsystem Recovery Loop ===
+let recoveryIntervalId = null;
+
+function startRecoveryLoop(intervalMs = 30000) {
+  console.log(`🛡 Recovery Loop Activated: Scanning every ${intervalMs / 1000} seconds.`);
+  if (recoveryIntervalId) {
+    clearInterval(recoveryIntervalId);
+  }
+  runRecoveryScan();
+  recoveryIntervalId = setInterval(runRecoveryScan, intervalMs);
+}
+
+function stopRecoveryLoop() {
+  if (recoveryIntervalId) {
+    clearInterval(recoveryIntervalId);
+    console.log("🛑 Recovery Loop Deactivated.");
+  } else {
+    console.log("ℹ Recovery Loop was not active.");
+  }
+}
+
+function runRecoveryScan() {
+  console.log("🧪 Running Subsystem Recovery Scan...");
+
+  // Forecast-Based Healing
+  NeuralAutoHealingForecast.evaluateAllRisks();
+
+  // Drift Reporting
+  const drift = NeuralDriftCore.getStatus();
+  console.log("🌌 Drift Metrics During Recovery:", drift);
+
+  // Orbital Mesh Validation
+  NeuralOrbitalMeshReconciliation.validateOrbitalMesh();
+
+  // Audit Sentinel
+  NeuralAuditSentinel.auditWiring();
 }
 window.NeuralOperatorConsole = NeuralOperatorConsole;
 // === Unified Neural Bootloader Stabilization ===
