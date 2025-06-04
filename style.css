@@ -2544,3 +2544,13 @@ h2, h3, p, label {
   height: 52px;
   border-radius: 50%;
 }
+
+/* --- Phase 40.5 — Orbital Icon Normalization --- */
+
+.orbital-btn img {
+  max-width: 60%;
+  max-height: 60%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}

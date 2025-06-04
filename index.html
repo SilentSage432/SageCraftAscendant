@@ -29,8 +29,37 @@
 <body class="dark-theme electric-fantasy">
 
 
-  <!-- ORBITAL HUD v2.5 — Structural Purification -->
-  <div class="orbital-dock" id="orbitalHudPanel"></div>
+  <div class="orbital-dock" id="orbitalHudPanel">
+    <button class="orbital-btn" data-target="#operatorConsolePanel" aria-label="Operator Console"><img src="assets/icons/icon-console.png"></button>
+    <button class="orbital-btn" data-target="#count" aria-label="Audit Modules"><img src="assets/icons/icon-audit.png"></button>
+    <button class="orbital-btn" data-target="#deltaAnalyzer" aria-label="Delta Analyzer"><img src="assets/icons/icon-delta.png"></button>
+    <button class="orbital-btn" data-target="#reportingHub" aria-label="Reporting Hub"><img src="assets/icons/icon-report.png"></button>
+    <button class="orbital-btn" data-target="#utilityHub" aria-label="Utility Hub"><img src="assets/icons/icon-utility.png"></button>
+    <button class="orbital-btn" data-target="#tools" aria-label="Control Settings"><img src="assets/icons/icon-tools.png"></button>
+    <button class="orbital-btn" data-target="#masterExportHub" aria-label="Master Export Hub"><img src="assets/icons/icon-export.png"></button>
+    <button class="orbital-btn" data-target="#sessionManager" aria-label="Session Manager"><img src="assets/icons/icon-session.png"></button>
+    <button class="orbital-btn" data-target="#mappings" aria-label="Mapping Manager"><img src="assets/icons/icon-mapping.png"></button>
+    <button class="orbital-btn" data-target="#advancedTools" aria-label="Advanced Tools"><img src="assets/icons/icon-advanced.png"></button>
+    <button class="orbital-btn" data-target="#audit" aria-label="Audit Rotation Schedule"><img src="assets/icons/icon-rotation.png"></button>
+    <button class="orbital-btn" data-target="#configPanel" aria-label="User Config Panel"><img src="assets/icons/icon-config.png"></button>
+    <button class="orbital-btn" data-target="#diagnosticsModal" aria-label="Diagnostics Panel"><img src="assets/icons/icon-diagnostics.png"></button>
+    <button class="orbital-btn" data-target="#dropboxModal" aria-label="Dropbox Control"><img src="assets/icons/icon-dropbox.png"></button>
+  </div>
+
+  <div id="operatorConsolePanel" class="tab-section panel-glow"></div>
+  <div id="count" class="tab-section panel-glow"></div>
+  <div id="deltaAnalyzer" class="tab-section panel-glow"></div>
+  <div id="reportingHub" class="tab-section panel-glow"></div>
+  <div id="utilityHub" class="tab-section panel-glow"></div>
+  <div id="tools" class="tab-section panel-glow"></div>
+  <div id="masterExportHub" class="tab-section panel-glow"></div>
+  <div id="sessionManager" class="tab-section panel-glow"></div>
+  <div id="mappings" class="tab-section panel-glow"></div>
+  <div id="advancedTools" class="tab-section panel-glow"></div>
+  <div id="audit" class="tab-section panel-glow"></div>
+  <div id="configPanel" class="tab-section panel-glow"></div>
+  <div id="diagnosticsModal" class="tab-section panel-glow"></div>
+  <div id="dropboxModal" class="tab-section panel-glow"></div>
 
 
   <header class="topbar mystic-header" role="banner">
@@ -519,6 +548,53 @@
       </div>
     </div>
 
+    <!-- === Neural Docking Anchors === -->
+    <div id="countContainer" class="tabcontent"></div>
+    <div id="deltaAnalyzerSection" class="tabcontent"></div>
+    <div id="reportingHubSection" class="tabcontent"></div>
+    <div id="utilityHubSection" class="tabcontent"></div>
+    <div id="toolsPanel" class="tabcontent"></div>
+    <div id="masterExportSection" class="tabcontent"></div>
+    <div id="sessionManagerSection" class="tabcontent"></div>
+    <div id="mappingManagerSection" class="tabcontent"></div>
+    <div id="advancedToolsSection" class="tabcontent"></div>
+    <div id="auditSection" class="tabcontent"></div>
+    <div id="configPanelSection" class="tabcontent"></div>
+    <div id="operatorConsole" class="tabcontent"></div>
+    <div id="diagnosticsModal" class="tabcontent"></div>
+    <div id="dropboxModal" class="tabcontent"></div>
+
+    <!-- === Missing Scaffold Panels for Full Orbital Routing === -->
+    <div id="operatorConsolePanel" class="tabcontent"></div>
+    <div id="count" class="tabcontent"></div>
+    <div id="deltaAnalyzer" class="tabcontent"></div>
+    <div id="reportingHub" class="tabcontent"></div>
+    <div id="utilityHub" class="tabcontent"></div>
+    <div id="tools" class="tabcontent"></div>
+    <div id="masterExportHub" class="tabcontent"></div>
+    <div id="sessionManager" class="tabcontent"></div>
+    <div id="mappings" class="tabcontent"></div>
+    <div id="advancedTools" class="tabcontent"></div>
+    <div id="audit" class="tabcontent"></div>
+    <div id="configPanel" class="tabcontent"></div>
+    <div id="diagnosticsModal" class="tabcontent"></div>
+    <div id="dropboxModal" class="tabcontent"></div>
+
+    <!-- === Neural Wiring Mesh DOM Anchors (Inserted for mesh wiring) === -->
+    <div id="operatorConsolePanel" class="tabcontent"></div>
+    <div id="count" class="tabcontent"></div>
+    <div id="deltaAnalyzer" class="tabcontent"></div>
+    <div id="reportingHub" class="tabcontent"></div>
+    <div id="utilityHub" class="tabcontent"></div>
+    <div id="tools" class="tabcontent"></div>
+    <div id="masterExportHub" class="tabcontent"></div>
+    <div id="sessionManager" class="tabcontent"></div>
+    <div id="mappings" class="tabcontent"></div>
+    <div id="advancedTools" class="tabcontent"></div>
+    <div id="audit" class="tabcontent"></div>
+    <div id="configPanel" class="tabcontent"></div>
+    <div id="diagnosticsModal" class="tabcontent"></div>
+    <div id="dropboxModal" class="tabcontent"></div>
 
   </main>
 
@@ -1331,7 +1407,19 @@ document.addEventListener("DOMContentLoaded", () => {
   <script type="module" src="scripts/utilities.js"></script>
   <script type="module" src="scripts/handlers.js"></script>
   <script type="module" src="scripts/dropbox.js"></script>
+
   <script type="module" src="scripts/init.js"></script>
+  <script>
+    window.NeuralGlobalRegistry = {
+      NavigationCore,
+      OrbitalController,
+      NeuralIntakeEngine,
+      NeuralForecastMemoryCortex,
+      NeuralVisualSync
+    };
+
+    console.log("✅ Neural Global Registry online.");
+  </script>
 
   <script type="module">
     if (window.location.search.includes('code=')) {
@@ -1438,6 +1526,43 @@ document.addEventListener("DOMContentLoaded", () => {
   <div id="hudForecast" style="margin-bottom: 8px;">Forecast: <span>Loading...</span></div>
   <div id="hudAnomaly" style="margin-bottom: 8px;">Anomalies: <span>Loading...</span></div>
   <div id="hudDrift" style="margin-bottom: 8px;">Drift: <span>Loading...</span></div>
+<!-- Phase 35 — Unified Orbital Event Mesh Injection -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const hudMap = {
+    hudAuditModules: "#count",
+    hudAnalysis: "#deltaAnalyzer",
+    hudReporting: "#reportingHub",
+    hudUtility: "#utilityHub",
+    hudControl: "#tools",
+    hudMasterExport: "#masterExportHub",
+    hudSessionManager: "#sessionManager",
+    hudMappingManager: "#mappings",
+    hudAdvancedTools: "#advancedTools",
+    hudAuditRotation: "#audit",
+    hudConfigPanel: "#configPanel",
+    hudOperatorConsole: "#operatorConsolePanel",
+    hudDiagnostics: "#diagnosticsModal",
+    hudDropbox: "#dropboxModal"
+  };
+
+  document.querySelectorAll(".orbital-btn").forEach(btn => {
+    const targetSelector = hudMap[btn.id];
+    if (targetSelector) {
+      btn.addEventListener("click", () => {
+        const targetPanel = document.querySelector(targetSelector);
+        if (targetPanel) {
+          targetPanel.scrollIntoView({ behavior: "smooth" });
+        } else {
+          console.warn(`⚠ Target panel '${targetSelector}' not found for button '${btn.id}'`);
+        }
+      });
+    } else {
+      console.warn(`⚠ No mapping found for button '${btn.id}'`);
+    }
+  });
+});
+</script>
 </div>
 
 <!-- Phase 200.13 — Forecast Drift Visualizer -->
