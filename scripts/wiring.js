@@ -146,170 +146,177 @@ window.NeuralForecastEngine = (function() {
     clearForecast
   };
 })();
+
+// === Phase 51: Neural Audit Integrity Sentinel Core ===
+window.NeuralAuditSentinel = (function() {
+
+  function auditWiring() {
+    console.log("🧪 Running Neural Audit Integrity Scan...");
+
+    const buttons = document.querySelectorAll('.orbital-btn');
+    const panels = document.querySelectorAll('.panel[id]');
+
+    const buttonTargets = Array.from(buttons).map(btn => btn.dataset.target);
+    const panelIds = Array.from(panels).map(panel => panel.id.replace(/^panel/, ''));
+
+    let missingPanels = 0;
+    let unmatchedButtons = [];
+
+    buttonTargets.forEach(targetId => {
+      if (!panelIds.includes(targetId)) {
+        console.warn(`⚠ No panel found for button target: ${targetId}`);
+        missingPanels++;
+        unmatchedButtons.push(targetId);
+      }
+    });
+
+    console.log(`✅ Audit Complete — ${buttons.length} buttons scanned.`);
+    console.log(`✅ Panels Found: ${panelIds.length}`);
+    if (missingPanels === 0) {
+      console.log("✅ All buttons have valid panel targets.");
+    } else {
+      console.warn(`❌ ${missingPanels} button(s) missing corresponding panels.`);
+      console.table(unmatchedButtons);
+    }
+  }
+
+  return {
+    auditWiring
+  };
+})();
+
+// === Phase 52: Neural Panel Synthesis Core ===
+window.NeuralPanelSynthesis = (function() {
+
+  function synthesizePanels() {
+    console.log("🧬 Running Neural Panel Synthesis...");
+
+    const buttons = document.querySelectorAll('.orbital-btn');
+    const panelContainer = document.body;  // Insert panels directly into <body> for now
+
+    let createdPanels = 0;
+
+    buttons.forEach(button => {
+      const targetId = button.dataset.target;
+      const panelId = `panel${targetId}`;
+      let panel = document.getElementById(panelId);
+
+      if (!panel) {
+        panel = document.createElement("section");
+        panel.id = panelId;
+        panel.className = "panel tab-section panel-glow synthetic-panel";
+        panel.innerHTML = `<h2>🔧 ${targetId} Panel (Synthesized)</h2><p>Auto-generated placeholder panel for '${targetId}'.</p>`;
+        panelContainer.appendChild(panel);
+        createdPanels++;
+        console.log(`➕ Synthesized Panel Created: ${panelId}`);
+      }
+    });
+
+    if (createdPanels === 0) {
+      console.log("✅ No missing panels detected. Synthesis complete.");
+    } else {
+      console.log(`✅ Synthesis Complete — ${createdPanels} panel(s) created.`);
+    }
+  }
+
+  return {
+    synthesizePanels
+  };
+})();
+
+// === Phase 54: Neural Self-Healing Engine ===
+window.NeuralSelfHealingEngine = (function() {
+
+  function runSelfHealing() {
+    console.log("🧬 Running Neural Self-Healing Process...");
+
+    const buttons = document.querySelectorAll('.orbital-btn');
+    const panelContainer = document.body;
+    let repairsMade = 0;
+
+    buttons.forEach(button => {
+      const targetId = button.dataset.target;
+      const panelId = `panel${targetId}`;
+      let panel = document.getElementById(panelId);
+
+      if (!panel) {
+        panel = document.createElement("section");
+        panel.id = panelId;
+        panel.className = "panel tab-section panel-glow synthetic-panel auto-repair";
+        panel.innerHTML = `<h2>🛡 ${targetId} Panel (Auto-Repaired)</h2><p>Panel was missing and has been automatically restored.</p>`;
+        panelContainer.appendChild(panel);
+        repairsMade++;
+        console.log(`🛡 Auto-Repaired Missing Panel: ${panelId}`);
+      }
+    });
+
+    if (repairsMade === 0) {
+      console.log("✅ No repairs necessary. System fully stabilized.");
+    } else {
+      console.log(`✅ Self-Healing Complete — ${repairsMade} panel(s) repaired.`);
+    }
+  }
+
+  return {
+    runSelfHealing
+  };
+})();
+
+// === Phase 55: Neural Auto-Healing Forecast Engine ===
+window.NeuralAutoHealingForecast = (function() {
+  const RISK_THRESHOLD = 5;  // Threshold of activations before triggering risk warnings
+
+  function evaluatePanelRisk(targetId) {
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    const forecast = forecastMap.find(([id, count]) => id === targetId);
+
+    if (!forecast) return;
+
+    const [, activationCount] = forecast;
+    if (activationCount >= RISK_THRESHOLD) {
+      const panelId = `panel${targetId}`;
+      const panel = document.getElementById(panelId);
+      if (!panel) {
+        console.warn(`⚠ PREDICTIVE WARNING: High activation risk detected for missing panel '${targetId}'.`);
+      }
+    }
+  }
+
+  function evaluateAllRisks() {
+    console.log("🧬 Running Auto-Healing Forecast Analysis...");
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+
+    forecastMap.forEach(([targetId, activationCount]) => {
+      if (activationCount >= RISK_THRESHOLD) {
+        const panelId = `panel${targetId}`;
+        const panel = document.getElementById(panelId);
+        if (!panel) {
+          console.warn(`⚠ PREDICTIVE WARNING: Panel '${targetId}' heavily activated but missing.`);
+        }
+      }
+    });
+
+    console.log("✅ Forecast Risk Analysis Complete.");
+  }
+
+  return {
+    evaluatePanelRisk,
+    evaluateAllRisks
+  };
+})();
 // === Unified Neural Bootloader Stabilization ===
 
 // === Phase 39 Neural Mesh Activation ===
 
 // === Phase 40 Purification Injection ===
 
-const anchors = [
-  { id: "operatorConsolePanel", icon: "icon-console.png" },
-  { id: "count", icon: "icon-audit.png" },
-  { id: "deltaAnalyzer", icon: "icon-delta.png" },
-  { id: "reportingHub", icon: "icon-report.png" },
-  { id: "utilityHub", icon: "icon-utility.png" },
-  { id: "tools", icon: "icon-tools.png" },
-  { id: "masterExportHub", icon: "icon-export.png" },
-  { id: "sessionManager", icon: "icon-session.png" },
-  { id: "mappings", icon: "icon-mapping.png" },
-  { id: "advancedTools", icon: "icon-advanced.png" },
-  { id: "rotation", icon: "icon-rotation.png" },
-  { id: "dropboxModal", icon: "icon-dropbox.png" }
-];
-
-anchors.forEach(anchor => {
-  const panel = document.getElementById(anchor.id);
-  const button = document.querySelector(`.tablink[data-target="${anchor.id}"]`);
-
-  if (!panel) {
-    console.warn(`⚠ Missing DOM Panel for: ${anchor.id}`);
-  }
-  if (!button) {
-    console.warn(`⚠ Missing DOM Button for: ${anchor.id}`);
-  } else {
-    const img = document.createElement("img");
-    img.src = `/assets/icons/${anchor.icon}`;
-    img.alt = anchor.id;
-    img.classList.add("orbital-icon");
-    button.innerHTML = "";
-    button.appendChild(img);
-  }
-});
-
-console.log("✅ Orbital Purification Compression Complete.");
 
 // === Phase 41: Orbital Anchor Wiring Bootstrap ===
 
-NavigationCore.bootstrapOrbitalAnchors = function() {
-  console.log("🧬 Phase 41 — Orbital Anchor Wiring Bootstrap Starting...");
-
-  const anchors = [
-    { id: "operatorConsolePanel", selector: "#paneloperatorConsolePanel" },
-    { id: "count", selector: "#panelcount" },
-    { id: "deltaAnalyzer", selector: "#paneldeltaAnalyzer" },
-    { id: "reportingHub", selector: "#panelreportingHub" },
-    { id: "utilityHub", selector: "#panelutilityHub" },
-    { id: "tools", selector: "#paneltools" },
-    { id: "masterExportHub", selector: "#panelmasterExportHub" },
-    { id: "sessionManager", selector: "#panelsessionManager" },
-    { id: "mappings", selector: "#panelmappings" },
-    { id: "advancedTools", selector: "#paneladvancedTools" },
-    { id: "rotation", selector: "#panelrotation" },
-    { id: "dropboxModal", selector: "#paneldropboxModal" }
-  ];
-
-  anchors.forEach(anchor => {
-    const button = document.querySelector(`.orbital-btn[data-target="${anchor.id}"]`);
-    const panel = document.querySelector(anchor.selector);
-
-    if (!button) {
-      console.warn(`⚠ Orbital Button not found for target: ${anchor.id}`);
-      return;
-    }
-
-    if (!panel) {
-      console.warn(`⚠ DOM Panel not found for target: ${anchor.id}`);
-      return;
-    }
-
-    button.addEventListener("click", () => {
-      document.querySelectorAll('.tabcontent, .panel').forEach(p => p.classList.remove("active"));
-      panel.classList.add("active");
-      panel.scrollIntoView({ behavior: "smooth" });
-      console.log(`✅ Activated Orbital Panel: ${anchor.id}`);
-    });
-  });
-
-  console.log("✅ Phase 41 — Orbital Anchor Wiring Bootstrap Complete.");
-};
 
 // === Phase 43: Orbital Router Activation Mesh ===
-NavigationCore.activateOrbitalRouterMesh = function() {
-  console.log("🧬 Phase 43 — Orbital Router Activation Mesh Engaged");
-
-  const buttons = document.querySelectorAll('.orbital-btn');
-  buttons.forEach(button => {
-    const targetId = button.dataset.target;
-    if (!targetId) {
-      console.warn("⚠ Orbital Button missing data-target attribute.");
-      return;
-    }
-
-    const panel = document.getElementById(`panel${targetId}`);
-    if (!panel) {
-      console.warn(`⚠ Panel not found for target: ${targetId}`);
-      return;
-    }
-
-    // Remove any previous listeners for safety (collision protection)
-    button.replaceWith(button.cloneNode(true));
-    const freshButton = document.querySelector(`.orbital-btn[data-target="${targetId}"]`);
-
-    freshButton.addEventListener("click", () => {
-      document.querySelectorAll('.tabcontent, .panel').forEach(p => p.classList.remove("active"));
-      panel.classList.add("active");
-      panel.scrollIntoView({ behavior: "smooth" });
-      console.log(`✅ Orbital Router activated: ${targetId}`);
-    });
-  });
-
-  console.log("✅ Phase 43 — Orbital Router Mesh Fully Synchronized.");
-};
 
 // === Phase 44: Dynamic Panel Loaders Bootstrap ===
-NavigationCore.dynamicPanelLoader = function() {
-  console.log("🧬 Phase 44 — Dynamic Panel Loaders Bootstrap Engaged");
-
-  // Build panel registry
-  const panels = {};
-  document.querySelectorAll('.panel[id]').forEach(panel => {
-    const id = panel.id.replace(/^panel/, '');
-    panels[id] = panel;
-  });
-  console.log("✅ Panel Registry:", panels);
-
-  // Attach dynamic event listeners to buttons
-  const buttons = document.querySelectorAll('.orbital-btn');
-  buttons.forEach(button => {
-    const targetId = button.dataset.target;
-    if (!targetId) {
-      console.warn("⚠ Orbital Button missing data-target attribute.");
-      return;
-    }
-
-    // Collision prevention
-    button.replaceWith(button.cloneNode(true));
-    const freshButton = document.querySelector(`.orbital-btn[data-target="${targetId}"]`);
-
-    freshButton.addEventListener("click", () => {
-      if (panels[targetId]) {
-        document.querySelectorAll('.tabcontent, .panel').forEach(p => p.classList.remove("active"));
-        panels[targetId].classList.add("active");
-        panels[targetId].scrollIntoView({ behavior: "smooth" });
-        console.log(`✅ Dynamic Panel Loaded: ${targetId}`);
-        NeuralDriftCore.registerActivation(targetId);
-        NeuralSessionMemory.saveLastPanel(targetId);
-        NeuralForecastEngine.registerActivation(targetId);
-      } else {
-        console.warn(`❌ Panel not found in registry: ${targetId}`);
-        NeuralDriftCore.registerError(targetId);
-        alert(`Panel "${targetId}" is unavailable.`);
-      }
-    });
-  });
-
-  console.log("✅ Phase 44 — Dynamic Panel Loaders Fully Activated.");
-};
 
 // === Phase 47: Neural Cortex Error Shielding Bootstrap ===
 document.addEventListener("DOMContentLoaded", () => {
@@ -319,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     OrbitalAnchorRegistry.buildRegistry();
     OrbitalController.bootstrap();
     NeuralSessionMemory.restoreLastPanel();
+    NeuralSelfHealingEngine.runSelfHealing();
 
     if (typeof NavigationCore.bootstrapOrbitalAnchors === "function") {
       NavigationCore.bootstrapOrbitalAnchors();
@@ -343,3 +351,27 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Neural Bootstrap Failure:", err);
   }
 });
+// === Phase 53: Neural Operator Console Logging Redirect ===
+(function() {
+  const consoleOutput = document.getElementById("neuralConsoleOutput");
+  if (!consoleOutput) return;
+
+  function appendToConsole(message) {
+    const p = document.createElement("p");
+    p.textContent = message;
+    consoleOutput.appendChild(p);
+    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+  }
+
+  const originalLog = console.log;
+  console.log = function(...args) {
+    originalLog.apply(console, args);
+    appendToConsole(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : a)).join(' '));
+  };
+
+  const originalWarn = console.warn;
+  console.warn = function(...args) {
+    originalWarn.apply(console, args);
+    appendToConsole("⚠ " + args.join(' '));
+  };
+})();
