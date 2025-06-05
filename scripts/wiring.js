@@ -626,18 +626,28 @@ window.NeuralOperatorConsole = (function() {
     panel.className = "panel tab-section panel-glow operator-console";
 
     panel.innerHTML = `
-      <h2>🧭 Neural Operator Command Bridge</h2>
-      <div class="console-section">
-        <button onclick="NeuralAuditSentinel.auditWiring()">Run Audit Integrity Scan</button>
-        <button onclick="NeuralSelfHealingEngine.runSelfHealing()">Run Self-Healing Engine</button>
-        <button onclick="NeuralForecastEngine.clearForecast()">Clear Forecast History</button>
-        <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
-        <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
-      </div>
-      <div class="console-log">
-        <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
-      </div>
-    `;
+  <h2>🧭 Neural Operator Command Bridge</h2>
+
+  <div class="console-section">
+    <button onclick="NeuralAuditSentinel.auditWiring()">Run Audit Integrity Scan</button>
+    <button onclick="NeuralSelfHealingEngine.runSelfHealing()">Run Self-Healing Engine</button>
+    <button onclick="NeuralForecastEngine.clearForecast()">Clear Forecast History</button>
+    <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
+    <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
+  </div>
+
+  <div class="console-section">
+    <h3>⚖ Governance Policy Controls</h3>
+    <label>Risk Threshold: <input type="number" id="riskThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().riskThreshold}"></label><br>
+    <label>Drift Threshold: <input type="number" id="driftThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().driftThreshold}"></label><br>
+    <label>Error Threshold: <input type="number" id="errorThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().errorThreshold}"></label><br>
+    <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
+  </div>
+
+  <div class="console-log">
+    <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
+  </div>
+`;
 
     document.body.appendChild(panel);
     console.log("✅ Operator Command Console Deployed.");
@@ -654,6 +664,19 @@ window.NeuralOperatorConsole = (function() {
   };
 
 })();
+function applyPolicyChanges() {
+  const risk = parseInt(document.getElementById("riskThresholdInput").value);
+  const drift = parseInt(document.getElementById("driftThresholdInput").value);
+  const error = parseInt(document.getElementById("errorThresholdInput").value);
+
+  NeuralGovernancePolicyCore.setPolicy({
+    riskThreshold: risk,
+    driftThreshold: drift,
+    errorThreshold: error
+  });
+
+  console.log("✅ Live Policy Changes Applied");
+}
 // === Phase 8000.3: Neural Live Panel Synchronizer ===
 function renderLiveSystemStatus() {
   console.log("🧬 Rendering Live System Status...");
@@ -932,6 +955,229 @@ window.NeuralGovernanceCore = (function() {
   return {
     evaluateSystem,
     startGovernanceLoop
+  };
+
+})();
+// === Phase 8002.5: Neural Governance Policy Console ===
+window.NeuralGovernancePolicyCore = (function() {
+
+  const STORAGE_KEY = 'neural_governance_policy';
+
+  // Default policy thresholds
+  const policy = {
+    riskThreshold: 10,
+    driftThreshold: 25,
+    errorThreshold: 5
+  };
+
+  function loadPolicy() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        Object.assign(policy, parsed);
+        console.log("💾 Governance Policy Loaded:", policy);
+      } catch (err) {
+        console.error("❌ Failed to parse saved policy:", err);
+      }
+    } else {
+      console.log("ℹ No saved governance policy found. Using defaults.");
+    }
+  }
+
+  function savePolicy() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(policy));
+      console.log("💾 Governance Policy Saved:", policy);
+    } catch (err) {
+      console.error("❌ Failed to save policy:", err);
+    }
+  }
+
+  function getPolicy() {
+    return { ...policy };
+  }
+
+  function setPolicy(newPolicy) {
+    Object.assign(policy, newPolicy);
+    savePolicy();
+    console.log("⚙ Governance Policy Updated:", policy);
+  }
+
+  function evaluateSystem() {
+    console.log("⚖ Live Policy Evaluation Running...");
+
+    let actionTaken = false;
+
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    forecastMap.forEach(([targetId, activationCount]) => {
+      if (activationCount >= policy.riskThreshold) {
+        console.warn(`⚠ Policy Alert: High activation risk detected for '${targetId}'`);
+        NeuralSelfHealingEngine.runSelfHealing();
+        actionTaken = true;
+      }
+    });
+
+    const drift = NeuralDriftCore.getStatus();
+    if (drift.totalActivations >= policy.driftThreshold) {
+      console.warn("⚠ Policy Alert: Drift activation threshold exceeded.");
+      NeuralAuditSentinel.auditWiring();
+      actionTaken = true;
+    }
+
+    if (drift.errorCount >= policy.errorThreshold) {
+      console.error("❌ Policy Emergency: Excessive system errors detected.");
+      NeuralPanelSynthesis.synthesizePanels();
+      actionTaken = true;
+    }
+
+    if (!actionTaken) {
+      console.log("✅ Policy Pass: System stable.");
+    }
+  }
+
+  // Load persisted policy on init
+  loadPolicy();
+
+  return {
+    getPolicy,
+    setPolicy,
+    evaluateSystem
+  };
+
+})();
+// === Phase 8003.0: Neural State Archive Core ===
+window.NeuralStateArchiveCore = (function() {
+
+  const STORAGE_KEY = 'neural_state_archive';
+
+  function saveState() {
+    const state = {
+      forecastMap: NeuralForecastEngine.getForecastReport(),
+      driftMetrics: NeuralDriftCore.getStatus(),
+      sessionPanel: NeuralSessionMemory.getLastPanel(),
+      policy: NeuralGovernancePolicyCore.getPolicy()
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      console.log("💾 Neural State Archive Saved:", state);
+    } catch (err) {
+      console.error("❌ Failed to save neural state archive:", err);
+    }
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      console.log("ℹ No neural state archive found.");
+      return;
+    }
+
+    try {
+      const state = JSON.parse(saved);
+      console.log("💾 Neural State Archive Loaded:", state);
+
+      // Restore Forecast
+      state.forecastMap.forEach(([targetId, count]) => {
+        for (let i = 0; i < count; i++) {
+          NeuralForecastEngine.registerActivation(targetId);
+        }
+      });
+
+      // Restore Drift Metrics (partial - we only restore activation count for safety)
+      state.driftMetrics.uniquePanels.forEach(panelId => {
+        NeuralDriftCore.registerActivation(panelId);
+      });
+
+      // Restore Session Memory
+      if (state.sessionPanel) {
+        NeuralSessionMemory.saveLastPanel(state.sessionPanel);
+      }
+
+      // Restore Policy
+      NeuralGovernancePolicyCore.setPolicy(state.policy);
+
+    } catch (err) {
+      console.error("❌ Failed to parse neural state archive:", err);
+    }
+  }
+
+  function clearState() {
+    localStorage.removeItem(STORAGE_KEY);
+    console.log("🧹 Neural State Archive Cleared.");
+  }
+
+  return {
+    saveState,
+    loadState,
+    clearState
+  };
+
+})();
+// === Phase 8003.5: Neural Continuity Loop Automation ===
+
+(function NeuralContinuityLoop() {
+  console.log("🔄 Neural Continuity Loop Activated");
+
+  // Load state on startup (this ensures state loads automatically on every boot)
+  NeuralStateArchiveCore.loadState();
+
+  // Auto-save state every X seconds (default: 60s)
+  const SAVE_INTERVAL = 60000;
+
+  setInterval(() => {
+    NeuralStateArchiveCore.saveState();
+  }, SAVE_INTERVAL);
+})();
+// === Phase 8004.0: Neural State Integrity Sentinel ===
+window.NeuralStateIntegritySentinel = (function() {
+
+  const STORAGE_KEY = 'neural_state_archive';
+
+  function validateArchive() {
+    console.log("🧪 Running Neural Archive Integrity Scan...");
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      console.log("ℹ No archive present to validate.");
+      return true;
+    }
+
+    try {
+      const state = JSON.parse(saved);
+
+      if (!state.forecastMap || !state.driftMetrics || !state.policy) {
+        console.error("❌ Archive Missing Critical Sections.");
+        return false;
+      }
+
+      if (!Array.isArray(state.forecastMap)) {
+        console.error("❌ ForecastMap structure invalid.");
+        return false;
+      }
+
+      if (typeof state.driftMetrics.totalActivations !== 'number') {
+        console.error("❌ DriftMetrics structure invalid.");
+        return false;
+      }
+
+      if (typeof state.policy.riskThreshold !== 'number') {
+        console.error("❌ Policy structure invalid.");
+        return false;
+      }
+
+      console.log("✅ Neural Archive Integrity Verified.");
+      return true;
+
+    } catch (err) {
+      console.error("❌ Archive Parse Error:", err);
+      return false;
+    }
+  }
+
+  return {
+    validateArchive
   };
 
 })();
