@@ -2510,3 +2510,105 @@ window.NeuralMeshReinforcementCore = (function () {
   };
 
 })();
+// === Phase 13001.4 — Neural Mesh Resilience Sentinel ===
+
+window.NeuralMeshResilienceSentinel = (function () {
+
+  function monitorMeshHealth() {
+    console.log("🧪 Neural Mesh Resilience Sentinel Scan Initiated...");
+
+    const registry = window.NeuralOrbitRegistry?.listOrbits?.();
+    const dockContainer = document.getElementById("orbitalDockContainer");
+
+    if (!registry || !dockContainer) {
+      console.error("❌ Resilience Sentinel Failure — registry or dock missing.");
+      return;
+    }
+
+    const expectedOrbits = Object.keys(registry).length;
+    const actualButtons = dockContainer.querySelectorAll(".orbital-btn").length;
+
+    console.log(`🔎 Expected Orbits: ${expectedOrbits} | Buttons Deployed: ${actualButtons}`);
+
+    if (expectedOrbits === actualButtons) {
+      console.log("✅ Neural Mesh Resilience Stable: All orbits successfully deployed.");
+    } else {
+      console.warn(`⚠ Mesh Discrepancy Detected: ${expectedOrbits - actualButtons} mismatch`);
+      console.warn("🚑 Triggering Orbital Mesh Reinforcement...");
+      NeuralMeshReinforcementCore.reinforceOrbitalMesh();
+    }
+  }
+
+  function startMeshMonitor(intervalMs = 60000) {
+    console.log(`🧬 Neural Mesh Resilience Monitor Activated — scanning every ${intervalMs / 1000} seconds.`);
+    monitorMeshHealth();
+    setInterval(monitorMeshHealth, intervalMs);
+  }
+
+  return {
+    monitorMeshHealth,
+    startMeshMonitor
+  };
+
+})();
+// === Phase 13002.0 — Neural Mesh Autonomic Supervisor ===
+
+window.NeuralAutonomicSupervisor = (function () {
+
+  let supervisorLoop = null;
+  const LOOP_INTERVAL = 45000;  // Supervisor scan every 45 seconds
+
+  function runSupervisorCycle() {
+    console.log("🧭 Autonomic Supervisor: Mesh Health Evaluation Initiated...");
+
+    try {
+      const registry = window.NeuralOrbitRegistry?.listOrbits?.();
+      const dockContainer = document.getElementById("orbitalDockContainer");
+
+      if (!registry || !dockContainer) {
+        console.error("❌ Supervisor Failure — Critical mesh component unavailable.");
+        return;
+      }
+
+      const expectedOrbits = Object.keys(registry).length;
+      const actualButtons = dockContainer.querySelectorAll(".orbital-btn").length;
+
+      if (expectedOrbits !== actualButtons) {
+        console.warn(`⚠ Supervisor Alert: Mesh mismatch detected. Orbits=${expectedOrbits}, Buttons=${actualButtons}`);
+
+        // Trigger automated reinforcement
+        NeuralMeshReinforcementCore.reinforceOrbitalMesh();
+
+        // Re-verify immediately
+        setTimeout(() => {
+          NeuralMeshIntegritySentinel.verifyRegistryIntegrity();
+        }, 2000);
+      } else {
+        console.log("✅ Supervisor Check: Mesh fully aligned.");
+      }
+
+    } catch (err) {
+      console.error("❌ Autonomic Supervisor Error:", err);
+    }
+  }
+
+  function startSupervisor() {
+    console.log(`🧭 Neural Autonomic Supervisor Activated — scanning every ${LOOP_INTERVAL / 1000} seconds.`);
+    runSupervisorCycle();
+    supervisorLoop = setInterval(runSupervisorCycle, LOOP_INTERVAL);
+  }
+
+  function stopSupervisor() {
+    if (supervisorLoop) {
+      clearInterval(supervisorLoop);
+      console.log("🛑 Autonomic Supervisor Deactivated.");
+    }
+  }
+
+  return {
+    runSupervisorCycle,
+    startSupervisor,
+    stopSupervisor
+  };
+
+})();
