@@ -1558,3 +1558,236 @@ window.NeuralSentinelCoordinator = (function() {
   };
 
 })();
+// === Phase 9000.1: Neural Health Diagnostics Panel ===
+function runHealthDiagnostics() {
+  const output = document.getElementById("healthOutput");
+  if (!output) return;
+
+  output.innerHTML = "🩺 Running Diagnostics...";
+
+  setTimeout(() => {
+    let report = "";
+
+    // Archive Integrity
+    const archiveValid = NeuralStateIntegritySentinel.validateArchive();
+    report += `📦 Archive Valid: ${archiveValid ? "✅ OK" : "❌ FAILED"}\n`;
+
+    // Forecast Report
+    const forecast = NeuralForecastEngine.getForecastReport();
+    report += `📊 Forecast Entries: ${forecast.length}\n`;
+
+    // Drift Metrics
+    const drift = NeuralDriftCore.getStatus();
+    report += `🌌 Drift Active Panels: ${drift.uniquePanels.length}\n`;
+
+    // Orbital Mesh Integrity
+    const meshValid = NeuralOrbitalMeshReconciliation.validateOrbitalMesh();
+    report += `🪐 Orbital Mesh Valid: ${meshValid ? "✅ OK" : "❌ FAILED"}\n`;
+
+    output.innerHTML = `<pre>${report}</pre>`;
+  }, 400);
+}
+// === Phase 9000.0: Orbital Control Room Panel Switching ===
+function switchControlPanel(panelKey) {
+  const panels = document.querySelectorAll('.control-panel');
+  panels.forEach(panel => panel.classList.remove('active-panel'));
+
+  const activePanel = document.getElementById(`panel-${panelKey}`);
+  if (activePanel) {
+    activePanel.classList.add('active-panel');
+  }
+}
+// === Phase 9000.2: Forecast Cortex Summary Generator ===
+
+function generateForecastSummary() {
+  const cortex = NeuralForecastMemoryCortex.getForecastHistory();
+  const output = document.getElementById("forecastSummaryOutput");
+  if (!cortex || cortex.length === 0) {
+    output.innerHTML = "<p>⚠ No forecast data loaded.</p>";
+    return;
+  }
+
+  let summary = "";
+  summary += `Total Forecast Records: ${cortex.length}\n`;
+
+  const categories = {};
+  cortex.forEach(f => {
+    categories[f.division] = (categories[f.division] || 0) + 1;
+  });
+
+  summary += `Category Breakdown:\n`;
+  Object.keys(categories).forEach(cat => {
+    summary += ` - ${cat}: ${categories[cat]}\n`;
+  });
+
+  output.innerHTML = `<pre>${summary}</pre>`;
+}
+
+// === Phase 9000.2: Forecast Cortex Summary Generator ===
+
+function generateForecastSummary() {
+  const cortex = NeuralForecastMemoryCortex.getForecastHistory();
+  const output = document.getElementById("forecastSummaryOutput");
+  if (!cortex || cortex.length === 0) {
+    output.innerHTML = "<p>⚠ No forecast data loaded.</p>";
+    return;
+  }
+
+  let summary = "";
+  summary += `Total Forecast Records: ${cortex.length}\n`;
+
+  const categories = {};
+  cortex.forEach(f => {
+    categories[f.division] = (categories[f.division] || 0) + 1;
+  });
+
+  summary += `Category Breakdown:\n`;
+  Object.keys(categories).forEach(cat => {
+    summary += ` - ${cat}: ${categories[cat]}\n`;
+  });
+
+  output.innerHTML = `<pre>${summary}</pre>`;
+}
+
+// === Phase 9000.2: Forecast Cortex Summary Generator ===
+
+function generateForecastSummary() {
+  const cortex = NeuralForecastMemoryCortex.getForecastHistory();
+  const output = document.getElementById("forecastSummaryOutput");
+  if (!cortex || cortex.length === 0) {
+    output.innerHTML = "<p>⚠ No forecast data loaded.</p>";
+    return;
+  }
+
+  let summary = "";
+  summary += `Total Forecast Records: ${cortex.length}\n`;
+
+  const categories = {};
+  cortex.forEach(f => {
+    categories[f.division] = (categories[f.division] || 0) + 1;
+  });
+
+  summary += `Category Breakdown:\n`;
+  Object.keys(categories).forEach(cat => {
+    summary += ` - ${cat}: ${categories[cat]}\n`;
+  });
+
+  output.innerHTML = `<pre>${summary}</pre>`;
+}
+
+function clearForecastSummary() {
+  document.getElementById("forecastSummaryOutput").innerHTML =
+    "<p>📊 Forecast report output cleared.</p>";
+}
+// === Phase 9000.3: Governance Policy Engine ===
+
+function applyPolicyChanges() {
+  const risk = parseInt(document.getElementById("riskThresholdInput").value);
+  const drift = parseInt(document.getElementById("driftThresholdInput").value);
+  const error = parseInt(document.getElementById("errorThresholdInput").value);
+
+  if (!window.neuralGovernancePolicyCore) {
+    window.neuralGovernancePolicyCore = {};
+  }
+
+  window.neuralGovernancePolicyCore.risk = risk;
+  window.neuralGovernancePolicyCore.drift = drift;
+  window.neuralGovernancePolicyCore.error = error;
+
+  const status = document.getElementById("policyStatusOutput");
+  status.textContent = `✅ Policy Applied: Risk ${risk} | Drift ${drift} | Error ${error}`;
+  console.log("⚖ Governance Policy Updated:", window.neuralGovernancePolicyCore);
+}
+// === Phase 9000.4: Neural Healing Console ===
+
+function runFullSelfHealing() {
+  NeuralAuditSentinel.auditWiring();
+  NeuralSelfHealingEngine.runSelfHealing();
+  healDriftState();
+  const output = document.getElementById("healingStatusOutput");
+  output.textContent = "✅ Full Healing Sequence Complete.";
+}
+
+function healWiringOnly() {
+  NeuralAuditSentinel.auditWiring();
+  NeuralSelfHealingEngine.runSelfHealing();
+  const output = document.getElementById("healingStatusOutput");
+  output.textContent = "✅ Wiring Layer Repaired.";
+}
+
+function healDriftState() {
+  if (window.NeuralDriftCore?.stabilizeDrift) {
+    window.NeuralDriftCore.stabilizeDrift();
+  }
+  const output = document.getElementById("healingStatusOutput");
+  output.textContent = "✅ Drift Synchronization Healed.";
+}
+// === Phase 9000.5: Archive & Snapshot Console ===
+
+function saveSnapshot() {
+  NeuralTemporalRollbackCore.saveSnapshot();
+  listSnapshots();
+}
+
+function listSnapshots() {
+  const keys = NeuralTemporalRollbackCore.listSnapshots();
+  const output = document.getElementById("snapshotListOutput");
+  if (!output) return;
+
+  if (keys.length === 0) {
+    output.innerHTML = "<p>📜 No snapshots found.</p>";
+    return;
+  }
+
+  output.innerHTML = "<ul>";
+  keys.forEach(key => {
+    output.innerHTML += `<li>${key} <button onclick="loadSnapshot('${key}')">Restore</button></li>`;
+  });
+  output.innerHTML += "</ul>";
+}
+
+function loadSnapshot(key) {
+  NeuralTemporalRollbackCore.loadSnapshot(key);
+  NeuralStateArchiveCore.saveState(); // Optional: re-sync archive after rollback
+}
+
+function clearSnapshots() {
+  if (confirm("⚠ Are you sure you want to clear all snapshots?")) {
+    NeuralTemporalRollbackCore.clearAllSnapshots();
+    listSnapshots();
+  }
+}
+// === Phase 9000.6: Redundancy Buffer Console ===
+
+function createRedundancyBackup() {
+  const archive = NeuralStateArchiveCore?.saveState?.();
+  if (!archive) {
+    alert("⚠ Failed to create redundancy backup.");
+    return;
+  }
+  localStorage.setItem("redundancyBackup", JSON.stringify(archive));
+  const output = document.getElementById("redundancyStatusOutput");
+  output.textContent = "📦 Redundancy Backup Created";
+}
+
+function restoreRedundancyBackup() {
+  const data = localStorage.getItem("redundancyBackup");
+  if (!data) {
+    alert("⚠ No redundancy backup found.");
+    return;
+  }
+  try {
+    const archive = JSON.parse(data);
+    NeuralStateArchiveCore?.loadState?.(archive);
+    const output = document.getElementById("redundancyStatusOutput");
+    output.textContent = "📥 Redundancy Backup Restored";
+  } catch {
+    alert("⚠ Failed to parse redundancy backup.");
+  }
+}
+
+function clearRedundancyBackup() {
+  localStorage.removeItem("redundancyBackup");
+  const output = document.getElementById("redundancyStatusOutput");
+  output.textContent = "🧹 Redundancy Backup Cleared";
+}

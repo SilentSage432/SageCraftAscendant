@@ -56,6 +56,113 @@
       <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
       <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
     </div>
+
+    <!-- === Phase 9000.0: Orbital Control Room Bootstrap === -->
+<section id="orbitalControlRoom" class="orbital-control-room panel panel-glow">
+  <h2>🧭 Orbital Control Room</h2>
+
+  <div id="controlRoomNavigation" class="control-room-nav">
+    <button onclick="switchControlPanel('health')">🩺 Health</button>
+    <button onclick="switchControlPanel('forecast')">📊 Forecast</button>
+    <button onclick="switchControlPanel('governance')">⚖ Governance</button>
+    <button onclick="switchControlPanel('healing')">🛡 Healing</button>
+    <button onclick="switchControlPanel('archives')">🗄 Archives</button>
+    <button onclick="switchControlPanel('redundancy')">♻ Redundancy</button>
+  </div>
+
+  <div id="controlRoomPanels" class="control-room-panels">
+    <div id="panel-health" class="control-panel active-panel">
+      <h3>🩺 Neural Health Status</h3>
+    
+      <div class="health-summary">
+        <button onclick="runHealthDiagnostics()">Run Full Diagnostics</button>
+    
+        <div id="healthOutput" style="margin-top: 20px; font-family: monospace;"></div>
+      </div>
+    </div>
+
+    <div id="panel-forecast" class="control-panel">
+      <h3>📊 Forecast Cortex Memory</h3>
+    
+      <div class="forecast-controls">
+        <button onclick="generateForecastSummary()">Generate Forecast Summary</button>
+        <button onclick="clearForecastSummary()">Clear Forecast</button>
+      </div>
+    
+      <div id="forecastSummaryOutput" style="
+        margin-top: 20px; background: #111; color: #0f0;
+        padding: 10px; font-family: monospace; border: 1px solid #333;
+        border-radius: 8px; max-height: 400px; overflow-y: auto;">
+        <p>📊 Forecast report output will appear here.</p>
+      </div>
+    </div>
+
+    <div id="panel-governance" class="control-panel">
+      <h3>⚖ Governance Policy Core</h3>
+    
+      <div class="governance-controls">
+        <label>Risk Threshold: <input type="number" id="riskThresholdInput" value="80"></label><br>
+        <label>Drift Threshold: <input type="number" id="driftThresholdInput" value="10"></label><br>
+        <label>Error Threshold: <input type="number" id="errorThresholdInput" value="5"></label><br>
+        <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
+      </div>
+    
+      <div id="policyStatusOutput" style="
+        margin-top: 20px; font-family: monospace; color: lime;
+        padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px;">
+        ✅ Current Policy Active
+      </div>
+    </div>
+
+    <div id="panel-healing" class="control-panel">
+      <h3>🛡 Self-Healing & Repair Console</h3>
+    
+      <div class="healing-controls">
+        <button onclick="runFullSelfHealing()">Run Full Self-Healing</button>
+        <button onclick="healWiringOnly()">Heal Wiring Layer</button>
+        <button onclick="healDriftState()">Heal Drift Synchronization</button>
+      </div>
+    
+      <div id="healingStatusOutput" style="
+        margin-top: 20px; font-family: monospace; color: lime;
+        padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px;">
+        ✅ Healing Console Ready
+      </div>
+    </div>
+
+    <div id="panel-archives" class="control-panel">
+      <h3>🗄 Archive & Snapshot Console</h3>
+    
+      <div class="archive-controls">
+        <button onclick="saveSnapshot()">📸 Save Snapshot</button>
+        <button onclick="listSnapshots()">📂 List Snapshots</button>
+        <button onclick="clearSnapshots()">🧹 Clear Snapshots</button>
+      </div>
+    
+      <div id="snapshotListOutput" style="
+        margin-top: 20px; font-family: monospace; color: lime;
+        padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px; max-height: 300px; overflow-y: auto;">
+        <p>📜 No snapshots listed yet.</p>
+      </div>
+    </div>
+
+    <div id="panel-redundancy" class="control-panel">
+      <h3>♻ Redundancy Buffer Console</h3>
+    
+      <div class="redundancy-controls">
+        <button onclick="createRedundancyBackup()">📦 Create Redundancy Backup</button>
+        <button onclick="restoreRedundancyBackup()">📥 Restore Redundancy Backup</button>
+        <button onclick="clearRedundancyBackup()">🧹 Clear Redundancy Backup</button>
+      </div>
+    
+      <div id="redundancyStatusOutput" style="
+        margin-top: 20px; font-family: monospace; color: lime;
+        padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px;">
+        ✅ Redundancy Buffer Online
+      </div>
+    </div>
+  </div>
+</section>
   
     <div class="console-section">
       <h3>⚖ Governance Policy Controls</h3>

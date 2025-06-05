@@ -2554,3 +2554,94 @@ h2, h3, p, label {
   pointer-events: none;
   user-select: none;
 }
+.orbital-control-room {
+  background: #111;
+  color: #0f0;
+  border: 2px solid #333;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 1000px;
+}
+
+.control-room-nav {
+  margin-bottom: 20px;
+}
+
+.control-room-nav button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  background: #222;
+  color: #0f0;
+  border: 1px solid #555;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.control-room-nav button:hover {
+  background: #333;
+}
+
+.control-panel {
+  display: none;
+}
+
+.active-panel {
+  display: block;
+}
+.health-summary {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(20, 20, 40, 0.8);
+  border: 2px solid #8f3aff;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(138, 43, 226, 0.4);
+}
+
+#healthOutput {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  color: #0f0;
+  font-weight: bold;
+}
+.forecast-controls {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+}
+.governance-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(20, 20, 40, 0.85);
+  border: 2px solid #ffa533;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255, 165, 51, 0.3);
+  color: #fff;
+}
+.healing-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(20, 30, 20, 0.85);
+  border: 2px solid #33ff99;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(51, 255, 153, 0.3);
+  color: #fff;
+}
+.archive-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(30, 20, 40, 0.85);
+  border: 2px solid #ffaa33;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255, 170, 51, 0.3);
+  color: #fff;
+}
+.redundancy-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(40, 20, 20, 0.85);
+  border: 2px solid #ff3344;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255, 51, 68, 0.3);
+  color: #fff;
+}
