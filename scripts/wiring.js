@@ -1359,3 +1359,39 @@ function startIntegritySentinels() {
     }
   }, 30000);  // Run every 30 seconds
 }
+// === Phase 8007.0: Neural Autonomous Repair Core ===
+window.NeuralAutonomousRepairCore = (function() {
+
+  function runFullRepairCycle() {
+    console.log("🧪 Running Full Neural Autonomous Repair Cycle...");
+
+    // Step 1️⃣ — Audit Integrity
+    NeuralAuditSentinel.auditWiring();
+
+    // Step 2️⃣ — Re-synthesize Missing Panels
+    NeuralPanelSynthesis.synthesizePanels();
+
+    // Step 3️⃣ — Apply Forecast-Based Auto-Healing
+    NeuralAutoHealingForecast.evaluateAllRisks();
+
+    // Step 4️⃣ — Validate Orbital Mesh
+    NeuralOrbitalMeshReconciliation.validateOrbitalMesh();
+
+    // Step 5️⃣ — Run Self-Healing Engine
+    NeuralSelfHealingEngine.runSelfHealing();
+
+    console.log("✅ Full Repair Cycle Complete.");
+  }
+
+  function startRepairLoop(intervalMs = 30000) {
+    console.log(`🛡 Autonomous Repair Loop Activated — scanning every ${intervalMs / 1000} seconds.`);
+    runFullRepairCycle(); // Immediate initial pass
+    setInterval(runFullRepairCycle, intervalMs);
+  }
+
+  return {
+    runFullRepairCycle,
+    startRepairLoop
+  };
+
+})();
