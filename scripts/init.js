@@ -114,4 +114,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   validateStorageIntegrity();
+
+  // Phase 14007 — Orbital Dock Live Boot Trigger
+  try {
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+      console.log("✅ Orbital Dock Rendered via Neural Registry");
+    } else {
+      console.error("❌ NeuralOrbitalDockMesh.renderOrbitalDock() unavailable.");
+    }
+  } catch (err) {
+    console.error("❌ Orbital Dock Live Boot Failure:", err);
+  }
 });

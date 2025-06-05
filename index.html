@@ -771,6 +771,10 @@
     ">
       🧠 Upload Intake Report
     </button>
+    <div class="console-section">
+      <h3>🧪 Orbital Dock Integrity</h3>
+      <button onclick="NeuralOrbitalDockValidator.runDockValidationBurnIn()">Run Dock Validation Burn-In</button>
+    </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
@@ -1880,12 +1884,11 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- Modal Manager for Item Link Modal -->
   <script type="module" src="scripts/itemLinkModal.js"></script>
 
-  <!-- load Registry seeder before Wiring.js - global load -->
-  <script src="scripts/neuralRegistrySeed.js"></script>
-  <script src="scripts/wiring.js"></script>
-  <!-- Orbital Controller -->
-  <script src="scripts/orbitalController.js"></script>
-
+<!-- Phase 15000 — Neural Load Order Synchronization -->
+<script type="module" src="scripts/neuralRegistrySeed.js"></script>
+<script type="module" src="scripts/wiring.js"></script>
+<script type="module" src="scripts/init.js"></script>
+<script type="module" src="scripts/orbitalController.js"></script>
 </div>
 
 <script>
