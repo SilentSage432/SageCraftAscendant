@@ -2645,3 +2645,12 @@ h2, h3, p, label {
   box-shadow: 0 0 18px rgba(255, 51, 68, 0.3);
   color: #fff;
 }
+.integration-controls {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(20, 10, 40, 0.9);
+  border: 2px solid #33d9ff;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(51, 217, 255, 0.4);
+  color: #fff;
+}

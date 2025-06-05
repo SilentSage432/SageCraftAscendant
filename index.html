@@ -154,6 +154,20 @@
         <button onclick="restoreRedundancyBackup()">📥 Restore Redundancy Backup</button>
         <button onclick="clearRedundancyBackup()">🧹 Clear Redundancy Backup</button>
       </div>
+
+      <div id="panel-integration" class="control-panel">
+        <h3>🧬 Neural Integration Core</h3>
+      
+        <div class="integration-controls">
+          <button onclick="NeuralIntegrationSequence.beginIntegration()">⚡ Begin Full Neural Synchronization</button>
+        </div>
+      
+        <div id="integrationStatusOutput" style="
+          margin-top: 20px; font-family: monospace; color: lime;
+          padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px;">
+          ✅ Integration Module Initialized
+        </div>
+      </div>
     
       <div id="redundancyStatusOutput" style="
         margin-top: 20px; font-family: monospace; color: lime;
