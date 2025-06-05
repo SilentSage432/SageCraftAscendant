@@ -2020,3 +2020,91 @@ const NeuralMemoryStabilityCore = (function () {
     viewStabilityHistory
   };
 })();
+// === Phase 10000.6: Neural Volatility Dampening Buffer ===
+
+const NeuralVolatilityDampeningCore = (function () {
+  const MAX_ACTIVATION_THRESHOLD = 20;
+  const DAMPENING_FACTOR = 0.75;  // Apply 25% soft reduction
+
+  function applyDampening() {
+    console.log("🌐 Applying Neural Volatility Dampening Buffer...");
+
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    forecastMap.forEach(([targetId, activationCount]) => {
+      if (activationCount > MAX_ACTIVATION_THRESHOLD) {
+        const dampenedCount = Math.floor(activationCount * DAMPENING_FACTOR);
+        console.warn(`⚠ Dampening '${targetId}' forecast from ${activationCount} ➔ ${dampenedCount}`);
+
+        // Reset forecast to dampened value (reset then re-register activations)
+        NeuralForecastEngine.clearForecast();
+        for (let i = 0; i < dampenedCount; i++) {
+          NeuralForecastEngine.registerActivation(targetId);
+        }
+      }
+    });
+
+    console.log("✅ Dampening Complete.");
+  }
+
+  return {
+    applyDampening
+  };
+})();
+// === Phase 10000.7: Unified Recovery Coordination Loop ===
+
+const NeuralRecoveryCoordinator = (function () {
+  let loopInterval = null;
+  const COORDINATION_INTERVAL = 60000; // every 60 seconds
+
+  function executeRecoveryCycle() {
+    console.log("🧭 Unified Recovery Coordination Cycle Initiated…");
+
+    try {
+      // 1️⃣ Run Audit Scan
+      NeuralAuditSentinel.auditWiring();
+
+      // 2️⃣ Run Forecast-Based Auto-Healing
+      NeuralAutoHealingForecast.evaluateAllRisks();
+
+      // 3️⃣ Apply Self-Healing Repairs
+      NeuralSelfHealingEngine.runSelfHealing();
+
+      // 4️⃣ Run Predictive Stabilization Cascade
+      NeuralPredictiveCascade.runStabilizationCycle();
+
+      // 5️⃣ Analyze Forecast Memory Stability
+      NeuralMemoryStabilityCore.analyzeForecastStability();
+
+      // 6️⃣ Apply Volatility Dampening Buffer
+      NeuralVolatilityDampeningCore.applyDampening();
+
+      // 7️⃣ Archive Current Neural State
+      NeuralStateArchiveCore.saveState();
+
+      // 8️⃣ Evaluate Governance Compliance
+      NeuralGovernancePolicyCore.evaluateSystem();
+
+      console.log("✅ Unified Recovery Cycle Complete.");
+    } catch (err) {
+      console.error("❌ Recovery Cycle Error:", err);
+    }
+  }
+
+  function startRecoveryLoop() {
+    console.log(`🛡 Unified Recovery Loop Activated (every ${COORDINATION_INTERVAL / 1000}s).`);
+    executeRecoveryCycle();
+    loopInterval = setInterval(executeRecoveryCycle, COORDINATION_INTERVAL);
+  }
+
+  function stopRecoveryLoop() {
+    if (loopInterval) {
+      clearInterval(loopInterval);
+      console.log("🛑 Unified Recovery Loop Deactivated.");
+    }
+  }
+
+  return {
+    startRecoveryLoop,
+    stopRecoveryLoop
+  };
+})();
