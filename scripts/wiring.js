@@ -1920,3 +1920,103 @@ const NeuralPredictiveCascade = (function () {
     viewStabilizationLog
   };
 })();
+// === Phase 10000.4: Temporal Forecast Snapshot Manager ===
+
+const NeuralForecastMemoryCortex = (function () {
+  let forecastHistory = [];
+
+  function captureForecastSnapshot() {
+    const timestamp = new Date().toISOString();
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+
+    const snapshot = {
+      timestamp,
+      records: forecastMap.map(([panel, count]) => ({ panel, count }))
+    };
+
+    forecastHistory.push(snapshot);
+    console.log("📡 Forecast Snapshot Captured:", snapshot);
+  }
+
+  function getForecastHistory() {
+    return forecastHistory;
+  }
+
+  function clearForecastHistory() {
+    forecastHistory = [];
+    console.log("🧹 Forecast History Cleared.");
+  }
+
+  function startForecastArchiving(intervalMs = 60000) {
+    console.log(`🧠 Forecast Archiving Activated: capturing every ${intervalMs / 1000} seconds.`);
+    captureForecastSnapshot();
+    setInterval(captureForecastSnapshot, intervalMs);
+  }
+
+  return {
+    captureForecastSnapshot,
+    getForecastHistory,
+    clearForecastHistory,
+    startForecastArchiving
+  };
+})();
+// === Phase 10000.5: Memory Cortex Stability Algorithms ===
+
+const NeuralMemoryStabilityCore = (function () {
+  let stabilityHistory = [];
+
+  function analyzeForecastStability() {
+    console.log("🧮 Analyzing Forecast Memory Stability...");
+    const history = NeuralForecastMemoryCortex.getForecastHistory();
+
+    if (history.length === 0) {
+      console.warn("⚠ No forecast history to analyze.");
+      return;
+    }
+
+    let totalSnapshots = history.length;
+    let fullyStableSnapshots = 0;
+    let partialStableSnapshots = 0;
+
+    history.forEach(snapshot => {
+      const missingPanels = snapshot.records.filter(record => {
+        const panelId = `panel${record.panel}`;
+        return !document.getElementById(panelId);
+      });
+
+      const missingRatio = missingPanels.length / snapshot.records.length;
+
+      let stabilityHint = "Stable";
+      if (missingRatio > 0 && missingRatio < 0.25) {
+        stabilityHint = "Minor Drift";
+        partialStableSnapshots++;
+      } else if (missingRatio >= 0.25) {
+        stabilityHint = "Volatile";
+      } else {
+        fullyStableSnapshots++;
+      }
+
+      snapshot.stabilityHint = stabilityHint;
+    });
+
+    const stabilityScore = (fullyStableSnapshots / totalSnapshots) * 100;
+    console.log(`📊 Forecast Stability Score: ${stabilityScore.toFixed(1)}%`);
+
+    stabilityHistory.push({
+      timestamp: new Date().toISOString(),
+      stabilityScore
+    });
+
+    return stabilityScore;
+  }
+
+  function viewStabilityHistory() {
+    console.table(stabilityHistory);
+    return stabilityHistory;
+  }
+
+  return {
+    analyzeForecastStability,
+    viewStabilityHistory
+  };
+})();
