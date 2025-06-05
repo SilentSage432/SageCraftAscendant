@@ -2304,6 +2304,7 @@ function renderOrbitalDock() {
   
     button.addEventListener("click", () => {
       NeuralNavigationCore.activatePanel(orbit.panelId);
+      NeuralDockPersistence.saveActivePanel(orbit.panelId);
     });
   
     orbitalDock.appendChild(button);
@@ -2419,24 +2420,26 @@ document.addEventListener("DOMContentLoaded", () => {
 window.NeuralOrbitalDockMesh = (function() {
 
   function renderOrbitalDock() {
-    console.log("🚀 Rendering Orbital Dock (Corrected Object Key Iteration)");
+    console.log("🚀 Silent Dynamo: Rendering Orbital Dock (Phase 16001)");
 
-    const orbitalDock = document.getElementById("orbitalDockContainer");
-    if (!orbitalDock) {
-      console.warn("⚠ Orbital Dock Container not found.");
+    const dockContainer = document.getElementById("orbitalDockContainer");
+    if (!dockContainer) {
+      console.error("❌ Orbital Dock Container not found.");
       return;
     }
 
-    orbitalDock.innerHTML = '';  // Fully clear previous buttons
+    // 🔄 Full wipe to avoid duplicates
+    dockContainer.innerHTML = "";
 
-    const orbits = window.NeuralOrbitRegistry?.listOrbits?.();
-    if (!orbits) {
-      console.error("❌ NeuralOrbitRegistry not found.");
+    const registry = window.NeuralOrbitRegistry?.listOrbits?.();
+    if (!registry) {
+      console.error("❌ NeuralOrbitRegistry unavailable.");
       return;
     }
 
-    Object.keys(orbits).forEach(orbitKey => {
-      const orbit = orbits[orbitKey];
+    // 🔬 Iterate through all orbits
+    Object.keys(registry).forEach(orbitKey => {
+      const orbit = registry[orbitKey];
 
       const button = document.createElement("button");
       button.classList.add("orbital-btn");
@@ -2448,7 +2451,6 @@ window.NeuralOrbitalDockMesh = (function() {
       img.alt = orbit.label;
       button.appendChild(img);
 
-      // Mesh-aware panel activation binding
       button.addEventListener("click", () => {
         try {
           NeuralNavigationCore.activatePanel(orbit.panelId);
@@ -2457,10 +2459,10 @@ window.NeuralOrbitalDockMesh = (function() {
         }
       });
 
-      orbitalDock.appendChild(button);
+      dockContainer.appendChild(button);
     });
 
-    console.log("✅ Orbital Dock Render Complete — Mesh stabilized.");
+    console.log(`✅ Silent Dynamo Dock Render Complete — ${Object.keys(registry).length} orbitals deployed.`);
   }
 
   return {
@@ -3047,4 +3049,59 @@ window.NeuralOrbitalDockValidator = (function () {
     runDockValidationBurnIn
   };
 
+})();
+// Phase 16003 — Neural Navigation Channel Wiring
+window.NeuralNavigationCore = (function() {
+
+  function activatePanel(panelId) {
+    console.log(`🔄 Activating Panel: ${panelId}`);
+
+    const allPanels = document.querySelectorAll(".orbital-panel");
+    allPanels.forEach(panel => {
+      panel.classList.add("hidden");
+    });
+
+    const targetPanel = document.getElementById(panelId);
+    if (!targetPanel) {
+      console.warn(`⚠️ Panel '${panelId}' not found.`);
+      return;
+    }
+
+    targetPanel.classList.remove("hidden");
+    console.log(`✅ Panel '${panelId}' displayed.`);
+  }
+
+  return {
+    activatePanel
+  };
+
+})();
+// === Phase 16004 — Neural Dock Persistence Layer ===
+window.NeuralDockPersistence = (function () {
+  const STORAGE_KEY = 'neural_last_active_panel';
+
+  function saveActivePanel(panelId) {
+    localStorage.setItem(STORAGE_KEY, panelId);
+    console.log(`💾 Dock Persistence Saved: ${panelId}`);
+  }
+
+  function getActivePanel() {
+    return localStorage.getItem(STORAGE_KEY);
+  }
+
+  function restoreActivePanel() {
+    const panelId = getActivePanel();
+    if (!panelId) {
+      console.log("ℹ No persisted active panel found.");
+      return;
+    }
+    NeuralNavigationCore.activatePanel(panelId);
+    console.log(`✅ Dock Persistence Restored: ${panelId}`);
+  }
+
+  return {
+    saveActivePanel,
+    getActivePanel,
+    restoreActivePanel
+  };
 })();

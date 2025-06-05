@@ -1,8 +1,13 @@
+
 // === NeuralRegistrySeed.js — Unified Permanent Orbit Definitions ===
+
+// Phase 16002 — Global Registry Binding Correction
+window.__NeuralGlobalOrbitStore__ = window.__NeuralGlobalOrbitStore__ || {};
+const orbits = window.__NeuralGlobalOrbitStore__;
 
 window.NeuralRegistrySeedBootstrap = function() {
   window.NeuralOrbitRegistry = {
-    registry: {},
+    registry: orbits,
 
     registerOrbit(key, label, modules, icon) {
       this.registry[key] = { panelId: key, label, icon, modules };
@@ -38,6 +43,27 @@ window.NeuralRegistrySeedBootstrap = function() {
 
   console.log("✅ Neural Orbit Registry Unified Seed Complete.");
 }
+
+// Phase 17000 — Dynamic Neural Orbit Injection
+window.injectDynamicOrbit = function (orbitKey, orbitName, orbitDependencies, orbitIcon) {
+    if (!window.NeuralOrbitRegistry) {
+        console.error("❌ NeuralOrbitRegistry not available.");
+        return;
+    }
+
+    if (window.NeuralOrbitRegistry.listOrbits().hasOwnProperty(orbitKey)) {
+        console.warn(`⚠️ Orbit "${orbitKey}" already exists.`);
+        return;
+    }
+
+    window.NeuralOrbitRegistry.registerOrbit(orbitKey, orbitName, orbitDependencies, orbitIcon);
+    console.log(`✅ Orbit "${orbitName}" injected into registry.`);
+
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+        NeuralOrbitalDockMesh.renderOrbitalDock();
+        console.log("✅ Orbital Dock refreshed post-injection.");
+    }
+};
 
 // Modified Bootstrap Logic — Phase 16000
 document.addEventListener("DOMContentLoaded", () => {
