@@ -64,9 +64,30 @@
       <label>Error Threshold: <input type="number" id="errorThresholdInput" value=""></label><br>
       <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
     </div>
+    <div class="console-section">
+      <h3>🕰 Neural Temporal Rollback</h3>
+      <button onclick="NeuralTemporalRollbackCore.saveSnapshot()">Save New Snapshot</button>
+      <button onclick="listSnapshots()">List Snapshots</button>
+      <button onclick="clearSnapshots()">Clear All Snapshots</button>
+  
+      <div id="snapshotListOutput" style="background:#111; color:#0f0; padding:10px; margin-top:10px; font-family:monospace; border:1px solid #333; border-radius:5px; max-height:200px; overflow-y:auto;">
+        <p>📜 No snapshots listed yet.</p>
+      </div>
+    </div>
   
     <div class="console-log">
       <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
+    </div>
+
+    <div class="console-section">
+      <h3>🕰 Neural Temporal Rollback</h3>
+      <button onclick="NeuralTemporalRollbackCore.saveSnapshot()">Save New Snapshot</button>
+      <button onclick="listSnapshots()">List Snapshots</button>
+      <button onclick="clearSnapshots()">Clear All Snapshots</button>
+    
+      <div id="snapshotListOutput" style="background:#111; color:#0f0; padding:10px; margin-top:10px; font-family:monospace; border:1px solid #333; border-radius:5px; max-height:200px; overflow-y:auto;">
+        <p>📜 No snapshots listed yet.</p>
+      </div>
     </div>
   </div>
     <div id="neuralConsoleOutput" style="background: #111; color: #0f0; padding: 10px; font-family: monospace; border: 1px solid #444; border-radius: 5px; height: 200px; overflow-y: auto;">

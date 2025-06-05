@@ -677,6 +677,34 @@ function applyPolicyChanges() {
 
   console.log("✅ Live Policy Changes Applied");
 }
+function listSnapshots() {
+  const keys = NeuralTemporalRollbackCore.listSnapshots();
+  const output = document.getElementById("snapshotListOutput");
+  if (!output) return;
+
+  if (keys.length === 0) {
+    output.innerHTML = "<p>📜 No snapshots found.</p>";
+    return;
+  }
+
+  output.innerHTML = "<ul>";
+  keys.forEach(key => {
+    output.innerHTML += `<li>${key} <button onclick="loadSnapshot('${key}')">Restore</button></li>`;
+  });
+  output.innerHTML += "</ul>";
+}
+
+function loadSnapshot(key) {
+  NeuralTemporalRollbackCore.loadSnapshot(key);
+  NeuralStateArchiveCore.saveState(); // Optional: Re-sync archive after rollback
+}
+
+function clearSnapshots() {
+  if (confirm("⚠ Are you sure you want to clear all snapshots?")) {
+    NeuralTemporalRollbackCore.clearAllSnapshots();
+    listSnapshots();
+  }
+}
 // === Phase 8000.3: Neural Live Panel Synchronizer ===
 function renderLiveSystemStatus() {
   console.log("🧬 Rendering Live System Status...");
@@ -1130,7 +1158,7 @@ window.NeuralStateArchiveCore = (function() {
     NeuralStateArchiveCore.saveState();
   }, SAVE_INTERVAL);
 })();
-// === Phase 8004.0: Neural State Integrity Sentinel ===
+// === Phase 8004.5: Neural Integrity Auto-Recovery Sentinel ===
 window.NeuralStateIntegritySentinel = (function() {
 
   const STORAGE_KEY = 'neural_state_archive';
@@ -1146,29 +1174,30 @@ window.NeuralStateIntegritySentinel = (function() {
 
     try {
       const state = JSON.parse(saved);
+      let valid = true;
 
-      if (!state.forecastMap || !state.driftMetrics || !state.policy) {
-        console.error("❌ Archive Missing Critical Sections.");
-        return false;
-      }
-
-      if (!Array.isArray(state.forecastMap)) {
+      if (!state.forecastMap || !Array.isArray(state.forecastMap)) {
         console.error("❌ ForecastMap structure invalid.");
-        return false;
+        valid = false;
       }
 
-      if (typeof state.driftMetrics.totalActivations !== 'number') {
+      if (!state.driftMetrics || typeof state.driftMetrics.totalActivations !== 'number') {
         console.error("❌ DriftMetrics structure invalid.");
-        return false;
+        valid = false;
       }
 
-      if (typeof state.policy.riskThreshold !== 'number') {
+      if (!state.policy || typeof state.policy.riskThreshold !== 'number') {
         console.error("❌ Policy structure invalid.");
-        return false;
+        valid = false;
       }
 
-      console.log("✅ Neural Archive Integrity Verified.");
-      return true;
+      if (valid) {
+        console.log("✅ Neural Archive Integrity Verified.");
+      } else {
+        console.warn("⚠ Partial corruption detected — auto-recovery may be possible.");
+      }
+
+      return valid;
 
     } catch (err) {
       console.error("❌ Archive Parse Error:", err);
@@ -1176,8 +1205,157 @@ window.NeuralStateIntegritySentinel = (function() {
     }
   }
 
+  function attemptAutoRecovery() {
+    console.log("🧬 Attempting Neural Archive Auto-Recovery...");
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      console.log("ℹ No archive present to recover.");
+      return;
+    }
+
+    try {
+      const state = JSON.parse(saved);
+
+      if (!state.forecastMap || !Array.isArray(state.forecastMap)) {
+        state.forecastMap = [];
+        console.warn("⚠ ForecastMap recovered as empty array.");
+      }
+
+      if (!state.driftMetrics || typeof state.driftMetrics.totalActivations !== 'number') {
+        state.driftMetrics = { totalActivations: 0, uniquePanels: [], errorCount: 0 };
+        console.warn("⚠ DriftMetrics recovered to safe defaults.");
+      }
+
+      if (!state.policy || typeof state.policy.riskThreshold !== 'number') {
+        state.policy = { riskThreshold: 10, driftThreshold: 25, errorThreshold: 5 };
+        console.warn("⚠ Policy recovered to default thresholds.");
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      console.log("✅ Auto-Recovery Complete — Archive Safely Stabilized.");
+
+    } catch (err) {
+      console.error("❌ Auto-Recovery Failed:", err);
+    }
+  }
+
   return {
-    validateArchive
+    validateArchive,
+    attemptAutoRecovery
   };
 
 })();
+// === Phase 8005.0: Neural Temporal Rollback Engine ===
+window.NeuralTemporalRollbackCore = (function() {
+
+  const STORAGE_KEY_PREFIX = 'neural_state_snapshot_';
+
+  function saveSnapshot() {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const key = STORAGE_KEY_PREFIX + timestamp;
+
+    const state = {
+      forecastMap: NeuralForecastEngine.getForecastReport(),
+      driftMetrics: NeuralDriftCore.getStatus(),
+      sessionPanel: NeuralSessionMemory.getLastPanel(),
+      policy: NeuralGovernancePolicyCore.getPolicy()
+    };
+
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+      console.log(`💾 Snapshot Saved: ${key}`);
+    } catch (err) {
+      console.error("❌ Failed to save snapshot:", err);
+    }
+  }
+
+  function listSnapshots() {
+    const keys = Object.keys(localStorage).filter(key => key.startsWith(STORAGE_KEY_PREFIX));
+    keys.sort();
+    console.log("📜 Available Snapshots:", keys);
+    return keys;
+  }
+
+  function loadSnapshot(snapshotKey) {
+    const saved = localStorage.getItem(snapshotKey);
+    if (!saved) {
+      console.error(`❌ Snapshot not found: ${snapshotKey}`);
+      return;
+    }
+
+    try {
+      const state = JSON.parse(saved);
+      console.log("💾 Snapshot Loaded:", state);
+
+      // Restore Forecast
+      state.forecastMap.forEach(([targetId, count]) => {
+        for (let i = 0; i < count; i++) {
+          NeuralForecastEngine.registerActivation(targetId);
+        }
+      });
+
+      // Restore Drift Metrics
+      state.driftMetrics.uniquePanels.forEach(panelId => {
+        NeuralDriftCore.registerActivation(panelId);
+      });
+
+      // Restore Session Memory
+      if (state.sessionPanel) {
+        NeuralSessionMemory.saveLastPanel(state.sessionPanel);
+      }
+
+      // Restore Policy
+      NeuralGovernancePolicyCore.setPolicy(state.policy);
+
+      console.log("✅ Snapshot Fully Restored.");
+
+    } catch (err) {
+      console.error("❌ Failed to load snapshot:", err);
+    }
+  }
+
+  function clearAllSnapshots() {
+    const keys = listSnapshots();
+    keys.forEach(key => localStorage.removeItem(key));
+    console.log(`🧹 Cleared ${keys.length} snapshots.`);
+  }
+
+  return {
+    saveSnapshot,
+    listSnapshots,
+    loadSnapshot,
+    clearAllSnapshots
+  };
+
+})();
+// === Phase 8006.0: Neural Integrity Sentinels Bootstrap ===
+function startIntegritySentinels() {
+  console.log("🧪 Neural Integrity Sentinels Activated...");
+
+  setInterval(() => {
+    try {
+      // Archive Integrity
+      const archiveValid = NeuralStateIntegritySentinel.validateArchive();
+      console.log(`📦 Archive Valid: ${archiveValid}`);
+
+      // Governance Status
+      const policy = NeuralGovernancePolicyCore.getPolicy();
+      console.log(`⚖ Governance Policy Active:`, policy);
+
+      // Forecast Stability
+      const cortex = NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
+      const total = cortex.length;
+      const stable = cortex.filter(f => f.stabilityHint === "Stable").length;
+      const volatilityRate = total > 0 ? (((total - stable) / total) * 100).toFixed(1) : "N/A";
+      console.log(`🌡 Forecast Volatility: ${volatilityRate}%`);
+
+      // Rollback Snapshots
+      const snapshots = NeuralTemporalRollbackCore.listSnapshots();
+      console.log(`🕰 Snapshots Stored: ${snapshots.length}`);
+
+    } catch (err) {
+      console.error("⚠ Neural Integrity Sentinel Error:", err);
+    }
+  }, 30000);  // Run every 30 seconds
+}
