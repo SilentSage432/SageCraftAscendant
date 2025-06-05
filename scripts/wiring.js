@@ -1506,3 +1506,55 @@ window.NeuralPredictiveStabilizationEngine = (function() {
   };
 
 })();
+// === Phase 8009.0: Neural Sentinel Coordination Core ===
+window.NeuralSentinelCoordinator = (function() {
+
+  let coordinationLoop = null;
+  const LOOP_INTERVAL = 60000;  // 60 seconds
+
+  function runCoordinationCycle() {
+    console.log("🧭 Running Neural Sentinel Coordination Cycle...");
+
+    // Step 1️⃣ Capture latest redundancy buffer
+    NeuralRedundancyBufferCore.captureBuffer();
+
+    // Step 2️⃣ Validate Archive Integrity
+    const archiveValid = NeuralStateIntegritySentinel.validateArchive();
+    if (!archiveValid) {
+      console.warn("⚠ Archive instability detected — attempting auto-recovery...");
+      NeuralStateIntegritySentinel.attemptAutoRecovery();
+    }
+
+    // Step 3️⃣ Predictive Forecast Stabilization
+    NeuralPredictiveStabilizationEngine.analyzeForecastVolatility();
+
+    // Step 4️⃣ Run Full Repair Cycle (if triggered by predictive or audit failures)
+    NeuralAutonomousRepairCore.runFullRepairCycle();
+
+    // Step 5️⃣ Governance Live Policy Evaluation
+    NeuralGovernancePolicyCore.evaluateSystem();
+
+    console.log("✅ Coordination Cycle Complete.");
+  }
+
+  function startCoordinationLoop() {
+    console.log(`🧭 Sentinel Coordination Loop Activated — scanning every ${LOOP_INTERVAL / 1000} seconds.`);
+    runCoordinationCycle();
+    coordinationLoop = setInterval(runCoordinationCycle, LOOP_INTERVAL);
+  }
+
+  function stopCoordinationLoop() {
+    if (coordinationLoop) {
+      clearInterval(coordinationLoop);
+      console.log("🛑 Sentinel Coordination Loop Deactivated.");
+    } else {
+      console.log("ℹ Coordination Loop not currently active.");
+    }
+  }
+
+  return {
+    startCoordinationLoop,
+    stopCoordinationLoop
+  };
+
+})();
