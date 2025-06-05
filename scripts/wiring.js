@@ -2108,3 +2108,113 @@ const NeuralRecoveryCoordinator = (function () {
     stopRecoveryLoop
   };
 })();
+// === Phase 10000.8: Neural Governance Master Loop ===
+
+const NeuralGovernanceMasterLoop = (function () {
+  let masterInterval = null;
+  const MASTER_INTERVAL = 120000; // Every 2 minutes
+
+  function executeMasterGovernanceCycle() {
+    console.log("⚖ Neural Governance Master Loop Initiated…");
+
+    try {
+      // 1️⃣ Run Recovery Coordination Loop
+      NeuralRecoveryCoordinator.executeRecoveryCycle();
+
+      // 2️⃣ Verify Archive Health
+      const archiveValid = NeuralStateIntegritySentinel.validateArchive();
+      if (!archiveValid) {
+        console.warn("⚠ Archive instability detected. Attempting auto-recovery...");
+        NeuralStateIntegritySentinel.attemptAutoRecovery();
+      }
+
+      // 3️⃣ Review Policy Compliance
+      NeuralGovernancePolicyCore.evaluateSystem();
+
+      // 4️⃣ Capture Redundancy Buffers
+      NeuralRedundancyBufferCore.captureBuffer();
+
+      console.log("✅ Master Governance Cycle Complete.");
+    } catch (err) {
+      console.error("❌ Governance Master Loop Error:", err);
+    }
+  }
+
+  function startMasterGovernanceLoop() {
+    console.log(`⚖ Neural Governance Master Loop Activated (every ${MASTER_INTERVAL / 1000}s).`);
+    executeMasterGovernanceCycle();
+    masterInterval = setInterval(executeMasterGovernanceCycle, MASTER_INTERVAL);
+  }
+
+  function stopMasterGovernanceLoop() {
+    if (masterInterval) {
+      clearInterval(masterInterval);
+      console.log("🛑 Neural Governance Master Loop Deactivated.");
+    }
+  }
+
+  return {
+    startMasterGovernanceLoop,
+    stopMasterGovernanceLoop
+  };
+})();
+// === Phase 11000.0: Full DOM Purification & Orbital Mesh Lockdown ===
+
+const NeuralDOMPurificationCore = (function () {
+
+  function purgeLegacyOrbitalTabs() {
+    console.log("🧹 Initiating Full DOM Purification...");
+
+    const legacyNodes = document.querySelectorAll('.orbital-btn');
+    let removed = 0;
+
+    legacyNodes.forEach(btn => {
+      const target = btn.dataset.target;
+      const id = btn.id;
+
+      // Criteria: Purge any buttons still using legacy static IDs (hud* identifiers)
+      if (!target || id.startsWith("hud") || target === "") {
+        console.warn(`🗑 Purging Legacy Orbital Button: ID='${id}', target='${target}'`);
+        btn.remove();
+        removed++;
+      }
+    });
+
+    console.log(`✅ DOM Purification Complete — ${removed} legacy orbital button(s) removed.`);
+
+    // Rebuild Anchor Registry after purge
+    OrbitalAnchorRegistry.buildRegistry();
+  }
+
+  return {
+    purgeLegacyOrbitalTabs
+  };
+
+})();
+// === Phase 11000.1: Neural Mesh Stabilizer Lock ===
+
+const NeuralMeshStabilizerCore = (function () {
+  let stabilized = false;
+
+  function lockOrbitalMesh() {
+    if (stabilized) {
+      console.log("🛡 Neural Mesh already stabilized.");
+      return;
+    }
+
+    console.log("🔒 Locking Neural Orbital Mesh...");
+    NeuralDOMPurificationCore.purgeLegacyOrbitalTabs();
+    OrbitalAnchorRegistry.buildRegistry();
+    stabilized = true;
+    console.log("✅ Neural Orbital Mesh Locked.");
+  }
+
+  function isMeshStabilized() {
+    return stabilized;
+  }
+
+  return {
+    lockOrbitalMesh,
+    isMeshStabilized
+  };
+})();
