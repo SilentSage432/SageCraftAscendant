@@ -908,6 +908,9 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Neural Bootstrap Failure:", err);
   }
 });
+document.addEventListener("DOMContentLoaded", () => {
+  initializeNeuralOrbitalMesh();
+});
 // === Phase 53: Neural Operator Console Logging Redirect ===
 (function() {
   const consoleOutput = document.getElementById("neuralConsoleOutput");
@@ -2217,4 +2220,293 @@ const NeuralMeshStabilizerCore = (function () {
     lockOrbitalMesh,
     isMeshStabilized
   };
+})();
+// === Phase 12000.0: Orbital Router Mesh Activation ===
+
+const NeuralOrbitalRouterMesh = (function () {
+
+  function activateRouting() {
+    console.log("🚀 Activating Neural Orbital Router Mesh...");
+
+    const buttons = document.querySelectorAll('.orbital-btn');
+
+    buttons.forEach(button => {
+      const target = button.dataset.target;
+
+      if (!target) {
+        console.warn("⚠ Skipping button with missing data-target:", button);
+        return;
+      }
+
+      button.addEventListener('click', () => {
+        console.log(`🛰 Routing activation: ${target}`);
+        routeToPanel(target);
+      });
+    });
+
+    console.log("✅ Neural Orbital Router Mesh Fully Activated.");
+  }
+
+  function routeToPanel(target) {
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(panel => panel.classList.remove('active'));
+
+    const panel = document.querySelector(target);
+    if (panel) {
+      panel.classList.add('active');
+      panel.scrollIntoView({ behavior: "smooth" });
+      console.log(`🧭 Panel Activated: ${target}`);
+    } else {
+      console.warn(`⚠ Panel not found for target '${target}'.`);
+    }
+  }
+
+  return {
+    activateRouting
+  };
+
+})();
+// === Phase 13000.1: Neural Anchor Mesh Synchronization ===
+
+function renderOrbitalDock() {
+  const orbitalDock = document.getElementById("orbitalDockContainer");
+  if (!orbitalDock) {
+    console.warn("⚠ Orbital Dock Container not found.");
+    return;
+  }
+
+  orbitalDock.innerHTML = '';  // Clear existing buttons
+
+  NeuralOrbitRegistry.listOrbits().forEach(orbit => {
+    const button = document.createElement("button");
+    button.classList.add("orbital-btn");
+    button.setAttribute("data-target", `#${orbit.panelId}`);
+    button.setAttribute("aria-label", orbit.label);
+
+    const img = document.createElement("img");
+    img.src = `assets/icons/${orbit.icon}`;
+    button.appendChild(img);
+
+    // Bind click logic
+    button.addEventListener("click", () => {
+      NeuralNavigationCore.activatePanel(orbit.panelId);
+    });
+
+    orbitalDock.appendChild(button);
+  });
+
+  console.log("✅ Orbital Dock fully synchronized.");
+}
+// === Phase 13000.3: Neural Dock Health Scan & Verification Layer ===
+
+function verifyOrbitalDockIntegrity() {
+  console.log("🩺 Running Orbital Dock Health Verification...");
+
+  const orbitalDock = document.getElementById("orbitalDockContainer");
+  if (!orbitalDock) {
+    console.error("❌ Orbital Dock Container not found.");
+    return;
+  }
+
+  const buttons = orbitalDock.querySelectorAll(".orbital-btn");
+  if (buttons.length === 0) {
+    console.warn("⚠ No orbital buttons detected in Dock.");
+  } else {
+    console.log(`✅ ${buttons.length} orbital buttons found.`);
+  }
+
+  buttons.forEach(button => {
+    const target = button.dataset.target;
+    const img = button.querySelector("img");
+
+    if (!target) {
+      console.warn("⚠ Button missing data-target attribute:", button);
+    }
+    if (!img || !img.src) {
+      console.warn("⚠ Button missing icon image:", button);
+    }
+  });
+
+  console.log("✅ Orbital Dock Health Verification Complete.");
+}
+// === Phase 13000.4: Orbital Auto-Rebuild Failsafe Layer ===
+
+function rebuildOrbitalDockIfCorrupted() {
+  const orbitalDock = document.getElementById("orbitalDockContainer");
+  if (!orbitalDock) {
+    console.error("❌ Orbital Dock Container not found.");
+    return;
+  }
+
+  const buttons = orbitalDock.querySelectorAll(".orbital-btn");
+
+  const expectedOrbits = NeuralOrbitRegistry.listOrbits();
+  const expectedCount = Object.keys(expectedOrbits).length;
+
+  if (buttons.length !== expectedCount) {
+    console.warn(`⚠ Orbital Dock mismatch detected. Expected ${expectedCount} buttons, found ${buttons.length}. Initiating full rebuild...`);
+    renderOrbitalDock();
+  } else {
+    console.log("✅ Orbital Dock is fully intact. No rebuild required.");
+  }
+}
+// === Phase 13000.5: Neural Mesh Auto-Initialization Sequencer ===
+
+function initializeNeuralOrbitalMesh() {
+  console.log("🧠 Initializing Neural Orbital Mesh...");
+
+  renderOrbitalDock();
+  verifyOrbitalDockIntegrity();
+  rebuildOrbitalDockIfCorrupted();
+
+  console.log("✅ Neural Orbital Mesh Fully Initialized.");
+}
+// === Phase 13000.7 — Neural Orbital Mesh Lockdown ===
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    console.log("🧬 Phase 13000.7 — Mesh Lockdown Activated");
+
+    const dockContainer = document.getElementById("orbitalDockContainer");
+    if (!dockContainer) {
+      console.warn("⚠ Orbital Dock Container not found.");
+      return;
+    }
+
+    // Full purge of any statically injected orbital buttons
+    dockContainer.innerHTML = "";
+
+    // Re-render dynamic orbital buttons directly from NeuralRegistrySeed
+    NeuralOrbitalDockMesh.renderOrbitalDock();
+
+    console.log("✅ Orbital Dock fully re-rendered from Neural Registry.");
+  } catch (err) {
+    console.error("❌ Mesh Lockdown Failure:", err);
+  }
+});
+// === Phase 13000.8 — Neural Orbital Dock Mesh Controller ===
+
+window.NeuralOrbitalDockMesh = (function() {
+
+  function renderOrbitalDock() {
+    console.log("🚀 Rendering Orbital Dock from Neural Registry...");
+
+    const orbitalDock = document.getElementById("orbitalDockContainer");
+    if (!orbitalDock) {
+      console.warn("⚠ Orbital Dock Container not found.");
+      return;
+    }
+
+    orbitalDock.innerHTML = '';  // Clear existing dock
+
+    const orbits = window.NeuralOrbitRegistry?.listOrbits?.();
+    if (!orbits) {
+      console.error("❌ NeuralOrbitRegistry not loaded.");
+      return;
+    }
+
+    Object.keys(orbits).forEach(orbitKey => {
+      const orbit = orbits[orbitKey];
+
+      const button = document.createElement("button");
+      button.classList.add("orbital-btn");
+      button.setAttribute("data-target", `#${orbit.panelId}`);
+      button.setAttribute("aria-label", orbit.label);
+
+      const img = document.createElement("img");
+      img.src = `assets/icons/${orbit.icon}`;
+      img.alt = orbit.label;
+      button.appendChild(img);
+
+      button.addEventListener("click", () => {
+        NeuralNavigationCore.activatePanel(orbit.panelId);
+      });
+
+      orbitalDock.appendChild(button);
+    });
+
+    console.log("✅ Orbital Dock Render Complete.");
+  }
+
+  return {
+    renderOrbitalDock
+  };
+
+})();
+// === Phase 13001.2 — Neural Mesh Integrity Sentinel ===
+
+window.NeuralMeshIntegritySentinel = (function () {
+
+  function verifyRegistryIntegrity() {
+    console.log("🩺 Running Neural Mesh Integrity Sentinel...");
+
+    const registry = window.NeuralOrbitRegistry?.listOrbits?.();
+    if (!registry) {
+      console.error("❌ NeuralOrbitRegistry unavailable.");
+      return;
+    }
+
+    let total = Object.keys(registry).length;
+    let validCount = 0;
+
+    Object.keys(registry).forEach(orbitKey => {
+      const orbit = registry[orbitKey];
+      const panel = document.querySelector(`#${orbit.panelId}`);
+
+      if (!panel) {
+        console.warn(`⚠ Orbit '${orbit.label}' → Panel '${orbit.panelId}' not found in DOM.`);
+      } else {
+        validCount++;
+      }
+    });
+
+    console.log(`✅ Integrity Scan Complete — ${validCount}/${total} orbits successfully mapped to DOM panels.`);
+  }
+
+  return {
+    verifyRegistryIntegrity
+  };
+
+})();
+// === Phase 13001.3 — Orbital Mesh Reinforcement Bootstrap ===
+
+window.NeuralMeshReinforcementCore = (function () {
+
+  function reinforceOrbitalMesh() {
+    console.log("🔧 Running Orbital Mesh Reinforcement Pass...");
+
+    const registry = window.NeuralOrbitRegistry?.listOrbits?.();
+    const dockContainer = document.getElementById("orbitalDockContainer");
+    if (!registry || !dockContainer) {
+      console.error("❌ Mesh Reinforcement failed — registry or dock missing.");
+      return;
+    }
+
+    dockContainer.innerHTML = '';  // Always fully clear dock for clean rebuild
+
+    Object.keys(registry).forEach(orbitKey => {
+      const orbit = registry[orbitKey];
+      const button = document.createElement("button");
+      button.classList.add("orbital-btn");
+      button.setAttribute("data-target", `#${orbit.panelId}`);
+      button.setAttribute("aria-label", orbit.label);
+
+      const img = document.createElement("img");
+      img.src = `assets/icons/${orbit.icon}`;
+      img.alt = orbit.label;
+      button.appendChild(img);
+
+      button.addEventListener("click", () => {
+        NeuralNavigationCore.activatePanel(orbit.panelId);
+      });
+
+      dockContainer.appendChild(button);
+    });
+
+    console.log("✅ Orbital Mesh Reinforcement Complete.");
+  }
+
+  return {
+    reinforceOrbitalMesh
+  };
+
 })();

@@ -27,24 +27,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body class="dark-theme electric-fantasy">
+  <div id="orbitalDockContainer" class="orbital-dock"></div>
 
-
-  <div class="orbital-dock" id="orbitalHudPanel">
-    <button class="orbital-btn" data-target="#operatorConsolePanel" aria-label="Operator Console"><img src="assets/icons/icon-console.png"></button>
-    <button class="orbital-btn" data-target="#count" aria-label="Audit Modules"><img src="assets/icons/icon-audit.png"></button>
-    <button class="orbital-btn" data-target="#deltaAnalyzer" aria-label="Delta Analyzer"><img src="assets/icons/icon-delta.png"></button>
-    <button class="orbital-btn" data-target="#reportingHub" aria-label="Reporting Hub"><img src="assets/icons/icon-report.png"></button>
-    <button class="orbital-btn" data-target="#utilityHub" aria-label="Utility Hub"><img src="assets/icons/icon-utility.png"></button>
-    <button class="orbital-btn" data-target="#tools" aria-label="Control Settings"><img src="assets/icons/icon-tools.png"></button>
-    <button class="orbital-btn" data-target="#masterExportHub" aria-label="Master Export Hub"><img src="assets/icons/icon-export.png"></button>
-    <button class="orbital-btn" data-target="#sessionManager" aria-label="Session Manager"><img src="assets/icons/icon-session.png"></button>
-    <button class="orbital-btn" data-target="#mappings" aria-label="Mapping Manager"><img src="assets/icons/icon-mapping.png"></button>
-    <button class="orbital-btn" data-target="#advancedTools" aria-label="Advanced Tools"><img src="assets/icons/icon-advanced.png"></button>
-    <button class="orbital-btn" data-target="#audit" aria-label="Audit Rotation Schedule"><img src="assets/icons/icon-rotation.png"></button>
-    <button class="orbital-btn" data-target="#configPanel" aria-label="User Config Panel"><img src="assets/icons/icon-config.png"></button>
-    <button class="orbital-btn" data-target="#diagnosticsModal" aria-label="Diagnostics Panel"><img src="assets/icons/icon-diagnostics.png"></button>
-    <button class="orbital-btn" data-target="#dropboxModal" aria-label="Dropbox Control"><img src="assets/icons/icon-dropbox.png"></button>
-  </div>
 
   <div id="operatorConsolePanel" class="tab-section panel-glow">
     <h2>🧭 Neural Operator Command Bridge</h2>
@@ -1890,7 +1874,8 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- Modal Manager for Item Link Modal -->
   <script type="module" src="scripts/itemLinkModal.js"></script>
 
-  <!-- Wiring.js - global load -->
+  <!-- load Registry seeder before Wiring.js - global load -->
+  <script src="scripts/neuralRegistrySeed.js"></script>
   <script src="scripts/wiring.js"></script>
   <!-- Orbital Controller -->
   <script src="scripts/orbitalController.js"></script>
