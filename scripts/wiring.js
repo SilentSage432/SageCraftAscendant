@@ -1395,3 +1395,114 @@ window.NeuralAutonomousRepairCore = (function() {
   };
 
 })();
+// === Phase 8007.5: Neural Redundancy Buffer Core ===
+window.NeuralRedundancyBufferCore = (function() {
+
+  let buffer = null;
+
+  function captureBuffer() {
+    buffer = {
+      timestamp: new Date().toISOString(),
+      forecastMap: NeuralForecastEngine.getForecastReport(),
+      driftMetrics: NeuralDriftCore.getStatus(),
+      sessionPanel: NeuralSessionMemory.getLastPanel(),
+      policy: NeuralGovernancePolicyCore.getPolicy()
+    };
+    console.log(`🧪 Redundancy Buffer Captured @ ${buffer.timestamp}`);
+  }
+
+  function restoreBuffer() {
+    if (!buffer) {
+      console.warn("⚠ No redundancy buffer available to restore.");
+      return;
+    }
+
+    console.log("♻ Restoring Redundancy Buffer:", buffer);
+
+    // Restore Forecast
+    buffer.forecastMap.forEach(([targetId, count]) => {
+      for (let i = 0; i < count; i++) {
+        NeuralForecastEngine.registerActivation(targetId);
+      }
+    });
+
+    // Restore Drift Metrics
+    buffer.driftMetrics.uniquePanels.forEach(panelId => {
+      NeuralDriftCore.registerActivation(panelId);
+    });
+
+    // Restore Session Memory
+    if (buffer.sessionPanel) {
+      NeuralSessionMemory.saveLastPanel(buffer.sessionPanel);
+    }
+
+    // Restore Policy
+    NeuralGovernancePolicyCore.setPolicy(buffer.policy);
+
+    console.log("✅ Redundancy Buffer Fully Restored.");
+  }
+
+  function clearBuffer() {
+    buffer = null;
+    console.log("🧹 Redundancy Buffer Cleared.");
+  }
+
+  function isBufferAvailable() {
+    return !!buffer;
+  }
+
+  return {
+    captureBuffer,
+    restoreBuffer,
+    clearBuffer,
+    isBufferAvailable
+  };
+
+})();
+// === Phase 8008.0: Neural Predictive Stabilization Engine ===
+window.NeuralPredictiveStabilizationEngine = (function() {
+
+  const PREDICTIVE_RISK_THRESHOLD = 0.4;  // 40% forecast volatility triggers predictive warnings
+
+  function analyzeForecastVolatility() {
+    const forecastMap = NeuralForecastEngine.getForecastReport();
+    const total = forecastMap.length;
+
+    if (total === 0) {
+      console.log("🌐 Predictive Stabilization: No forecast data available.");
+      return;
+    }
+
+    let highRiskPanels = 0;
+
+    forecastMap.forEach(([targetId, activationCount]) => {
+      const panelId = `panel${targetId}`;
+      const panelExists = !!document.getElementById(panelId);
+      if (!panelExists) {
+        highRiskPanels++;
+      }
+    });
+
+    const volatilityRate = highRiskPanels / total;
+    console.log(`🌡 Predictive Forecast Volatility: ${(volatilityRate * 100).toFixed(1)}%`);
+
+    if (volatilityRate >= PREDICTIVE_RISK_THRESHOLD) {
+      console.warn("⚠ Predictive Alert: Forecast volatility elevated — preemptive stabilization recommended.");
+      NeuralAutonomousRepairCore.runFullRepairCycle();
+    } else {
+      console.log("✅ Predictive Stabilization: Forecast within normal tolerance.");
+    }
+  }
+
+  function startPredictiveLoop(intervalMs = 45000) {
+    console.log(`🧠 Predictive Stabilization Loop Activated: scanning every ${intervalMs / 1000} seconds.`);
+    analyzeForecastVolatility();
+    setInterval(analyzeForecastVolatility, intervalMs);
+  }
+
+  return {
+    analyzeForecastVolatility,
+    startPredictiveLoop
+  };
+
+})();
