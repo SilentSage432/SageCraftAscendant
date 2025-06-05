@@ -179,7 +179,7 @@
         <p>📜 No snapshots listed yet.</p>
       </div>
     </div>
-  
+
     <div class="console-log">
       <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
     </div>
@@ -193,6 +193,12 @@
       <div id="snapshotListOutput" style="background:#111; color:#0f0; padding:10px; margin-top:10px; font-family:monospace; border:1px solid #333; border-radius:5px; max-height:200px; overflow-y:auto;">
         <p>📜 No snapshots listed yet.</p>
       </div>
+    </div>
+
+    <div class="console-section">
+      <h3>🛡 Operator Overrides</h3>
+      <button onclick="NeuralOperatorOverride.manualMeshRebuild()">🛠 Rebuild Orbital Mesh</button>
+      <button onclick="NeuralOperatorOverride.resetSupervisorEscalation()">🔄 Reset Supervisor Escalation</button>
     </div>
   </div>
     <div id="neuralConsoleOutput" style="background: #111; color: #0f0; padding: 10px; font-family: monospace; border: 1px solid #444; border-radius: 5px; height: 200px; overflow-y: auto;">

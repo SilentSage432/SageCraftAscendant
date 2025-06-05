@@ -2560,35 +2560,35 @@ window.NeuralAutonomicSupervisor = (function () {
 
   function runSupervisorCycle() {
     console.log("🧭 Autonomic Supervisor: Mesh Health Evaluation Initiated...");
-
+  
     try {
       const registry = window.NeuralOrbitRegistry?.listOrbits?.();
       const dockContainer = document.getElementById("orbitalDockContainer");
-
+  
       if (!registry || !dockContainer) {
         console.error("❌ Supervisor Failure — Critical mesh component unavailable.");
+        window.NeuralSupervisorEscalation.recordSupervisorResult(false);
         return;
       }
-
+  
       const expectedOrbits = Object.keys(registry).length;
       const actualButtons = dockContainer.querySelectorAll(".orbital-btn").length;
-
+  
       if (expectedOrbits !== actualButtons) {
         console.warn(`⚠ Supervisor Alert: Mesh mismatch detected. Orbits=${expectedOrbits}, Buttons=${actualButtons}`);
-
-        // Trigger automated reinforcement
         NeuralMeshReinforcementCore.reinforceOrbitalMesh();
-
-        // Re-verify immediately
         setTimeout(() => {
           NeuralMeshIntegritySentinel.verifyRegistryIntegrity();
         }, 2000);
+        window.NeuralSupervisorEscalation.recordSupervisorResult(false);
       } else {
         console.log("✅ Supervisor Check: Mesh fully aligned.");
+        window.NeuralSupervisorEscalation.recordSupervisorResult(true);
       }
-
+  
     } catch (err) {
       console.error("❌ Autonomic Supervisor Error:", err);
+      window.NeuralSupervisorEscalation.recordSupervisorResult(false);
     }
   }
 
@@ -2609,6 +2609,72 @@ window.NeuralAutonomicSupervisor = (function () {
     runSupervisorCycle,
     startSupervisor,
     stopSupervisor
+  };
+
+})();
+// === Phase 13002.1 — Supervisor Escalation Engine ===
+
+window.NeuralSupervisorEscalation = (function () {
+
+  let failureStreak = 0;
+  const FAILURE_THRESHOLD = 3;  // Escalate after 3 consecutive failures
+
+  function recordSupervisorResult(success) {
+    if (success) {
+      failureStreak = 0;
+      console.log("✅ Supervisor Escalation Reset — Mesh healthy.");
+    } else {
+      failureStreak++;
+      console.warn(`⚠ Supervisor Failure Streak: ${failureStreak} consecutive failures.`);
+
+      if (failureStreak >= FAILURE_THRESHOLD) {
+        escalateToOperator();
+        failureStreak = 0; // Auto-reset after escalation
+      }
+    }
+  }
+
+  function escalateToOperator() {
+    console.error("🚨 Supervisor Escalation Triggered — Operator Attention Required!");
+    const logPanel = document.getElementById("neuralConsoleOutput");
+    if (logPanel) {
+      const p = document.createElement("p");
+      p.textContent = "🚨 Supervisor Escalation: Multiple mesh failures detected!";
+      logPanel.appendChild(p);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+  }
+
+  return {
+    recordSupervisorResult
+  };
+
+})();
+// === Phase 13002.5 — Operator Override Protocol ===
+
+window.NeuralOperatorOverride = (function () {
+
+  function manualMeshRebuild() {
+    console.log("🚨 Operator Override: Manually Rebuilding Orbital Mesh...");
+    try {
+      NeuralMeshReinforcementCore.reinforceOrbitalMesh();
+      NeuralMeshIntegritySentinel.verifyRegistryIntegrity();
+      console.log("✅ Manual Orbital Mesh Rebuild Complete.");
+    } catch (err) {
+      console.error("❌ Manual Mesh Rebuild Failed:", err);
+    }
+  }
+
+  function resetSupervisorEscalation() {
+    console.log("🚨 Operator Override: Resetting Supervisor Escalation Streak...");
+    if (window.NeuralSupervisorEscalation) {
+      window.NeuralSupervisorEscalation.recordSupervisorResult(true);
+    }
+  }
+
+  return {
+    manualMeshRebuild,
+    resetSupervisorEscalation
   };
 
 })();
