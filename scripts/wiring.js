@@ -370,6 +370,44 @@ window.NeuralOrbitRegistry = (function() {
     clearOrbits
   };
 })();
+// === Phase 16006 — Neural Registry Persistence Layer ===
+window.NeuralRegistryPersistence = (function () {
+  const STORAGE_KEY = 'neural_orbit_registry';
+
+  function saveRegistry(orbits) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orbits));
+      console.log("💾 Neural Orbit Registry Saved.");
+    } catch (err) {
+      console.error("❌ Failed to save orbit registry:", err);
+    }
+  }
+
+  function loadRegistry() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log("💾 Neural Orbit Registry Loaded:", parsed);
+        return parsed;
+      }
+    } catch (err) {
+      console.error("❌ Failed to load orbit registry:", err);
+    }
+    return null;
+  }
+
+  function clearRegistry() {
+    localStorage.removeItem(STORAGE_KEY);
+    console.log("🧹 Neural Orbit Registry Cleared.");
+  }
+
+  return {
+    saveRegistry,
+    loadRegistry,
+    clearRegistry
+  };
+})();
 // === Phase 14001: Neural Registry Boot Order Synchronization ===
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🧬 Phase 14001 — Neural Registry Boot Synchronization Activated");
@@ -2303,6 +2341,7 @@ function renderOrbitalDock() {
     button.appendChild(img);
   
     button.addEventListener("click", () => {
+      NeuralPanelSynthesis.synthesizePanel(orbit.panelId);
       NeuralNavigationCore.activatePanel(orbit.panelId);
       NeuralDockPersistence.saveActivePanel(orbit.panelId);
     });
@@ -2518,6 +2557,38 @@ window.NeuralOrbitalMeshValidator = (function() {
     validateMesh
   };
 
+})();
+window.NeuralPanelSynthesis = (function() {
+  function synthesizePanels() {
+  }
+
+  // 🔥 Add new single-panel synthesize function here
+  function synthesizePanel(panelId) {
+    console.log(`🧬 Synthesizing panel: ${panelId}`);
+
+    const existingPanel = document.getElementById(panelId);
+    if (existingPanel) {
+      console.log(`✅ Panel '${panelId}' already exists.`);
+      return;
+    }
+
+    const panel = document.createElement("section");
+    panel.id = panelId;
+    panel.classList.add("panel", "tab-section", "panel-glow", "synthesized-panel");
+
+    panel.innerHTML = `
+      <h2>🔧 ${panelId} Panel</h2>
+      <p>This panel was auto-synthesized by NeuralPanelSynthesis.</p>
+    `;
+
+    document.body.appendChild(panel);
+    console.log(`✅ Panel '${panelId}' synthesized successfully.`);
+  }
+
+  return {
+    synthesizePanels,
+    synthesizePanel  // <-- expose new method
+  };
 })();
 // === Phase 13001.2 — Neural Mesh Integrity Sentinel ===
 
@@ -3104,4 +3175,33 @@ window.NeuralDockPersistence = (function () {
     getActivePanel,
     restoreActivePanel
   };
+})();
+// === Phase 16005 — Neural Panel Auto-Synthesis ===
+window.NeuralPanelSynthesis = (function() {
+
+  function synthesizePanel(panelId) {
+    console.log(`🧬 Synthesizing missing panel: ${panelId}`);
+
+    const existingPanel = document.getElementById(panelId);
+    if (existingPanel) {
+      console.log(`✅ Panel '${panelId}' already exists.`);
+      return;
+    }
+
+    const panel = document.createElement("section");
+    panel.id = panelId;
+    panel.classList.add("panel", "tab-section", "panel-glow", "synthesized-panel");
+    panel.innerHTML = `
+      <h2>🔧 ${panelId} Panel</h2>
+      <p>This panel was auto-synthesized by NeuralPanelSynthesis.</p>
+    `;
+
+    document.body.appendChild(panel);
+    console.log(`✅ Panel '${panelId}' synthesized successfully.`);
+  }
+
+  return {
+    synthesizePanel
+  };
+
 })();
