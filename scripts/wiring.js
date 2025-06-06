@@ -2562,6 +2562,11 @@ window.NeuralOrbitalDockMesh = (function() {
     // 🔬 Iterate through all orbits
     Object.keys(registry).forEach(orbitKey => {
       const orbit = registry[orbitKey];
+      // === Phase 16015: Injection Safety Harness ===
+      if (!orbit.panelId || !orbit.label || !orbit.icon) {
+        console.warn(`⚠ Orbit '${orbitKey}' rejected: Missing required properties.`);
+        return; // Skip invalid orbit
+      }
 
       const button = document.createElement("button");
       button.classList.add("orbital-btn");
