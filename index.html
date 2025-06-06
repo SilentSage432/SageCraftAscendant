@@ -833,6 +833,12 @@
         Analyze Adaptation Results
       </button>
     </div>
+    <div class="console-section">
+      <h3>📊 Forecast Stability Clusters</h3>
+      <button onclick="SageCraftAscendant.ForecastStabilityCluster.computeStabilityClusters()">
+        Analyze Stability Clusters
+      </button>
+    </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
@@ -1628,6 +1634,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="scripts/sagecraft/forecast.adaptation.engine.js"></script>
 <script src="scripts/sagecraft/forecast.adaptation.analyzer.js"></script>
 <script src="scripts/sagecraft/forecast.visualizer.mutation.js"></script>
+<script src="scripts/sagecraft/forecast.stability.cluster.js"></script>
 <script src="scripts/forecast.snapshot.archiver.js"></script>
 <script src="scripts/forecast.snapshot.loader.js"></script>
 <script src="scripts/forecast.snapshot.validator.js"></script>
