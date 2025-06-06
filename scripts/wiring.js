@@ -1,3 +1,49 @@
+// === Phase 16016 — Dock Mesh Reconciliation Engine ===
+
+window.NeuralDockMeshReconciler = (function () {
+
+  const RECONCILIATION_INTERVAL = 30000; // every 30 seconds
+
+  function runDockReconciliation() {
+    console.log("🩺 Running Dock Mesh Reconciliation Pass...");
+
+    if (!window.NeuralOrbitRegistry?.listOrbits || !window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      console.error("❌ Dock Reconciliation System unavailable.");
+      return;
+    }
+
+    const registry = window.NeuralOrbitRegistry.listOrbits();
+    const dock = document.getElementById("orbitalDockContainer");
+
+    if (!dock) {
+      console.error("❌ Orbital Dock Container not found.");
+      return;
+    }
+
+    const expectedCount = Object.keys(registry).length;
+    const deployedCount = dock.querySelectorAll(".orbital-btn").length;
+
+    console.log(`🪐 Registry: ${expectedCount} | Dock Buttons: ${deployedCount}`);
+
+    if (expectedCount !== deployedCount) {
+      console.warn("⚠ Dock Mesh desync detected — initiating full dock rebuild...");
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    } else {
+      console.log("✅ Dock Mesh fully synchronized.");
+    }
+  }
+
+  function startReconciliationLoop() {
+    console.log("🔄 Dock Mesh Reconciliation Loop Activated.");
+    runDockReconciliation(); // Run immediately
+    setInterval(runDockReconciliation, RECONCILIATION_INTERVAL);
+  }
+
+  return {
+    startReconciliationLoop
+  };
+
+})();
 // === Phase 8000.2: NavigationCore Neutralization (optional) ===
 window.NavigationCore = (function() {
   function bootstrapOrbitalAnchors() {
@@ -442,6 +488,50 @@ window.NeuralMeshIntegritySentinel = (function () {
   };
 
 })();
+
+
+// === Phase 16020 — Neural Persistence Synchronizer ===
+
+window.NeuralPersistenceSynchronizer = (function () {
+
+  function synchronizePersistence() {
+    console.log("🔄 Running Neural Persistence Synchronization...");
+
+    if (!window.NeuralRegistryPersistence?.loadRegistry) {
+      console.error("❌ NeuralRegistryPersistence not available.");
+      return;
+    }
+
+    const savedRegistry = NeuralRegistryPersistence.loadRegistry();
+    if (!savedRegistry) {
+      console.warn("⚠ No saved registry found.");
+      return;
+    }
+
+    // Overwrite full live registry with saved version
+    Object.keys(savedRegistry).forEach(key => {
+      const orbit = savedRegistry[key];
+      window.NeuralOrbitRegistry.registerOrbit(
+        orbit.panelId, orbit.label, orbit.modules, orbit.icon
+      );
+    });
+
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    }
+
+    if (window.NeuralDockMeshReconciler?.runDockReconciliation) {
+      NeuralDockMeshReconciler.runDockReconciliation();
+    }
+
+    console.log("✅ Persistence Synchronization Complete.");
+  }
+
+  return {
+    synchronizePersistence
+  };
+
+})();
 // === Phase 16008 — Neural Registry Editor Core ===
 window.NeuralRegistryEditorCore = (function () {
 
@@ -513,11 +603,85 @@ window.NeuralRegistryEditorCore = (function () {
   };
 
 })();
-window.addEventListener('NeuralRegistryReady', () => {
-  console.log("✅ Neural Registry Ready — Initializing Wiring...");
-  initializeWiring();
-  initializeDockMesh();
-  NeuralMeshIntegritySentinel.autoSyncAfterBootstrap();
+
+// === Phase 16017 — Dynamic Orbit Injection Bus ===
+
+window.NeuralOrbitInjectionBus = (function () {
+
+  function injectOrbit({ key, label, icon = "icon-default.png", modules = [] }) {
+    console.log(`🚀 Injecting Orbit: ${key}`);
+
+    if (!key || !label || !icon) {
+      console.error("❌ Invalid injection payload — key, label, and icon are required.");
+      return;
+    }
+
+    if (!window.NeuralOrbitRegistry?.registerOrbit) {
+      console.error("❌ NeuralOrbitRegistry not initialized.");
+      return;
+    }
+
+    // Inject directly into registry
+    NeuralOrbitRegistry.registerOrbit(key, label, modules, icon);
+    NeuralRegistryPersistence.saveRegistry(NeuralOrbitRegistry.registry);
+    console.log(`✅ Orbit '${key}' injected and persisted.`);
+
+    // Immediately refresh dock
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    }
+
+    // Trigger mesh reconciliation (optional)
+    if (window.NeuralDockMeshReconciler?.runDockReconciliation) {
+      NeuralDockMeshReconciler.runDockReconciliation();
+    }
+  }
+
+  return {
+    injectOrbit
+  };
+
+})();
+
+// === Phase 1601 — Neural Orbit Registry Validator Core ===
+
+window.NeuralOrbitRegistryValidator = (function () {
+
+  function validateRegistry() {
+    console.log("🩺 Validating Neural Orbit Registry...");
+
+    if (!window.NeuralOrbitRegistry?.listOrbits) {
+      console.error("❌ NeuralOrbitRegistry unavailable.");
+      return;
+    }
+
+    const registry = NeuralOrbitRegistry.listOrbits();
+    let validCount = 0;
+    let invalidCount = 0;
+
+    Object.keys(registry).forEach(orbitKey => {
+      const orbit = registry[orbitKey];
+      const isValid = orbit?.panelId && orbit?.label && orbit?.icon;
+      if (isValid) {
+        validCount++;
+      } else {
+        invalidCount++;
+        console.warn(`⚠ Invalid Orbit '${orbitKey}' — Missing required fields.`);
+      }
+    });
+
+    console.log(`✅ Registry Validation Complete — ${validCount} valid, ${invalidCount} invalid.`);
+  }
+
+  return {
+    validateRegistry
+  };
+
+})();
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧬 DOM Ready — Beginning Full Neural Bootstrap...");
+  const bootstrap = NeuralUnifiedBootstrap();
+  bootstrap.startBootstrapSequence();
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
@@ -793,6 +957,15 @@ window.NeuralOperatorConsole = (function() {
     <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
   </div>
 
+  <div class="console-section">
+    <h3>🚀 Live Orbit Injection</h3>
+    <label>Key: <input id="injectKey" type="text"></label><br>
+    <label>Label: <input id="injectLabel" type="text"></label><br>
+    <label>Icon: <input id="injectIcon" type="text" value="icon-default.png"></label><br>
+    <label>Modules (comma-separated): <input id="injectModules" type="text"></label><br>
+    <button onclick="injectLiveOrbit()">Inject Orbit</button>
+  </div>
+
   <div class="console-log">
     <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
   </div>
@@ -1010,6 +1183,19 @@ function runRecoveryScan() {
   NeuralAuditSentinel.auditWiring();
 }
 window.NeuralOperatorConsole = NeuralOperatorConsole;
+
+// === Live Orbit Injection Handler ===
+function injectLiveOrbit() {
+  const key = document.getElementById("injectKey").value.trim();
+  const label = document.getElementById("injectLabel").value.trim();
+  const icon = document.getElementById("injectIcon").value.trim();
+  const modulesInput = document.getElementById("injectModules").value.trim();
+  const modules = modulesInput ? modulesInput.split(",").map(m => m.trim()) : [];
+
+  NeuralOrbitInjectionBus.injectOrbit({
+    key, label, icon, modules
+  });
+}
 // === Unified Neural Bootloader Stabilization ===
 
 // === Phase 39 Neural Mesh Activation ===
@@ -1024,15 +1210,25 @@ window.NeuralOperatorConsole = NeuralOperatorConsole;
 
 // === Phase 47: Neural Cortex Error Shielding Bootstrap ===
 
-// === Phase 16013: Unified Neural Bootstrap Function ===
+// === Phase 16021: Unified Neural Bootstrap Synchronization ===
+
 function NeuralUnifiedBootstrap() {
-  // Bootstraps the unified neural system
   function startBootstrapSequence() {
-    // === Phase 16007 Mesh Integrity Sentinel ===
+    console.log("🚀 Unified Neural Bootstrap Sequence Initiated...");
+
+    // Synchronize registry state fully first
+    NeuralPersistenceSynchronizer.synchronizePersistence();
+
+    // Mesh refresh after state loaded
     NeuralMeshIntegritySentinel.synchronizeDockMesh();
-    // === Phase 16014 Persistence Auto-Restore Layer ===
+
+    // Restore last active panel session
     NeuralSessionMemory.restoreLastPanel();
-    // ... further bootstrap phases can be added here
+
+    // Start reconciliation loop to continuously verify mesh health
+    NeuralDockMeshReconciler.startReconciliationLoop();
+
+    console.log("✅ Unified Bootstrap Sequence Complete.");
   }
   return {
     startBootstrapSequence
@@ -2712,6 +2908,52 @@ window.NeuralMeshIntegritySentinel = (function () {
 
     console.log(`✅ Integrity Scan Complete — ${validCount}/${total} orbits successfully mapped to DOM panels.`);
   }
+  // === Phase 16016 — Dock Mesh Reconciliation Engine ===
+
+window.NeuralDockMeshReconciler = (function () {
+
+  const RECONCILIATION_INTERVAL = 30000; // every 30 seconds
+
+  function runDockReconciliation() {
+    console.log("🩺 Running Dock Mesh Reconciliation Pass...");
+
+    if (!window.NeuralOrbitRegistry?.listOrbits || !window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      console.error("❌ Dock Reconciliation System unavailable.");
+      return;
+    }
+
+    const registry = window.NeuralOrbitRegistry.listOrbits();
+    const dock = document.getElementById("orbitalDockContainer");
+
+    if (!dock) {
+      console.error("❌ Orbital Dock Container not found.");
+      return;
+    }
+
+    const expectedCount = Object.keys(registry).length;
+    const deployedCount = dock.querySelectorAll(".orbital-btn").length;
+
+    console.log(`🪐 Registry: ${expectedCount} | Dock Buttons: ${deployedCount}`);
+
+    if (expectedCount !== deployedCount) {
+      console.warn("⚠ Dock Mesh desync detected — initiating full dock rebuild...");
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    } else {
+      console.log("✅ Dock Mesh fully synchronized.");
+    }
+  }
+
+  function startReconciliationLoop() {
+    console.log("🔄 Dock Mesh Reconciliation Loop Activated.");
+    runDockReconciliation(); // Run immediately
+    setInterval(runDockReconciliation, RECONCILIATION_INTERVAL);
+  }
+
+  return {
+    startReconciliationLoop
+  };
+
+})();
 
   // === Phase 16012: Mesh Integrity Synchronization ===
   function synchronizeDockMesh() {
