@@ -408,17 +408,116 @@ window.NeuralRegistryPersistence = (function () {
     clearRegistry
   };
 })();
-// === Phase 14001: Neural Registry Boot Order Synchronization ===
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("🧬 Phase 14001 — Neural Registry Boot Synchronization Activated");
-  
-  // Ensure the Neural Registry Seed executes BEFORE orbital mesh rendering
-  if (typeof window.registerAllOrbits === "function") {
-    window.registerAllOrbits();
-    console.log("✅ Neural Orbit Registry Seed Executed.");
-  } else {
-    console.warn("⚠ Neural Registry Seed not found. Seed file may not have loaded properly.");
+// === Phase 16007 — Mesh Integrity Sentinel ===
+window.NeuralMeshIntegritySentinel = (function () {
+
+  function synchronizeDockMesh() {
+    console.log("🧭 Running Mesh Integrity Synchronization...");
+
+    if (!window.NeuralOrbitRegistry || !window.NeuralOrbitRegistry.listOrbits) {
+      console.error("❌ NeuralOrbitRegistry not initialized.");
+      return;
+    }
+
+    if (!window.NeuralOrbitalDockMesh || !window.NeuralOrbitalDockMesh.renderOrbitalDock) {
+      console.error("❌ NeuralOrbitalDockMesh renderer unavailable.");
+      return;
+    }
+
+    // Force full mesh refresh
+    NeuralOrbitalDockMesh.renderOrbitalDock();
+    console.log("✅ Mesh synchronized with latest registry state.");
   }
+
+  function autoSyncAfterBootstrap() {
+    console.log("🕰 Scheduling post-bootstrap mesh sync...");
+    setTimeout(() => {
+      synchronizeDockMesh();
+    }, 250); // small delay to ensure all modules loaded before rendering
+  }
+
+  return {
+    synchronizeDockMesh,
+    autoSyncAfterBootstrap
+  };
+
+})();
+// === Phase 16008 — Neural Registry Editor Core ===
+window.NeuralRegistryEditorCore = (function () {
+
+  let notifyListeners = null;
+
+  function addOrbit(key, label, modules = [], icon = "icon-default.png") {
+    if (!window.NeuralOrbitRegistry || !window.NeuralOrbitRegistry.registerOrbit) {
+      console.error("❌ NeuralOrbitRegistry not initialized.");
+      return;
+    }
+
+    if (window.NeuralOrbitRegistry.listOrbits().hasOwnProperty(key)) {
+      console.warn(`⚠ Orbit '${key}' already exists.`);
+      return;
+    }
+
+    window.NeuralOrbitRegistry.registerOrbit(key, label, modules, icon);
+    NeuralRegistryPersistence.saveRegistry(window.NeuralOrbitRegistry.registry);
+    console.log(`✅ Orbit '${key}' registered via Editor.`);
+
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    }
+
+    if (notifyListeners) {
+      notifyListeners();
+    }
+  }
+
+  function removeOrbit(key) {
+    if (!window.NeuralOrbitRegistry || !window.NeuralOrbitRegistry.listOrbits) {
+      console.error("❌ NeuralOrbitRegistry not available.");
+      return;
+    }
+
+    if (!window.NeuralOrbitRegistry.registry[key]) {
+      console.warn(`⚠ Orbit '${key}' not found.`);
+      return;
+    }
+
+    delete window.NeuralOrbitRegistry.registry[key];
+    NeuralRegistryPersistence.saveRegistry(window.NeuralOrbitRegistry.registry);
+    console.log(`🗑 Orbit '${key}' removed via Editor.`);
+
+    if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    }
+
+    if (notifyListeners) {
+      notifyListeners();
+    }
+  }
+
+  function listOrbits() {
+    const orbits = window.NeuralOrbitRegistry?.listOrbits?.() || {};
+    console.table(orbits);
+    return orbits;
+  }
+
+  function setLiveSyncCallback(callback) {
+    notifyListeners = callback;
+  }
+
+  return {
+    addOrbit,
+    removeOrbit,
+    listOrbits,
+    setLiveSyncCallback
+  };
+
+})();
+window.addEventListener('NeuralRegistryReady', () => {
+  console.log("✅ Neural Registry Ready — Initializing Wiring...");
+  initializeWiring();
+  initializeDockMesh();
+  NeuralMeshIntegritySentinel.autoSyncAfterBootstrap();
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
@@ -917,50 +1016,28 @@ window.NeuralOperatorConsole = NeuralOperatorConsole;
 
 // === Phase 40 Purification Injection ===
 
-
 // === Phase 41: Orbital Anchor Wiring Bootstrap ===
-
 
 // === Phase 43: Orbital Router Activation Mesh ===
 
 // === Phase 44: Dynamic Panel Loaders Bootstrap ===
 
 // === Phase 47: Neural Cortex Error Shielding Bootstrap ===
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("🧬 Phase 47 — Unified Neural Bootstrap Activated");
 
-  try {
-    OrbitalAnchorRegistry.buildRegistry();
-    OrbitalController.bootstrap();
+// === Phase 16013: Unified Neural Bootstrap Function ===
+function NeuralUnifiedBootstrap() {
+  // Bootstraps the unified neural system
+  function startBootstrapSequence() {
+    // === Phase 16007 Mesh Integrity Sentinel ===
+    NeuralMeshIntegritySentinel.synchronizeDockMesh();
+    // === Phase 16014 Persistence Auto-Restore Layer ===
     NeuralSessionMemory.restoreLastPanel();
-    NeuralSelfHealingEngine.runSelfHealing();
-
-    if (typeof NavigationCore.bootstrapOrbitalAnchors === "function") {
-      NavigationCore.bootstrapOrbitalAnchors();
-    } else {
-      console.warn("⚠ bootstrapOrbitalAnchors not found (Phase 41 may have been retired).");
-    }
-
-    if (typeof NavigationCore.activateOrbitalRouterMesh === "function") {
-      NavigationCore.activateOrbitalRouterMesh();
-    } else {
-      console.warn("⚠ activateOrbitalRouterMesh not found (Phase 43 may have been retired).");
-    }
-
-    if (typeof NavigationCore.dynamicPanelLoader === "function") {
-      NavigationCore.dynamicPanelLoader();
-    } else {
-      console.warn("⚠ dynamicPanelLoader not found (Phase 44 may have been retired).");
-    }
-
-    console.log("✅ Neural Bootstrap Fully Stabilized.");
-  } catch (err) {
-    console.error("❌ Neural Bootstrap Failure:", err);
+    // ... further bootstrap phases can be added here
   }
-});
-document.addEventListener("DOMContentLoaded", () => {
-  initializeNeuralOrbitalMesh();
-});
+  return {
+    startBootstrapSequence
+  };
+}
 // === Phase 53: Neural Operator Console Logging Redirect ===
 (function() {
   const consoleOutput = document.getElementById("neuralConsoleOutput");
@@ -2341,9 +2418,15 @@ function renderOrbitalDock() {
     button.appendChild(img);
   
     button.addEventListener("click", () => {
-      NeuralPanelSynthesis.synthesizePanel(orbit.panelId);
-      NeuralNavigationCore.activatePanel(orbit.panelId);
-      NeuralDockPersistence.saveActivePanel(orbit.panelId);
+      if (window.NeuralPanelSynthesis?.synthesizePanel) {
+        NeuralPanelSynthesis.synthesizePanel(orbit.panelId);
+      }
+      if (window.NeuralNavigationCore?.activatePanel) {
+        NeuralNavigationCore.activatePanel(orbit.panelId);
+      }
+      if (window.NeuralDockPersistence?.saveActivePanel) {
+        NeuralDockPersistence.saveActivePanel(orbit.panelId);
+      }
     });
   
     orbitalDock.appendChild(button);
@@ -2490,11 +2573,16 @@ window.NeuralOrbitalDockMesh = (function() {
       img.alt = orbit.label;
       button.appendChild(img);
 
+      // === Phase 16011: Fully integrated navigation, synthesis, and persistence ===
       button.addEventListener("click", () => {
-        try {
+        if (window.NeuralPanelSynthesis?.synthesizePanel) {
+          NeuralPanelSynthesis.synthesizePanel(orbit.panelId);
+        }
+        if (window.NeuralNavigationCore?.activatePanel) {
           NeuralNavigationCore.activatePanel(orbit.panelId);
-        } catch (err) {
-          console.error(`❌ Failed to activate panel '${orbit.panelId}':`, err);
+        }
+        if (window.NeuralDockPersistence?.saveActivePanel) {
+          NeuralDockPersistence.saveActivePanel(orbit.panelId);
         }
       });
 
@@ -2620,8 +2708,38 @@ window.NeuralMeshIntegritySentinel = (function () {
     console.log(`✅ Integrity Scan Complete — ${validCount}/${total} orbits successfully mapped to DOM panels.`);
   }
 
+  // === Phase 16012: Mesh Integrity Synchronization ===
+  function synchronizeDockMesh() {
+    console.log("🧭 Running Mesh Integrity Synchronization...");
+
+    if (!window.NeuralOrbitRegistry || !window.NeuralOrbitRegistry.listOrbits) {
+      console.error("❌ NeuralOrbitRegistry not initialized.");
+      return;
+    }
+
+    if (!window.NeuralOrbitalDockMesh || !window.NeuralOrbitalDockMesh.renderOrbitalDock) {
+      console.error("❌ NeuralOrbitalDockMesh renderer unavailable.");
+      return;
+    }
+
+    const dock = document.getElementById("orbitalDockContainer");
+    const registry = window.NeuralOrbitRegistry.listOrbits();
+    const expectedCount = Object.keys(registry).length;
+    const deployedCount = dock ? dock.querySelectorAll(".orbital-btn").length : 0;
+
+    console.log(`🪐 Expected: ${expectedCount} orbitals | Found: ${deployedCount} buttons.`);
+
+    if (expectedCount !== deployedCount) {
+      console.warn("⚠ Mesh Discrepancy Detected — Forcing Dock Rebuild...");
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    } else {
+      console.log("✅ Mesh Integrity Fully Aligned.");
+    }
+  }
+
   return {
-    verifyRegistryIntegrity
+    verifyRegistryIntegrity,
+    synchronizeDockMesh
   };
 
 })();
@@ -3205,3 +3323,44 @@ window.NeuralPanelSynthesis = (function() {
   };
 
 })();
+window.NeuralUnifiedBootstrap = (function () {
+  function startBootstrapSequence() {
+    console.log("🧬 Neural Unified Bootstrap Sequence Initiated...");
+    // ✅ Restore Session Memory
+NeuralSessionMemory.restoreLastPanel();
+
+    try {
+      // ✅ Execute Neural Registry Seed (if available)
+      if (typeof window.registerAllOrbits === "function") {
+        window.registerAllOrbits();
+        console.log("✅ Neural Orbit Registry Seed Executed.");
+      }
+
+      // ✅ Synchronize Neural Dock Mesh
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+
+      // ✅ Mesh Integrity Sentinel
+      NeuralMeshIntegritySentinel.synchronizeDockMesh();
+
+      // ✅ Restore Session Memory
+      NeuralSessionMemory.restoreLastPanel();
+
+      // ✅ Activate Operator Console (optional)
+      if (window.NeuralOperatorConsole?.renderOperatorConsole) {
+        NeuralOperatorConsole.renderOperatorConsole();
+      }
+
+      console.log("✅ Unified Neural Bootstrap Fully Stabilized.");
+    } catch (err) {
+      console.error("❌ Unified Bootstrap Failure:", err);
+    }
+  }
+
+  return {
+    startBootstrapSequence
+  };
+})();
+// === Phase 16013: Unified Neural Bootstrap Activation ===
+document.addEventListener("DOMContentLoaded", () => {
+  NeuralUnifiedBootstrap.startBootstrapSequence();
+});
