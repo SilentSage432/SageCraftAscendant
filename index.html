@@ -827,6 +827,12 @@
       <h3>📊 Neural Stability Analytics</h3>
       <button onclick="SageCraftAscendant.ForecastStabilityAnalytics.computeStabilityIndex()">🔎 Compute Stability Index</button>
     </div>
+    <div class="console-section">
+      <h3>📊 Adaptation Analyzer</h3>
+      <button onclick="SageCraftAscendant.ForecastAdaptationAnalyzer.analyzeAdaptationResults()">
+        Analyze Adaptation Results
+      </button>
+    </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
@@ -1619,6 +1625,8 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="scripts/sagecraft/forecast.signal.reinforcement.js"></script>
 <script src="scripts/sagecraft/forecast.synthesis.core.js"></script>
 <script src="scripts/sagecraft/forecast.mutation.layer.js"></script>
+<script src="scripts/sagecraft/forecast.adaptation.engine.js"></script>
+<script src="scripts/sagecraft/forecast.adaptation.analyzer.js"></script>
 <script src="scripts/sagecraft/forecast.visualizer.mutation.js"></script>
 <script src="scripts/forecast.snapshot.archiver.js"></script>
 <script src="scripts/forecast.snapshot.loader.js"></script>
