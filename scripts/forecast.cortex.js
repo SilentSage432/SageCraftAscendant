@@ -8,12 +8,18 @@ SageCraftAscendant.ForecastCortex = (function() {
   let forecastMemory = [];
 
   function injectForecastRecord(record) {
-    forecastMemory.push(record);
-    console.log("🧠 Forecast Record Injected:", record);
+    // Phase 7.0 — Apply Self-Healing Forecast Memory Engine before ingestion
+    const healedRecord = SageCraftAscendant.ForecastMemoryHealer.healForecastRecord(record);
+
+    // Phase 7.1 — Apply Forecast Validation Sentinel after healing
+    SageCraftAscendant.ForecastValidationSentinel.validateForecastRecord(healedRecord);
+
+    forecastMemory.push(healedRecord);
+    console.log("🧠 Forecast Record Injected:", healedRecord);
 
     // Auto-run injection hooks
     if (typeof onInjectionHook === "function") {
-      onInjectionHook(record);
+      onInjectionHook(healedRecord);
     }
   }
 

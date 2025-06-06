@@ -86,6 +86,16 @@
         border-radius: 8px; max-height: 400px; overflow-y: auto;">
         <p>📊 Forecast report output will appear here.</p>
       </div>
+      <div class="console-section">
+        <h3>📈 Forecast Drift Visualizer</h3>
+        <button onclick="SageCraftAscendant.ForecastDriftVisualizer.renderDriftChart()">Render Drift Chart</button>
+      </div>
+      <div class="console-section">
+        <h3>📊 Forecast Confidence Overlay</h3>
+        <button onclick="SageCraftAscendant.ForecastConfidenceOverlay.renderConfidenceChart()">Render Confidence Chart</button>
+      </div>
+      <canvas id="forecastConfidenceChart" width="600" height="300"></canvas>
+      <button onclick="SageCraftAscendant.ForecastConfidenceOverlay.renderConfidenceChart()">📊 Render Confidence Overlay</button>
     </div>
 
     <div id="panel-governance" class="control-panel">
@@ -206,6 +216,11 @@
       <h3>🛡 Operator Overrides</h3>
       <button onclick="NeuralOperatorOverride.manualMeshRebuild()">🛠 Rebuild Orbital Mesh</button>
       <button onclick="NeuralOperatorOverride.resetSupervisorEscalation()">🔄 Reset Supervisor Escalation</button>
+    </div>
+    <div class="console-section">
+      <h3>🗄 Snapshot Audit Console</h3>
+      <button onclick="SageCraftAscendant.ForecastSnapshotValidator.promptSnapshotValidation()">🧪 Validate Snapshot</button>
+      <button onclick="SageCraftAscendant.ForecastSnapshotRepair.promptSnapshotRepair()">🛠 Repair Snapshot</button>
     </div>
   </div>
     <div id="neuralConsoleOutput" style="background: #111; color: #0f0; padding: 10px; font-family: monospace; border: 1px solid #444; border-radius: 5px; height: 200px; overflow-y: auto;">
@@ -803,6 +818,14 @@
       <div id="orbitRemovalList">
         <button onclick="refreshOrbitRemovalList()">🔄 Refresh Orbits</button>
       </div>
+    </div>
+    <div class="console-section">
+      <h3>📊 Archive Compliance Monitor</h3>
+      <button onclick="SageCraftAscendant.ForecastArchiveCompliance.runComplianceAudit()">🔎 Run Compliance Audit</button>
+    </div>
+    <div class="console-section">
+      <h3>📊 Neural Stability Analytics</h3>
+      <button onclick="SageCraftAscendant.ForecastStabilityAnalytics.computeStabilityIndex()">🔎 Compute Stability Index</button>
     </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
@@ -1597,6 +1620,17 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="scripts/sagecraft/forecast.synthesis.core.js"></script>
 <script src="scripts/sagecraft/forecast.mutation.layer.js"></script>
 <script src="scripts/sagecraft/forecast.visualizer.mutation.js"></script>
+<script src="scripts/forecast.snapshot.archiver.js"></script>
+<script src="scripts/forecast.snapshot.loader.js"></script>
+<script src="scripts/forecast.snapshot.validator.js"></script>
+<script src="scripts/forecast.snapshot.repair.js"></script>
+<script src="scripts/forecast.archive.compliance.js"></script>
+<script src="scripts/forecast.archive.autoscan.js"></script>
+<script src="scripts/forecast.memory.healer.js"></script>
+<script src="scripts/forecast.validation.sentinel.js"></script>
+<script src="scripts/forecast.analytics.stability.js"></script>
+<script src="scripts/forecast.drift.visualizer.js"></script>
+<script src="scripts/forecast.confidence.overlay.js"></script>
 <script src="scripts/sagecraft/persistence.registry.js"></script>
 <script src="scripts/sagecraft/persistence.session.js"></script>
 <script src="scripts/sagecraft/operator.console.js"></script>
@@ -1778,6 +1812,9 @@ document.addEventListener("DOMContentLoaded", () => {
     <canvas id="forecastDriftChart" width="400" height="250"></canvas>
     <div style="text-align:center; margin-top:15px;">
       <button id="closeDriftChartBtn">❌ Close</button>
+      <button id="generateForecastBtn" ...></button>
+      <canvas id="forecastDriftChart" width="600" height="300"></canvas>
+      <button onclick="SageCraftAscendant.ForecastDriftVisualizer.renderDriftChart()">📊 Render Forecast Drift Chart</button>
     </div>
   </div>
 </div>

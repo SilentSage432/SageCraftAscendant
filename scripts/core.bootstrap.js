@@ -50,6 +50,12 @@ SageCraftAscendant.Bootstrap = (function() {
     if (SageCraftAscendant.RecoveryAutonomous?.startAutoRecovery) {
       SageCraftAscendant.RecoveryAutonomous.startAutoRecovery();
     }
+
+    // Automated Archive Compliance Sweep (Phase 6.9)
+    if (SageCraftAscendant.ForecastArchiveAutoScanner?.runAutoComplianceSweep) {
+      SageCraftAscendant.ForecastArchiveAutoScanner.runAutoComplianceSweep();
+    }
+
     console.log("✅ SageCraft Ascendant: Bootstrap Complete.");
   }
 
