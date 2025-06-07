@@ -69,6 +69,14 @@ SageCraftAscendant.Bootstrap = (function() {
     if (SageCraftAscendant.OperatorConsole?.renderOperatorConsole) {
       SageCraftAscendant.OperatorConsole.renderOperatorConsole();
     }
+    // Phase 10.4.1 — Diagnostics Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerDiagnosticsConsole) {
+      SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole();
+    }
+    // Phase 10.5.1 — Mesh Integrity Overlay Activation
+    if (SageCraftAscendant.OperatorConsole?.registerMeshIntegrityOverlay) {
+      SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay();
+    }
 
     if (SageCraftAscendant.GovernancePolicy?.initialize) {
       SageCraftAscendant.GovernancePolicy.initialize();

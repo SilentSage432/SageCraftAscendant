@@ -186,7 +186,77 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // Phase 10.4 — Neural Diagnostics Console Deployment
+  SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🧬 Neural Diagnostics Console";
+    section.appendChild(header);
+
+    const integrityBtn = document.createElement("button");
+    integrityBtn.textContent = "🔎 Run Integrity Scan";
+    integrityBtn.onclick = () => {
+      const result = SageCraftAscendant.NeuralMeshDiagnostics?.runIntegrityScan();
+      console.log("🧬 Integrity Scan Result:", result);
+      alert(JSON.stringify(result, null, 2));
+    };
+    section.appendChild(integrityBtn);
+
+    const auditBtn = document.createElement("button");
+    auditBtn.textContent = "🩺 Subsystem Audit";
+    auditBtn.onclick = () => {
+      const audit = SageCraftAscendant.NeuralMeshDiagnostics?.runSubsystemAudit();
+      console.log("🩺 Subsystem Audit Report:", audit);
+      alert(JSON.stringify(audit, null, 2));
+    };
+    section.appendChild(auditBtn);
+
+    container.appendChild(section);
+  };
+
+  // Phase 10.5 — Mesh Integrity Overlay Panel Deployment
+  SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🌐 Mesh Integrity Overlay";
+    section.appendChild(header);
+
+    const meshContainer = document.createElement("div");
+    meshContainer.style.border = "1px solid #888";
+    meshContainer.style.padding = "10px";
+    meshContainer.style.background = "#111";
+    meshContainer.style.color = "#0f0";
+
+    const orbits = window.NeuralOrbitRegistry?.listOrbits?.() || {};
+
+    if (Object.keys(orbits).length === 0) {
+      meshContainer.textContent = "No active orbits detected.";
+    } else {
+      for (const key in orbits) {
+        const orbit = orbits[key];
+        const orbitStatus = document.createElement("div");
+        orbitStatus.textContent = `🛰 ${orbit.label} [${orbit.panelId}] — Modules: ${orbit.modules.length}`;
+        meshContainer.appendChild(orbitStatus);
+      }
+    }
+
+    section.appendChild(meshContainer);
+    container.appendChild(section);
+  };
+
   return {
-    renderOperatorConsole
+    renderOperatorConsole,
+    registerDiagnosticsConsole: SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole,
+    registerMeshIntegrityOverlay: SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay
   };
 })();
