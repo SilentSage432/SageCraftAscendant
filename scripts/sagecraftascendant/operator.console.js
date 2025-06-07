@@ -60,6 +60,132 @@ SageCraftAscendant.OperatorConsole = (function() {
     console.log("✅ Operator Console fully rendered.");
   }
 
+  // Phase 9.3 — Live Orbit Injection Console
+  SageCraftAscendant.OperatorConsole.registerOrbitInjectionControls = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🛰 Live Orbit Injection";
+    section.appendChild(header);
+
+    const labelInput = document.createElement("input");
+    labelInput.placeholder = "Orbit Label";
+    section.appendChild(labelInput);
+
+    const panelInput = document.createElement("input");
+    panelInput.placeholder = "Panel ID";
+    section.appendChild(panelInput);
+
+    const iconInput = document.createElement("input");
+    iconInput.placeholder = "Icon Filename";
+    section.appendChild(iconInput);
+
+    const injectBtn = document.createElement("button");
+    injectBtn.textContent = "➕ Inject Orbit";
+    injectBtn.onclick = () => {
+      const label = labelInput.value.trim();
+      const panelId = panelInput.value.trim();
+      const icon = iconInput.value.trim() || "icon-default.png";
+      if (!label || !panelId) {
+        alert("⚠ Both Label and Panel ID are required.");
+        return;
+      }
+      SageCraftAscendant.OrbitRegistry.registerOrbit(panelId, label, [], icon);
+      SageCraftAscendant.NeuralOrbitalDockMesh.renderDock();
+      SageCraftAscendant.PersistenceRegistry.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
+      // === Dock Persistence Sync Hook ===
+      if (SageCraftAscendant.DockPersistence?.saveRegistry) {
+        SageCraftAscendant.DockPersistence.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
+        console.log("💾 DockPersistence updated.");
+      }
+      alert(`✅ Orbit '${label}' injected and saved.`);
+    };
+
+    section.appendChild(injectBtn);
+    container.appendChild(section);
+  };
+
+  // Phase 9.5 — Orbit Removal Console Enhancer
+  SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🗑 Orbit Removal Console";
+    section.appendChild(header);
+
+    const orbitList = document.createElement("div");
+    orbitList.id = "orbitRemovalList";
+    section.appendChild(orbitList);
+
+    container.appendChild(section);
+
+    function refreshOrbitList() {
+      orbitList.innerHTML = '';
+
+      const registry = SageCraftAscendant.OrbitRegistry.listOrbits();
+      Object.entries(registry).forEach(([key, orbit]) => {
+        const orbitBtn = document.createElement("button");
+        orbitBtn.textContent = `Remove ${orbit.label}`;
+        orbitBtn.style.margin = "5px";
+        orbitBtn.onclick = () => {
+          if (confirm(`Remove orbit '${orbit.label}'?`)) {
+            SageCraftAscendant.OrbitRegistry.removeOrbit(key);
+            SageCraftAscendant.NeuralOrbitalDockMesh.renderDock();
+            SageCraftAscendant.PersistenceRegistry.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
+            refreshOrbitList();
+          }
+        };
+        orbitList.appendChild(orbitBtn);
+      });
+    }
+
+    refreshOrbitList();
+  };
+
+  // Phase 9.7 — Neural Orbital Registry Control Panel
+  SageCraftAscendant.OperatorConsole.registerOrbitRegistryControls = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🪐 Neural Orbit Registry";
+    section.appendChild(header);
+
+    const listBtn = document.createElement("button");
+    listBtn.textContent = "📋 List Current Orbits";
+    listBtn.onclick = () => {
+      const orbits = SageCraftAscendant.OrbitRegistry.listOrbits();
+      console.log("🪐 Current Orbits:", orbits);
+      alert(JSON.stringify(orbits, null, 2));
+    };
+    section.appendChild(listBtn);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "🧹 Clear Registry";
+    clearBtn.onclick = () => {
+      if (confirm("⚠ Are you sure you want to clear ALL orbits?")) {
+        SageCraftAscendant.OrbitRegistry.clearRegistry();
+        SageCraftAscendant.NeuralOrbitalDockMesh.renderDock();
+        SageCraftAscendant.PersistenceRegistry.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
+        alert("✅ Registry cleared.");
+      }
+    };
+    section.appendChild(clearBtn);
+
+    container.appendChild(section);
+  };
+
   return {
     renderOperatorConsole
   };

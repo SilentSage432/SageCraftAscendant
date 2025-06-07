@@ -12,9 +12,9 @@ SageCraftAscendant.MeshDock = (function() {
       console.warn("⚠ Orbital Dock Container not found.");
       return;
     }
-
+  
     orbitalDock.innerHTML = '';
-
+  
     const orbits = SageCraftAscendant.OrbitRegistry.listOrbits();
     Object.keys(orbits).forEach(orbitKey => {
       const orbit = orbits[orbitKey];
@@ -22,20 +22,21 @@ SageCraftAscendant.MeshDock = (function() {
       button.classList.add("orbital-btn");
       button.setAttribute("data-target", `#${orbit.panelId}`);
       button.setAttribute("aria-label", orbit.label);
-
+  
       const img = document.createElement("img");
       img.src = `assets/icons/${orbit.icon}`;
       img.alt = orbit.label;
       button.appendChild(img);
-
+  
       button.addEventListener("click", () => {
         console.log(`🛰 Orbit Activated: ${orbit.panelId}`);
-        // 🔧 Hook in your Panel Activation Logic (if any)
+        SageCraftAscendant.NeuralNavigationCore.activatePanel(orbit.panelId);
+        NeuralDockPersistence.saveActivePanel(orbit.panelId);
       });
-
+  
       orbitalDock.appendChild(button);
     });
-
+  
     console.log("✅ Orbital Dock fully rendered.");
   }
 

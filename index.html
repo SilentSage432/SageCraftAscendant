@@ -812,6 +812,12 @@
       <button onclick="NeuralOrbitalDockValidator.runDockValidationBurnIn()">Run Dock Validation Burn-In</button>
     </div>
     <div class="console-section">
+      <h3>🗄 Neural Registry Editor</h3>
+      <button onclick="SageCraftAscendant.OrbitRegistryEditor.listOrbits()">📋 List Registered Orbits</button>
+      <button onclick="SageCraftAscendant.OrbitRegistryEditor.clearRegistry()">🧹 Clear Full Registry</button>
+      <button onclick="SageCraftAscendant.OrbitRegistryEditor.rebuildDock()">🔄 Rebuild Dock From Registry</button>
+    </div>
+    <div class="console-section">
       <h3>🪐 Orbit Manager</h3>
       <label>Orbit Key: <input type="text" id="orbitKeyInput"></label><br>
       <label>Orbit Label: <input type="text" id="orbitLabelInput"></label><br>
@@ -1697,8 +1703,28 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="scripts/sagecraftascendant/forecast.confidence.overlay.js"></script>
 <script src="scripts/sagecraftascendant/persistence.registry.js"></script>
 <script src="scripts/sagecraftascendant/persistence.session.js"></script>
+<script src="scripts/sagecraftascendant/dock.persistence.js"></script>
 <script src="scripts/sagecraftascendant/operator.console.js"></script>
+<script src="scripts/sagecraftascendant/orbit.registry.editor.js"></script>
 <script src="scripts/sagecraftascendant/core.bootstrap.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.SageCraftAscendant?.OrbitInjectionConsole?.registerOrbitInjectionControls) {
+    window.SageCraftAscendant.OrbitInjectionConsole.registerOrbitInjectionControls();
+    console.log("✅ Orbit Injection Console Initialized.");
+  }
+});
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.SageCraftAscendant?.OperatorConsole?.registerOrbitRemovalControls) {
+      window.SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls();
+      console.log("✅ Orbit Removal Console Initialized.");
+    }
+  });
+  </script>
 
   <!-- === SageCraft Ascendant Unified Bootstrap Invocation === -->
   <script>
