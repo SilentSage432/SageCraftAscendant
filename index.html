@@ -858,6 +858,16 @@
         Render Anomaly Drift Chart
       </button>
     </div>
+    <div class="console-section">
+      <h3>💬 Codex Whisper Console</h3>
+      <div id="codexConsoleOutput" style="height: 300px; overflow-y: auto; background: #111; color: #0f0; padding: 10px; border: 1px solid #444;"></div>
+      <input type="text" id="codexUserInput" placeholder="Type command..." style="width: 80%; padding: 5px;">
+      <button onclick="SageCraftAscendant.CodexWhisper.userMessage(document.getElementById('codexUserInput').value)">Send</button>
+    </div>
+    <div class="console-section">
+      <h3>🧮 Codex Whisper Audit</h3>
+      <button onclick="SageCraftAscendant.CodexWhisper.auditMemoryChain()">Run Memory Audit</button>
+    </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
@@ -1613,73 +1623,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- SageCraft Neural Codex Proper Load Order -->
 
-<script src="scripts/sagecraft/core.namespace.js"></script>
-<script src="scripts/sagecraft/registry.orbits.js"></script>
-<script src="scripts/sagecraft/mesh.dock.js"></script>
-<script src="scripts/sagecraft/mesh.integrity.js"></script>
-<script src="scripts/sagecraft/recovery.autonomous.js"></script>
-<script src="scripts/sagecraft/policy.governance.js"></script>
-<script src="scripts/sagecraft/forecast.cortex.js"></script>
-<script src="scripts/sagecraft/forecast.intake.js"></script>
-<script src="scripts/sagecraft/forecast.visualizer.js"></script>
-<script src="scripts/sagecraft/forecast.analyzer.js"></script>
-<script src="scripts/sagecraft/forecast.ai.scaffold.js"></script>
-<script src="scripts/sagecraft/forecast.drift.sentinel.js"></script>
-<script src="scripts/sagecraft/forecast.recovery.supervisor.js"></script>
-<script src="scripts/sagecraft/forecast.purification.engine.js"></script>
-<script src="scripts/sagecraft/forecast.threat.monitor.js"></script>
-<script src="scripts/sagecraft/forecast.anomaly.profiler.js"></script>
-<script src="scripts/sagecraft/core.drift.balancer.js"></script>
-<script src="scripts/sagecraft/core.drift.compensator.js"></script>
-<script src="scripts/sagecraft/core.autocorrect.shell.js"></script>
-<script src="scripts/sagecraft/core.stabilization.feedback.js"></script>
-<script src="scripts/sagecraft/core.resilience.sentinel.js"></script>
-<script src="scripts/sagecraft/core.hazard.deflection.js"></script>
-<script src="scripts/sagecraft/core.repair.optimizer.js"></script>
-<script src="scripts/sagecraft/core.threat.deflection.nexus.js"></script>
-<script src="scripts/sagecraft/core.anomaly.fusion.matrix.js"></script>
-<script src="scripts/sagecraft/core.pattern.resolution.js"></script>
-<script src="scripts/sagecraft/forecast.predictive.cortex.js"></script>
-<script src="scripts/sagecraft/forecast.recursive.memory.js"></script>
-<script src="scripts/sagecraft/forecast.weight.adaptation.js"></script>
-<script src="scripts/sagecraft/forecast.confidence.engine.js"></script>
-<script src="scripts/sagecraft/forecast.correction.injector.js"></script>
-<script src="scripts/sagecraft/forecast.threat.overseer.js"></script>
-<script src="scripts/sagecraft/forecast.stabilizer.core.js"></script>
-<script src="scripts/sagecraft/forecast.anomaly.resolver.js"></script>
-<script src="scripts/sagecraft/forecast.signal.reinforcement.js"></script>
-<script src="scripts/sagecraft/forecast.synthesis.core.js"></script>
-<script src="scripts/sagecraft/forecast.mutation.layer.js"></script>
-<script src="scripts/sagecraft/forecast.adaptation.engine.js"></script>
-<script src="scripts/sagecraft/forecast.adaptation.analyzer.js"></script>
-<script src="scripts/sagecraft/forecast.visualizer.mutation.js"></script>
-<script src="scripts/sagecraft/forecast.stability.cluster.js"></script>
-<script src="scripts/forecast.snapshot.archiver.js"></script>
-<script src="scripts/forecast.snapshot.loader.js"></script>
-<script src="scripts/forecast.snapshot.validator.js"></script>
-<script src="scripts/forecast.snapshot.repair.js"></script>
-<script src="scripts/forecast.archive.compliance.js"></script>
-<script src="scripts/forecast.archive.autoscan.js"></script>
-<script src="scripts/forecast.memory.healer.js"></script>
-<script src="scripts/forecast.validation.sentinel.js"></script>
-<script src="scripts/forecast.analytics.stability.js"></script>
-<script src="scripts/forecast.drift.visualizer.js"></script>
-<script src="scripts/forecast.confidence.overlay.js"></script>
-<script src="scripts/sagecraft/persistence.registry.js"></script>
-<script src="scripts/sagecraft/persistence.session.js"></script>
-<script src="scripts/sagecraft/operator.console.js"></script>
+<!-- SageCraft Neural Codex Proper Load Order (Realigned Paths) -->
 
-<script src="scripts/sagecraft/core.bootstrap.js"></script>
-
-  <!-- === Temporary Legacy Support (Safe to remove after full migration) === -->
-  <script src="scripts/ui.js?v=2.0.1" type="module"></script>
-  <script src="scripts/globals.js" type="module"></script>
-  <script src="scripts/utilities.js" type="module"></script>
-  <script src="scripts/handlers.js" type="module"></script>
-  <script src="scripts/dropbox.js" type="module"></script>
-  <script src="scripts/index.js?v=2.0.2" type="module"></script>
-  <script src="scripts/rotationEngine.js?v=1.0.0" type="module"></script>
-  <script src="scripts/init.js" type="module"></script>
+<script src="scripts/sagecraftascendant/core.namespace.js"></script>
+<script src="scripts/sagecraftascendant/registry.orbits.js"></script>
+<script src="scripts/sagecraftascendant/mesh.dock.js"></script>
+<script src="scripts/sagecraftascendant/mesh.integrity.js"></script>
+<script src="scripts/sagecraftascendant/recovery.autonomous.js"></script>
+<script src="scripts/sagecraftascendant/policy.governance.js"></script>
+<script src="scripts/sagecraftascendant/forecast.cortex.js"></script>
+<script src="scripts/sagecraftascendant/forecast.intake.js"></script>
+<script src="scripts/sagecraftascendant/forecast.visualizer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.analyzer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.ai.scaffold.js"></script>
+<script src="scripts/sagecraftascendant/forecast.drift.sentinel.js"></script>
+<script src="scripts/sagecraftascendant/forecast.recovery.supervisor.js"></script>
+<script src="scripts/sagecraftascendant/forecast.purification.engine.js"></script>
+<script src="scripts/sagecraftascendant/forecast.threat.monitor.js"></script>
+<script src="scripts/sagecraftascendant/forecast.anomaly.profiler.js"></script>
+<script src="scripts/sagecraftascendant/core.drift.balancer.js"></script>
+<script src="scripts/sagecraftascendant/core.drift.compensator.js"></script>
+<script src="scripts/sagecraftascendant/core.autocorrect.shell.js"></script>
+<script src="scripts/sagecraftascendant/core.stabilization.feedback.js"></script>
+<script src="scripts/sagecraftascendant/core.resilience.sentinel.js"></script>
+<script src="scripts/sagecraftascendant/core.hazard.deflection.js"></script>
+<script src="scripts/sagecraftascendant/core.repair.optimizer.js"></script>
+<script src="scripts/sagecraftascendant/core.threat.deflection.nexus.js"></script>
+<script src="scripts/sagecraftascendant/core.anomaly.fusion.matrix.js"></script>
+<script src="scripts/sagecraftascendant/core.pattern.resolution.js"></script>
+<script src="scripts/sagecraftascendant/forecast.predictive.cortex.js"></script>
+<script src="scripts/sagecraftascendant/forecast.recursive.memory.js"></script>
+<script src="scripts/sagecraftascendant/forecast.weight.adaptation.js"></script>
+<script src="scripts/sagecraftascendant/forecast.confidence.engine.js"></script>
+<script src="scripts/sagecraftascendant/forecast.correction.injector.js"></script>
+<script src="scripts/sagecraftascendant/forecast.threat.overseer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.stabilizer.core.js"></script>
+<script src="scripts/sagecraftascendant/forecast.anomaly.resolver.js"></script>
+<script src="scripts/sagecraftascendant/forecast.signal.reinforcement.js"></script>
+<script src="scripts/sagecraftascendant/forecast.synthesis.core.js"></script>
+<script src="scripts/sagecraftascendant/forecast.mutation.layer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.adaptation.engine.js"></script>
+<script src="scripts/sagecraftascendant/forecast.adaptation.analyzer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.visualizer.mutation.js"></script>
+<script src="scripts/sagecraftascendant/forecast.stability.cluster.js"></script>
+<script src="scripts/sagecraftascendant/forecast.snapshot.archiver.js"></script>
+<script src="scripts/sagecraftascendant/forecast.snapshot.loader.js"></script>
+<script src="scripts/sagecraftascendant/forecast.snapshot.validator.js"></script>
+<script src="scripts/sagecraftascendant/forecast.snapshot.repair.js"></script>
+<script src="scripts/sagecraftascendant/forecast.archive.compliance.js"></script>
+<script src="scripts/sagecraftascendant/forecast.archive.autoscan.js"></script>
+<script src="scripts/sagecraftascendant/forecast.memory.healer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.validation.sentinel.js"></script>
+<script src="scripts/sagecraftascendant/forecast.analytics.stability.js"></script>
+<script src="scripts/sagecraftascendant/forecast.drift.visualizer.js"></script>
+<script src="scripts/sagecraftascendant/forecast.confidence.overlay.js"></script>
+<script src="scripts/sagecraftascendant/persistence.registry.js"></script>
+<script src="scripts/sagecraftascendant/persistence.session.js"></script>
+<script src="scripts/sagecraftascendant/operator.console.js"></script>
+<script src="scripts/sagecraftascendant/core.bootstrap.js"></script>
 
   <!-- === SageCraft Ascendant Unified Bootstrap Invocation === -->
   <script>
