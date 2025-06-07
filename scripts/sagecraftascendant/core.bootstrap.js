@@ -98,6 +98,11 @@ SageCraftAscendant.Bootstrap = (function() {
       SageCraftAscendant.OperatorConsole.registerMemoryConsole();
     }
 
+    // Phase 15.2 — Recovery Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerRecoveryConsole) {
+      SageCraftAscendant.OperatorConsole.registerRecoveryConsole();
+    }
+
     if (SageCraftAscendant.GovernancePolicy?.initialize) {
       SageCraftAscendant.GovernancePolicy.initialize();
     }

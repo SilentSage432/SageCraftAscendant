@@ -393,6 +393,28 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // Phase 15.1 — Neural Autonomous Recovery Console Deployment
+  SageCraftAscendant.OperatorConsole.registerRecoveryConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "⚙ Neural Recovery Console";
+    section.appendChild(header);
+
+    const recoveryBtn = document.createElement("button");
+    recoveryBtn.textContent = "🛠 Run Autonomous Recovery";
+    recoveryBtn.onclick = () => {
+      SageCraftAscendant.NeuralRecoveryAutonomous?.runAutoRecovery();
+    };
+    section.appendChild(recoveryBtn);
+
+    container.appendChild(section);
+  };
+
   return {
     renderOperatorConsole,
     registerDiagnosticsConsole: SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole,
@@ -400,6 +422,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     registerEventLogConsole: SageCraftAscendant.OperatorConsole.registerEventLogConsole,
     registerForecastAnomalyConsole: SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole,
     registerControlLatticeConsole: SageCraftAscendant.OperatorConsole.registerControlLatticeConsole,
-    registerMemoryConsole: SageCraftAscendant.OperatorConsole.registerMemoryConsole
+    registerMemoryConsole: SageCraftAscendant.OperatorConsole.registerMemoryConsole,
+    registerRecoveryConsole: SageCraftAscendant.OperatorConsole.registerRecoveryConsole
   };
 })();
