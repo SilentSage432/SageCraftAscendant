@@ -96,6 +96,12 @@
       </div>
       <canvas id="forecastConfidenceChart" width="600" height="300"></canvas>
       <button onclick="SageCraftAscendant.ForecastConfidenceOverlay.renderConfidenceChart()">📊 Render Confidence Overlay</button>
+
+      <div class="console-section">
+        <h3>📈 Anomaly Drift Sentinel</h3>
+        <canvas id="anomalyDriftChart" width="600" height="300"></canvas>
+        <button onclick="AnomalyDriftSentinel.renderAnomalyDriftChart()">📊 Render Anomaly Drift</button>
+      </div>
     </div>
 
     <div id="panel-governance" class="control-panel">
@@ -837,6 +843,19 @@
       <h3>📊 Forecast Stability Clusters</h3>
       <button onclick="SageCraftAscendant.ForecastStabilityCluster.computeStabilityClusters()">
         Analyze Stability Clusters
+      </button>
+    </div>
+    <div class="console-section">
+      <h3>📊 Anomaly Density Visualizer</h3>
+      <canvas id="anomalyDensityChart" width="600" height="300"></canvas>
+      <button onclick="SageCraftAscendant.AnomalyDensityMapper.renderAnomalyDensityChart()">
+        📊 Render Anomaly Density
+      </button>
+    </div>
+    <div class="console-section">
+      <h3>📈 Anomaly Drift Sentinel</h3>
+      <button onclick="AnomalyDriftSentinel.renderAnomalyDriftChart()">
+        Render Anomaly Drift Chart
       </button>
     </div>
   </div>
