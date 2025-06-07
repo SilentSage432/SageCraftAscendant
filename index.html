@@ -868,6 +868,24 @@
       <h3>🧮 Codex Whisper Audit</h3>
       <button onclick="SageCraftAscendant.CodexWhisper.auditMemoryChain()">Run Memory Audit</button>
     </div>
+    <div class="console-section">
+      <h3>🧹 Memory Purge Controls</h3>
+      <button onclick="SageCraftAscendant.CodexWhisper.purgeAllMemory()">Full Memory Purge</button>
+      <button onclick="SageCraftAscendant.CodexWhisper.purgeSystemOnly()">Purge System Only</button>
+    </div>
+    <div class="console-section">
+      <h3>📊 Knowledge Chain Analyzer</h3>
+      <button onclick="SageCraftAscendant.CodexWhisper.analyzeKnowledgeChain()">Run Knowledge Audit</button>
+    </div>
+    <div class="console-section">
+      <h3>📊 Codex Chain Visualizer</h3>
+      <canvas id="knowledgeChainCanvas" width="800" height="500" style="border:1px solid #444; background:#000;"></canvas>
+      <button onclick="SageCraftAscendant.CodexWhisperChainVisualizer.visualizeKnowledgeChain()">🔎 Render Knowledge Chain</button>
+    </div>
+    <div class="console-section">
+      <h3>🩺 Chain Integrity Validator</h3>
+      <button onclick="SageCraftAscendant.CodexWhisperChainIntegrity.validateKnowledgeChain()">Run Integrity Scan</button>
+    </div>
   </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
