@@ -254,9 +254,152 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // Phase 11.1 — Neural Event Log Console Deployment
+  SageCraftAscendant.OperatorConsole.registerEventLogConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "📜 Neural Event Log";
+    section.appendChild(header);
+
+    const viewLogBtn = document.createElement("button");
+    viewLogBtn.textContent = "🔎 View Event Log";
+    viewLogBtn.onclick = () => {
+      const log = SageCraftAscendant.NeuralEventLogger?.getLog();
+      console.log("📜 Neural Event Log:", log);
+      alert(JSON.stringify(log, null, 2));
+    };
+    section.appendChild(viewLogBtn);
+
+    const clearLogBtn = document.createElement("button");
+    clearLogBtn.textContent = "🧹 Clear Event Log";
+    clearLogBtn.onclick = () => {
+      if (confirm("⚠ Are you sure you want to clear the Event Log?")) {
+        SageCraftAscendant.NeuralEventLogger?.clearLog();
+      }
+    };
+    section.appendChild(clearLogBtn);
+
+    container.appendChild(section);
+  };
+
+  // Phase 12.1 — Neural Forecast Anomaly Console Deployment
+  SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🌩 Forecast Anomaly Sentinel";
+    section.appendChild(header);
+
+    const viewAnomaliesBtn = document.createElement("button");
+    viewAnomaliesBtn.textContent = "🔎 View Anomalies";
+    viewAnomaliesBtn.onclick = () => {
+      const anomalies = SageCraftAscendant.NeuralForecastAnomalySentinel?.getAnomalies();
+      console.log("🌩 Detected Anomalies:", anomalies);
+      alert(JSON.stringify(anomalies, null, 2));
+    };
+    section.appendChild(viewAnomaliesBtn);
+
+    const clearAnomaliesBtn = document.createElement("button");
+    clearAnomaliesBtn.textContent = "🧹 Clear Anomalies";
+    clearAnomaliesBtn.onclick = () => {
+      if (confirm("⚠ Are you sure you want to clear all anomalies?")) {
+        SageCraftAscendant.NeuralForecastAnomalySentinel?.clearAnomalies();
+      }
+    };
+    section.appendChild(clearAnomaliesBtn);
+
+    container.appendChild(section);
+  };
+
+  // Phase 13.0 — Neural Control Lattice Console Deployment
+  SageCraftAscendant.OperatorConsole.registerControlLatticeConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🧮 Neural Control Lattice";
+    section.appendChild(header);
+
+    const subsystems = [
+      { label: "Diagnostics Console", toggle: () => toggleSubsystem("Diagnostics") },
+      { label: "Mesh Overlay", toggle: () => toggleSubsystem("MeshOverlay") },
+      { label: "Event Logger", toggle: () => toggleSubsystem("EventLogger") },
+      { label: "Anomaly Sentinel", toggle: () => toggleSubsystem("AnomalySentinel") }
+    ];
+
+    subsystems.forEach(sub => {
+      const btn = document.createElement("button");
+      btn.innerText = `Toggle ${sub.label}`;
+      btn.addEventListener("click", sub.toggle);
+      section.appendChild(btn);
+    });
+
+    container.appendChild(section);
+
+    function toggleSubsystem(subsystem) {
+      alert(`🔄 Subsystem toggle requested: ${subsystem}`);
+      // Placeholder: actual enable/disable logic can be wired here as subsystems evolve.
+    }
+  };
+
+  // Phase 14.1 — Neural Memory Console Deployment
+  SageCraftAscendant.OperatorConsole.registerMemoryConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "💾 Neural Memory Control";
+    section.appendChild(header);
+
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = "💾 Save Memory Snapshot";
+    saveBtn.onclick = () => {
+      SageCraftAscendant.NeuralMemoryExpansion?.saveCurrentState();
+    };
+    section.appendChild(saveBtn);
+
+    const loadBtn = document.createElement("button");
+    loadBtn.textContent = "🔄 Load Last Snapshot";
+    loadBtn.onclick = () => {
+      const memory = SageCraftAscendant.NeuralMemoryExpansion?.loadLastState();
+      alert(JSON.stringify(memory, null, 2));
+    };
+    section.appendChild(loadBtn);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "🧹 Clear Saved Memory";
+    clearBtn.onclick = () => {
+      if (confirm("⚠ Are you sure you want to clear saved memory?")) {
+        SageCraftAscendant.NeuralMemoryExpansion?.clearMemory();
+      }
+    };
+    section.appendChild(clearBtn);
+
+    container.appendChild(section);
+  };
+
   return {
     renderOperatorConsole,
     registerDiagnosticsConsole: SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole,
-    registerMeshIntegrityOverlay: SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay
+    registerMeshIntegrityOverlay: SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay,
+    registerEventLogConsole: SageCraftAscendant.OperatorConsole.registerEventLogConsole,
+    registerForecastAnomalyConsole: SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole,
+    registerControlLatticeConsole: SageCraftAscendant.OperatorConsole.registerControlLatticeConsole,
+    registerMemoryConsole: SageCraftAscendant.OperatorConsole.registerMemoryConsole
   };
 })();

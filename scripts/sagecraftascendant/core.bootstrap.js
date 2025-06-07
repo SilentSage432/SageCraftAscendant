@@ -78,6 +78,26 @@ SageCraftAscendant.Bootstrap = (function() {
       SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay();
     }
 
+    // Phase 11.2 — Event Log Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerEventLogConsole) {
+      SageCraftAscendant.OperatorConsole.registerEventLogConsole();
+    }
+
+    // Phase 12.2 — Forecast Anomaly Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerForecastAnomalyConsole) {
+      SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole();
+    }
+
+    // Phase 13.1 — Control Lattice Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerControlLatticeConsole) {
+      SageCraftAscendant.OperatorConsole.registerControlLatticeConsole();
+    }
+
+    // Phase 14.2 — Memory Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerMemoryConsole) {
+      SageCraftAscendant.OperatorConsole.registerMemoryConsole();
+    }
+
     if (SageCraftAscendant.GovernancePolicy?.initialize) {
       SageCraftAscendant.GovernancePolicy.initialize();
     }
