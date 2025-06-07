@@ -103,6 +103,11 @@ SageCraftAscendant.Bootstrap = (function() {
       SageCraftAscendant.OperatorConsole.registerRecoveryConsole();
     }
 
+    // Phase 16.2 — Forecast Mutation Console Activation
+    if (SageCraftAscendant.OperatorConsole?.registerForecastMutationConsole) {
+      SageCraftAscendant.OperatorConsole.registerForecastMutationConsole();
+    }
+
     if (SageCraftAscendant.GovernancePolicy?.initialize) {
       SageCraftAscendant.GovernancePolicy.initialize();
     }

@@ -415,6 +415,77 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // Phase 16.1 — Neural Forecast Mutation Console Deployment
+  SageCraftAscendant.OperatorConsole.registerForecastMutationConsole = function () {
+    const container = document.getElementById("operatorConsole");
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🧪 Forecast Mutation Simulator";
+    section.appendChild(header);
+
+    const factorInput = document.createElement("input");
+    factorInput.type = "number";
+    factorInput.value = "15";
+    factorInput.min = "1";
+    factorInput.max = "50";
+    factorInput.style.width = "60px";
+    section.appendChild(document.createTextNode("Mutation Factor (%): "));
+    section.appendChild(factorInput);
+
+    section.appendChild(document.createElement("br"));
+
+    const scenariosInput = document.createElement("input");
+    scenariosInput.type = "number";
+    scenariosInput.value = "5";
+    scenariosInput.min = "1";
+    scenariosInput.max = "50";
+    scenariosInput.style.width = "60px";
+    section.appendChild(document.createTextNode("Scenarios: "));
+    section.appendChild(scenariosInput);
+
+    section.appendChild(document.createElement("br"));
+
+    const runBtn = document.createElement("button");
+    runBtn.textContent = "🧬 Run Mutation";
+    runBtn.onclick = () => {
+      const factor = parseFloat(factorInput.value) / 100;
+      const scenarios = parseInt(scenariosInput.value);
+      const mockForecast = [
+        { label: "Metric A", value: 100 },
+        { label: "Metric B", value: 250 },
+        { label: "Metric C", value: 75 }
+      ];
+      const result = SageCraftAscendant.NeuralForecastMutation?.mutateForecasts(mockForecast, factor, scenarios);
+      console.log("🧪 Mutation Result:", result);
+      alert("Forecast Mutations Complete — check console for results.");
+    };
+    section.appendChild(runBtn);
+
+    const historyBtn = document.createElement("button");
+    historyBtn.textContent = "📜 View Mutation History";
+    historyBtn.onclick = () => {
+      const history = SageCraftAscendant.NeuralForecastMutation?.getMutationHistory();
+      console.log("📜 Mutation History:", history);
+      alert(JSON.stringify(history, null, 2));
+    };
+    section.appendChild(historyBtn);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "🧹 Clear History";
+    clearBtn.onclick = () => {
+      if (confirm("Clear all mutation history?")) {
+        SageCraftAscendant.NeuralForecastMutation?.clearMutationHistory();
+      }
+    };
+    section.appendChild(clearBtn);
+
+    container.appendChild(section);
+  };
+
   return {
     renderOperatorConsole,
     registerDiagnosticsConsole: SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole,
@@ -423,6 +494,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     registerForecastAnomalyConsole: SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole,
     registerControlLatticeConsole: SageCraftAscendant.OperatorConsole.registerControlLatticeConsole,
     registerMemoryConsole: SageCraftAscendant.OperatorConsole.registerMemoryConsole,
-    registerRecoveryConsole: SageCraftAscendant.OperatorConsole.registerRecoveryConsole
+    registerRecoveryConsole: SageCraftAscendant.OperatorConsole.registerRecoveryConsole,
+    registerForecastMutationConsole: SageCraftAscendant.OperatorConsole.registerForecastMutationConsole
   };
 })();
