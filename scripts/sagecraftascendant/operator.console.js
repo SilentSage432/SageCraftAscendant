@@ -1,8 +1,210 @@
+  // Phase 18.1 — Neural Live Table Core Rendering
+  SageCraftAscendant.OperatorConsole.renderLiveTablePanel = function (container) {
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "📊 Neural Live Table";
+    section.appendChild(header);
+
+    // Build Table Container
+    const tableContainer = document.createElement("div");
+    tableContainer.style.overflowX = "auto";
+    tableContainer.style.border = "1px solid #555";
+    tableContainer.style.background = "#111";
+    tableContainer.style.padding = "10px";
+
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.color = "#eee";
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    const headers = ["Item #", "Description", "Location", "Quantity", "Category"];
+    headers.forEach(text => {
+      const th = document.createElement("th");
+      th.textContent = text;
+      th.style.border = "1px solid #666";
+      th.style.padding = "8px";
+      th.style.background = "#222";
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    tbody.id = "neuralLiveTableBody";
+    table.appendChild(tbody);
+
+    tableContainer.appendChild(table);
+    // Attempt to auto-load persisted table state
+    if (SageCraftAscendant.NeuralLiveTable?.loadPersistentState) {
+      SageCraftAscendant.NeuralLiveTable.loadPersistentState();
+    }
+    section.appendChild(tableContainer);
+
+    const message = document.createElement("p");
+    message.style.marginTop = "10px";
+    message.style.fontStyle = "italic";
+    message.style.color = "#aaa";
+    message.textContent = "⚙ Neural Live Table core initialized. Data population coming in Phase 18.2+.";
+    section.appendChild(message);
+
+    // === Phase 18.2: Inject Mock Data Button for Verification ===
+    const injectBtn = document.createElement("button");
+    injectBtn.textContent = "➕ Inject Mock Data";
+    injectBtn.style.marginTop = "10px";
+    injectBtn.onclick = () => {
+      SageCraftAscendant.NeuralLiveTable.injectMockData();
+    };
+    section.appendChild(injectBtn);
+
+    container.appendChild(section);
+  };
+  // Phase 18.2 — Neural Live Table Data Injection Engine
+  SageCraftAscendant.NeuralLiveTable = (function() {
+    const _tableBodyId = "neuralLiveTableBody";
+
+    function injectMockData() {
+      const mockData = [
+        { item: "1001", desc: "Crystal Wand", loc: "Vault A1", qty: 10, cat: "Artifacts" },
+        { item: "1002", desc: "Enchanted Scroll", loc: "Library B2", qty: 25, cat: "Tomes" },
+        { item: "1003", desc: "Starlight Orb", loc: "Observatory C3", qty: 5, cat: "Celestial" }
+      ];
+      renderData(mockData);
+    }
+
+    function renderData(data) {
+      const tbody = document.getElementById(_tableBodyId);
+      if (!tbody) {
+        console.warn("⚠ Live Table body not found.");
+        return;
+      }
+
+      tbody.innerHTML = ""; // Clear existing rows
+
+      data.forEach(entry => {
+        const row = document.createElement("tr");
+
+        [entry.item, entry.desc, entry.loc, entry.qty, entry.cat].forEach(val => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          td.style.border = "1px solid #666";
+          td.style.padding = "6px";
+          row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function importData(externalData) {
+      if (!Array.isArray(externalData) || externalData.length === 0) {
+        console.warn("⚠ Invalid or empty external data provided.");
+        return;
+      }
+      renderData(externalData);
+    }
+
+    // === Added: Save/Restore Live Table State ===
+    function saveTableState() {
+      const tbody = document.getElementById(_tableBodyId);
+      if (!tbody) {
+        console.warn("⚠ Live Table body not found.");
+        return;
+      }
+
+      const rows = [...tbody.querySelectorAll("tr")];
+      const data = rows.map(row => {
+        const cells = [...row.querySelectorAll("td")].map(td => td.textContent);
+        return {
+          item: cells[0],
+          desc: cells[1],
+          loc: cells[2],
+          qty: parseInt(cells[3]),
+          cat: cells[4]
+        };
+      });
+
+      SageCraftAscendant.NeuralMemoryExpansion?.saveLiveTableMemory(data);
+      console.log("💾 Live Table state saved to neural memory.");
+    }
+
+    function restoreTableState() {
+      const data = SageCraftAscendant.NeuralMemoryExpansion?.loadLiveTableMemory();
+      if (Array.isArray(data)) {
+        renderData(data);
+        console.log("🔄 Live Table state restored from neural memory.");
+      } else {
+        console.warn("⚠ No Live Table memory found to restore.");
+      }
+    }
+
+    // === Persistence Registry Save/Load Functions ===
+    function savePersistentState() {
+      const tbody = document.getElementById(_tableBodyId);
+      if (!tbody) {
+        console.warn("⚠ Live Table body not found.");
+        return;
+      }
+
+      const rows = [...tbody.querySelectorAll("tr")];
+      const data = rows.map(row => {
+        const cells = [...row.querySelectorAll("td")].map(td => td.textContent);
+        return {
+          item: cells[0],
+          desc: cells[1],
+          loc: cells[2],
+          qty: parseInt(cells[3]),
+          cat: cells[4]
+        };
+      });
+
+      SageCraftAscendant.PersistenceRegistry?.saveLiveTableSnapshot?.(data);
+      console.log("💾 Live Table state saved to Persistence Layer.");
+    }
+
+    function loadPersistentState() {
+      const data = SageCraftAscendant.PersistenceRegistry?.loadLiveTableSnapshot?.();
+      if (Array.isArray(data)) {
+        renderData(data);
+        console.log("🔄 Live Table state restored from Persistence Layer.");
+      } else {
+        console.warn("⚠ No persisted Live Table snapshot found.");
+      }
+    }
+
+    return {
+      injectMockData,
+      renderData,
+      importData,
+      saveTableState,
+      restoreTableState,
+      savePersistentState,
+      loadPersistentState
+    };
+  })();
 // === SAGECRAFT ASCENDANT MODULE ===
 // Codex ID: Ascendant.v1.5
 // Subsystem: Operator Console
 
 window.SageCraftAscendant = window.SageCraftAscendant || {};
+
+  // Phase 17.1 — Subsystem Registry Initialization
+  SageCraftAscendant.OperatorConsoleRegistry = {
+    panels: {},
+    registerPanel: function(panelConfig) {
+      this.panels[panelConfig.id] = panelConfig;
+    },
+    listPanels: function() {
+      return Object.values(this.panels);
+    }
+  };
 
 SageCraftAscendant.OperatorConsole = (function() {
 
@@ -186,9 +388,8 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 10.4 — Neural Diagnostics Console Deployment
-  SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Phase 17.2.0 — Diagnostics Console Migration
+  SageCraftAscendant.OperatorConsole.renderDiagnosticsPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -219,9 +420,15 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 10.5 — Mesh Integrity Overlay Panel Deployment
-  SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay = function () {
-    const container = document.getElementById("operatorConsole");
+  // Diagnostics Panel Registration — Phase 17.2.0
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'diagnostics',
+    label: 'Diagnostics Console',
+    render: SageCraftAscendant.OperatorConsole.renderDiagnosticsPanel
+  });
+
+  // Phase 17.2.1 — Mesh Integrity Overlay Migration
+  SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -254,9 +461,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 11.1 — Neural Event Log Console Deployment
-  SageCraftAscendant.OperatorConsole.registerEventLogConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Mesh Integrity Panel Registration — Phase 17.2.1
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'meshIntegrity',
+    label: 'Mesh Integrity Overlay',
+    render: SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel
+  });
+
+
+  // Phase 17.2.2 — Event Log Console Migration
+  SageCraftAscendant.OperatorConsole.renderEventLogPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -287,9 +501,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 12.1 — Neural Forecast Anomaly Console Deployment
-  SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Event Log Panel Registration — Phase 17.2.2
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'eventLog',
+    label: 'Event Log Console',
+    render: SageCraftAscendant.OperatorConsole.renderEventLogPanel
+  });
+
+
+  // Phase 17.2.3 — Forecast Anomaly Sentinel Migration
+  SageCraftAscendant.OperatorConsole.renderForecastAnomalyPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -320,9 +541,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 13.0 — Neural Control Lattice Console Deployment
-  SageCraftAscendant.OperatorConsole.registerControlLatticeConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Forecast Anomaly Panel Registration — Phase 17.2.3
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'forecastAnomaly',
+    label: 'Forecast Anomaly Sentinel',
+    render: SageCraftAscendant.OperatorConsole.renderForecastAnomalyPanel
+  });
+
+
+  // Phase 17.2.4 — Control Lattice Migration
+  SageCraftAscendant.OperatorConsole.renderControlLatticePanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -354,9 +582,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     }
   };
 
-  // Phase 14.1 — Neural Memory Console Deployment
-  SageCraftAscendant.OperatorConsole.registerMemoryConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Control Lattice Panel Registration — Phase 17.2.4
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'controlLattice',
+    label: 'Control Lattice Console',
+    render: SageCraftAscendant.OperatorConsole.renderControlLatticePanel
+  });
+
+
+  // Phase 17.2.5 — Neural Memory Console Migration
+  SageCraftAscendant.OperatorConsole.renderMemoryPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -393,9 +628,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 15.1 — Neural Autonomous Recovery Console Deployment
-  SageCraftAscendant.OperatorConsole.registerRecoveryConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Memory Panel Registration — Phase 17.2.5
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'memoryControl',
+    label: 'Memory Control Console',
+    render: SageCraftAscendant.OperatorConsole.renderMemoryPanel
+  });
+
+
+  // Phase 17.2.6 — Neural Autonomous Recovery Console Migration
+  SageCraftAscendant.OperatorConsole.renderRecoveryPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -415,9 +657,16 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 16.1 — Neural Forecast Mutation Console Deployment
-  SageCraftAscendant.OperatorConsole.registerForecastMutationConsole = function () {
-    const container = document.getElementById("operatorConsole");
+  // Recovery Panel Registration — Phase 17.2.6
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'recoveryConsole',
+    label: 'Recovery Console',
+    render: SageCraftAscendant.OperatorConsole.renderRecoveryPanel
+  });
+
+
+  // Phase 17.2.7 — Forecast Mutation Console Migration
+  SageCraftAscendant.OperatorConsole.renderForecastMutationPanel = function (container) {
     if (!container) return;
 
     const section = document.createElement("div");
@@ -486,15 +735,89 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // Forecast Mutation Panel Registration — Phase 17.2.7
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'forecastMutation',
+    label: 'Forecast Mutation Simulator',
+    render: SageCraftAscendant.OperatorConsole.renderForecastMutationPanel
+  });
+
+
+  // Phase 17.0 — Unified Operator Control Deck Bootstrap
+  SageCraftAscendant.OperatorConsole.renderOperatorControlDeck = function () {
+    const root = document.getElementById("operatorConsole");
+    if (!root) {
+      console.warn("⚠ Operator Console container not found.");
+      return;
+    }
+
+    // Clear existing contents
+    root.innerHTML = '';
+
+    // Create Control Deck container
+    const deckContainer = document.createElement("div");
+    deckContainer.id = "operatorControlDeck";
+    deckContainer.style.display = "flex";
+    deckContainer.style.flexDirection = "row";
+    deckContainer.style.height = "100%";
+
+    // Create Navigation Menu placeholder
+    const navMenu = document.createElement("div");
+    navMenu.id = "navigationMenu";
+    navMenu.style.width = "220px";
+    navMenu.style.borderRight = "1px solid #555";
+    navMenu.style.padding = "10px";
+    navMenu.style.background = "#222";
+    navMenu.innerHTML = "<h3>🧭 Control Deck</h3><p>Subsystem Navigation Loading...</p>";
+
+    // Create Panel Container placeholder
+    const panelContainer = document.createElement("div");
+    panelContainer.id = "panelContainer";
+    panelContainer.style.flexGrow = "1";
+    panelContainer.style.padding = "10px";
+    panelContainer.style.background = "#111";
+
+    // Assemble deck
+    deckContainer.appendChild(navMenu);
+    deckContainer.appendChild(panelContainer);
+    root.appendChild(deckContainer);
+
+    console.log("✅ Operator Control Deck Bootstrap Initialized.");
+  };
+
+  // Phase 17.1 — Subsystem Navigation Rendering
+  SageCraftAscendant.OperatorConsole.renderSubsystemNavigation = function () {
+    const navMenu = document.getElementById("navigationMenu");
+    const panelContainer = document.getElementById("panelContainer");
+    if (!navMenu || !panelContainer) return;
+
+    navMenu.innerHTML = "<h3>🧭 Control Deck</h3>";
+
+    SageCraftAscendant.OperatorConsoleRegistry.listPanels().forEach(panel => {
+      const btn = document.createElement("button");
+      btn.textContent = panel.label;
+      btn.style.display = "block";
+      btn.style.width = "100%";
+      btn.style.marginBottom = "5px";
+      btn.onclick = () => {
+        panelContainer.innerHTML = '';
+        panel.render(panelContainer);
+      };
+      navMenu.appendChild(btn);
+    });
+
+    console.log("✅ Subsystem Navigation Menu Rendered.");
+  };
+
   return {
     renderOperatorConsole,
-    registerDiagnosticsConsole: SageCraftAscendant.OperatorConsole.registerDiagnosticsConsole,
-    registerMeshIntegrityOverlay: SageCraftAscendant.OperatorConsole.registerMeshIntegrityOverlay,
-    registerEventLogConsole: SageCraftAscendant.OperatorConsole.registerEventLogConsole,
-    registerForecastAnomalyConsole: SageCraftAscendant.OperatorConsole.registerForecastAnomalyConsole,
-    registerControlLatticeConsole: SageCraftAscendant.OperatorConsole.registerControlLatticeConsole,
-    registerMemoryConsole: SageCraftAscendant.OperatorConsole.registerMemoryConsole,
-    registerRecoveryConsole: SageCraftAscendant.OperatorConsole.registerRecoveryConsole,
-    registerForecastMutationConsole: SageCraftAscendant.OperatorConsole.registerForecastMutationConsole
+    renderOperatorControlDeck: SageCraftAscendant.OperatorConsole.renderOperatorControlDeck,
+    renderSubsystemNavigation: SageCraftAscendant.OperatorConsole.renderSubsystemNavigation
   };
 })();
+  // Live Table Panel Registration — Phase 18.0
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'liveTable',
+    label: 'Neural Live Table',
+    render: SageCraftAscendant.OperatorConsole.renderLiveTablePanel
+  });
