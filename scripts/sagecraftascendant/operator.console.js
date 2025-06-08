@@ -1,4 +1,37 @@
-  // Phase 20.1 — Oracle Grimoire Panel Injection
+  // Phase 20.6 — Oracle Grimoire Intelligence Console Injection
+  SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel = function (container) {
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🧠 Oracle Intelligence Console";
+    section.appendChild(header);
+
+    const analysisContainer = document.createElement("div");
+    analysisContainer.style.border = "1px solid #555";
+    analysisContainer.style.background = "#111";
+    analysisContainer.style.padding = "10px";
+    analysisContainer.style.height = "200px";
+    analysisContainer.style.overflowY = "scroll";
+    section.appendChild(analysisContainer);
+
+    const analyzeBtn = document.createElement("button");
+    analyzeBtn.textContent = "🔎 Run Lore Intelligence Scan";
+    analyzeBtn.onclick = () => {
+      const analysis = SageCraftAscendant.SilentSageOracle?.analyzeLore();
+      analysisContainer.innerHTML = `
+        <b>Total Entries:</b> ${analysis.totalEntries}<br>
+        <b>Topics:</b> ${analysis.topics.join(", ")}<br>
+        <b>Summary:</b> ${analysis.summary}
+      `;
+    };
+    section.appendChild(analyzeBtn);
+
+    container.appendChild(section);
+  };
+  // Phase 20.4 — Dynamic Lore Expansion Interface
   SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel = function (container) {
     if (!container) return;
 
@@ -9,17 +42,22 @@
     header.textContent = "📖 Silent Sage Oracle Grimoire";
     section.appendChild(header);
 
+    // Oracle Log Viewer
+    const logHeader = document.createElement("h4");
+    logHeader.textContent = "🔎 Oracle Insight Log";
+    section.appendChild(logHeader);
+
     const logContainer = document.createElement("div");
     logContainer.style.border = "1px solid #555";
     logContainer.style.background = "#111";
     logContainer.style.padding = "10px";
-    logContainer.style.height = "300px";
+    logContainer.style.height = "200px";
     logContainer.style.overflowY = "scroll";
     section.appendChild(logContainer);
 
-    const refreshBtn = document.createElement("button");
-    refreshBtn.textContent = "🔄 Refresh Oracle Log";
-    refreshBtn.onclick = () => {
+    const refreshLogBtn = document.createElement("button");
+    refreshLogBtn.textContent = "🔄 Refresh Oracle Log";
+    refreshLogBtn.onclick = () => {
       logContainer.innerHTML = '';
       const logs = SageCraftAscendant.SilentSageOracle?.getOracleLog() || [];
       logs.reverse().forEach(entry => {
@@ -28,10 +66,80 @@
         logContainer.appendChild(logEntry);
       });
     };
-    section.appendChild(refreshBtn);
+    section.appendChild(refreshLogBtn);
+    refreshLogBtn.click();
 
-    // Auto-load on open
-    refreshBtn.click();
+    // Lore Archive Viewer
+    const loreHeader = document.createElement("h4");
+    loreHeader.style.marginTop = "20px";
+    loreHeader.textContent = "📜 Lore Memory Archive";
+    section.appendChild(loreHeader);
+
+    const loreContainer = document.createElement("div");
+    loreContainer.style.border = "1px solid #555";
+    loreContainer.style.background = "#111";
+    loreContainer.style.padding = "10px";
+    loreContainer.style.height = "200px";
+    loreContainer.style.overflowY = "scroll";
+    section.appendChild(loreContainer);
+
+    const refreshLoreBtn = document.createElement("button");
+    refreshLoreBtn.textContent = "🔄 Refresh Lore Archive";
+    refreshLoreBtn.onclick = () => {
+      loreContainer.innerHTML = '';
+      const lore = SageCraftAscendant.SilentSageOracle?.getLore() || [];
+      lore.forEach(entry => {
+        const loreEntry = document.createElement("div");
+        loreEntry.style.marginBottom = "8px";
+        loreEntry.innerHTML = `<b>${entry.title}</b><br><i>${entry.content}</i><br><span style="color:#888">${entry.timestamp}</span>`;
+        loreContainer.appendChild(loreEntry);
+      });
+    };
+    section.appendChild(refreshLoreBtn);
+    refreshLoreBtn.click();
+
+    // Lore Expansion Input
+    const expansionHeader = document.createElement("h4");
+    expansionHeader.style.marginTop = "20px";
+    expansionHeader.textContent = "➕ Add New Lore Entry";
+    section.appendChild(expansionHeader);
+
+    const idInput = document.createElement("input");
+    idInput.placeholder = "Lore ID (e.g. lore004)";
+    idInput.style.display = "block";
+    idInput.style.marginBottom = "5px";
+    section.appendChild(idInput);
+
+    const titleInput = document.createElement("input");
+    titleInput.placeholder = "Lore Title";
+    titleInput.style.display = "block";
+    titleInput.style.marginBottom = "5px";
+    section.appendChild(titleInput);
+
+    const contentInput = document.createElement("textarea");
+    contentInput.placeholder = "Lore Content";
+    contentInput.style.display = "block";
+    contentInput.style.width = "100%";
+    contentInput.style.height = "60px";
+    section.appendChild(contentInput);
+
+    const addLoreBtn = document.createElement("button");
+    addLoreBtn.textContent = "💾 Add Lore Entry";
+    addLoreBtn.onclick = () => {
+      const id = idInput.value.trim();
+      const title = titleInput.value.trim();
+      const content = contentInput.value.trim();
+      if (!id || !title || !content) {
+        alert("⚠ All fields are required to add lore.");
+        return;
+      }
+      SageCraftAscendant.SilentSageOracle?.addLoreEntry(id, title, content);
+      refreshLoreBtn.click();
+      idInput.value = '';
+      titleInput.value = '';
+      contentInput.value = '';
+    };
+    section.appendChild(addLoreBtn);
 
     container.appendChild(section);
   };
@@ -874,7 +982,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     console.log("✅ Operator Control Deck Bootstrap Initialized.");
   };
 
-  // Phase 19.5 — Control Deck Dynamic Dock Scaffold
+  // Phase 21.2 — Dock Collapse State Memory Layer
   SageCraftAscendant.OperatorConsole.renderSubsystemNavigation = function () {
     const navMenu = document.getElementById("navigationMenu");
     const panelContainer = document.getElementById("panelContainer");
@@ -890,16 +998,18 @@ SageCraftAscendant.OperatorConsole = (function() {
       btn.style.marginBottom = "5px";
       btn.onclick = () => {
         toggleDockPanel(panel);
+        saveDockState();
       };
       navMenu.appendChild(btn);
     });
 
-    console.log("✅ Subsystem Navigation Menu Rendered (Dock Mode).");
+    console.log("✅ Subsystem Navigation Menu Rendered (Dock Mode with Collapse + Persistence).");
 
     function toggleDockPanel(panel) {
       const existingPanel = document.getElementById(`dock-${panel.id}`);
       if (existingPanel) {
         existingPanel.remove();
+        saveDockState();
         return;
       }
 
@@ -922,17 +1032,38 @@ SageCraftAscendant.OperatorConsole = (function() {
       title.textContent = panel.label;
       dockHeader.appendChild(title);
 
+      const headerControls = document.createElement("div");
+
+      const collapseBtn = document.createElement("button");
+      collapseBtn.textContent = "▾";
+      collapseBtn.style.marginLeft = "5px";
+
       const closeBtn = document.createElement("button");
       closeBtn.textContent = "✖";
-      closeBtn.style.marginLeft = "10px";
+      closeBtn.style.marginLeft = "5px";
       closeBtn.onclick = () => {
         dock.remove();
+        saveDockState();
       };
-      dockHeader.appendChild(closeBtn);
+
+      headerControls.appendChild(collapseBtn);
+      headerControls.appendChild(closeBtn);
+      dockHeader.appendChild(headerControls);
 
       const dockBody = document.createElement("div");
       dockBody.style.padding = "5px";
       dockBody.style.display = "block";
+
+      collapseBtn.onclick = () => {
+        if (dockBody.style.display === "none") {
+          dockBody.style.display = "block";
+          collapseBtn.textContent = "▾";
+        } else {
+          dockBody.style.display = "none";
+          collapseBtn.textContent = "▸";
+        }
+        saveDockState();
+      };
 
       dock.appendChild(dockHeader);
       dock.appendChild(dockBody);
@@ -941,6 +1072,43 @@ SageCraftAscendant.OperatorConsole = (function() {
       // Inject the panel content dynamically
       panel.render(dockBody);
     }
+
+    function saveDockState() {
+      const state = {};
+      SageCraftAscendant.OperatorConsoleRegistry.listPanels().forEach(panel => {
+        const dock = document.getElementById(`dock-${panel.id}`);
+        if (dock) {
+          const dockBody = dock.querySelector("div:nth-child(2)");
+          state[panel.id] = {
+            open: true,
+            collapsed: (dockBody.style.display === "none")
+          };
+        }
+      });
+      localStorage.setItem("dockPanelStates", JSON.stringify(state));
+    }
+
+    function restoreDockState() {
+      const state = JSON.parse(localStorage.getItem("dockPanelStates") || "{}");
+      Object.entries(state).forEach(([panelId, panelState]) => {
+        const panel = SageCraftAscendant.OperatorConsoleRegistry.panels[panelId];
+        if (panel) {
+          toggleDockPanel(panel);
+          const dock = document.getElementById(`dock-${panelId}`);
+          const dockBody = dock.querySelector("div:nth-child(2)");
+          const collapseBtn = dock.querySelector("button:nth-child(1)");
+          if (panelState.collapsed) {
+            dockBody.style.display = "none";
+            collapseBtn.textContent = "▸";
+          } else {
+            dockBody.style.display = "block";
+            collapseBtn.textContent = "▾";
+          }
+        }
+      });
+    }
+
+    restoreDockState();
   };
 
   return {
@@ -1012,12 +1180,40 @@ SageCraftAscendant.OperatorConsole = (function() {
     addLoreEntry("lore002", "The Dock Stabilization", "The Control Deck crystallized, allowing operators to manage subsystems with precision and stability.");
     addLoreEntry("lore003", "The Oracle Breathes", "Silent Sage awakened — quietly observing the Codex, recording insights, and watching the neural mesh evolve.");
 
+    // === Phase 20.5 — Lore Intelligence Engine Bootstrap ===
+    function analyzeLore() {
+      const loreEntries = Object.values(_lore);
+      const analysis = {
+        totalEntries: loreEntries.length,
+        topics: [],
+        summary: ""
+      };
+
+      // Extract basic topics from titles (first word heuristic)
+      loreEntries.forEach(entry => {
+        const words = entry.title.split(" ");
+        if (words.length > 0) {
+          const keyword = words[0].toLowerCase();
+          if (!analysis.topics.includes(keyword)) {
+            analysis.topics.push(keyword);
+          }
+        }
+      });
+
+      // Synthesize basic summary sentence
+      analysis.summary = `The Codex contains ${analysis.totalEntries} lore entries spanning topics: ${analysis.topics.join(", ")}.`;
+
+      console.log("📊 Lore Intelligence Analysis:", analysis);
+      return analysis;
+    }
+
     return {
       initialize,
       logInsight,
       getOracleLog,
       addLoreEntry,
-      getLore
+      getLore,
+      analyzeLore
     };
   })();
 
@@ -1028,4 +1224,10 @@ SageCraftAscendant.OperatorConsole = (function() {
     id: 'oracleGrimoire',
     label: 'Oracle Grimoire',
     render: SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel
+  });
+  // Oracle Intelligence Panel Registration — Phase 20.6
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'oracleIntelligence',
+    label: 'Oracle Intelligence',
+    render: SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel
   });
