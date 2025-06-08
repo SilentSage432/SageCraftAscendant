@@ -1,0 +1,46 @@
+<h2>🧠 Neural Operator Console</h2>
+
+<div class="console-section">
+  <h3>🪐 Orbit Manager</h3>
+  <label>Orbit Key: <input type="text" id="orbitKeyInput"></label><br>
+  <label>Orbit Label: <input type="text" id="orbitLabelInput"></label><br>
+  <label>Orbit Icon: <input type="text" id="orbitIconInput" placeholder="icon-default.png"></label><br>
+  <button onclick="addOrbitFromUI()">➕ Add Orbit</button>
+  <button onclick="removeOrbitFromUI()">🗑 Remove Orbit</button>
+</div>
+<div class="console-section">
+  <h3>📜 Operator Macro Console</h3>
+  <div id="macroList"></div>
+  <button onclick="refreshMacroList()">🔄 Refresh Macros</button>
+</div>
+
+<script>
+  function refreshMacroList() {
+    const macroList = document.getElementById("macroList");
+    macroList.innerHTML = "";
+
+    if (typeof NeuralOperatorMacros === 'undefined') {
+      macroList.innerHTML = "<p>⚠ NeuralOperatorMacros Engine not available.</p>";
+      return;
+    }
+
+    const macros = NeuralOperatorMacros.listMacros();
+    if (Object.keys(macros).length === 0) {
+      macroList.innerHTML = "<p>No registered macros found.</p>";
+      return;
+    }
+
+    Object.entries(macros).forEach(([id, macro]) => {
+      const btn = document.createElement("button");
+      btn.textContent = `▶ ${macro.label}`;
+      btn.onclick = () => NeuralOperatorMacros.executeMacro(id);
+      macroList.appendChild(btn);
+      macroList.appendChild(document.createElement("br"));
+    });
+  }
+
+  // Auto-load macro list on console load
+  window.addEventListener("DOMContentLoaded", () => {
+    refreshMacroList();
+  });
+</script>
