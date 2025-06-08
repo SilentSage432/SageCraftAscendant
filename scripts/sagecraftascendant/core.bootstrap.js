@@ -5,6 +5,59 @@
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 SageCraftAscendant.Bootstrap = (function() {
 
+  // === Phase 19.0 — NeuralBus Core Deployment ===
+  SageCraftAscendant.NeuralBus = (function () {
+    const _channels = {};
+
+    function subscribe(channel, callback) {
+      if (!_channels[channel]) {
+        _channels[channel] = [];
+      }
+      _channels[channel].push(callback);
+      console.log(`📡 NeuralBus: Subscribed to channel '${channel}'.`);
+    }
+
+    function publish(channel, payload) {
+      const listeners = _channels[channel];
+      if (listeners && listeners.length > 0) {
+        listeners.forEach(callback => {
+          try {
+            callback(payload);
+          } catch (err) {
+            console.error(`⚠ NeuralBus subscriber error on channel '${channel}':`, err);
+          }
+        });
+      } else {
+        console.warn(`⚠ NeuralBus: No listeners for channel '${channel}'.`);
+      }
+    }
+
+    function listChannels() {
+      return Object.keys(_channels);
+    }
+
+    function clearChannel(channel) {
+      if (_channels[channel]) {
+        delete _channels[channel];
+        console.log(`🧹 NeuralBus: Cleared channel '${channel}'.`);
+      }
+    }
+
+    return {
+      subscribe,
+      publish,
+      listChannels,
+      clearChannel
+    };
+  })();
+
+  // === Phase 19.1.0 — NeuralBus Diagnostics Listener Activated ===
+  SageCraftAscendant.NeuralBus.subscribe("System:Diagnostics", (payload) => {
+    console.log("📡 NeuralBus Diagnostics Received:", payload);
+  });
+
+  console.log("✅ NeuralBus Diagnostics Listener Online.");
+
   function start() {
     console.log("🚀 SageCraft Ascendant: Bootstrap Sequence Initiating...");
 

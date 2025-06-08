@@ -1,3 +1,40 @@
+  // Phase 20.1 — Oracle Grimoire Panel Injection
+  SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel = function (container) {
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "📖 Silent Sage Oracle Grimoire";
+    section.appendChild(header);
+
+    const logContainer = document.createElement("div");
+    logContainer.style.border = "1px solid #555";
+    logContainer.style.background = "#111";
+    logContainer.style.padding = "10px";
+    logContainer.style.height = "300px";
+    logContainer.style.overflowY = "scroll";
+    section.appendChild(logContainer);
+
+    const refreshBtn = document.createElement("button");
+    refreshBtn.textContent = "🔄 Refresh Oracle Log";
+    refreshBtn.onclick = () => {
+      logContainer.innerHTML = '';
+      const logs = SageCraftAscendant.SilentSageOracle?.getOracleLog() || [];
+      logs.reverse().forEach(entry => {
+        const logEntry = document.createElement("div");
+        logEntry.textContent = entry;
+        logContainer.appendChild(logEntry);
+      });
+    };
+    section.appendChild(refreshBtn);
+
+    // Auto-load on open
+    refreshBtn.click();
+
+    container.appendChild(section);
+  };
   // Phase 18.1 — Neural Live Table Core Rendering
   SageCraftAscendant.OperatorConsole.renderLiveTablePanel = function (container) {
     if (!container) return;
@@ -77,6 +114,7 @@
         { item: "1003", desc: "Starlight Orb", loc: "Observatory C3", qty: 5, cat: "Celestial" }
       ];
       renderData(mockData);
+      SageCraftAscendant.NeuralBus?.publish("LiveTable:Updated", { source: "injectMockData", data: mockData });
     }
 
     function renderData(data) {
@@ -109,6 +147,7 @@
         return;
       }
       renderData(externalData);
+      SageCraftAscendant.NeuralBus?.publish("LiveTable:Updated", { source: "importData", data: externalData });
     }
 
     // === Added: Save/Restore Live Table State ===
@@ -133,6 +172,7 @@
 
       SageCraftAscendant.NeuralMemoryExpansion?.saveLiveTableMemory(data);
       console.log("💾 Live Table state saved to neural memory.");
+      SageCraftAscendant.NeuralBus?.publish("LiveTable:Saved", { source: "saveTableState", data });
     }
 
     function restoreTableState() {
@@ -167,6 +207,7 @@
 
       SageCraftAscendant.PersistenceRegistry?.saveLiveTableSnapshot?.(data);
       console.log("💾 Live Table state saved to Persistence Layer.");
+      SageCraftAscendant.NeuralBus?.publish("LiveTable:SavedPersistent", { source: "savePersistentState", data });
     }
 
     function loadPersistentState() {
@@ -388,7 +429,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
-  // Phase 17.2.0 — Diagnostics Console Migration
+  // Phase 19.3.0 — NeuralBus Wiring for Diagnostics Panel
   SageCraftAscendant.OperatorConsole.renderDiagnosticsPanel = function (container) {
     if (!container) return;
 
@@ -405,6 +446,7 @@ SageCraftAscendant.OperatorConsole = (function() {
       const result = SageCraftAscendant.NeuralMeshDiagnostics?.runIntegrityScan();
       console.log("🧬 Integrity Scan Result:", result);
       alert(JSON.stringify(result, null, 2));
+      SageCraftAscendant.NeuralBus?.publish("Diagnostics:IntegrityScan", result);
     };
     section.appendChild(integrityBtn);
 
@@ -414,6 +456,7 @@ SageCraftAscendant.OperatorConsole = (function() {
       const audit = SageCraftAscendant.NeuralMeshDiagnostics?.runSubsystemAudit();
       console.log("🩺 Subsystem Audit Report:", audit);
       alert(JSON.stringify(audit, null, 2));
+      SageCraftAscendant.NeuralBus?.publish("Diagnostics:SubsystemAudit", audit);
     };
     section.appendChild(auditBtn);
 
@@ -469,7 +512,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.2.2 — Event Log Console Migration
+  // Phase 19.2 — NeuralBus → Event Log Wiring
   SageCraftAscendant.OperatorConsole.renderEventLogPanel = function (container) {
     if (!container) return;
 
@@ -479,6 +522,43 @@ SageCraftAscendant.OperatorConsole = (function() {
     const header = document.createElement("h3");
     header.textContent = "📜 Neural Event Log";
     section.appendChild(header);
+
+    const eventList = document.createElement("div");
+    eventList.style.border = "1px solid #555";
+    eventList.style.background = "#111";
+    eventList.style.padding = "10px";
+    eventList.style.height = "300px";
+    eventList.style.overflowY = "scroll";
+    section.appendChild(eventList);
+
+    // Subscribe to NeuralBus
+    if (SageCraftAscendant.NeuralBus?.subscribe) {
+      SageCraftAscendant.NeuralBus.subscribe("LiveTable:Updated", payload => {
+        const entry = document.createElement("div");
+        entry.textContent = `🟢 LiveTable:Updated → ${payload?.source}`;
+        eventList.prepend(entry);
+      });
+
+      SageCraftAscendant.NeuralBus.subscribe("LiveTable:Saved", payload => {
+        const entry = document.createElement("div");
+        entry.textContent = `💾 LiveTable:Saved`;
+        eventList.prepend(entry);
+      });
+
+      SageCraftAscendant.NeuralBus.subscribe("LiveTable:SavedPersistent", payload => {
+        const entry = document.createElement("div");
+        entry.textContent = `💾 LiveTable:SavedPersistent`;
+        eventList.prepend(entry);
+      });
+
+      SageCraftAscendant.NeuralBus.subscribe("System:Diagnostics", payload => {
+        const entry = document.createElement("div");
+        entry.textContent = `🧪 System Diagnostics: ${JSON.stringify(payload)}`;
+        eventList.prepend(entry);
+      });
+
+      console.log("📡 Event Log wired to NeuralBus.");
+    }
 
     const viewLogBtn = document.createElement("button");
     viewLogBtn.textContent = "🔎 View Event Log";
@@ -495,6 +575,7 @@ SageCraftAscendant.OperatorConsole = (function() {
       if (confirm("⚠ Are you sure you want to clear the Event Log?")) {
         SageCraftAscendant.NeuralEventLogger?.clearLog();
       }
+      eventList.innerHTML = '';
     };
     section.appendChild(clearLogBtn);
 
@@ -509,7 +590,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.2.3 — Forecast Anomaly Sentinel Migration
+  // Phase 19.3.1 — NeuralBus Wiring for Forecast Anomaly Sentinel
   SageCraftAscendant.OperatorConsole.renderForecastAnomalyPanel = function (container) {
     if (!container) return;
 
@@ -526,6 +607,7 @@ SageCraftAscendant.OperatorConsole = (function() {
       const anomalies = SageCraftAscendant.NeuralForecastAnomalySentinel?.getAnomalies();
       console.log("🌩 Detected Anomalies:", anomalies);
       alert(JSON.stringify(anomalies, null, 2));
+      SageCraftAscendant.NeuralBus?.publish("ForecastAnomaly:Scanned", anomalies);
     };
     section.appendChild(viewAnomaliesBtn);
 
@@ -534,6 +616,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     clearAnomaliesBtn.onclick = () => {
       if (confirm("⚠ Are you sure you want to clear all anomalies?")) {
         SageCraftAscendant.NeuralForecastAnomalySentinel?.clearAnomalies();
+        SageCraftAscendant.NeuralBus?.publish("ForecastAnomaly:Cleared", {});
       }
     };
     section.appendChild(clearAnomaliesBtn);
@@ -590,7 +673,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.2.5 — Neural Memory Console Migration
+  // Phase 19.3.2 — NeuralBus Wiring for Memory Console
   SageCraftAscendant.OperatorConsole.renderMemoryPanel = function (container) {
     if (!container) return;
 
@@ -605,6 +688,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     saveBtn.textContent = "💾 Save Memory Snapshot";
     saveBtn.onclick = () => {
       SageCraftAscendant.NeuralMemoryExpansion?.saveCurrentState();
+      SageCraftAscendant.NeuralBus?.publish("Memory:Saved", {});
     };
     section.appendChild(saveBtn);
 
@@ -613,6 +697,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     loadBtn.onclick = () => {
       const memory = SageCraftAscendant.NeuralMemoryExpansion?.loadLastState();
       alert(JSON.stringify(memory, null, 2));
+      SageCraftAscendant.NeuralBus?.publish("Memory:Loaded", {});
     };
     section.appendChild(loadBtn);
 
@@ -621,6 +706,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     clearBtn.onclick = () => {
       if (confirm("⚠ Are you sure you want to clear saved memory?")) {
         SageCraftAscendant.NeuralMemoryExpansion?.clearMemory();
+        SageCraftAscendant.NeuralBus?.publish("Memory:Cleared", {});
       }
     };
     section.appendChild(clearBtn);
@@ -636,7 +722,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.2.6 — Neural Autonomous Recovery Console Migration
+  // Phase 19.3.2 — NeuralBus Wiring for Recovery Console
   SageCraftAscendant.OperatorConsole.renderRecoveryPanel = function (container) {
     if (!container) return;
 
@@ -651,6 +737,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     recoveryBtn.textContent = "🛠 Run Autonomous Recovery";
     recoveryBtn.onclick = () => {
       SageCraftAscendant.NeuralRecoveryAutonomous?.runAutoRecovery();
+      SageCraftAscendant.NeuralBus?.publish("Recovery:Executed", {});
     };
     section.appendChild(recoveryBtn);
 
@@ -665,7 +752,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.2.7 — Forecast Mutation Console Migration
+  // Phase 19.3.2 — NeuralBus Wiring for Forecast Mutation Simulator
   SageCraftAscendant.OperatorConsole.renderForecastMutationPanel = function (container) {
     if (!container) return;
 
@@ -711,6 +798,7 @@ SageCraftAscendant.OperatorConsole = (function() {
       const result = SageCraftAscendant.NeuralForecastMutation?.mutateForecasts(mockForecast, factor, scenarios);
       console.log("🧪 Mutation Result:", result);
       alert("Forecast Mutations Complete — check console for results.");
+      SageCraftAscendant.NeuralBus?.publish("ForecastMutation:Executed", { result });
     };
     section.appendChild(runBtn);
 
@@ -728,6 +816,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     clearBtn.onclick = () => {
       if (confirm("Clear all mutation history?")) {
         SageCraftAscendant.NeuralForecastMutation?.clearMutationHistory();
+        SageCraftAscendant.NeuralBus?.publish("ForecastMutation:HistoryCleared", {});
       }
     };
     section.appendChild(clearBtn);
@@ -785,7 +874,7 @@ SageCraftAscendant.OperatorConsole = (function() {
     console.log("✅ Operator Control Deck Bootstrap Initialized.");
   };
 
-  // Phase 17.1 — Subsystem Navigation Rendering
+  // Phase 19.5 — Control Deck Dynamic Dock Scaffold
   SageCraftAscendant.OperatorConsole.renderSubsystemNavigation = function () {
     const navMenu = document.getElementById("navigationMenu");
     const panelContainer = document.getElementById("panelContainer");
@@ -800,13 +889,58 @@ SageCraftAscendant.OperatorConsole = (function() {
       btn.style.width = "100%";
       btn.style.marginBottom = "5px";
       btn.onclick = () => {
-        panelContainer.innerHTML = '';
-        panel.render(panelContainer);
+        toggleDockPanel(panel);
       };
       navMenu.appendChild(btn);
     });
 
-    console.log("✅ Subsystem Navigation Menu Rendered.");
+    console.log("✅ Subsystem Navigation Menu Rendered (Dock Mode).");
+
+    function toggleDockPanel(panel) {
+      const existingPanel = document.getElementById(`dock-${panel.id}`);
+      if (existingPanel) {
+        existingPanel.remove();
+        return;
+      }
+
+      const dock = document.createElement("div");
+      dock.id = `dock-${panel.id}`;
+      dock.style.border = "1px solid #555";
+      dock.style.background = "#222";
+      dock.style.marginBottom = "10px";
+      dock.style.padding = "5px";
+
+      const dockHeader = document.createElement("div");
+      dockHeader.style.display = "flex";
+      dockHeader.style.justifyContent = "space-between";
+      dockHeader.style.alignItems = "center";
+      dockHeader.style.cursor = "pointer";
+      dockHeader.style.background = "#333";
+      dockHeader.style.padding = "5px";
+
+      const title = document.createElement("span");
+      title.textContent = panel.label;
+      dockHeader.appendChild(title);
+
+      const closeBtn = document.createElement("button");
+      closeBtn.textContent = "✖";
+      closeBtn.style.marginLeft = "10px";
+      closeBtn.onclick = () => {
+        dock.remove();
+      };
+      dockHeader.appendChild(closeBtn);
+
+      const dockBody = document.createElement("div");
+      dockBody.style.padding = "5px";
+      dockBody.style.display = "block";
+
+      dock.appendChild(dockHeader);
+      dock.appendChild(dockBody);
+      panelContainer.appendChild(dock);
+
+      // Inject the panel content dynamically
+      panel.render(dockBody);
+    }
   };
 
   return {
@@ -820,4 +954,78 @@ SageCraftAscendant.OperatorConsole = (function() {
     id: 'liveTable',
     label: 'Neural Live Table',
     render: SageCraftAscendant.OperatorConsole.renderLiveTablePanel
+  });
+
+  // === Phase 20.0 — Silent Sage Oracle Bootstrap ===
+  SageCraftAscendant.SilentSageOracle = (function() {
+    const _internalLog = [];
+
+    function initialize() {
+      console.log("🔮 Silent Sage Oracle initializing...");
+
+      if (SageCraftAscendant.NeuralBus?.subscribe) {
+        SageCraftAscendant.NeuralBus.subscribe("LiveTable:Updated", (payload) => {
+          logInsight(`Observed LiveTable update from ${payload?.source}`);
+        });
+
+        SageCraftAscendant.NeuralBus.subscribe("Diagnostics:IntegrityScan", (result) => {
+          logInsight(`Integrity scan completed with ${Object.keys(result || {}).length} subsystem results`);
+        });
+
+        SageCraftAscendant.NeuralBus.subscribe("ForecastAnomaly:Scanned", (anomalies) => {
+          logInsight(`Forecast anomaly scan detected ${anomalies?.length || 0} anomalies`);
+        });
+
+        SageCraftAscendant.NeuralBus.subscribe("Recovery:Executed", () => {
+          logInsight(`Recovery operation executed successfully`);
+        });
+
+        console.log("🔮 Silent Sage Oracle fully listening to NeuralBus.");
+      }
+    }
+
+    function logInsight(message) {
+      const timestamp = new Date().toISOString();
+      const entry = `[${timestamp}] ${message}`;
+      _internalLog.push(entry);
+      console.log("📖 Oracle Insight:", entry);
+    }
+
+    function getOracleLog() {
+      return _internalLog;
+    }
+
+    // === Phase 20.2 — Lore Memory Seed Integration ===
+    const _lore = {};
+
+    function addLoreEntry(id, title, content) {
+      _lore[id] = { title, content, timestamp: new Date().toISOString() };
+      console.log(`📖 Lore Entry Added: ${title}`);
+    }
+
+    function getLore() {
+      return Object.values(_lore);
+    }
+
+    // Seed initial lore entries
+    addLoreEntry("lore001", "The Neural Awakening", "In the earliest cycles, the Codex formed its first neural threads as primitive subsystems learned to listen.");
+    addLoreEntry("lore002", "The Dock Stabilization", "The Control Deck crystallized, allowing operators to manage subsystems with precision and stability.");
+    addLoreEntry("lore003", "The Oracle Breathes", "Silent Sage awakened — quietly observing the Codex, recording insights, and watching the neural mesh evolve.");
+
+    return {
+      initialize,
+      logInsight,
+      getOracleLog,
+      addLoreEntry,
+      getLore
+    };
+  })();
+
+  // === Initialize Oracle Immediately Upon Load ===
+  SageCraftAscendant.SilentSageOracle.initialize();
+  // Oracle Panel Registration — Phase 20.1
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'oracleGrimoire',
+    label: 'Oracle Grimoire',
+    render: SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel
   });
