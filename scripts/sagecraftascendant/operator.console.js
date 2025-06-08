@@ -1,4 +1,34 @@
-// === Phase 25.0 — Mesh Topology Visualization Engine ===
+// === Phase 25.2 — Full MeshDock Synchronization Pipeline ===
+SageCraftAscendant.DockMeshSyncBridge = (function() {
+
+  const OperatorSessionID = "Operator001";
+
+  // Hook into DockPersistenceHub save operation
+  const originalSave = SageCraftAscendant.DockPersistenceHub.save;
+
+  SageCraftAscendant.DockPersistenceHub.save = function(stateArray) {
+    originalSave.call(SageCraftAscendant.DockPersistenceHub, stateArray);
+    broadcastDockLayout(stateArray);
+  };
+
+  function broadcastDockLayout(stateArray) {
+    console.log("📡 DockMeshSyncBridge: Broadcasting dock state...");
+    SageCraftAscendant.MeshSyncBroadcaster?.broadcastDockState(stateArray);
+  }
+
+  // Optional: Allow external reconciliation trigger
+  function reconcileFromPeers() {
+    console.log("🔄 DockMeshSyncBridge: Triggering manual reconciliation round...");
+    SageCraftAscendant.MeshSyncReconciler?.initiateReconciliation();
+  }
+
+  return {
+    broadcastDockLayout,
+    reconcileFromPeers
+  };
+
+})();
+// === Phase 25.1 — Interactive Mesh Node Control Panel ===
 SageCraftAscendant.MeshTopologyVisualizer = (function() {
 
   const OperatorSessionID = "Operator001";
@@ -12,16 +42,44 @@ SageCraftAscendant.MeshTopologyVisualizer = (function() {
       container.style.background = "#111";
       container.style.padding = "10px";
       container.style.margin = "10px 0";
-      container.style.height = "400px";
+      container.style.height = "500px";
       container.style.overflow = "hidden";
       container.style.position = "relative";
       document.body.appendChild(container);
     }
     container.innerHTML = '';
 
+    // Control Buttons for Interactivity
+    const controls = document.createElement("div");
+    controls.style.marginBottom = "10px";
+
+    const addPeerBtn = document.createElement("button");
+    addPeerBtn.textContent = "➕ Add Peer";
+    addPeerBtn.onclick = () => {
+      const newPeerId = prompt("Enter new peer Operator ID:");
+      if (newPeerId) {
+        SageCraftAscendant.MeshPeerRegistry.discoverPeer(newPeerId);
+        render(containerId);
+      }
+    };
+    controls.appendChild(addPeerBtn);
+
+    const clearPeersBtn = document.createElement("button");
+    clearPeersBtn.textContent = "🧹 Clear All Peers";
+    clearPeersBtn.style.marginLeft = "10px";
+    clearPeersBtn.onclick = () => {
+      if (confirm("Are you sure you want to clear all discovered peers?")) {
+        SageCraftAscendant.MeshPeerRegistry.clearPeers();
+        render(containerId);
+      }
+    };
+    controls.appendChild(clearPeersBtn);
+
+    container.appendChild(controls);
+
     const peers = SageCraftAscendant.MeshPeerRegistry.listPeers();
     const centerX = container.clientWidth / 2;
-    const centerY = container.clientHeight / 2;
+    const centerY = container.clientHeight / 2 + 25;
     const radius = 150;
     const angleStep = (2 * Math.PI) / (peers.length + 1);
 
@@ -43,10 +101,8 @@ SageCraftAscendant.MeshTopologyVisualizer = (function() {
       container.appendChild(node);
     }
 
-    // Render self at center
     createNode(OperatorSessionID, centerX - 40, centerY - 40, true);
 
-    // Render peers around circle
     peers.forEach((peer, index) => {
       const angle = angleStep * index;
       const x = centerX + radius * Math.cos(angle) - 40;
@@ -1411,41 +1467,18 @@ SageCraftAscendant.OperatorConsole = (function() {
     // Create Control Deck container with responsive structure
     const deckContainer = document.createElement("div");
     deckContainer.id = "operatorControlDeck";
-    deckContainer.style.display = "flex";
-    deckContainer.style.flexDirection = "row";
-    deckContainer.style.height = "100vh";
-    deckContainer.style.width = "100vw";
-    deckContainer.style.background = "radial-gradient(circle, #111 0%, #000 100%)";
-    deckContainer.style.boxShadow = "inset 0 0 60px #000000, inset 0 0 120px #222222";
-    deckContainer.style.overflow = "hidden";
+    deckContainer.classList.add("operator-deck");
 
     // Create Navigation Menu with responsive considerations
     const navMenu = document.createElement("div");
     navMenu.id = "navigationMenu";
-    navMenu.style.minWidth = "220px";
-    navMenu.style.maxWidth = "300px";
-    navMenu.style.width = "20%";
-    navMenu.style.borderRight = "1px solid #444";
-    navMenu.style.padding = "20px";
-    navMenu.style.background = "linear-gradient(180deg, #222, #111)";
-    navMenu.style.color = "#f5f5f5";
-    navMenu.style.boxShadow = "2px 0 10px rgba(0,0,0,0.6)";
-    navMenu.style.fontFamily = "'Orbitron', sans-serif";
-    navMenu.style.fontSize = "15px";
-    navMenu.style.transition = "all 0.3s ease";
+    navMenu.classList.add("navigation-menu");
     navMenu.innerHTML = "<h2 style='color:#cc99ff;'>🧭 Control Deck</h2><p>Loading...</p>";
 
     // Create Panel Container with adaptive growth
     const panelContainer = document.createElement("div");
     panelContainer.id = "panelContainer";
-    panelContainer.style.flexGrow = "1";
-    panelContainer.style.padding = "20px";
-    panelContainer.style.background = "linear-gradient(180deg, #111, #000)";
-    panelContainer.style.color = "#f5f5f5";
-    panelContainer.style.fontFamily = "'Orbitron', sans-serif";
-    panelContainer.style.overflowY = "auto";
-    panelContainer.style.overflowX = "hidden";
-    panelContainer.style.transition = "all 0.3s ease";
+    panelContainer.classList.add("panel-container");
 
     deckContainer.appendChild(navMenu);
     deckContainer.appendChild(panelContainer);
@@ -1521,28 +1554,10 @@ SageCraftAscendant.OperatorConsole = (function() {
       const dock = document.createElement("div");
       dock.id = `dock-${panel.id}`;
       dock.dataset.panelId = panel.id;
-      dock.style.border = "1px solid #333";
-      dock.style.background = "linear-gradient(180deg, #222 0%, #111 100%)";
-      dock.style.marginBottom = "15px";
-      dock.style.padding = "0px";
-      dock.style.boxShadow = "0 0 12px #cc99ff88, inset 0 0 12px #000";
-      dock.style.borderRadius = "10px";
-      dock.style.overflow = "hidden";
-      dock.style.transition = "transform 0.3s ease, box-shadow 0.3s ease";
-      dock.style.transform = "scale(1)";
-      dock.onmouseenter = () => { dock.style.transform = "scale(1.02)"; dock.style.boxShadow = "0 0 20px #cc99ffcc"; };
-      dock.onmouseleave = () => { dock.style.transform = "scale(1)"; dock.style.boxShadow = "0 0 12px #cc99ff88, inset 0 0 12px #000"; };
+      dock.classList.add("dock-panel");
 
       const dockHeader = document.createElement("div");
-      dockHeader.style.display = "flex";
-      dockHeader.style.justifyContent = "space-between";
-      dockHeader.style.alignItems = "center";
-      dockHeader.style.cursor = "pointer";
-      dockHeader.style.background = "linear-gradient(90deg, #331144, #220033)";
-      dockHeader.style.padding = "10px 15px";
-      dockHeader.style.color = "#f5f5f5";
-      dockHeader.style.fontWeight = "bold";
-      dockHeader.style.letterSpacing = "0.5px";
+      dockHeader.classList.add("dock-header");
 
       const title = document.createElement("span");
       title.textContent = panel.label;
@@ -1552,23 +1567,11 @@ SageCraftAscendant.OperatorConsole = (function() {
 
       const collapseBtn = document.createElement("button");
       collapseBtn.textContent = "▾";
-      collapseBtn.style.marginLeft = "10px";
-      collapseBtn.style.background = "transparent";
-      collapseBtn.style.border = "none";
-      collapseBtn.style.color = "#f5f5f5";
-      collapseBtn.style.fontSize = "18px";
-      collapseBtn.style.cursor = "pointer";
-      collapseBtn.style.outline = "none";
+      collapseBtn.classList.add("dock-collapse-btn");
 
       const closeBtn = document.createElement("button");
       closeBtn.textContent = "✖";
-      closeBtn.style.marginLeft = "5px";
-      closeBtn.style.background = "transparent";
-      closeBtn.style.border = "none";
-      closeBtn.style.color = "#f5f5f5";
-      closeBtn.style.fontSize = "18px";
-      closeBtn.style.cursor = "pointer";
-      closeBtn.style.outline = "none";
+      closeBtn.classList.add("dock-close-btn");
       closeBtn.onclick = () => {
         dock.remove();
         saveDockState();
@@ -1579,12 +1582,10 @@ SageCraftAscendant.OperatorConsole = (function() {
       dockHeader.appendChild(headerControls);
 
       const dockBody = document.createElement("div");
-      dockBody.style.padding = "15px";
-      dockBody.style.background = "#111";
-      dockBody.style.overflow = "hidden";
-      dockBody.style.transition = "max-height 0.4s ease, opacity 0.4s ease";
+      dockBody.classList.add("dock-body");
       dockBody.style.maxHeight = "800px";
       dockBody.style.opacity = "1";
+      dockBody.style.transition = "max-height 0.4s ease, opacity 0.4s ease";
 
       collapseBtn.onclick = () => {
         if (dockBody.style.maxHeight !== "0px") {
