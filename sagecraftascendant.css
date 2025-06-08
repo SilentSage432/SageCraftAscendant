@@ -167,3 +167,37 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 30px #cc99ff, inset 0 0 20px #220033;
   transition: box-shadow 0.5s ease;
 }
+. 
+/* === Phase 26.5 — Control Deck Navigation Animation Layer === */
+
+/* Navigation Menu Button Base Enhancements */
+#navigationMenu button {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transition: all 0.3s ease, transform 0.3s ease;
+}
+
+/* Navigation Hover Effects */
+#navigationMenu button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #cc99ff88, 0 0 30px #33114488;
+  background: linear-gradient(90deg, #552288, #330044);
+}
+
+/* Navigation Active Pulse */
+#navigationMenu button:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 25px #cc99ffaa;
+}
+
+/* Subtle Navigation Pulse Effect (Optional) */
+@keyframes nav-pulse {
+  0% { box-shadow: 0 0 5px #220033; }
+  50% { box-shadow: 0 0 15px #cc99ff; }
+  100% { box-shadow: 0 0 5px #220033; }
+}
+
+#navigationMenu button.pulse {
+  animation: nav-pulse 3s infinite;
+}
