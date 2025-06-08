@@ -185,3 +185,22 @@ console.log("✅ Loaded autonomous.js");
 // Phase: Structural Harmonization — 38.2.K
 
 console.log("✅ Loaded autocorrect.shell.js");
+
+// SageCraft Ascendant — Wave 100: Sovereign API Bridge Injection
+
+import('/scripts/operator/operatorDockWiring.js').then(module => {
+  const OperatorDockWiring = module.default || module.OperatorDockWiring || window.OperatorDockWiring;
+
+  if (!OperatorDockWiring || typeof OperatorDockWiring.getDockAPI !== 'function') {
+    console.error("❌ Sovereign API Bridge: OperatorDockWiring or getDockAPI not available.");
+    return;
+  }
+
+  // Expose Sovereign API globally
+  window.SovereignAPI = OperatorDockWiring.getDockAPI();
+  console.log("✅ Sovereign API Bridge activated: window.SovereignAPI is now live.");
+}).catch(err => {
+  console.error("❌ Failed to load OperatorDockWiring module:", err);
+});
+
+

@@ -1,5 +1,65 @@
 <h2>🧠 Neural Operator Console</h2>
 
+<div id="sovereignContainer">
+
+  <div id="operatorHeader" class="ui-shell">
+    <h3>🧬 Sovereign Mesh Control Deck</h3>
+  </div>
+
+  <div id="operatorDockGrid" class="dock-grid">
+    <!-- Dock Panels will dynamically mount here -->
+  </div>
+
+  <div id="operatorFooter" class="ui-shell">
+    <p>🔒 Sovereign Mesh Stabilized — Phase: Bootstrap Wave 76</p>
+  </div>
+
+</div>
+
+<!-- 🧭 Operator Control Deck Resurrection -->
+<div id="operatorControlDeck">
+
+  <div id="navigationMenu">
+    <h3>Control Deck</h3>
+    <button onclick="loadProfile()">Load Profile</button>
+    <button onclick="saveProfile()">Save Profile</button>
+    <button onclick="mergeProfiles()">Merge Profiles</button>
+    <button onclick="runIntegrityAudit()">Run Integrity Audit</button>
+    <button onclick="activateRoleCluster()">Activate Cluster</button>
+    <button onclick="simulateMerge()">Simulate Merge</button>
+    <button onclick="recoverDockState()">Recover State</button>
+  </div>
+
+  <div id="panelContainer">
+    <h3>🧮 Merge Visualization Engine</h3>
+
+    <div id="mergeVisualization">
+      <p>⚙ No active delta chain loaded.</p>
+      <div id="deltaReport"></div>
+      <div id="conflictReport"></div>
+      <div id="arbitrationReport"></div>
+    </div>
+
+    <h3>🗄 Snapshot Manager</h3>
+
+    <div id="snapshotManager">
+      <p>⚙ Snapshot archive control interface.</p>
+
+      <div id="snapshotControls">
+        <button onclick="exportSnapshot()">Export Snapshot</button>
+        <button onclick="importSnapshot()">Import Snapshot</button>
+        <button onclick="saveCurrentState()">Save Current State</button>
+        <button onclick="loadSavedState()">Load Saved State</button>
+      </div>
+
+      <div id="snapshotList">
+        <p>📂 No snapshots loaded.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <div class="console-section">
   <h3>🪐 Orbit Manager</h3>
   <label>Orbit Key: <input type="text" id="orbitKeyInput"></label><br>

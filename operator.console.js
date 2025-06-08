@@ -1,3 +1,23 @@
+// === Wave 107 — Sovereign Anomaly Recovery Wiring ===
+// Expose global triggerAnomalyRecovery() function for Control Deck binding
+window.triggerAnomalyRecovery = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.triggerAnomalyRecovery !== 'function') {
+    console.error("❌ SovereignAPI.triggerAnomalyRecovery() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  if (!confirm("⚠ Trigger full anomaly recovery cycle?")) return;
+
+  try {
+    const result = await window.SovereignAPI.triggerAnomalyRecovery();
+    console.log(`🩺 Anomaly Recovery Triggered:`, result);
+    alert("✅ Anomaly Recovery Cycle Initiated.");
+  } catch (err) {
+    console.error(`❌ Failed to trigger anomaly recovery:`, err);
+    alert("❌ Anomaly Recovery Failed. See console for details.");
+  }
+};
 // === Phase 27.2 — Neural Macro Console Panel Injection ===
 SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container) {
   if (!container) return;
@@ -2393,3 +2413,177 @@ SageCraftAscendant.OperatorScripts = (function () {
     renderSubsystemNavigation
 };
 })();
+// === Wave 101 — Sovereign Profile Loader Wiring ===
+
+// Expose global loadProfile() function for Control Deck binding
+window.loadProfile = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.loadProfile !== 'function') {
+    console.error("❌ SovereignAPI.loadProfile() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  const profileName = prompt("Enter profile name to load:");
+  if (!profileName) {
+    alert("⚠ Profile name required.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.loadProfile(profileName);
+    console.log(`✅ Profile '${profileName}' loaded successfully:`, result);
+    alert(`✅ Profile '${profileName}' loaded successfully.`);
+  } catch (err) {
+    console.error(`❌ Failed to load profile '${profileName}':`, err);
+    alert(`❌ Failed to load profile '${profileName}'. See console for details.`);
+  }
+};
+// === Wave 102 — Sovereign Profile Saver Wiring ===
+
+// Expose global saveCurrentState() function for Control Deck binding
+window.saveCurrentState = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.saveCurrentState !== 'function') {
+    console.error("❌ SovereignAPI.saveCurrentState() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  const profileName = prompt("Enter profile name to save current state as:");
+  if (!profileName) {
+    alert("⚠ Profile name required.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.saveCurrentState(profileName);
+    console.log(`✅ Current state saved as profile '${profileName}':`, result);
+    alert(`✅ Current state saved as profile '${profileName}'.`);
+  } catch (err) {
+    console.error(`❌ Failed to save current state as '${profileName}':`, err);
+    alert(`❌ Failed to save state. See console for details.`);
+  }
+};
+// === Wave 103 — Sovereign Merge Executor Wiring ===
+// Expose global mergeProfiles() function for Control Deck binding
+window.mergeProfiles = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.mergeProfiles !== 'function') {
+    console.error("❌ SovereignAPI.mergeProfiles() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  const baseProfile = prompt("Enter base profile name:");
+  if (!baseProfile) {
+    alert("⚠ Base profile name required.");
+    return;
+  }
+
+  const mergeProfile = prompt("Enter profile name to merge into base:");
+  if (!mergeProfile) {
+    alert("⚠ Merge profile name required.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.mergeProfiles(baseProfile, mergeProfile);
+    console.log(`✅ Profiles merged: '${baseProfile}' ⬅ '${mergeProfile}' →`, result);
+    alert(`✅ Profiles merged successfully.`);
+  } catch (err) {
+    console.error(`❌ Failed to merge profiles:`, err);
+    alert(`❌ Failed to merge profiles. See console for details.`);
+  }
+};
+// === Wave 104 — Sovereign Integrity Auditor Wiring ===
+
+// Expose global auditIntegrity() function for Control Deck binding
+window.auditIntegrity = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.auditIntegrity !== 'function') {
+    console.error("❌ SovereignAPI.auditIntegrity() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.auditIntegrity();
+    console.log(`🧪 Integrity Audit Result:`, result);
+    alert(`🧪 Integrity Audit Complete.\nSubsystems: ${result?.subsystems?.length || 0}\nMesh Stability: ${result?.stability || 'Unknown'}`);
+  } catch (err) {
+    console.error(`❌ Failed to execute integrity audit:`, err);
+    alert(`❌ Failed to execute integrity audit. See console for details.`);
+  }
+};
+// === Wave 105 — Sovereign Cluster Activator Wiring ===
+// Expose global activateCluster() function for Control Deck binding
+window.activateCluster = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.activateCluster !== 'function') {
+    console.error("❌ SovereignAPI.activateCluster() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  const clusterName = prompt("Enter Cluster Name to activate:");
+  if (!clusterName) {
+    alert("⚠ Cluster name required.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.activateCluster(clusterName);
+    console.log(`✅ Cluster '${clusterName}' activated successfully:`, result);
+    alert(`✅ Cluster '${clusterName}' activated successfully.`);
+  } catch (err) {
+    console.error(`❌ Failed to activate cluster '${clusterName}':`, err);
+    alert(`❌ Failed to activate cluster '${clusterName}'. See console for details.`);
+  }
+};
+// === Wave 106 — Sovereign Merge Simulation Wiring ===
+// Expose global simulateMerge() function for Control Deck binding
+window.simulateMerge = async function() {
+  if (!window.SovereignAPI || typeof window.SovereignAPI.simulateMerge !== 'function') {
+    console.error("❌ SovereignAPI.simulateMerge() is not available.");
+    alert("Sovereign API Bridge not active.");
+    return;
+  }
+
+  const baseProfile = prompt("Enter base profile name:");
+  if (!baseProfile) {
+    alert("⚠ Base profile name required.");
+    return;
+  }
+
+  const mergeProfile = prompt("Enter profile name to simulate merge:");
+  if (!mergeProfile) {
+    alert("⚠ Merge profile name required.");
+    return;
+  }
+
+  try {
+    const result = await window.SovereignAPI.simulateMerge(baseProfile, mergeProfile);
+    console.log(`🧪 Merge Simulation Result for '${baseProfile}' ⬅ '${mergeProfile}':`, result);
+    alert(`🧪 Merge Simulation Complete. Conflicts: ${result?.conflicts?.length || 0}`);
+  } catch (err) {
+    console.error(`❌ Failed to simulate merge:`, err);
+    alert(`❌ Failed to simulate merge. See console for details.`);
+  }
+};
+// === Wave 108 — Sovereign Finalization Wiring ===
+// Auto-bind Operator Control Deck buttons to Sovereign API functions
+window.addEventListener("DOMContentLoaded", () => {
+  const bindButton = (btnId, fn) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) {
+      console.warn(`⚠ Sovereign Deck Binding: Button ${btnId} not found.`);
+      return;
+    }
+    btn.addEventListener("click", fn);
+    console.log(`✅ Sovereign Deck Binding: ${btnId} wired.`);
+  };
+
+  bindButton("btnLoadProfile", window.loadProfile);
+  bindButton("btnSaveState", window.saveCurrentState);
+  bindButton("btnMergeProfiles", window.mergeProfiles);
+  bindButton("btnSimulateMerge", window.simulateMerge);
+  bindButton("btnAuditIntegrity", window.auditIntegrity);
+  bindButton("btnActivateCluster", window.activateCluster);
+  bindButton("btnTriggerRecovery", window.triggerAnomalyRecovery);
+});
