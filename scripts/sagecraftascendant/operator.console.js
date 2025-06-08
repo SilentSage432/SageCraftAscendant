@@ -1,3 +1,460 @@
+// === Phase 25.0 — Mesh Topology Visualization Engine ===
+SageCraftAscendant.MeshTopologyVisualizer = (function() {
+
+  const OperatorSessionID = "Operator001";
+
+  function render(containerId = "meshTopologyContainer") {
+    let container = document.getElementById(containerId);
+    if (!container) {
+      container = document.createElement("div");
+      container.id = containerId;
+      container.style.border = "1px solid #555";
+      container.style.background = "#111";
+      container.style.padding = "10px";
+      container.style.margin = "10px 0";
+      container.style.height = "400px";
+      container.style.overflow = "hidden";
+      container.style.position = "relative";
+      document.body.appendChild(container);
+    }
+    container.innerHTML = '';
+
+    const peers = SageCraftAscendant.MeshPeerRegistry.listPeers();
+    const centerX = container.clientWidth / 2;
+    const centerY = container.clientHeight / 2;
+    const radius = 150;
+    const angleStep = (2 * Math.PI) / (peers.length + 1);
+
+    function createNode(operatorId, x, y, isSelf = false) {
+      const node = document.createElement("div");
+      node.style.position = "absolute";
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+      node.style.width = "80px";
+      node.style.height = "80px";
+      node.style.borderRadius = "50%";
+      node.style.textAlign = "center";
+      node.style.lineHeight = "80px";
+      node.style.background = isSelf ? "#cc66ff" : "#3399ff";
+      node.style.color = "#fff";
+      node.style.fontWeight = "bold";
+      node.style.boxShadow = "0 0 10px #000";
+      node.textContent = operatorId;
+      container.appendChild(node);
+    }
+
+    // Render self at center
+    createNode(OperatorSessionID, centerX - 40, centerY - 40, true);
+
+    // Render peers around circle
+    peers.forEach((peer, index) => {
+      const angle = angleStep * index;
+      const x = centerX + radius * Math.cos(angle) - 40;
+      const y = centerY + radius * Math.sin(angle) - 40;
+      createNode(peer.operatorId, x, y);
+    });
+
+    console.log("🌐 MeshTopologyVisualizer: Rendered current topology.");
+  }
+
+  return {
+    render
+  };
+
+})();
+// === Phase 24.8 — Mesh Synchronization Feedback Loop ===
+SageCraftAscendant.MeshSyncReconciler = (function() {
+
+  const OperatorSessionID = "Operator001";
+
+  function initiateReconciliation() {
+    console.log("🔄 Initiating Mesh Synchronization Feedback Loop...");
+    const peers = SageCraftAscendant.MeshPeerRegistry.listPeers();
+
+    peers.forEach(peer => {
+      if (peer.operatorId !== OperatorSessionID) {
+        requestStateFromPeer(peer.operatorId);
+      }
+    });
+  }
+
+  function requestStateFromPeer(peerId) {
+    console.log(`📡 Requesting state snapshot from peer: ${peerId}`);
+
+    const peerStorageKey = `_remoteMeshState_${peerId}`;
+    const peerState = window[peerStorageKey];
+
+    if (peerState) {
+      evaluateIncomingState(peerId, peerState);
+    } else {
+      console.warn(`⚠ No state found for peer ${peerId}`);
+    }
+  }
+
+  function evaluateIncomingState(peerId, incomingState) {
+    const selfKey = `_remoteMeshState_${OperatorSessionID}`;
+    const selfState = window[selfKey];
+
+    if (!selfState || new Date(incomingState.timestamp) > new Date(selfState.timestamp)) {
+      window[selfKey] = incomingState;
+      console.log(`✅ MeshSyncReconciler: Adopted newer state from peer ${peerId}`);
+    } else {
+      console.log(`ℹ MeshSyncReconciler: Local state is newer — no update from ${peerId}`);
+    }
+  }
+
+  return {
+    initiateReconciliation
+  };
+
+})();
+// === Phase 24.7 — Peer State Broadcasting & Listening Engine ===
+SageCraftAscendant.MeshSyncBroadcaster = (function() {
+
+  const OperatorSessionID = "Operator001"; // Same session ID used across mesh systems
+
+  function broadcastDockState(stateArray) {
+    const timestamp = new Date().toISOString();
+    const message = {
+      from: OperatorSessionID,
+      timestamp: timestamp,
+      state: stateArray
+    };
+
+    console.log(`📡 Broadcasting dock state to peers at ${timestamp}`, message);
+    simulateMeshBroadcast(message);
+  }
+
+  function simulateMeshBroadcast(message) {
+    // This simulates broadcasting to all discovered peers
+    const peers = SageCraftAscendant.MeshPeerRegistry.listPeers();
+    peers.forEach(peer => {
+      if (peer.operatorId !== OperatorSessionID) {
+        simulatePeerReceive(peer.operatorId, message);
+      }
+    });
+  }
+
+  function simulatePeerReceive(peerId, message) {
+    console.log(`📥 Peer ${peerId} received broadcast from ${message.from}`);
+    const peerStorageKey = `_remoteMeshState_${peerId}`;
+    const existing = window[peerStorageKey];
+
+    if (!existing || new Date(message.timestamp) > new Date(existing.timestamp)) {
+      window[peerStorageKey] = {
+        state: message.state,
+        timestamp: message.timestamp
+      };
+      console.log(`✅ Peer ${peerId} accepted new state from ${message.from}`);
+    } else {
+      console.warn(`⚠ Peer ${peerId} rejected outdated broadcast from ${message.from}`);
+    }
+  }
+
+  return {
+    broadcastDockState
+  };
+
+})();
+// === Phase 24.6 — Distributed Mesh Peer Discovery Bootstrap ===
+SageCraftAscendant.MeshPeerRegistry = (function() {
+  const _peers = {};
+
+  function announceSelf(operatorId = "Operator001") {
+    const peer = {
+      operatorId: operatorId,
+      discoveredAt: new Date().toISOString()
+    };
+    _peers[operatorId] = peer;
+    console.log(`🌐 MeshPeerRegistry: Announced self as ${operatorId}`);
+  }
+
+  function discoverPeer(operatorId) {
+    if (_peers[operatorId]) {
+      console.log(`ℹ MeshPeerRegistry: Peer ${operatorId} already known.`);
+      return;
+    }
+    const peer = {
+      operatorId: operatorId,
+      discoveredAt: new Date().toISOString()
+    };
+    _peers[operatorId] = peer;
+    console.log(`🔎 MeshPeerRegistry: Discovered peer ${operatorId}`);
+  }
+
+  function listPeers() {
+    return Object.values(_peers);
+  }
+
+  function clearPeers() {
+    for (let id in _peers) delete _peers[id];
+    console.log("🧹 MeshPeerRegistry: All peers cleared.");
+  }
+
+  return {
+    announceSelf,
+    discoverPeer,
+    listPeers,
+    clearPeers
+  };
+})();
+// === Phase 24.5 — Distributed Mesh Operator Session Isolation ===
+SageCraftAscendant.MeshSyncProvider = (function() {
+
+  // Global Operator Session ID (can be dynamic per instance in future)
+  const OperatorSessionID = "Operator001";
+
+  function _getStorageKey() {
+    return `_remoteMeshState_${OperatorSessionID}`;
+  }
+
+  function saveDockLayout(stateArray) {
+    const timestamp = new Date().toISOString();
+    console.log(`🌐 MeshSync [${OperatorSessionID}]: Transmitting dock layout to remote mesh hub...`);
+
+    const newState = {
+      state: stateArray,
+      timestamp: timestamp
+    };
+
+    const existingState = window[_getStorageKey()];
+
+    if (!existingState || new Date(newState.timestamp) > new Date(existingState.timestamp)) {
+      window[_getStorageKey()] = newState;
+      console.log(`✅ MeshSync [${OperatorSessionID}]: Layout saved to remote mesh.`);
+    } else {
+      console.warn(`⚠ MeshSync [${OperatorSessionID}]: Incoming state older — rejected.`);
+    }
+  }
+
+  function loadDockLayout() {
+    console.log(`🌐 MeshSync [${OperatorSessionID}]: Requesting dock layout from remote mesh hub...`);
+    const stored = window[_getStorageKey()];
+    if (stored) {
+      console.log(`🔄 MeshSync [${OperatorSessionID}]: Loaded state timestamp: ${stored.timestamp}`);
+      return stored.state || [];
+    }
+    return [];
+  }
+
+  function clearDockLayout() {
+    console.log(`🌐 MeshSync [${OperatorSessionID}]: Clearing remote mesh dock layout...`);
+    window[_getStorageKey()] = null;
+  }
+
+  return {
+    saveDockLayout,
+    loadDockLayout,
+    clearDockLayout
+  };
+
+})();
+// === Phase 24.1 — Persistence Hub Synchronization Engine ===
+SageCraftAscendant.DockPersistenceHub = (function() {
+  let _provider = null;
+
+  function registerProvider(provider) {
+    _provider = provider;
+    console.log("🔗 DockPersistenceHub: Persistence provider registered.");
+  }
+
+  function save(stateArray) {
+    if (!_provider || typeof _provider.saveDockLayout !== "function") {
+      console.warn("⚠ DockPersistenceHub: No valid provider available for save.");
+      return;
+    }
+    _provider.saveDockLayout(stateArray);
+  }
+
+  function load() {
+    if (!_provider || typeof _provider.loadDockLayout !== "function") {
+      console.warn("⚠ DockPersistenceHub: No valid provider available for load.");
+      return [];
+    }
+    return _provider.loadDockLayout();
+  }
+
+  function clear() {
+    if (!_provider || typeof _provider.clearDockLayout !== "function") {
+      console.warn("⚠ DockPersistenceHub: No valid provider available for clear.");
+      return;
+    }
+    _provider.clearDockLayout();
+  }
+
+  return {
+    registerProvider,
+    save,
+    load,
+    clear
+  };
+})();
+// === Phase 24.0 — Dock Persistence Expansion & Inter-Orbital Synchronization ===
+SageCraftAscendant.DockPersistence = (function() {
+  // Centralized dock layout registry (in-memory for now)
+  let _dockRegistry = [];
+
+  // Save the current dock panel layout state (array of {panelId, collapsed})
+  function saveDockLayout(stateArray) {
+    _dockRegistry = stateArray;
+    console.log("💾 DockPersistence: Layout state captured:", _dockRegistry);
+    // In future phase: transmit _dockRegistry to distributed mesh persistence hub
+  }
+
+  // Retrieve the current dock panel layout state
+  function loadDockLayout() {
+    console.log("🔄 DockPersistence: Layout state restored:", _dockRegistry);
+    return _dockRegistry;
+  }
+
+  // Clear the dock layout state
+  function clearDockLayout() {
+    _dockRegistry = [];
+    console.log("🧹 DockPersistence: Layout state cleared.");
+  }
+
+  // Scaffold for future mesh persistence API
+  // function transmitToMeshHub() { ... }
+
+  return {
+    saveDockLayout,
+    loadDockLayout,
+    clearDockLayout
+  };
+})();
+  // Phase 22.5 — Forecast Model Performance Console Panel
+  SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel = function (container) {
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "📈 Forecast Performance Console";
+    section.appendChild(header);
+
+    const evaluateBtn = document.createElement("button");
+    evaluateBtn.textContent = "🔬 Evaluate Forecast Accuracy";
+    evaluateBtn.onclick = () => {
+      const liveData = SageCraftAscendant.NeuralMemoryExpansion?.loadLiveTableMemory?.();
+      if (!liveData || liveData.length === 0) {
+        alert("⚠ No live table data available to evaluate.");
+        return;
+      }
+      const evaluation = SageCraftAscendant.ForecastCortex?.evaluateForecastAccuracy(liveData);
+      if (!evaluation) {
+        alert("⚠ No forecast available to evaluate.");
+        return;
+      }
+      renderEvaluation(evaluation);
+    };
+    section.appendChild(evaluateBtn);
+
+    const evaluationContainer = document.createElement("div");
+    evaluationContainer.style.border = "1px solid #555";
+    evaluationContainer.style.background = "#111";
+    evaluationContainer.style.padding = "10px";
+    evaluationContainer.style.height = "250px";
+    evaluationContainer.style.overflowY = "scroll";
+    evaluationContainer.style.marginTop = "10px";
+    section.appendChild(evaluationContainer);
+
+    function renderEvaluation(evaluation) {
+      evaluationContainer.innerHTML = '';
+      evaluation.forEach(result => {
+        const entryDiv = document.createElement("div");
+        entryDiv.style.marginBottom = "8px";
+        if (result.actualQty !== null) {
+          entryDiv.innerHTML = `
+            <b>${result.item} — ${result.desc}</b><br>
+            Projected: ${result.projectedQty} | Actual: ${result.actualQty} | 
+            Error: ${result.error} | Accuracy: ${result.accuracy}%
+          `;
+        } else {
+          entryDiv.innerHTML = `
+            <b>${result.item} — ${result.desc}</b><br>
+            Projected: ${result.projectedQty} | Actual: Unknown
+          `;
+        }
+        evaluationContainer.appendChild(entryDiv);
+      });
+    }
+
+    container.appendChild(section);
+  };
+  // Phase 22.2 — Live Data Fusion Integration
+  SageCraftAscendant.OperatorConsole.renderForecastCortexPanel = function (container) {
+    if (!container) return;
+
+    const section = document.createElement("div");
+    section.classList.add("console-section");
+
+    const header = document.createElement("h3");
+    header.textContent = "🔮 Forecast Cortex Console";
+    section.appendChild(header);
+
+    const simulateLiveBtn = document.createElement("button");
+    simulateLiveBtn.textContent = "📊 Simulate Forecast (Live Data)";
+    simulateLiveBtn.onclick = () => {
+      const liveData = SageCraftAscendant.NeuralMemoryExpansion?.loadLiveTableMemory?.();
+      if (!liveData || liveData.length === 0) {
+        alert("⚠ No live table data available to simulate.");
+        return;
+      }
+
+      // Transform to Forecast Cortex input format
+      const forecastInput = liveData.map(entry => ({
+        item: entry.item,
+        desc: entry.desc,
+        qty: entry.qty,
+        cat: entry.cat
+      }));
+
+      SageCraftAscendant.ForecastCortex?.simulateForecast(forecastInput);
+      refreshForecasts();
+    };
+    section.appendChild(simulateLiveBtn);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.textContent = "🧹 Clear Forecast History";
+    clearBtn.style.marginLeft = "10px";
+    clearBtn.onclick = () => {
+      SageCraftAscendant.ForecastCortex?.clearForecasts();
+      refreshForecasts();
+    };
+    section.appendChild(clearBtn);
+
+    const forecastContainer = document.createElement("div");
+    forecastContainer.style.border = "1px solid #555";
+    forecastContainer.style.background = "#111";
+    forecastContainer.style.padding = "10px";
+    forecastContainer.style.height = "250px";
+    forecastContainer.style.overflowY = "scroll";
+    forecastContainer.style.marginTop = "10px";
+    section.appendChild(forecastContainer);
+
+    function refreshForecasts() {
+      forecastContainer.innerHTML = '';
+      const history = SageCraftAscendant.ForecastCortex?.getForecastHistory() || [];
+      if (history.length === 0) {
+        forecastContainer.textContent = "⚠ No forecasts available.";
+        return;
+      }
+
+      history.forEach(snapshot => {
+        const snapDiv = document.createElement("div");
+        snapDiv.style.marginBottom = "10px";
+        snapDiv.innerHTML = `<b>${snapshot.timestamp}</b><br>`;
+        snapshot.forecast.forEach(entry => {
+          snapDiv.innerHTML += `- ${entry.item}: ${entry.desc} → Projected Qty: ${entry.projectedQty}<br>`;
+        });
+        forecastContainer.appendChild(snapDiv);
+      });
+    }
+
+    refreshForecasts();
+    container.appendChild(section);
+  };
   // Phase 20.6 — Oracle Grimoire Intelligence Console Injection
   SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel = function (container) {
     if (!container) return;
@@ -940,7 +1397,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   });
 
 
-  // Phase 17.0 — Unified Operator Control Deck Bootstrap
+  // Phase 23.2 — Control Deck Responsive Fluidity Layer
   SageCraftAscendant.OperatorConsole.renderOperatorControlDeck = function () {
     const root = document.getElementById("operatorConsole");
     if (!root) {
@@ -951,51 +1408,98 @@ SageCraftAscendant.OperatorConsole = (function() {
     // Clear existing contents
     root.innerHTML = '';
 
-    // Create Control Deck container
+    // Create Control Deck container with responsive structure
     const deckContainer = document.createElement("div");
     deckContainer.id = "operatorControlDeck";
     deckContainer.style.display = "flex";
     deckContainer.style.flexDirection = "row";
-    deckContainer.style.height = "100%";
+    deckContainer.style.height = "100vh";
+    deckContainer.style.width = "100vw";
+    deckContainer.style.background = "radial-gradient(circle, #111 0%, #000 100%)";
+    deckContainer.style.boxShadow = "inset 0 0 60px #000000, inset 0 0 120px #222222";
+    deckContainer.style.overflow = "hidden";
 
-    // Create Navigation Menu placeholder
+    // Create Navigation Menu with responsive considerations
     const navMenu = document.createElement("div");
     navMenu.id = "navigationMenu";
-    navMenu.style.width = "220px";
-    navMenu.style.borderRight = "1px solid #555";
-    navMenu.style.padding = "10px";
-    navMenu.style.background = "#222";
-    navMenu.innerHTML = "<h3>🧭 Control Deck</h3><p>Subsystem Navigation Loading...</p>";
+    navMenu.style.minWidth = "220px";
+    navMenu.style.maxWidth = "300px";
+    navMenu.style.width = "20%";
+    navMenu.style.borderRight = "1px solid #444";
+    navMenu.style.padding = "20px";
+    navMenu.style.background = "linear-gradient(180deg, #222, #111)";
+    navMenu.style.color = "#f5f5f5";
+    navMenu.style.boxShadow = "2px 0 10px rgba(0,0,0,0.6)";
+    navMenu.style.fontFamily = "'Orbitron', sans-serif";
+    navMenu.style.fontSize = "15px";
+    navMenu.style.transition = "all 0.3s ease";
+    navMenu.innerHTML = "<h2 style='color:#cc99ff;'>🧭 Control Deck</h2><p>Loading...</p>";
 
-    // Create Panel Container placeholder
+    // Create Panel Container with adaptive growth
     const panelContainer = document.createElement("div");
     panelContainer.id = "panelContainer";
     panelContainer.style.flexGrow = "1";
-    panelContainer.style.padding = "10px";
-    panelContainer.style.background = "#111";
+    panelContainer.style.padding = "20px";
+    panelContainer.style.background = "linear-gradient(180deg, #111, #000)";
+    panelContainer.style.color = "#f5f5f5";
+    panelContainer.style.fontFamily = "'Orbitron', sans-serif";
+    panelContainer.style.overflowY = "auto";
+    panelContainer.style.overflowX = "hidden";
+    panelContainer.style.transition = "all 0.3s ease";
 
-    // Assemble deck
     deckContainer.appendChild(navMenu);
     deckContainer.appendChild(panelContainer);
     root.appendChild(deckContainer);
 
-    console.log("✅ Operator Control Deck Bootstrap Initialized.");
+    // Attach simple viewport resize listener
+    window.addEventListener("resize", () => {
+      const width = window.innerWidth;
+      if (width < 600) {
+        navMenu.style.width = "100px";
+        navMenu.style.padding = "10px";
+        navMenu.style.fontSize = "12px";
+        panelContainer.style.padding = "10px";
+      } else if (width < 900) {
+        navMenu.style.width = "160px";
+        navMenu.style.padding = "15px";
+        navMenu.style.fontSize = "14px";
+        panelContainer.style.padding = "15px";
+      } else {
+        navMenu.style.width = "20%";
+        navMenu.style.padding = "20px";
+        navMenu.style.fontSize = "15px";
+        panelContainer.style.padding = "20px";
+      }
+    });
+
+    console.log("✅ Phase 23.2 — Responsive Fluidity Layer Activated.");
   };
 
-  // Phase 21.2 — Dock Collapse State Memory Layer
+  // Phase 23.3 — Control Deck Dynamic Dock Memory Sync
   SageCraftAscendant.OperatorConsole.renderSubsystemNavigation = function () {
     const navMenu = document.getElementById("navigationMenu");
     const panelContainer = document.getElementById("panelContainer");
     if (!navMenu || !panelContainer) return;
 
-    navMenu.innerHTML = "<h3>🧭 Control Deck</h3>";
+    navMenu.innerHTML = "<h3 style='color:#cc99ff;letter-spacing:1px;margin-bottom:20px;'>🧭 Control Deck</h3>";
 
     SageCraftAscendant.OperatorConsoleRegistry.listPanels().forEach(panel => {
       const btn = document.createElement("button");
       btn.textContent = panel.label;
       btn.style.display = "block";
       btn.style.width = "100%";
-      btn.style.marginBottom = "5px";
+      btn.style.marginBottom = "8px";
+      btn.style.background = "linear-gradient(90deg,#331144,#220033)";
+      btn.style.color = "#f5f5f5";
+      btn.style.border = "none";
+      btn.style.borderRadius = "6px";
+      btn.style.fontWeight = "bold";
+      btn.style.letterSpacing = "0.5px";
+      btn.style.padding = "10px 0";
+      btn.style.boxShadow = "0 2px 8px #22003333";
+      btn.style.cursor = "pointer";
+      btn.onmouseenter = () => { btn.style.background = "linear-gradient(90deg, #441166, #330044)"; };
+      btn.onmouseleave = () => { btn.style.background = "linear-gradient(90deg,#331144,#220033)"; };
       btn.onclick = () => {
         toggleDockPanel(panel);
         saveDockState();
@@ -1003,8 +1507,9 @@ SageCraftAscendant.OperatorConsole = (function() {
       navMenu.appendChild(btn);
     });
 
-    console.log("✅ Subsystem Navigation Menu Rendered (Dock Mode with Collapse + Persistence).");
+    console.log("✅ Subsystem Navigation Menu Rendered (Dock Mode with Dynamic Memory Sync).");
 
+    // Phase 23.4 — Dock Animation Fluidity Layer
     function toggleDockPanel(panel) {
       const existingPanel = document.getElementById(`dock-${panel.id}`);
       if (existingPanel) {
@@ -1015,18 +1520,29 @@ SageCraftAscendant.OperatorConsole = (function() {
 
       const dock = document.createElement("div");
       dock.id = `dock-${panel.id}`;
-      dock.style.border = "1px solid #555";
-      dock.style.background = "#222";
-      dock.style.marginBottom = "10px";
-      dock.style.padding = "5px";
+      dock.dataset.panelId = panel.id;
+      dock.style.border = "1px solid #333";
+      dock.style.background = "linear-gradient(180deg, #222 0%, #111 100%)";
+      dock.style.marginBottom = "15px";
+      dock.style.padding = "0px";
+      dock.style.boxShadow = "0 0 12px #cc99ff88, inset 0 0 12px #000";
+      dock.style.borderRadius = "10px";
+      dock.style.overflow = "hidden";
+      dock.style.transition = "transform 0.3s ease, box-shadow 0.3s ease";
+      dock.style.transform = "scale(1)";
+      dock.onmouseenter = () => { dock.style.transform = "scale(1.02)"; dock.style.boxShadow = "0 0 20px #cc99ffcc"; };
+      dock.onmouseleave = () => { dock.style.transform = "scale(1)"; dock.style.boxShadow = "0 0 12px #cc99ff88, inset 0 0 12px #000"; };
 
       const dockHeader = document.createElement("div");
       dockHeader.style.display = "flex";
       dockHeader.style.justifyContent = "space-between";
       dockHeader.style.alignItems = "center";
       dockHeader.style.cursor = "pointer";
-      dockHeader.style.background = "#333";
-      dockHeader.style.padding = "5px";
+      dockHeader.style.background = "linear-gradient(90deg, #331144, #220033)";
+      dockHeader.style.padding = "10px 15px";
+      dockHeader.style.color = "#f5f5f5";
+      dockHeader.style.fontWeight = "bold";
+      dockHeader.style.letterSpacing = "0.5px";
 
       const title = document.createElement("span");
       title.textContent = panel.label;
@@ -1036,11 +1552,23 @@ SageCraftAscendant.OperatorConsole = (function() {
 
       const collapseBtn = document.createElement("button");
       collapseBtn.textContent = "▾";
-      collapseBtn.style.marginLeft = "5px";
+      collapseBtn.style.marginLeft = "10px";
+      collapseBtn.style.background = "transparent";
+      collapseBtn.style.border = "none";
+      collapseBtn.style.color = "#f5f5f5";
+      collapseBtn.style.fontSize = "18px";
+      collapseBtn.style.cursor = "pointer";
+      collapseBtn.style.outline = "none";
 
       const closeBtn = document.createElement("button");
       closeBtn.textContent = "✖";
       closeBtn.style.marginLeft = "5px";
+      closeBtn.style.background = "transparent";
+      closeBtn.style.border = "none";
+      closeBtn.style.color = "#f5f5f5";
+      closeBtn.style.fontSize = "18px";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.style.outline = "none";
       closeBtn.onclick = () => {
         dock.remove();
         saveDockState();
@@ -1051,16 +1579,22 @@ SageCraftAscendant.OperatorConsole = (function() {
       dockHeader.appendChild(headerControls);
 
       const dockBody = document.createElement("div");
-      dockBody.style.padding = "5px";
-      dockBody.style.display = "block";
+      dockBody.style.padding = "15px";
+      dockBody.style.background = "#111";
+      dockBody.style.overflow = "hidden";
+      dockBody.style.transition = "max-height 0.4s ease, opacity 0.4s ease";
+      dockBody.style.maxHeight = "800px";
+      dockBody.style.opacity = "1";
 
       collapseBtn.onclick = () => {
-        if (dockBody.style.display === "none") {
-          dockBody.style.display = "block";
-          collapseBtn.textContent = "▾";
-        } else {
-          dockBody.style.display = "none";
+        if (dockBody.style.maxHeight !== "0px") {
+          dockBody.style.maxHeight = "0px";
+          dockBody.style.opacity = "0";
           collapseBtn.textContent = "▸";
+        } else {
+          dockBody.style.maxHeight = "800px";
+          dockBody.style.opacity = "1";
+          collapseBtn.textContent = "▾";
         }
         saveDockState();
       };
@@ -1069,39 +1603,41 @@ SageCraftAscendant.OperatorConsole = (function() {
       dock.appendChild(dockBody);
       panelContainer.appendChild(dock);
 
-      // Inject the panel content dynamically
       panel.render(dockBody);
+      saveDockState();
     }
 
     function saveDockState() {
-      const state = {};
-      SageCraftAscendant.OperatorConsoleRegistry.listPanels().forEach(panel => {
-        const dock = document.getElementById(`dock-${panel.id}`);
-        if (dock) {
-          const dockBody = dock.querySelector("div:nth-child(2)");
-          state[panel.id] = {
-            open: true,
-            collapsed: (dockBody.style.display === "none")
-          };
-        }
+      const state = [];
+      const dockPanels = [...panelContainer.children];
+      dockPanels.forEach(dock => {
+        const panelId = dock.dataset.panelId;
+        const dockBody = dock.querySelector("div:nth-child(2)");
+        // For new animation: collapsed = maxHeight === "0px"
+        state.push({
+          panelId: panelId,
+          collapsed: (dockBody.style.maxHeight === "0px")
+        });
       });
-      localStorage.setItem("dockPanelStates", JSON.stringify(state));
+      localStorage.setItem("dockPanelLayout", JSON.stringify(state));
     }
 
     function restoreDockState() {
-      const state = JSON.parse(localStorage.getItem("dockPanelStates") || "{}");
-      Object.entries(state).forEach(([panelId, panelState]) => {
-        const panel = SageCraftAscendant.OperatorConsoleRegistry.panels[panelId];
+      const state = JSON.parse(localStorage.getItem("dockPanelLayout") || "[]");
+      state.forEach(panelState => {
+        const panel = SageCraftAscendant.OperatorConsoleRegistry.panels[panelState.panelId];
         if (panel) {
           toggleDockPanel(panel);
-          const dock = document.getElementById(`dock-${panelId}`);
+          const dock = document.getElementById(`dock-${panelState.panelId}`);
           const dockBody = dock.querySelector("div:nth-child(2)");
           const collapseBtn = dock.querySelector("button:nth-child(1)");
           if (panelState.collapsed) {
-            dockBody.style.display = "none";
+            dockBody.style.maxHeight = "0px";
+            dockBody.style.opacity = "0";
             collapseBtn.textContent = "▸";
           } else {
-            dockBody.style.display = "block";
+            dockBody.style.maxHeight = "800px";
+            dockBody.style.opacity = "1";
             collapseBtn.textContent = "▾";
           }
         }
@@ -1231,3 +1767,157 @@ SageCraftAscendant.OperatorConsole = (function() {
     label: 'Oracle Intelligence',
     render: SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel
   });
+
+  // === Phase 22.7 — Automated Continuous Tuning Engine ===
+  SageCraftAscendant.ForecastCortex = (function() {
+    const _forecasts = [];
+    let _adjustmentRange = 0.05; // Start with ±5% default range
+
+    function simulateForecast(inputData = []) {
+      if (!Array.isArray(inputData) || inputData.length === 0) {
+        console.warn("⚠ No input data provided for Forecast Cortex.");
+        return null;
+      }
+
+      const forecastResult = inputData.map(entry => {
+        const adjustment = 1 + (Math.random() * (_adjustmentRange * 2) - _adjustmentRange);
+        return {
+          item: entry.item,
+          desc: entry.desc,
+          projectedQty: Math.round(entry.qty * adjustment),
+          category: entry.cat
+        };
+      });
+
+      const snapshot = {
+        timestamp: new Date().toISOString(),
+        adjustmentRange: _adjustmentRange,
+        forecast: forecastResult
+      };
+
+      _forecasts.push(snapshot);
+      saveForecastMemory();
+      console.log("📊 Forecast Cortex Simulation:", snapshot);
+      return snapshot;
+    }
+
+    function getForecastHistory() {
+      return _forecasts;
+    }
+
+    function clearForecasts() {
+      _forecasts.length = 0;
+      saveForecastMemory();
+      console.log("🧹 Forecast Cortex history cleared.");
+    }
+
+    function saveForecastMemory() {
+      if (SageCraftAscendant.NeuralMemoryExpansion?.saveForecastMemory) {
+        SageCraftAscendant.NeuralMemoryExpansion.saveForecastMemory(_forecasts);
+        console.log("💾 Forecast history saved to Neural Memory.");
+      }
+    }
+
+    function loadForecastMemory() {
+      if (SageCraftAscendant.NeuralMemoryExpansion?.loadForecastMemory) {
+        const saved = SageCraftAscendant.NeuralMemoryExpansion.loadForecastMemory();
+        if (Array.isArray(saved)) {
+          _forecasts.length = 0;
+          _forecasts.push(...saved);
+          console.log("🔄 Forecast history restored from Neural Memory.");
+        }
+      }
+    }
+
+    function evaluateForecastAccuracy(actualData = []) {
+      if (_forecasts.length === 0) {
+        console.warn("⚠ No forecast history to evaluate.");
+        return null;
+      }
+      const lastForecast = _forecasts[_forecasts.length - 1];
+      if (!lastForecast || !lastForecast.forecast) {
+        console.warn("⚠ Last forecast snapshot invalid.");
+        return null;
+      }
+
+      const evaluation = lastForecast.forecast.map(prediction => {
+        const actual = actualData.find(item => item.item === prediction.item);
+        const actualQty = actual ? actual.qty : null;
+        const error = actualQty !== null ? Math.abs(actualQty - prediction.projectedQty) : null;
+        const accuracy = actualQty !== null ? (100 - (error / actualQty) * 100).toFixed(2) : null;
+
+        return {
+          item: prediction.item,
+          desc: prediction.desc,
+          projectedQty: prediction.projectedQty,
+          actualQty: actualQty,
+          error: error,
+          accuracy: accuracy
+        };
+      });
+
+      console.log("📈 Forecast Accuracy Evaluation:", evaluation);
+
+      // Trigger auto-adjustment after evaluation
+      adjustModel(evaluation);
+
+      return evaluation;
+    }
+
+    function adjustModel(evaluationResults = []) {
+      if (!evaluationResults || evaluationResults.length === 0) {
+        console.warn("⚠ No evaluation results provided for adjustment.");
+        return;
+      }
+
+      let totalAccuracy = 0;
+      let validCount = 0;
+
+      evaluationResults.forEach(result => {
+        if (result.accuracy !== null) {
+          totalAccuracy += parseFloat(result.accuracy);
+          validCount++;
+        }
+      });
+
+      if (validCount === 0) {
+        console.warn("⚠ No valid accuracy data found for adjustment.");
+        return;
+      }
+
+      const avgAccuracy = totalAccuracy / validCount;
+      console.log(`🎯 Average Forecast Accuracy: ${avgAccuracy.toFixed(2)}%`);
+
+      if (avgAccuracy > 95) {
+        _adjustmentRange = Math.max(_adjustmentRange - 0.005, 0.01);
+      } else if (avgAccuracy < 85) {
+        _adjustmentRange = Math.min(_adjustmentRange + 0.01, 0.20);
+      }
+
+      console.log(`🧪 Adjustment Range Updated: ±${(_adjustmentRange * 100).toFixed(2)}%`);
+    }
+
+    loadForecastMemory();
+
+    return {
+      simulateForecast,
+      getForecastHistory,
+      clearForecasts,
+      evaluateForecastAccuracy
+    };
+  })();
+  // Forecast Cortex Panel Registration — Phase 22.1
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'forecastCortex',
+    label: 'Forecast Cortex',
+    render: SageCraftAscendant.OperatorConsole.renderForecastCortexPanel
+  });
+  // Forecast Performance Panel Registration — Phase 22.5
+  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
+    id: 'forecastPerformance',
+    label: 'Forecast Performance',
+    render: SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel
+  });
+// === Phase 24.3 — Provider Handoff Wiring ===
+SageCraftAscendant.DockPersistenceHub.registerProvider(SageCraftAscendant.MeshSyncProvider);
+console.log("✅ DockPersistenceHub now routed to MeshSyncProvider.");
