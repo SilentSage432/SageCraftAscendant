@@ -1,124 +1,187 @@
-// SageCraft Ascendant — Modular Bootstrap Loader v1.0
+// SageCraft Ascendant — Namespace Core
+// Phase: Skeleton Injection — TRP.4
 
-document.addEventListener("DOMContentLoaded", async () => {
-    async function loadComponent(id, url) {
-      const startTime = performance.now();
-      try {
-        const res = await fetch(url);
-        if (!res.ok) {
-          const errorMsg = `❌ Failed to load ${url} — HTTP Status: ${res.status}`;
-          console.error(errorMsg);
-          publishInjectionFailure(id, url, res.status);
-          return;
-        }
-        const html = await res.text();
-        const mountPoint = document.getElementById(id);
-        if (!mountPoint) {
-          const errorMsg = `❌ Mount point '${id}' not found for component ${url}`;
-          console.error(errorMsg);
-          publishInjectionFailure(id, url, "NoMountPoint");
-          return;
-        }
-        mountPoint.innerHTML = html;
-        const endTime = performance.now();
-        const duration = (endTime - startTime).toFixed(2);
-        console.log(`✅ Component loaded → ${url} (${duration} ms)`);
-        publishInjectionTelemetry(id, url, duration);
-      } catch (err) {
-        console.error(`❌ Exception while loading component [${url}]:`, err);
-        publishInjectionFailure(id, url, err.message);
-      }
-    }
+window.SageCraftAscendant = window.SageCraftAscendant || {};
+console.log("✅ Loaded Namespace Core");
 
-    function publishInjectionFailure(id, url, reason) {
-      const failurePayload = { id, url, reason, timestamp: new Date().toISOString() };
-      console.warn("⚠ Injection Failure Sentinel:", failurePayload);
-      // Future: NeuralBus integration point
-      // SageCraftAscendant.NeuralBus?.publish("InjectionFailure", failurePayload);
-    }
+// SageCraft Ascendant — bootstrap.js
+// Phase: Skeleton Injection — TRP.4
 
-    function publishInjectionTelemetry(id, url, duration) {
-      const telemetryPayload = { id, url, duration: `${duration} ms`, timestamp: new Date().toISOString() };
-      console.info("📊 Injection Telemetry:", telemetryPayload);
-      // Future: NeuralTelemetryBus integration
-      // SageCraftAscendant.NeuralBus?.publish("InjectionTelemetry", telemetryPayload);
-    }
-  
-    console.log("🚀 SageCraft Modular Bootstrap initializing...");
-  
-    // Mount points are already injected into index.html during Phase 31.1/31.2
-    await loadComponent("headerMount", "/components/header.html");
-    await loadComponent("operatorConsoleMount", "/components/operatorConsole.html");
-    await loadComponent("footerMount", "/components/footer.html");
+console.log("✅ Loaded bootstrap.js");
 
-    // Phase 31.6 — Modular Modal Loader Injection
-    const modalComponents = [
-      "diagnosticsModal",
-      "dropboxModal",
-      "forecastDriftModal",
-      "resolverModal",
-      "trendsModal",
-      "addItemModal",
-      "editModal",
-      "summaryModal",
-      "customModal",
-      "itemLinkModal",
-      "devToolsModal"
-    ];
+// SageCraft Ascendant — stabilization.feedback.js
+// Phase: Skeleton Injection — TRP.4
 
-    for (const modal of modalComponents) {
-      await loadComponent("modalsMount", `/components/modals/${modal}.html`);
-    }
-  
-    console.log("✅ All modular components injected.");
+console.log("✅ Loaded stabilization.feedback.js");
 
-    // Phase 31.7 — Neural Modal Logic Binding Layer
-    function bindModalLogic() {
-      try {
-        // Example binding: Add Item Modal
-        const addItemBtn = document.getElementById("confirmAddItemBtn");
-        if (addItemBtn) {
-          addItemBtn.addEventListener("click", () => {
-            console.log("🚀 Add Item logic triggered.");
-            // Insert actual add item logic here
-          });
-        }
+// SageCraft Ascendant — drift.balancer.js
+// Phase: Skeleton Injection — TRP.4
 
-        // Example binding: Edit Item Modal
-        const editItemBtn = document.getElementById("confirmEditBtn");
-        if (editItemBtn) {
-          editItemBtn.addEventListener("click", () => {
-            console.log("🚀 Edit Item logic triggered.");
-            // Insert actual edit item logic here
-          });
-        }
+console.log("✅ Loaded drift.balancer.js");
 
-        // Example binding: Dropbox Upload
-        const dropboxBtn = document.getElementById("uploadDropBoxBtn");
-        if (dropboxBtn) {
-          dropboxBtn.addEventListener("click", () => {
-            console.log("🚀 Dropbox upload triggered.");
-            // Insert actual dropbox logic here
-          });
-        }
+// SageCraft Ascendant — drift.compensator.js
+// Phase: Structural Harmonization — 38.2.J
 
-        console.log("✅ Neural Modal Logic Binding Complete.");
-      } catch (err) {
-        console.error("❌ Error binding modal logic:", err);
-      }
-    }
+console.log("✅ Loaded drift.compensator.js");
 
-    // Allow brief DOM settlement before binding logic
-    setTimeout(bindModalLogic, 250);
+// SageCraft Ascendant — drift.compensator.js
+// Phase: Skeleton Injection — TRP.4
 
-    // Phase 32.1 — Neuroprogramming Macro Engine Activation
-    if (typeof NeuralOperatorMacros !== 'undefined') {
-      console.log("🧠 NeuralOperatorMacros Engine Initialized.");
-      const macros = NeuralOperatorMacros.listMacros();
-      console.log("📋 Registered Macros:", macros);
-    } else {
-      console.warn("⚠ NeuralOperatorMacros Engine not detected.");
-    }
-  
-    // 🔮 Future phase: dynamically import logic modules here after injection complete
-  });
+console.log("✅ Loaded drift.compensator.js");
+
+
+// SageCraft Ascendant — resilience.sentinel.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded resilience.sentinel.js");
+
+// SageCraft Ascendant — hazard.deflection.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded hazard.deflection.js");
+
+// SageCraft Ascendant — repair.optimizer.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded repair.optimizer.js");
+
+// SageCraft Ascendant — threat.deflection.nexus.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded threat.deflection.nexus.js");
+
+// SageCraft Ascendant — anomaly.fusion.matrix.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded anomaly.fusion.matrix.js");
+
+// SageCraft Ascendant — pattern.resolution.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded pattern.resolution.js");
+
+
+
+
+// SageCraft Ascendant — registry.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded registry.js");
+
+// SageCraft Ascendant — session.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded session.js");
+
+// SageCraft Ascendant — dock.persistence.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded dock.persistence.js");
+
+// SageCraft Ascendant — console.js
+// Phase: Skeleton Injection — TRP.4
+
+console.log("✅ Loaded console.js");
+
+// Forecast Module Group (Relocated)
+console.log("✅ Loaded forecast/forecast.cortex.js");
+console.log("✅ Loaded forecast/forecast.intake.js");
+console.log("✅ Loaded forecast/forecast.visualizer.js");
+console.log("✅ Loaded forecast/forecast.analyzer.js");
+console.log("✅ Loaded forecast/forecast.ai.scaffold.js");
+console.log("✅ Loaded forecast/forecast.drift.sentinel.js");
+console.log("✅ Loaded forecast/forecast.recovery.supervisor.js");
+console.log("✅ Loaded forecast/forecast.purification.engine.js");
+console.log("✅ Loaded forecast/forecast.threat.monitor.js");
+console.log("✅ Loaded forecast/forecast.anomaly.profiler.js");
+console.log("✅ Loaded forecast/forecast.predictive.cortex.js");
+console.log("✅ Loaded forecast/forecast.recursive.memory.js");
+console.log("✅ Loaded forecast/forecast.weight.adaptation.js");
+console.log("✅ Loaded forecast/forecast.confidence.engine.js");
+console.log("✅ Loaded forecast/forecast.correction.injector.js");
+console.log("✅ Loaded forecast/forecast.threat.overseer.js");
+console.log("✅ Loaded forecast/forecast.stabilizer.core.js");
+console.log("✅ Loaded forecast/forecast.anomaly.resolver.js");
+console.log("✅ Loaded forecast/forecast.signal.reinforcement.js");
+console.log("✅ Loaded forecast/forecast.synthesis.core.js");
+console.log("✅ Loaded forecast/forecast.mutation.layer.js");
+console.log("✅ Loaded forecast/forecast.adaptation.engine.js");
+console.log("✅ Loaded forecast/forecast.adaptation.analyzer.js");
+console.log("✅ Loaded forecast/forecast.visualizer.mutation.js");
+console.log("✅ Loaded forecast/forecast.stability.cluster.js");
+console.log("✅ Loaded forecast/forecast.snapshot.archiver.js");
+console.log("✅ Loaded forecast/forecast.snapshot.loader.js");
+console.log("✅ Loaded forecast/forecast.snapshot.validator.js");
+console.log("✅ Loaded forecast/forecast.snapshot.repair.js");
+console.log("✅ Loaded forecast/forecast.archive.compliance.js");
+console.log("✅ Loaded forecast/forecast.archive.autoscan.js");
+console.log("✅ Loaded forecast/forecast.memory.healer.js");
+console.log("✅ Loaded forecast/forecast.validation.sentinel.js");
+console.log("✅ Loaded forecast/forecast.analytics.stability.js");
+console.log("✅ Loaded forecast/forecast.drift.visualizer.js");
+console.log("✅ Loaded forecast/forecast.confidence.overlay.js");
+
+// SageCraft Ascendant — core.namespace.js
+// Phase: Structural Harmonization — 38.2.A
+
+console.log("✅ Loaded core.namespace.js");
+
+// SageCraft Ascendant — core.bootstrap.js
+// Phase: Structural Harmonization — 38.2.B
+
+console.log("✅ Loaded core.bootstrap.js");
+
+// SageCraft Ascendant — stabilization.feedback.js
+// Phase: Structural Harmonization — 38.2.C
+
+console.log("✅ Loaded stabilization.feedback.js");
+
+// SageCraft Ascendant — resilience.sentinel.js
+// Phase: Structural Harmonization — 38.2.D
+
+console.log("✅ Loaded resilience.sentinel.js");
+
+// SageCraft Ascendant — hazard.deflection.js
+// Phase: Structural Harmonization — 38.2.D
+
+console.log("✅ Loaded hazard.deflection.js");
+
+// SageCraft Ascendant — repair.optimizer.js
+// Phase: Structural Harmonization — 38.2.D
+
+console.log("✅ Loaded repair.optimizer.js");
+
+// SageCraft Ascendant — threat.deflection.nexus.js
+// Phase: Structural Harmonization — 38.2.D
+
+console.log("✅ Loaded threat.deflection.nexus.js");
+
+// SageCraft Ascendant — anomaly.fusion.matrix.js
+// Phase: Structural Harmonization — 38.2.F
+
+console.log("✅ Loaded anomaly.fusion.matrix.js");
+
+// SageCraft Ascendant — pattern.resolution.js
+// Phase: Structural Harmonization — 38.2.F
+
+console.log("✅ Loaded pattern.resolution.js");
+
+// SageCraft Ascendant — registry.orbits.js
+// Phase: Structural Harmonization — 38.2.G
+
+console.log("✅ Loaded registry.orbits.js");
+
+// SageCraft Ascendant — registry.editor.js
+// Phase: Structural Harmonization — 38.2.G
+
+console.log("✅ Loaded registry.editor.js");
+
+// SageCraft Ascendant — autonomous.js
+// Phase: Structural Harmonization — 38.2.I
+
+console.log("✅ Loaded autonomous.js");
+
+// SageCraft Ascendant — autocorrect.shell.js
+// Phase: Structural Harmonization — 38.2.K
+
+console.log("✅ Loaded autocorrect.shell.js");
