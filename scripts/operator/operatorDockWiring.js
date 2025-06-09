@@ -1,3 +1,48 @@
+// === Phase 1000.0: Sovereign Dock Population Matrix Injection ===
+
+OperatorDockWiring.populateDockMatrix = function() {
+    console.log("🚀 Sovereign Dock Population Matrix Injection Activated");
+
+    const dockDefinitions = [
+        { id: "count", label: "📊 Live Counts", description: "Live inventory counting subsystem online." },
+        { id: "deltaAnalyzer", label: "Δ Delta Analyzer", description: "Delta analytics subsystem loaded." },
+        { id: "exceptionManager", label: "⚠ Exception Manager", description: "Monitoring anomaly exceptions." },
+        { id: "progressDashboard", label: "🚦 Progress Dashboard", description: "System progress indicators operational." },
+        { id: "reportingHub", label: "📄 Reporting Hub", description: "Report generation subsystem ready." },
+        { id: "masterExportHub", label: "📤 Master Export Hub", description: "Bulk export interfaces deployed." },
+        { id: "utilityHub", label: "🛠 Utility Hub", description: "Utility tools accessible here." },
+        { id: "sessionManager", label: "📂 Session Manager", description: "Session archival and recovery available." },
+        { id: "mappings", label: "🗺 Mappings Interface", description: "Mapping configuration subsystem loaded." },
+        { id: "tools", label: "🔧 Tools Panel", description: "Developer and diagnostic tools online." },
+        { id: "audit", label: "📋 Audit Manager", description: "System audit controls engaged." },
+        { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." }
+    ];
+
+    const dockGrid = document.getElementById("operatorDockGrid");
+    if (!dockGrid) {
+        console.warn("❌ Dock Grid container not found.");
+        return;
+    }
+
+    dockDefinitions.forEach(def => {
+        let panel = document.getElementById(def.id);
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.id = def.id;
+            panel.classList.add("tab-section", "dock-panel");
+            dockGrid.appendChild(panel);
+            console.log(`✅ Sovereign Dock Panel Created: ${def.id}`);
+        }
+        panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
+    });
+
+    console.log("✅ Sovereign Dock Population Matrix Injection Complete.");
+};
+
+// Call the population method during initialization
+document.addEventListener("DOMContentLoaded", () => {
+    OperatorDockWiring.populateDockMatrix();
+});
 // SageCraft Ascendant — Phase 41: Operator Dock Wiring Layer Injection
 
 console.log("🔌 Operator Dock Wiring Module Initialized");
@@ -1570,6 +1615,14 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("📋 Audit Manager Activated");
         alert("📋 Audit Manager Loaded — System Audit Controls Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "oracle",
+    onClick: () => {
+        console.log("🔮 Oracle Subsystem Activated");
+        alert("🧙‍♂️ Oracle Interface Loaded — Whispering into the Codex");
     }
 });
 

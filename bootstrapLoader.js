@@ -46,6 +46,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   
     console.log("🚀 SageCraft Modular Bootstrap initializing...");
 
+    // === Sovereign Stylesheet Mesh Injection ===
+    function injectSovereignStylesheet() {
+      console.log("🎨 Sovereign Stylesheet Mesh Injection Activated.");
+
+      const styleLink = document.createElement("link");
+      styleLink.rel = "stylesheet";
+      styleLink.href = "./scripts/styles/sagecraftascendant.css";
+      styleLink.onload = () => console.log("✅ Sovereign stylesheet loaded successfully.");
+      styleLink.onerror = () => console.error("❌ Failed to load sovereign stylesheet.");
+      
+      document.head.appendChild(styleLink);
+    }
+
+    injectSovereignStylesheet();
+
     // === Phase 600.8 — Sovereign Manifest Loader Activation ===
     const SovereignManifest = {
       forecastModules: [
@@ -132,12 +147,108 @@ document.addEventListener("DOMContentLoaded", async () => {
     // === Phase 701 — Sovereign Modular Bootstrap Loader Expansion ===
     console.log("🌐 Sovereign Modular Bootstrap Expansion Engaged.");
 
+    // === Phase 1300 — Neural Cortex Synchronization Layer ===
+    console.log("🧠 Neural Cortex Synchronization Layer Activated.");
+
+    // === Phase 1400.0 — Emergency Dock Scaffold Bootstrap ===
+    function emergencyDockScaffold() {
+      console.log("🚑 Phase 1400.0 — Executing Dock Scaffold Safety Net...");
+
+      const operatorConsoleMount = document.getElementById("operatorConsoleMount");
+      if (!operatorConsoleMount) {
+        console.warn("⚠ Dock Mount Point 'operatorConsoleMount' missing — constructing scaffold...");
+
+        const mainDock = document.createElement("div");
+        mainDock.id = "operatorConsoleMount";
+        document.body.appendChild(mainDock);
+        console.log("✅ Operator Console Mount successfully reconstructed.");
+      } else {
+        console.log("✅ Operator Console Mount already present — scaffold not required.");
+      }
+
+      const defaultPanels = [
+        "diagnosticsPanel", "forecastPanel", "mutationPanel",
+        "memoryPanel", "recoveryPanel", "eventLogPanel",
+        "controlLatticePanel", "meshOverlayPanel", "oraclePanel"
+      ];
+
+      defaultPanels.forEach(panelId => {
+        if (!document.getElementById(panelId)) {
+          const panelDiv = document.createElement("div");
+          panelDiv.id = panelId;
+          panelDiv.classList.add("dock-panel");
+          panelDiv.innerHTML = `<h3>${panelId}</h3><p>⚠ Awaiting subsystem injection.</p>`;
+          document.getElementById("operatorConsoleMount").appendChild(panelDiv);
+          console.log(`✅ Dock panel '${panelId}' scaffolded.`);
+        }
+      });
+    }
+
+    emergencyDockScaffold();
+
+    // === Phase 1308-B — PredictiveHUD Path Resolution Audit ===
+    try {
+      const testPath = './scripts/operator/predictiveHUD.js';
+      console.log(`🧪 PredictiveHUD Audit: Attempting to load: ${testPath}`);
+
+      const testScript = document.createElement("script");
+      testScript.src = testPath;
+      testScript.onload = () => console.log("✅ PredictiveHUD test path successfully loaded");
+      testScript.onerror = () => console.warn("❌ PredictiveHUD test path failed to load");
+
+      document.body.appendChild(testScript);
+    } catch (err) {
+      console.error("❌ PredictiveHUD Path Audit Failure:", err);
+    }
+
+    async function initializeNeuralCortexSynchronization() {
+      try {
+        console.log("⚙ Performing Cortex Mesh Integrity Sweep...");
+
+        const cortexModules = [
+          ...SovereignManifest.forecastModules.map(m => `./scripts/forecast/${m}.js`),
+          ...SovereignManifest.coreModules.map(m => `./scripts/core/${m}.js`),
+          ...SovereignManifest.recoveryModules.map(m => `./scripts/recovery/${m}.js`)
+        ];
+
+        for (const modulePath of cortexModules) {
+          try {
+            await import(modulePath);
+            console.log(`✅ Cortex Module Loaded: ${modulePath}`);
+          } catch (err) {
+            console.warn(`⚠ Failed to load Cortex Module: ${modulePath}`, err);
+          }
+        }
+
+        console.log("🧠 Cortex Synchronization Complete.");
+      } catch (err) {
+        console.error("❌ Neural Cortex Synchronization failed:", err);
+      }
+    }
+
+    await initializeNeuralCortexSynchronization();
+
     const sovereignModules = [
-      './scripts/operator/roleAssignment.js',
-      './scripts/operator/profileFabrication.js',
-      './scripts/operator/subsystemBindings.js',
-      './scripts/operator/toggleSystem.js',
-      './scripts/operator/sandboxEngine.js'
+      './scripts/operator/roles/roleAssignment.js',
+      './scripts/operator/profiles/profileFabrication.js',
+      './scripts/operator/wiring/subsystemBindings.js',
+      './scripts/operator/wiring/dockToggleSystem.js',
+      './scripts/operator/tools/sandboxEngine.js',
+      './scripts/sageoracle/codex.whisper.core.js',
+      './scripts/operator/sovereign/sovereignToggleAutoWire.js',
+      './scripts/operator/sovereign/sovereignSubsystemWire.js',
+      './scripts/operator/sovereign/sovereignDiagnostics.js',
+      './scripts/operator/sovereign/sovereignNeuralReconciliation.js',
+      './scripts/operator/sovereign/sovereignDockPopulationEngine.js',
+      './scripts/operator/sovereign/sovereignDockToggleBinder.js',
+      './scripts/sageoracle/oracleBootstrap.js',
+      './scripts/operator/tools.js',
+      './scripts/operator/reportingHub.js',
+      './scripts/operator/progressDashboard.js',
+      './scripts/operator/exceptionManager.js',
+      './scripts/operator/mappings.js',
+      './scripts/operator/tools.js',
+      './scripts/operator/NeuralBus.js',
     ];
 
     for (const modulePath of sovereignModules) {

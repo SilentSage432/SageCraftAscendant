@@ -41,8 +41,20 @@ SageCraftAscendant.CodexWhisper = (function () {
     let reply = expandThought(input);
     const response = { sender: "codex", message: reply, timestamp: new Date().toISOString() };
     conversationHistory.push(response);
+    dispatchOracleResponse(reply);
     renderConsole();
     saveMemoryChain();
+  }
+
+  function dispatchOracleResponse(output) {
+    const dialogueWindow = document.getElementById("oracleDialogueWindow");
+    if (!dialogueWindow) {
+      console.warn("🧭 Oracle Dialogue Window not found.");
+      return;
+    }
+    const p = document.createElement("p");
+    p.textContent = `🧙 Oracle: ${output}`;
+    dialogueWindow.appendChild(p);
   }
 
   function expandThought(input) {
@@ -217,13 +229,25 @@ SageCraftAscendant.CodexWhisper = (function () {
 
   })();
 
+  // === Phase 1100.1: SovereignMesh Oracle Interface Hook ===
+  function injectExternalMessage(input) {
+    userMessage(input);
+  }
+
+  function exportMemoryChain() {
+    return conversationHistory;
+  }
+
   return {
     initializeWhisper,
     userMessage,
     auditMemoryChain,
     purgeAllMemory,
     purgeSystemOnly,
-    analyzeKnowledgeChain
+    analyzeKnowledgeChain,
+    injectExternalMessage,
+    exportMemoryChain,
+    dispatchOracleResponse
   };
 
 })();

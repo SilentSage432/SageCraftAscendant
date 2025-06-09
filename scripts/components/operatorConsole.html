@@ -126,6 +126,37 @@
 
 </div>
 
+<!-- 🧭 Oracle Whisper Interface -->
+<div id="oracleWhisperConsole" class="oracle-console">
+  <h3>🔮 Sage Oracle Interface</h3>
+  <div id="oracleDialogueWindow">
+    <p>🗣 Awaiting Oracle Activation...</p>
+  </div>
+  <div id="oracleInputPanel">
+    <input type="text" id="oracleUserInput" placeholder="Speak to the Oracle..." />
+    <button onclick="sendToOracle()">Submit</button>
+  </div>
+</div>
+
+<script>
+  function sendToOracle() {
+    const input = document.getElementById("oracleUserInput").value.trim();
+    if (!input) return;
+
+    // Dispatch message to Whisper Core
+    if (typeof SageCraftAscendant !== 'undefined' && SageCraftAscendant.Oracle) {
+      SageCraftAscendant.Oracle.injectExternalMessage(input);
+    }
+
+    const dialogueWindow = document.getElementById("oracleDialogueWindow");
+    const p = document.createElement("p");
+    p.textContent = `🧑‍💻 Operator: ${input}`;
+    dialogueWindow.appendChild(p);
+
+    document.getElementById("oracleUserInput").value = "";
+  }
+</script>
+
 <div class="console-section">
   <h3>🪐 Orbit Manager</h3>
   <label>Orbit Key: <input type="text" id="orbitKeyInput"></label><br>

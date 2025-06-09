@@ -1,12 +1,12 @@
-// SageCraft Ascendant — Phase 1301 Neural Dock Reinforcement Layer
 
-console.log("🚀 Phase 1301: Sovereign Neural Dock Reinforcement Initialized");
+
+// Phase 1200 — Sovereign Dock Wiring Recovery Mesh
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚦 Executing Neural Sovereign Dock Mesh Activation...");
+    console.log("🧩 Sovereign Dock Wiring Recovery Engaged.");
 
-    const dockMappings = {
-        count: "countSection",
+    const panelMappings = {
+        countContainer: "countSection",
         deltaAnalyzer: "deltaAnalyzerSection",
         exceptionManager: "exceptionManagerSection",
         progressDashboard: "progressDashboardSection",
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         configPanel: "configPanelSection"
     };
 
-    Object.entries(dockMappings).forEach(([buttonId, panelId]) => {
+    for (const [buttonId, panelId] of Object.entries(panelMappings)) {
         const button = document.getElementById(buttonId);
         const panel = document.getElementById(panelId);
 
@@ -28,12 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
             button.addEventListener("click", () => {
                 document.querySelectorAll(".sovereign-panel").forEach(p => p.style.display = "none");
                 panel.style.display = "block";
-                console.log(`✅ Sovereign Panel Activated: ${panelId}`);
+                console.log(`🟣 Sovereign Panel Activated: ${panelId}`);
             });
         } else {
-            console.warn(`⚠ Missing binding target: Button (${buttonId}) or Panel (${panelId})`);
+            console.warn(`⚠️ Wiring skipped for: ${buttonId} → ${panelId} (element missing)`);
         }
-    });
-
-    console.log("✅ Neural Sovereign Dock Reinforcement Completed.");
+    }
 });
