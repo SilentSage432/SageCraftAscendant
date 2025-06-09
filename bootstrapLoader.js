@@ -46,106 +46,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   
     console.log("🚀 SageCraft Modular Bootstrap initializing...");
 
-    // === Sovereign Stylesheet Mesh Injection ===
-    function injectSovereignStylesheet() {
-      console.log("🎨 Sovereign Stylesheet Mesh Injection Activated.");
+    const bootstrapModules = [
+      './scripts/bootstrap/bootstrapCore.js',
+      './scripts/bootstrap/bootstrapDiagnostics.js',
+      './scripts/bootstrap/bootstrapNeural.js',
+      './scripts/bootstrap/bootstrapDock.js',
+      './scripts/bootstrap/bootstrapModal.js',
+      './scripts/bootstrap/bootstrapSubsystems.js',
+      './scripts/bootstrap/bootstrapToolbar.js',
+      './scripts/bootstrap/bootstrapOperatorShell.js',
+      './scripts/bootstrap/bootstrapVisualIdentity.js',
+      './scripts/bootstrap/bootstrapAdvancedWiring.js',
+      './scripts/bootstrap/sovereignRuntime.js'
+    ];
 
-      const styleLink = document.createElement("link");
-      styleLink.rel = "stylesheet";
-      styleLink.href = "./scripts/styles/sagecraftascendant.css";
-      styleLink.onload = () => console.log("✅ Sovereign stylesheet loaded successfully.");
-      styleLink.onerror = () => console.error("❌ Failed to load sovereign stylesheet.");
-      
-      document.head.appendChild(styleLink);
-    }
-
-    injectSovereignStylesheet();
-
-    // === Phase 600.8 — Sovereign Manifest Loader Activation ===
-    const SovereignManifest = {
-      forecastModules: [
-        'forecast.cortex',
-        'forecast.intake',
-        'forecast.visualizer',
-        'forecast.analyzer',
-        'forecast.ai.scaffold',
-        'forecast.drift.sentinel',
-        'forecast.recovery.supervisor',
-        'forecast.purification.engine',
-        'forecast.threat.monitor',
-        'forecast.anomaly.profiler',
-        'forecast.predictive.cortex',
-        'forecast.recursive.memory',
-        'forecast.weight.adaptation',
-        'forecast.confidence.engine',
-        'forecast.correction.injector',
-        'forecast.threat.overseer',
-        'forecast.stabilizer.core',
-        'forecast.anomaly.resolver',
-        'forecast.signal.reinforcement',
-        'forecast.synthesis.core',
-        'forecast.mutation.layer',
-        'forecast.adaptation.engine',
-        'forecast.adaptation.analyzer',
-        'forecast.visualizer.mutation',
-        'forecast.stability.cluster',
-        'forecast.snapshot.archiver',
-        'forecast.snapshot.loader',
-        'forecast.snapshot.validator',
-        'forecast.snapshot.repair',
-        'forecast.archive.compliance',
-        'forecast.archive.autoscan',
-        'forecast.memory.healer',
-        'forecast.validation.sentinel',
-        'forecast.analytics.stability',
-        'forecast.drift.visualizer',
-        'forecast.confidence.overlay'
-      ],
-      coreModules: [
-        'anomaly.fusion.matrix',
-        'autocorrect.shell',
-        'drift.balancer',
-        'drift.compensator',
-        'hazard.deflection',
-        'pattern.resolution',
-        'repair.optimizer',
-        'resilience.sentinel',
-        'stabilization.feedback',
-        'threat.deflection.nexus'
-      ],
-      recoveryModules: [
-        'autonomous'
-      ]
-    };
-
-    // === Phase 600.9 — Sovereign Manifest Integrity Diagnostics ===
-    async function validateManifestIntegrity() {
-      console.log("🔎 Running Sovereign Manifest Integrity Diagnostics...");
-
-      async function checkModules(modules, basePath) {
-        for (const moduleName of modules) {
-          const modulePath = `${basePath}/${moduleName}.js`;
-          try {
-            await fetch(modulePath, { method: 'HEAD' });
-            console.log(`✅ Found ${modulePath}`);
-          } catch (err) {
-            console.error(`❌ Missing Module: ${modulePath}`);
-          }
-        }
+    for (const path of bootstrapModules) {
+      try {
+        await import(path);
+        console.log(`✅ Sovereign Bootstrap Module Loaded: ${path}`);
+      } catch (err) {
+        console.error(`❌ Failed to load ${path}`, err);
       }
-
-      await checkModules(SovereignManifest.forecastModules, "./scripts/forecast");
-      await checkModules(SovereignManifest.coreModules, "./scripts/core");
-      await checkModules(SovereignManifest.recoveryModules, "./scripts/recovery");
-
-      console.log("🔎 Sovereign Manifest Integrity Diagnostics Complete.");
     }
-
-    // Automatically trigger integrity check after SovereignManifest creation
-    await validateManifestIntegrity();
-
-    // === Phase 701 — Sovereign Modular Bootstrap Loader Expansion ===
-    console.log("🌐 Sovereign Modular Bootstrap Expansion Engaged.");
 
     // === Phase 1300 — Neural Cortex Synchronization Layer ===
     console.log("🧠 Neural Cortex Synchronization Layer Activated.");
@@ -228,7 +150,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await initializeNeuralCortexSynchronization();
 
-    const sovereignModules = [
+
+    // === Phase 1906 — Sovereign Load Realignment Sequence ===
+
+    const sovereignPreModules = [
       './scripts/operator/roles/roleAssignment.js',
       './scripts/operator/profiles/profileFabrication.js',
       './scripts/operator/wiring/subsystemBindings.js',
@@ -247,17 +172,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       './scripts/operator/progressDashboard.js',
       './scripts/operator/exceptionManager.js',
       './scripts/operator/mappings.js',
-      './scripts/operator/tools.js',
       './scripts/operator/NeuralBus.js',
+      './scripts/operator/sovereign/sovereignToolbarRenderer.js',
+      './scripts/operator/sovereign/sovereignControlToolbar.js'
     ];
 
-    for (const modulePath of sovereignModules) {
+    for (const modulePath of sovereignPreModules) {
       try {
-        await import(modulePath);
+        const mod = await import(modulePath);
+        if (modulePath.includes('sovereignToolbarRenderer.js')) {
+          window.SovereignToolbarRenderer = mod.default;
+        }
         console.log(`✅ Sovereign Module Loaded: ${modulePath}`);
       } catch (err) {
         console.error(`❌ Failed to load Sovereign Module: ${modulePath}`, err);
       }
+    }
+
+    // === Phase 1908 — Sovereign Runtime Import Injector ===
+    try {
+      console.log("🚀 Phase 1908 — Sovereign Runtime Import Injector Activated");
+
+      const sovereignToolbarModule = await import('./scripts/operator/sovereign/sovereignToolbarRenderer.js');
+      
+      if (!window.SovereignSubsystems) {
+        window.SovereignSubsystems = {};
+      }
+
+      window.SovereignSubsystems.toolbarRenderer = sovereignToolbarModule.default;
+      window.SovereignToolbarRenderer = sovereignToolbarModule.default;
+      console.log("✅ SovereignToolbarRenderer dynamically imported and registered into SovereignSubsystems");
+    } catch (err) {
+      console.error("❌ Failed Phase 1908 Sovereign Import Injector:", err);
+    }
+    // === Phase 1907 — Sovereign Toolbar Render Invocation ===
+    try {
+      console.log("🔧 Phase 1907 — Sovereign Toolbar Render Invocation Activated.");
+      if (typeof SovereignToolbarRenderer !== 'undefined' && typeof SovereignToolbarRenderer.renderToolbar === 'function') {
+        SovereignToolbarRenderer.renderToolbar();
+        console.log("✅ Sovereign Toolbar successfully rendered.");
+      } else {
+        console.warn("⚠ SovereignToolbarRenderer not available — toolbar render skipped.");
+      }
+    } catch (err) {
+      console.error("❌ Exception during Sovereign Toolbar Render Invocation:", err);
+    }
+
+    // Load operatorDockWiring.js last
+    try {
+      await import('./scripts/operator/operatorDockWiring.js');
+      console.log("✅ Sovereign Final Dock Wiring Loaded Successfully");
+    } catch (err) {
+      console.error("❌ Failed to load Sovereign Dock Wiring Module:", err);
     }
 
     // === Phase 37.0 — Visual Restoration Layer Bootstrap ===

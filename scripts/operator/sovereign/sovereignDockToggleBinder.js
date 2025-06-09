@@ -1,5 +1,3 @@
-
-
 // sovereignDockToggleBinder.js — Phase 1500-A Injection
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,7 +21,14 @@ document.addEventListener("DOMContentLoaded", () => {
     { buttonId: "toggleProgressDashboardBtn", panelId: "progressDashboard" },
     { buttonId: "toggleExceptionManagerBtn", panelId: "exceptionManager" },
     { buttonId: "toggleMappingsBtn", panelId: "mappings" },
-    { buttonId: "toggleToolsBtn", panelId: "tools" }
+    { buttonId: "toggleToolsBtn", panelId: "tools" },
+    { buttonId: "toggleCountBtn", panelId: "count" },
+    { buttonId: "toggleDeltaAnalyzerBtn", panelId: "deltaAnalyzer" },
+    { buttonId: "toggleMasterExportHubBtn", panelId: "masterExportHub" },
+    { buttonId: "toggleUtilityHubBtn", panelId: "utilityHub" },
+    { buttonId: "toggleSessionManagerBtn", panelId: "sessionManager" },
+    { buttonId: "toggleAuditBtn", panelId: "audit" },
+    { buttonId: "toggleConfigPanelBtn", panelId: "configPanel" }
   ];
 
   dockToggles.forEach(({ buttonId, panelId }) => {
