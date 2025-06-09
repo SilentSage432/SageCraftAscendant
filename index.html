@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inventory Auditor</title>
-  <link rel="stylesheet" href="style.css?v=2.0.1" />
-  <link rel="stylesheet" href="styles/sagecraftascendant.css?v=1.0.0" />
+  <title>SageCraft Ascendant — Sovereign Codex</title>
+  <link rel="stylesheet" href="scripts/styles/sagecraftascendant.css?v=1.0.0">
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon/icon-192.png" type="image/png" />
   <!-- <meta name="theme-color" content="#1e1e2f" /> -->
@@ -37,9 +36,9 @@
 
 
   <header class="topbar mystic-header" role="banner">
-    <div class="logo-banner">
-      <img src="icon/icon-1280.png" alt="Inventory Auditor Logo" class="logo-icon" />
-      <h1 class="logo-title">Inventory Auditor</h1>
+    <div class="logo-banner-flex">
+      <img src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" class="logo-icon" />
+      <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
     </div>
   </header>
 
@@ -52,473 +51,23 @@
   </style>
 
   <main class="container neon-container" role="main">
+    <!-- Phase 300.12 — Orbital Dock Visibility Mesh -->
+    <div id="dockToggleBar" class="dock-toggle-bar" style="text-align: center; margin: 20px 0;">
+      <button class="dock-toggle" data-panel="count">Live Counts</button>
+      <button class="dock-toggle" data-panel="deltaAnalyzer">Delta Analyzer</button>
+      <button class="dock-toggle" data-panel="exceptionManager">Exception Manager</button>
+      <button class="dock-toggle" data-panel="progressDashboard">Progress Dashboard</button>
+      <button class="dock-toggle" data-panel="reportingHub">Reporting Hub</button>
+      <button class="dock-toggle" data-panel="masterExportHub">Master Export</button>
+      <button class="dock-toggle" data-panel="utilityHub">Utility Hub</button>
+      <button class="dock-toggle" data-panel="sessionManager">Session Manager</button>
+      <button class="dock-toggle" data-panel="mappings">Mappings</button>
+      <button class="dock-toggle" data-panel="tools">Tools</button>
+      <button class="dock-toggle" data-panel="audit">Audit</button>
+      <button class="dock-toggle" data-panel="configPanel">Config Panel</button>
+    </div>
     <div class="mobile-wrapper">
       <div class="fantasy-wrapper electric-vibe">
-      <section id="count" class="tab-section active panel-glow" role="tabpanel" aria-label="Live Counts">
-        <h2>Live Counts</h2>
-        <div class="active-status-bar">
-          <span id="currentBayStatus">🗂 Bay: None</span>
-          <span id="currentCategoryStatus">🧭 Category: None</span>
-        </div>
-        <!-- Session Stats Panel -->
-        <div class="session-stats" style="display: flex; gap: 10px; justify-content: center; margin: 10px 0; font-size: 0.9em; color: #ccc;">
-          <div><strong>📦 Items Counted:</strong> <span id="sessionItemCount">0</span></div>
-          <div><strong>📁 Bay:</strong> <span id="sessionBay">None</span></div>
-          <div><strong>🧭 Category:</strong> <span id="sessionCategory">None</span></div>
-        </div>
-        <div id="bayStatusDisplay" style="margin-bottom: 8px; font-weight: bold; color: red;">
-          🚫 No Active Bay
-        </div>
-        <div id="activeCategoryDisplay" style="margin-bottom: 8px; font-weight: bold; color: cyan;">
-          🧭 Active Category: None Selected
-        </div>
-        <div id="closeBayWrapper" style="margin-bottom: 12px;">
-          <button id="closeBayBtn" style="background-color: crimson; color: white;">❌ Close Bay</button>
-          <span id="bayClosedNotice" style="color: limegreen; font-weight: bold; margin-left: 10px; display: none;">Bay closed</span>
-        </div>
-        <!-- Live map tracking status -->
-        <div id="mapStatusDisplay" style="margin-bottom: 12px; font-size: 0.9em; color: #aaf;">
-          🧠 Map Status: UPC → 0 | ESL → 0 | Bay Codes → 0
-        </div>
-
-        <!-- Live count table -->
-        <div class="table-wrapper" style="max-height: 250px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
-          <table id="liveCountTable" aria-describedby="liveCountsDesc">
-            <caption id="liveCountsDesc" class="sr-only">Table showing live counts of scanned items</caption>
-            <thead>
-              <tr>
-                <th scope="col">Item #</th>
-                <th scope="col">Count</th>
-                <th scope="col">Category</th>
-                <th scope="col">Location</th>
-                <th scope="col">Previous</th>
-                <th scope="col">Δ from Last Week</th>
-                <th scope="col">Edit</th>
-              </tr>
-            </thead>
-            <tbody id="liveScanTableBody">
-              <tr id="placeholderRow">
-                <td colspan="7" style="text-align: center; color: #888;">No items scanned yet</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Scan entry capsule -->
-        <div id="entryControls" class="scan-capsule" role="region" aria-label="Scan Entry Controls">
-          <h3>📲 Scan Entry</h3>
-          <div class="scan-fields">
-            <input id="scanInput" data-id="scanInput" type="tel" class="live-input" placeholder="Scan or type item number..." autocomplete="off" aria-label="Scan or type item number" />
-            <input type="number" id="liveQty" value="1" min="1" inputmode="numeric" class="qty-input" aria-label="Quantity to add" tabindex="-1" />
-            <select id="categorySelect" data-id="categorySelect" class="category-select" aria-label="Select item category">
-              <option value="Laundry" data-category="Laundry">Laundry</option>
-              <option value="Fridges & Freezers" data-category="Fridges $ Freezers">Fridges & Freezers</option>
-              <option value="Ranges" dats-category="Ranges">Ranges</option>
-              <option value="Dishwashers" data-category="Dishwashers">Dishwashers</option>
-              <option value="Wall Ovens" data-category="Wall Ovens">Wall Ovens</option>
-              <option value="Cooktops" data-category="Cooktops">Cooktops</option>
-              <option value="OTR Microwaves" data-category="OTR Microwaves">OTR Microwaves</option>
-              <option value="Microwaves (Countertop)" data-category="Microwaves (Countertop)">Microwaves (Countertop)</option>
-              <option value="Vent Hoods" data-category="Vent Hoods">Vent Hoods</option>
-              <option value="Beverage & Wine Coolers" data-category="Beverage & Wine Coolers">Beverage & Wine Coolers</option>
-              <option value="Cabinets" data-category="Cabinets">Cabinets</option>
-              <option value="Countertops" data-category="Countertops">Countertops</option>
-              <option value="Interior Doors" data-category="Interior Doors">Interior Doors</option>
-              <option value="Exterior Doors" data-category="Exterior Doors">Exterior Doors</option>
-              <option value="Storm Doors" data-category="Storm Doors">Storm Doors</option>
-              <option value="Windows" data-category="Windows">Windows</option>
-              <option value="Commodity Moulding" data-category="Commodity Moulding">Commodity Moulding</option>
-              <option value="Other / Misc" data-category="Other / Misc">Other / Misc</option>
-            </select>
-          </div>
-
-          <div class="scan-buttons">
-            <button id="addLiveItem" aria-label="Add scanned item to count">Add Item</button>
-          </div>
-
-        <h3>🧬 Merge Session Archives</h3>
-        <div id="mergeSessionPanel" style="margin-top: 10px; padding: 10px; background: #222; border: 1px solid #555; border-radius: 5px;">
-          <label for="mergeSessionSelect" style="color: #ccc;">Select Sessions to Merge:</label>
-          <select id="mergeSessionSelect" multiple size="5" style="width: 100%; margin-bottom: 10px;"></select>
-          <button id="performMergeBtn" style="margin-top: 10px;">🧪 Execute Merge</button>
-          <button id="exportMergedAuditBtn" style="margin-top: 10px;">📤 Export Merged Audit</button>
-        </div>
-      </section>
-
-      <section id="deltaAnalyzer" class="tab-section panel-glow" role="tabpanel" aria-label="Delta Analyzer">
-        <h2>📊 Delta Anomaly Analyzer</h2>
-
-        <div class="delta-control-group" style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; align-items: center;">
-          <div style="flex-grow: 1;">
-            <label for="baseAuditSelect">Base Audit:</label><br/>
-            <select id="baseAuditSelect" style="width: 100%;"></select>
-          </div>
-
-          <div style="flex-grow: 1;">
-            <label for="compareAuditSelect">Compare Audit:</label><br/>
-            <select id="compareAuditSelect" style="width: 100%;"></select>
-          </div>
-
-          <div style="min-width: 200px; display: flex; flex-direction: column; gap: 10px;">
-            <button id="runDeltaAnalysis">🧮 Analyze Delta</button>
-            <button id="exportDeltaCSV">📤 Export Delta CSV</button>
-          </div>
-        </div>
-
-        <div id="deltaTableWrapper" style="max-height: 300px; overflow-y: auto; border: 1px solid #444; border-radius: 5px; margin-bottom: 30px;">
-          <table id="deltaTable" style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th>Item #</th>
-                <th>Base Count</th>
-                <th>Compare Count</th>
-                <th>Delta</th>
-                <th>Category</th>
-                <th>Location</th>
-              </tr>
-            </thead>
-            <tbody id="deltaTableBody">
-              <tr>
-                <td colspan="6" style="text-align:center; color:#888;">No comparison run</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Phase 73.5 Delta Review Interface -->
-        <h3>🔍 Delta Review Interface</h3>
-        <div class="delta-review-controls" style="display: flex; gap: 15px; margin-bottom: 15px;">
-          <button id="refreshDeltaView">🔄 Refresh View</button>
-          <button id="exportDeltaView">📥 Export View to CSV</button>
-        </div>
-
-        <div id="deltaReviewTableWrapper" style="max-height: 400px; overflow-y: auto; border: 1px solid #555; border-radius: 5px;">
-          <table id="deltaReviewTable" style="width:100%; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th>Item #</th>
-                <th>Base</th>
-                <th>Compare</th>
-                <th>Delta</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td colspan="7" style="text-align:center; color:#888;">No delta loaded</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Phase 74 — Audit Exception Manager -->
-      <section id="exceptionManager" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Exception Manager">
-        <h2>🚩 Audit Exception Manager</h2>
-
-        <div class="exception-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
-          <button id="refreshExceptionsBtn">🔄 Refresh Exceptions</button>
-          <button id="exportExceptionsBtn">📥 Export Exceptions to CSV</button>
-        </div>
-
-        <div id="exceptionTableWrapper" style="max-height: 400px; overflow-y: auto; border: 1px solid #555; border-radius: 5px;">
-          <table id="exceptionTable" style="width:100%; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th>Item #</th>
-                <th>Delta</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Action Tag</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td colspan="6" style="text-align:center; color:#888;">No exceptions loaded</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Phase 75 — Audit Progress Dashboard -->
-      <section id="progressDashboard" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Progress Dashboard">
-        <h2>📅 Audit Progress Dashboard</h2>
-
-        <div class="progress-controls" style="display: flex; gap: 15px; margin-bottom: 20px;">
-          <button id="refreshProgressBtn">🔄 Refresh Progress</button>
-          <button id="exportProgressBtn">📥 Export Progress to CSV</button>
-        </div>
-
-        <div id="progressTableWrapper" style="max-height: 400px; overflow-y: auto; border: 1px solid #555; border-radius: 5px;">
-          <table id="progressTable" style="width:100%; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Last Audited</th>
-                <th>Next Due</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td colspan="4" style="text-align:center; color:#888;">No progress data loaded</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="reportingHub" class="tab-section panel-glow" role="tabpanel" aria-label="Reporting Hub">
-        <h2>🖨️ Reporting Hub</h2>
-
-        <div class="reporting-controls" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; padding: 10px;">
-          <button id="exportDeltaReportBtn" style="width: 100%;">📊 Export Delta Report</button>
-          <button id="exportExceptionsReportBtn" style="width: 100%;">🚩 Export Exceptions Report</button>
-          <button id="exportProgressReportBtn" style="width: 100%;">📅 Export Progress Report</button>
-          <button id="exportAllReportsBtn" style="width: 100%;">📦 Export All Reports</button>
-          <button id="generateForecastBtn" style="width: 100%;">🔮 Generate Forecast Summary</button>
-          <button id="generateHeuristicBtn" style="width: 100%;">🔬 Generate Heuristic Summary</button>
-          <button id="generateRiskBtn" style="width: 100%;">🚩 Generate Risk Factor Table</button>
-          <button id="generatePatternSignalsBtn" style="width: 100%;">🧬 Generate Pattern Signals</button>
-          <button id="generatePatternSignalsBtn">🧬 Generate Pattern Signals</button>
-          <button id="generateMasterAuditReportBtn" style="width: 100%;">📋 Generate Master Audit Report</button>
-          <button id="renderControlRoomDashboardBtn" style="width: 100%;">🧭 Open AI Control Room</button>
-          <button id="runAISelfOptimizerBtn" style="width: 100%;">⚙️ Run AI Optimizer</button>
-          <!-- Phase 103.2 Admin Console Buttons -->
-          <button id="purgeLongTermMemoryBtn" style="width: 100%;">🧹 Purge Long-Term Memory</button>
-          <button id="purgeMappingsBtn" style="width: 100%;">🧹 Purge Mappings</button>
-          <button id="purgeSessionsBtn" style="width: 100%;">🧹 Purge Sessions</button>
-          <hr style="border: 1px solid #555;">
-          <button id="runRotationEngineAuditBtn" style="width: 100%;">🧮 Run Rotation Engine Audit</button>
-        </div>
-        <div id="forecastSummaryContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="heuristicSummaryContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="riskFactorContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="auditRecommendationsContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="historicalTrendContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="forecastCurveContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="patternSignalsContainer" style="margin-top: 20px; color: #fff;"></div>
-        <div id="controlRoomContainer" style="margin-top: 20px; color: #fff;"></div>
-
-        <div style="color:#aaa; font-size:0.9em;">
-          Use this centralized hub to export full reports for audits, exceptions, and audit progress. All reports are formatted for print, email, or management review handoff.
-        </div>
-      </section>
-
-      <section id="masterExportHub" class="tab-section panel-glow" role="tabpanel" aria-label="Master Export Hub">
-        <h2>📦 Master Export Hub</h2>
-
-        <div class="master-export-controls" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
-          <button id="exportAllSessionsBtn">📂 Export All Sessions</button>
-          <button id="exportAllMappingsBtn">🧭 Export All Mappings</button>
-          <button id="exportFullDeltaBtn">📊 Export Full Delta History</button>
-          <button id="exportFullExceptionsBtn">🚩 Export Full Exceptions Log</button>
-          <button id="exportFullProgressBtn">📅 Export Full Progress Logs</button>
-          <button id="exportMemorySnapshotBtn">🧠 Export Memory Snapshot</button>
-          <button id="uploadMemorySnapshotBtn">☁️ Upload Memory Snapshot</button>
-          <!-- Phase 98.3 Reporting Export Engine Buttons -->
-          <button id="exportAuditSummaryBtn">📋 Export Audit Summary</button>
-          <button id="exportForecastModelBtn">📊 Export Forecast Model</button>
-          <button id="exportAnomalyProfilesBtn">🧬 Export Anomaly Profiles</button>
-          <button id="exportHeuristicScoresBtn">🎯 Export Heuristic Scores</button>
-          <button id="exportRiskMatrixBtn">🚩 Export Risk Matrix</button>
-          <button id="exportRecommendationPlanBtn">📝 Export Recommendations Plan</button>
-          <button id="exportFullSystemSnapshotBtn">📦 Export Full System Snapshot</button>
-        </div>
-
-        <div style="color:#aaa; font-size:0.9em;">
-          This Master Export System consolidates all available datasets for complete audit archiving, external backups, or migration pipelines.
-        </div>
-      </section>
-
-      <section id="utilityHub" class="tab-section panel-glow" role="tabpanel" aria-label="Utility Hub">
-        <h2>🛠️ Utility Hub</h2>
-        <div class="utility-controls" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-          <button id="exportBayMappings">📤 Export Bay Mappings</button>
-          <button id="importBayMappings">📥 Import Bay Mappings</button>
-          <button id="exportUPCBtn">📤 Export UPC Map</button>
-          <button id="importUPCBtn">📥 Import UPC Map</button>
-          <button id="clearHistoryBtn">🧹 Clear History</button>
-          <button id="clearSnapshotsBtn">🧹 Clear Snapshots</button>
-          <button id="viewTrendsBtn">📈 View Trends</button>
-          <button id="exportFieldLog">📥 Export Field Logs</button>
-          <button id="syncDropboxMapsBtn">🔄 Sync Dropbox Maps</button>
-          <button id="restoreDropboxMapsBtn">📂 Restore Dropbox Maps</button>
-        </div>
-      </section>
-
-
-      <section id="vault" class="tab-section panel-glow" role="tabpanel" aria-label="Session Controls">
-        <h2>Session Controls</h2>
-        <div class="grouped-buttons">
-          <button id="clearLiveTableBtn">🗑️ Clear Live Table</button>
-          <button id="saveSessionBtn">💾 Save Session</button>
-          <button id="loadSessionBtn">📥 Load Session</button>
-          <button id="triggerImportExcelSession">📂 Import Excel Session</button>
-        </div>
-        <input type="file" id="importExcelSession" accept=".xlsx,.xls" style="display:none;" />
-        <div style="margin-top: 15px;">
-          <button id="browseDropboxSessions">📂 Browse Dropbox Sessions</button>
-          <select id="dropboxSessionSelect" style="display:none; margin-top: 8px;"></select>
-        </div>
-        <div style="margin-top: 20px;">
-          <h3>🗃️ Versioned Session Manager</h3>
-          <input id="versionSessionName" type="text" placeholder="Enter session name..." />
-          <button id="saveNamedSession">💾 Save Named Session</button>
-          <br /><br />
-          <select id="namedSessionSelect" style="margin-right: 10px;">
-            <option value="">Select a saved session</option>
-          </select>
-          <button id="loadNamedSession">📥 Load</button>
-          <button id="deleteNamedSession">❌ Delete</button>
-        </div>
-        <div style="margin-top: 20px;">
-          <h3>📊 Merge Excel Sessions</h3>
-          <button id="mergeMasterReport">📑 Merge Master Report</button>
-        </div>
-      </section>
-
-      <!-- Session Manager Engine (Full Control Room) -->
-      <section id="sessionManager" class="tab-section panel-glow" role="tabpanel" aria-label="Session Manager">
-        <h2>📂 Full Session Manager</h2>
-        <div style="margin-bottom: 15px;">
-          <button id="refreshSessionList">🔄 Refresh Session List</button>
-        </div>
-        <div id="sessionManagerTableWrapper" style="max-height: 300px; overflow-y: auto; border: 1px solid #444; border-radius: 5px;">
-          <table id="sessionManagerTable" style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th>Session Name</th>
-                <th>Saved</th>
-                <th>Size</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="sessionManagerTableBody">
-              <tr>
-                <td colspan="4" style="text-align:center; color:#888;">No sessions loaded</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="mappings" class="tab-section panel-glow" role="tabpanel" aria-label="Mapping Manager">
-        <h2>🧠 Mapping Manager</h2>
-        <div style="margin-bottom: 10px;">
-          <button id="exportMappings">📤 Export Mappings</button>
-          <button id="importMappings">📥 Import Mappings</button>
-        </div>
-        <table id="mappingsTable" style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr><th>Scanned Code</th><th>Mapped Item #</th><th>Type</th><th>Actions</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-
-      <section id="tools" class="tab-section panel-glow" role="tabpanel" aria-label="Settings">
-      <!-- Advanced Tools Panel -->
-      <section id="advancedTools" class="tab-section panel-glow" role="tabpanel" aria-label="Advanced Tools">
-        <h2>🧰 Advanced Tools</h2>
-        <div style="color:#aaa; font-size:0.9em;">
-          Full access to system tools, maintenance utilities, mapping controls, and internal log managers.
-        </div>
-      </section>
-        <h2>Settings</h2>
-        <div class="settings-group">
-          <h3>🖼 Appearance</h3>
-          <label><input type="checkbox" id="darkModeToggle" /> Enable Dark Mode</label>
-          <label>Font Size:
-            <select id="fontSizeSelect">
-              <option value="small">Small</option>
-              <option value="medium" selected>Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="settings-group">
-          <h3>📦 Scan Behavior</h3>
-          <label><input type="checkbox" id="batchScanToggle" /> Enable Batch Scan Mode</label>
-          <label><input type="checkbox" id="numericKeypadToggle" /> Use Numeric Keypad for Manual Entry</label>
-        </div>
-
-
-        <h3>☁️ Dropbox Cloud Sync</h3>
-        <div id="dropboxControls" class="button-grid">
-          <button id="connectDropbox">🔐 Connect to Dropbox</button>
-          <button id="syncDropboxMaps">🔄 Sync All Maps</button>
-          <button id="restoreDropboxMaps">📂 Restore All Maps</button>
-          <button id="disconnectDropbox">❌ Disconnect</button>
-        </div>
-        <h3>📁 Local Session Tools</h3>
-        <div class="button-grid">
-          <button id="saveSessionLocal">💾 Save Session Locally</button>
-          <button id="loadSessionLocal">📂 Load Session Locally</button>
-          <button id="clearSessionHistory">🧹 Clear Session History</button>
-        </div>
-
-        <h3>📤 Mapping Management</h3>
-        <div id="mapStatusDisplay" style="margin-bottom: 12px; font-size: 0.9em; color: #aaf;">
-          🧠 Map Status: Checking...
-        </div>
-        <div class="button-grid" style="margin-top: 12px;">
-          <button id="masterBackupBtn">💾 Master Cloud Backup</button>
-          <button id="masterRestoreBtn">📥 Master Cloud Restore</button>
-        </div>
-
-        <h3>🧬 Advanced Tools</h3>
-        <div class="button-grid">
-          <button id="downloadBackupBtn">📥 Download Backup</button>
-          <button id="clearAllSessions">🧹 Clear All Sessions</button>
-          <button id="cleanStaleSessions">🧹 Clean Empty Sessions</button>
-        </div>
-
-        <h3>📄 Field Log Viewer</h3>
-        <div id="logFilterButtons" style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
-          <button class="log-filter-btn" data-filter="all">Show All</button>
-          <button class="log-filter-btn" data-filter="ScanInput">Scans</button>
-          <button class="log-filter-btn" data-filter="AutoSave">Auto-Saves</button>
-          <button class="log-filter-btn" data-filter="LearnMapping">Learned</button>
-          <button class="log-filter-btn" data-filter="GhostModalDetected">Ghost Incidents</button>
-          <button class="log-filter-btn" data-filter="DropboxSyncMaps">Dropbox Sync</button>
-        </div>
-        <div id="fieldLogContainer" style="max-height: 300px; overflow-y: auto; background: #111; border: 1px solid #555; border-radius: 5px; padding: 10px; color: #ccc; font-family: monospace; font-size: 0.75em;">
-          <div id="fieldLogContent">Loading field log...</div>
-        </div>
-        <button id="refreshFieldLog" style="margin-top: 10px;">🔄 Refresh Log</button>
-        <button id="exportFieldLog" style="margin-top: 10px;">📥 Export Field Log</button>
-      </section>
-
-      <section id="audit" class="tab-section panel-glow" role="tabpanel" aria-label="Audit Rotation Schedule">
-        <h2>🕒 Audit Rotation Schedule</h2>
-        <p>This tool helps you track which categories need to be audited based on their rotation schedule.</p>
-        <button id="refreshAuditLog" class="settings-button" style="margin-top: 10px; margin-bottom: 10px;">🔄 Refresh Log</button>
-        <table id="rotationTable" style="width:100%; border-collapse:collapse; margin-top: 15px;">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Last Audited</th>
-              <th>Next Due</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </section>
-
-      <section id="configPanel" class="tab-section panel-glow" role="region" aria-label="User Config Panel" style="margin-top: 20px;">
-        <h2>⚙️ User Config Panel</h2>
-        <div class="settings-group">
-          <label>
-            <input type="checkbox" id="toggleAutoRestore" checked />
-            Enable Auto-Restore on Startup
-          </label>
-          <label>
-            <input type="checkbox" id="toggleToasts" checked />
-            Show Toast Notifications
-          </label>
-        </div>
-      </section>
       </div>
     </div>
 
@@ -541,146 +90,6 @@
 
   </main>
 
-  <!-- Phase 134.1 — Operator Console Panel Injection -->
-  <div id="operatorConsolePanel" style="
-    background: #1b1b2f;
-    border: 2px solid #553399;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 40px auto;
-    width: 90%;
-    max-width: 900px;
-    font-family: monospace;
-    color: #fff;
-    box-shadow: 0 0 20px rgba(85, 51, 153, 0.8);
-  ">
-    <h2 style="margin-bottom: 20px; color: #cc99ff;">🛠 Operator Console</h2>
-    <div id="operatorTools" style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <!-- Buttons will be dynamically injected here -->
-    </div>
-    <!-- Mutation Scenario Visualizer Panel -->
-    <div style="margin-top:50px;">
-      <h3 style="color:#66ccff;">📊 Mutation Scenario Visualizer</h3>
-      <canvas id="mutationChart" width="900" height="400"></canvas>
-      <button onclick="SageCraftAscendant.MutationScenarioVisualizer.renderMutationVisualizer()" style="margin-top:10px;">
-        🔄 Render Visualizer
-      </button>
-    </div>
-    <!-- Static Drift Visualizer Button -->
-    <button id="launchDriftVisualizerBtn" style="
-      padding: 12px 18px;
-      font-size: 1em;
-      font-family: monospace;
-      background: #2a003f;
-      color: #fff;
-      border: 2px solid #9933ff;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    ">
-      📈 Forecast Drift Visualizer
-    </button>
-    <!-- Phase 201.2 — Neural Intake Uploader -->
-    <input type="file" id="neuralIntakeFile" accept=".xlsx,.xls" style="display:none;" />
-    <button id="launchNeuralIntakeBtn" style="
-      padding: 12px 18px;
-      font-size: 1em;
-      font-family: monospace;
-      background: #003366;
-      color: #fff;
-      border: 2px solid #00ccff;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    ">
-      🧠 Upload Intake Report
-    </button>
-    <div class="console-section">
-      <h3>🧪 Orbital Dock Integrity</h3>
-      <button onclick="NeuralOrbitalDockValidator.runDockValidationBurnIn()">Run Dock Validation Burn-In</button>
-    </div>
-    <div class="console-section">
-      <h3>🗄 Neural Registry Editor</h3>
-      <button onclick="SageCraftAscendant.OrbitRegistryEditor.listOrbits()">📋 List Registered Orbits</button>
-      <button onclick="SageCraftAscendant.OrbitRegistryEditor.clearRegistry()">🧹 Clear Full Registry</button>
-      <button onclick="SageCraftAscendant.OrbitRegistryEditor.rebuildDock()">🔄 Rebuild Dock From Registry</button>
-    </div>
-    <div class="console-section">
-      <h3>🪐 Orbit Manager</h3>
-      <label>Orbit Key: <input type="text" id="orbitKeyInput"></label><br>
-      <label>Orbit Label: <input type="text" id="orbitLabelInput"></label><br>
-      <label>Orbit Icon: <input type="text" id="orbitIconInput" placeholder="icon-default.png"></label><br>
-      <button onclick="addOrbitFromUI()">➕ Add Orbit</button>
-      <button onclick="removeOrbitFromUI()">🗑 Remove Orbit</button>
-    </div>
-    <div class="console-section">
-      <h3>🗑 Orbit Removal Panel</h3>
-      <div id="orbitRemovalList">
-        <button onclick="refreshOrbitRemovalList()">🔄 Refresh Orbits</button>
-      </div>
-    </div>
-    <div class="console-section">
-      <h3>📊 Archive Compliance Monitor</h3>
-      <button onclick="SageCraftAscendant.ForecastArchiveCompliance.runComplianceAudit()">🔎 Run Compliance Audit</button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Neural Stability Analytics</h3>
-      <button onclick="SageCraftAscendant.ForecastStabilityAnalytics.computeStabilityIndex()">🔎 Compute Stability Index</button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Adaptation Analyzer</h3>
-      <button onclick="SageCraftAscendant.ForecastAdaptationAnalyzer.analyzeAdaptationResults()">
-        Analyze Adaptation Results
-      </button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Forecast Stability Clusters</h3>
-      <button onclick="SageCraftAscendant.ForecastStabilityCluster.computeStabilityClusters()">
-        Analyze Stability Clusters
-      </button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Anomaly Density Visualizer</h3>
-      <canvas id="anomalyDensityChart" width="600" height="300"></canvas>
-      <button onclick="SageCraftAscendant.AnomalyDensityMapper.renderAnomalyDensityChart()">
-        📊 Render Anomaly Density
-      </button>
-    </div>
-    <div class="console-section">
-      <h3>📈 Anomaly Drift Sentinel</h3>
-      <button onclick="AnomalyDriftSentinel.renderAnomalyDriftChart()">
-        Render Anomaly Drift Chart
-      </button>
-    </div>
-    <div class="console-section">
-      <h3>💬 Codex Whisper Console</h3>
-      <div id="codexConsoleOutput" style="height: 300px; overflow-y: auto; background: #111; color: #0f0; padding: 10px; border: 1px solid #444;"></div>
-      <input type="text" id="codexUserInput" placeholder="Type command..." style="width: 80%; padding: 5px;">
-      <button onclick="SageCraftAscendant.CodexWhisper.userMessage(document.getElementById('codexUserInput').value)">Send</button>
-    </div>
-    <div class="console-section">
-      <h3>🧮 Codex Whisper Audit</h3>
-      <button onclick="SageCraftAscendant.CodexWhisper.auditMemoryChain()">Run Memory Audit</button>
-    </div>
-    <div class="console-section">
-      <h3>🧹 Memory Purge Controls</h3>
-      <button onclick="SageCraftAscendant.CodexWhisper.purgeAllMemory()">Full Memory Purge</button>
-      <button onclick="SageCraftAscendant.CodexWhisper.purgeSystemOnly()">Purge System Only</button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Knowledge Chain Analyzer</h3>
-      <button onclick="SageCraftAscendant.CodexWhisper.analyzeKnowledgeChain()">Run Knowledge Audit</button>
-    </div>
-    <div class="console-section">
-      <h3>📊 Codex Chain Visualizer</h3>
-      <canvas id="knowledgeChainCanvas" width="800" height="500" style="border:1px solid #444; background:#000;"></canvas>
-      <button onclick="SageCraftAscendant.CodexWhisperChainVisualizer.visualizeKnowledgeChain()">🔎 Render Knowledge Chain</button>
-    </div>
-    <div class="console-section">
-      <h3>🩺 Chain Integrity Validator</h3>
-      <button onclick="SageCraftAscendant.CodexWhisperChainIntegrity.validateKnowledgeChain()">Run Integrity Scan</button>
-    </div>
-  </div>
 <!-- Bind Drift Visualizer Button -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1217,7 +626,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <footer style="text-align:center; margin-top:30px; font-size:12px; color:#a366ff; font-family:'Share Tech Mono', monospace;">
-    Inventory Auditor — <span id="versionInfo">Loading...</span> ⚡
+    SageCraft Ascendant — Sovereign Codex </span> ⚡
   </footer>
 
   <script>
@@ -1429,114 +838,11 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- === External Libraries (unchanged) === -->
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <!-- SheetJS (xlsx parser) -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
-<!-- SageCraft Neural Codex Proper Load Order -->
-
-<!-- SageCraft Neural Codex Proper Load Order (Realigned Paths) -->
-
-<script src="scripts/sagecraftascendant/core.namespace.js"></script>
-<script src="scripts/sagecraftascendant/registry.orbits.js"></script>
-<script src="scripts/sagecraftascendant/mesh.dock.js"></script>
-<script src="scripts/sagecraftascendant/mesh.integrity.js"></script>
-<script src="scripts/sagecraftascendant/recovery.autonomous.js"></script>
-<script src="scripts/sagecraftascendant/policy.governance.js"></script>
-<script src="scripts/sagecraftascendant/forecast.cortex.js"></script>
-<script src="scripts/sagecraftascendant/forecast.intake.js"></script>
-<script src="scripts/sagecraftascendant/forecast.visualizer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.analyzer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.ai.scaffold.js"></script>
-<script src="scripts/sagecraftascendant/forecast.drift.sentinel.js"></script>
-<script src="scripts/sagecraftascendant/forecast.recovery.supervisor.js"></script>
-<script src="scripts/sagecraftascendant/forecast.purification.engine.js"></script>
-<script src="scripts/sagecraftascendant/forecast.threat.monitor.js"></script>
-<script src="scripts/sagecraftascendant/forecast.anomaly.profiler.js"></script>
-<script src="scripts/sagecraftascendant/core.drift.balancer.js"></script>
-<script src="scripts/sagecraftascendant/core.drift.compensator.js"></script>
-<script src="scripts/sagecraftascendant/core.autocorrect.shell.js"></script>
-<script src="scripts/sagecraftascendant/core.stabilization.feedback.js"></script>
-<script src="scripts/sagecraftascendant/core.resilience.sentinel.js"></script>
-<script src="scripts/sagecraftascendant/core.hazard.deflection.js"></script>
-<script src="scripts/sagecraftascendant/core.repair.optimizer.js"></script>
-<script src="scripts/sagecraftascendant/core.threat.deflection.nexus.js"></script>
-<script src="scripts/sagecraftascendant/core.anomaly.fusion.matrix.js"></script>
-<script src="scripts/sagecraftascendant/core.pattern.resolution.js"></script>
-<script src="scripts/sagecraftascendant/forecast.predictive.cortex.js"></script>
-<script src="scripts/sagecraftascendant/forecast.recursive.memory.js"></script>
-<script src="scripts/sagecraftascendant/forecast.weight.adaptation.js"></script>
-<script src="scripts/sagecraftascendant/forecast.confidence.engine.js"></script>
-<script src="scripts/sagecraftascendant/forecast.correction.injector.js"></script>
-<script src="scripts/sagecraftascendant/forecast.threat.overseer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.stabilizer.core.js"></script>
-<script src="scripts/sagecraftascendant/forecast.anomaly.resolver.js"></script>
-<script src="scripts/sagecraftascendant/forecast.signal.reinforcement.js"></script>
-<script src="scripts/sagecraftascendant/forecast.synthesis.core.js"></script>
-<script src="scripts/sagecraftascendant/forecast.mutation.layer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.adaptation.engine.js"></script>
-<script src="scripts/sagecraftascendant/forecast.adaptation.analyzer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.visualizer.mutation.js"></script>
-<script src="scripts/sagecraftascendant/forecast.stability.cluster.js"></script>
-<script src="scripts/sagecraftascendant/forecast.snapshot.archiver.js"></script>
-<script src="scripts/sagecraftascendant/forecast.snapshot.loader.js"></script>
-<script src="scripts/sagecraftascendant/forecast.snapshot.validator.js"></script>
-<script src="scripts/sagecraftascendant/forecast.snapshot.repair.js"></script>
-<script src="scripts/sagecraftascendant/forecast.archive.compliance.js"></script>
-<script src="scripts/sagecraftascendant/forecast.archive.autoscan.js"></script>
-<script src="scripts/sagecraftascendant/forecast.memory.healer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.validation.sentinel.js"></script>
-<script src="scripts/sagecraftascendant/forecast.analytics.stability.js"></script>
-<script src="scripts/sagecraftascendant/forecast.drift.visualizer.js"></script>
-<script src="scripts/sagecraftascendant/forecast.confidence.overlay.js"></script>
-<script src="scripts/sagecraftascendant/persistence.registry.js"></script>
-<script src="scripts/sagecraftascendant/persistence.session.js"></script>
-<script src="scripts/sagecraftascendant/dock.persistence.js"></script>
-<script src="scripts/sagecraftascendant/operator.console.js"></script>
-<script src="scripts/sagecraftascendant/orbit.registry.editor.js"></script>
-<script src="scripts/sagecraftascendant/core.bootstrap.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.SageCraftAscendant?.OrbitInjectionConsole?.registerOrbitInjectionControls) {
-    window.SageCraftAscendant.OrbitInjectionConsole.registerOrbitInjectionControls();
-    console.log("✅ Orbit Injection Console Initialized.");
-  }
-});
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (window.SageCraftAscendant?.OperatorConsole?.registerOrbitRemovalControls) {
-      window.SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls();
-      console.log("✅ Orbit Removal Console Initialized.");
-    }
-  });
-  </script>
-
-  <!-- === SageCraft Ascendant Unified Bootstrap Invocation === -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      SageCraftAscendant?.Bootstrap?.start();
-    });
-  </script>
-
-  <script type="module">
-    if (window.location.search.includes('code=')) {
-      import('./scripts/dropbox.js?v=2.0.1').then(module => {
-        module.handleDropboxCallback();
-      });
-    }
-  </script>
-
-<script>
-  const categorySelect = document.getElementById('categorySelect');
-  const activeCategoryDisplay = document.getElementById('activeCategoryDisplay');
-  categorySelect.addEventListener('change', () => {
-    const selected = categorySelect.options[categorySelect.selectedIndex].text;
-    activeCategoryDisplay.textContent = `🧭 Active Category: ${selected}`;
-  });
-</script>
+  <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
+  <script src="scripts/bootstrap/bootstrapLoader.js"></script>
 
 <!-- Phase 600.0 — Predictive HUD Deep Linkage Bootstrap -->
 <script>
@@ -1749,14 +1055,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 });
-</script>
-</script>
-<!-- DOM Sync Audit Utility -->
-<script type="module">
+  </script>
+  <!-- DOM Sync Audit Utility -->
+  <!-- <script type="module">
 
-</script>
-</script>
-</div>
+  </script> -->
+  </div>
 
 
   <!-- Phase 135.4 — Forecast Overlay Containers Injection -->
@@ -1773,6 +1077,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <!-- Orbit Removal Panel Handlers -->
+  <!--
   <script>
   function refreshOrbitRemovalList() {
     const listContainer = document.getElementById("orbitRemovalList");
@@ -1804,3 +1109,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   </script>
+  -->
+<script>
+// Phase 600.1 — Unified Sovereign Dock Wiring Linkage
+document.addEventListener("DOMContentLoaded", () => {
+  const panelMap = {
+    count: "countContainer",
+    deltaAnalyzer: "deltaAnalyzerSection",
+    exceptionManager: "exceptionManagerSection",
+    progressDashboard: "progressDashboardSection",
+    reportingHub: "reportingHubSection",
+    masterExportHub: "masterExportSection",
+    utilityHub: "utilityHubSection",
+    sessionManager: "sessionManagerSection",
+    mappings: "mappingManagerSection",
+    tools: "toolsPanel",
+    audit: "auditSection",
+    configPanel: "configPanelSection"
+  };
+
+  const dockButtons = document.querySelectorAll("#dockToggleBar button");
+
+  dockButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panelKey = btn.dataset.panel;
+      Object.entries(panelMap).forEach(([key, sectionId]) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.style.display = (key === panelKey) ? "block" : "none";
+        }
+      });
+    });
+  });
+
+  // Default: activate first panel
+  if (dockButtons.length > 0) {
+    dockButtons[0].click();
+  }
+});
+</script>

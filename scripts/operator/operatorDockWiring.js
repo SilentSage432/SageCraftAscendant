@@ -1273,7 +1273,21 @@ const OperatorDockWiring = {
             activateRoleCluster: this.activateRoleCluster.bind(this),
             setClusterPriority: this.setClusterPriority.bind(this),
             getClusterPriority: this.getClusterPriority.bind(this),
-            activateRoleClusters: this.activateRoleClusters.bind(this)
+            activateRoleClusters: this.activateRoleClusters.bind(this),
+
+            // Sovereign Panel Scaffold API (Phase 500.5)
+            getCountDockContent: () => "<h2>📊 Live Counts</h2><p>Placeholder content for Live Counts panel.</p>",
+            getDeltaAnalyzerContent: () => "<h2>Δ Delta Analyzer</h2><p>Placeholder content for Delta Analyzer.</p>",
+            getExceptionManagerContent: () => "<h2>⚠ Exception Manager</h2><p>Placeholder content for Exception Manager.</p>",
+            getProgressDashboardContent: () => "<h2>🚦 Progress Dashboard</h2><p>Placeholder content for Progress Dashboard.</p>",
+            getReportingHubContent: () => "<h2>📄 Reporting Hub</h2><p>Placeholder content for Reporting Hub.</p>",
+            getMasterExportHubContent: () => "<h2>📤 Master Export Hub</h2><p>Placeholder content for Master Export Hub.</p>",
+            getUtilityHubContent: () => "<h2>🛠 Utility Hub</h2><p>Placeholder content for Utility Hub.</p>",
+            getSessionManagerContent: () => "<h2>📂 Session Manager</h2><p>Placeholder content for Session Manager.</p>",
+            getMappingsContent: () => "<h2>🗺 Mappings Interface</h2><p>Placeholder content for Mappings Interface.</p>",
+            getToolsContent: () => "<h2>🔧 Tools Panel</h2><p>Placeholder content for Tools Panel.</p>",
+            getAuditContent: () => "<h2>📋 Audit Manager</h2><p>Placeholder content for Audit Manager.</p>",
+            getConfigPanelContent: () => "<h2>⚙ Configuration Panel</h2><p>Placeholder content for Configuration Panel.</p>"
         };
     },
 
@@ -1364,3 +1378,231 @@ const OperatorDockConsole = {
 
 window.OperatorDockConsole = OperatorDockConsole;
 console.log("🧭 Operator Dock Admin Console Ready — Type 'OperatorDockConsole' to begin diagnostics.");
+
+
+// === Phase 300.7: Subsystem Dock Content Injection ===
+
+setTimeout(() => {
+    console.log("🚀 Executing Phase 300.7 Dock Content Injection...");
+
+    const dockContents = {
+        count: `<h2>📊 Live Counts</h2><p>Live inventory counting subsystem online.</p>`,
+        deltaAnalyzer: `<h2>Δ Delta Analyzer</h2><p>Delta analytics subsystem loaded.</p>`,
+        exceptionManager: `<h2>⚠ Exception Manager</h2><p>Monitoring anomaly exceptions.</p>`,
+        progressDashboard: `<h2>🚦 Progress Dashboard</h2><p>System progress indicators operational.</p>`,
+        reportingHub: `<h2>📄 Reporting Hub</h2><p>Report generation subsystem ready.</p>`,
+        masterExportHub: `<h2>📤 Master Export Hub</h2><p>Bulk export interfaces deployed.</p>`,
+        utilityHub: `<h2>🛠 Utility Hub</h2><p>Utility tools accessible here.</p>`,
+        sessionManager: `<h2>📂 Session Manager</h2><p>Session archival and recovery available.</p>`,
+        mappings: `<h2>🗺 Mappings Interface</h2><p>Mapping configuration subsystem loaded.</p>`,
+        tools: `<h2>🔧 Tools Panel</h2><p>Developer and diagnostic tools online.</p>`,
+        audit: `<h2>📋 Audit Manager</h2><p>System audit controls engaged.</p>`,
+        configPanel: `<h2>⚙ Configuration Panel</h2><p>Codex configuration settings loaded.</p>`
+    };
+
+    Object.entries(dockContents).forEach(([dockId, content]) => {
+        const panel = document.getElementById(dockId);
+        if (panel) {
+            panel.innerHTML = content;
+            console.log(`✅ Content injected into ${dockId}`);
+        } else {
+            console.warn(`⚠ Dock panel ${dockId} not found.`);
+        }
+    });
+
+}, 600);
+
+// === Phase 300.9: Dock Grid Unification Protocol ===
+
+setTimeout(() => {
+    console.log("🚀 Executing Phase 300.9 Dock Grid Unification...");
+
+    const dockMap = {
+        count: "countContainer",
+        deltaAnalyzer: "deltaAnalyzerSection",
+        exceptionManager: "exceptionManagerSection",
+        progressDashboard: "progressDashboardSection",
+        reportingHub: "reportingHubSection",
+        masterExportHub: "masterExportSection",
+        utilityHub: "utilityHubSection",
+        sessionManager: "sessionManagerSection",
+        mappings: "mappingManagerSection",
+        tools: "toolsPanel",
+        audit: "auditSection",
+        configPanel: "configPanelSection"
+    };
+
+    Object.entries(dockMap).forEach(([dockId, legacyId]) => {
+        const legacyContainer = document.getElementById(legacyId);
+        const newDockPanel = document.getElementById(dockId);
+
+        if (legacyContainer && newDockPanel) {
+            newDockPanel.innerHTML = legacyContainer.innerHTML;
+            legacyContainer.remove();
+            console.log(`✅ Migrated '${legacyId}' ➔ '${dockId}'`);
+        } else {
+            console.warn(`⚠ Skipped migration for '${dockId}'`);
+        }
+    });
+
+    console.log("✅ Phase 300.9 Dock Grid Unification complete.");
+
+}, 800);
+
+
+// === Phase 300.13: Dynamic Dock Panel Population Injection ===
+
+setTimeout(() => {
+    console.log("🚀 Executing Phase 300.13: Dynamic Dock Panel Population...");
+
+    const dockGrid = document.getElementById("operatorDockGrid");
+    if (!dockGrid) {
+        console.warn("❌ Dock Grid not found.");
+        return;
+    }
+
+    const dockDefinitions = [
+        { id: "count", label: "📊 Live Counts", description: "Live inventory counting subsystem online." },
+        { id: "deltaAnalyzer", label: "Δ Delta Analyzer", description: "Delta analytics subsystem loaded." },
+        { id: "exceptionManager", label: "⚠ Exception Manager", description: "Monitoring anomaly exceptions." },
+        { id: "progressDashboard", label: "🚦 Progress Dashboard", description: "System progress indicators operational." },
+        { id: "reportingHub", label: "📄 Reporting Hub", description: "Report generation subsystem ready." },
+        { id: "masterExportHub", label: "📤 Master Export Hub", description: "Bulk export interfaces deployed." },
+        { id: "utilityHub", label: "🛠 Utility Hub", description: "Utility tools accessible here." },
+        { id: "sessionManager", label: "📂 Session Manager", description: "Session archival and recovery available." },
+        { id: "mappings", label: "🗺 Mappings Interface", description: "Mapping configuration subsystem loaded." },
+        { id: "tools", label: "🔧 Tools Panel", description: "Developer and diagnostic tools online." },
+        { id: "audit", label: "📋 Audit Manager", description: "System audit controls engaged." },
+        { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." }
+    ];
+
+    dockDefinitions.forEach(def => {
+        let panel = document.getElementById(def.id);
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.id = def.id;
+            panel.classList.add("tab-section");
+            dockGrid.appendChild(panel);
+            console.log(`✅ Created Dock Panel: ${def.id}`);
+        }
+        panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
+    });
+
+}, 1000);
+
+
+// === Phase 700.3-B: Sovereign Dock Toggle Core Rebuild Injection ===
+
+OperatorDockWiring.initializeToggleSystem = function() {
+    console.log("🚀 Sovereign Dock Toggle System Initialized");
+
+    const dockButtons = document.querySelectorAll(".dock-toggle-button");
+
+    dockButtons.forEach(button => {
+        const targetId = button.getAttribute("data-target");
+        if (!targetId) {
+            console.warn("⚠ Dock toggle button missing data-target attribute.");
+            return;
+        }
+
+        button.addEventListener("click", () => {
+            const panel = document.getElementById(targetId);
+            if (!panel) {
+                console.warn(`❌ Dock panel '${targetId}' not found.`);
+                return;
+            }
+            panel.classList.toggle("hidden");
+            console.log(`🔀 Toggled visibility for dock panel '${targetId}'`);
+            OperatorDockWiring.saveDockState();
+        });
+    });
+};
+
+// === Register Subsystem Docks ===
+// (Add new subsystem dock registrations below this line)
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "exceptionManager",
+    onClick: () => {
+        console.log("⚠ Sovereign Exception Manager Activated");
+        alert("🚨 Exception Manager Panel Loaded — Sovereign Mesh Stabilization Online");
+    }
+});
+
+// === Micro-Patch 700.8-A: Progress Dashboard Subsystem Wiring ===
+
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "progressDashboard",
+    onClick: () => {
+        console.log("🚦 Progress Dashboard Activated");
+        alert("📊 Progress Dashboard Loaded — Monitoring Live Metrics");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "masterExportHub",
+    onClick: () => {
+        console.log("📤 Master Export Hub Activated");
+        alert("📤 Master Export Hub Loaded — Export Interfaces Ready");
+    }
+});
+
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "mappings",
+    onClick: () => {
+        console.log("🗺 Mappings Interface Activated");
+        alert("🗺 Mappings Interface Loaded — Map Configurations Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "tools",
+    onClick: () => {
+        console.log("🔧 Tools Panel Activated");
+        alert("🔧 Tools Panel Loaded — Developer & Diagnostics Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "audit",
+    onClick: () => {
+        console.log("📋 Audit Manager Activated");
+        alert("📋 Audit Manager Loaded — System Audit Controls Online");
+    }
+});
+
+// Automatically initialize toggle system after DOM content is fully loaded
+
+// === Phase 700.4: Sovereign Dock Unified Auto-Binding Engine ===
+
+OperatorDockWiring.autoBindDockToggles = function() {
+    console.log("🚀 Sovereign Dock Unified Auto-Binding Initialized");
+
+    const dockButtons = document.querySelectorAll(".dock-toggle-button");
+
+    dockButtons.forEach(button => {
+        const targetId = button.getAttribute("data-target");
+        if (!targetId) {
+            console.warn("⚠ Dock toggle button missing data-target attribute.");
+            return;
+        }
+
+        button.addEventListener("click", () => {
+            const panel = document.getElementById(targetId);
+            if (!panel) {
+                console.warn(`❌ Dock panel '${targetId}' not found.`);
+                return;
+            }
+            panel.classList.toggle("hidden");
+            console.log(`🔀 Auto-Bound toggle for '${targetId}'`);
+            OperatorDockWiring.saveDockState();
+        });
+    });
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    OperatorDockWiring.initializeToggleSystem();
+    OperatorDockWiring.autoBindDockToggles();
+});

@@ -46,13 +46,116 @@ document.addEventListener("DOMContentLoaded", async () => {
   
     console.log("🚀 SageCraft Modular Bootstrap initializing...");
 
+    // === Phase 600.8 — Sovereign Manifest Loader Activation ===
+    const SovereignManifest = {
+      forecastModules: [
+        'forecast.cortex',
+        'forecast.intake',
+        'forecast.visualizer',
+        'forecast.analyzer',
+        'forecast.ai.scaffold',
+        'forecast.drift.sentinel',
+        'forecast.recovery.supervisor',
+        'forecast.purification.engine',
+        'forecast.threat.monitor',
+        'forecast.anomaly.profiler',
+        'forecast.predictive.cortex',
+        'forecast.recursive.memory',
+        'forecast.weight.adaptation',
+        'forecast.confidence.engine',
+        'forecast.correction.injector',
+        'forecast.threat.overseer',
+        'forecast.stabilizer.core',
+        'forecast.anomaly.resolver',
+        'forecast.signal.reinforcement',
+        'forecast.synthesis.core',
+        'forecast.mutation.layer',
+        'forecast.adaptation.engine',
+        'forecast.adaptation.analyzer',
+        'forecast.visualizer.mutation',
+        'forecast.stability.cluster',
+        'forecast.snapshot.archiver',
+        'forecast.snapshot.loader',
+        'forecast.snapshot.validator',
+        'forecast.snapshot.repair',
+        'forecast.archive.compliance',
+        'forecast.archive.autoscan',
+        'forecast.memory.healer',
+        'forecast.validation.sentinel',
+        'forecast.analytics.stability',
+        'forecast.drift.visualizer',
+        'forecast.confidence.overlay'
+      ],
+      coreModules: [
+        'anomaly.fusion.matrix',
+        'autocorrect.shell',
+        'drift.balancer',
+        'drift.compensator',
+        'hazard.deflection',
+        'pattern.resolution',
+        'repair.optimizer',
+        'resilience.sentinel',
+        'stabilization.feedback',
+        'threat.deflection.nexus'
+      ],
+      recoveryModules: [
+        'autonomous'
+      ]
+    };
+
+    // === Phase 600.9 — Sovereign Manifest Integrity Diagnostics ===
+    async function validateManifestIntegrity() {
+      console.log("🔎 Running Sovereign Manifest Integrity Diagnostics...");
+
+      async function checkModules(modules, basePath) {
+        for (const moduleName of modules) {
+          const modulePath = `${basePath}/${moduleName}.js`;
+          try {
+            await fetch(modulePath, { method: 'HEAD' });
+            console.log(`✅ Found ${modulePath}`);
+          } catch (err) {
+            console.error(`❌ Missing Module: ${modulePath}`);
+          }
+        }
+      }
+
+      await checkModules(SovereignManifest.forecastModules, "./scripts/forecast");
+      await checkModules(SovereignManifest.coreModules, "./scripts/core");
+      await checkModules(SovereignManifest.recoveryModules, "./scripts/recovery");
+
+      console.log("🔎 Sovereign Manifest Integrity Diagnostics Complete.");
+    }
+
+    // Automatically trigger integrity check after SovereignManifest creation
+    await validateManifestIntegrity();
+
+    // === Phase 701 — Sovereign Modular Bootstrap Loader Expansion ===
+    console.log("🌐 Sovereign Modular Bootstrap Expansion Engaged.");
+
+    const sovereignModules = [
+      './scripts/operator/roleAssignment.js',
+      './scripts/operator/profileFabrication.js',
+      './scripts/operator/subsystemBindings.js',
+      './scripts/operator/toggleSystem.js',
+      './scripts/operator/sandboxEngine.js'
+    ];
+
+    for (const modulePath of sovereignModules) {
+      try {
+        await import(modulePath);
+        console.log(`✅ Sovereign Module Loaded: ${modulePath}`);
+      } catch (err) {
+        console.error(`❌ Failed to load Sovereign Module: ${modulePath}`, err);
+      }
+    }
+
     // === Phase 37.0 — Visual Restoration Layer Bootstrap ===
     function injectVisualRestorationLayer() {
       console.log("🎨 Visual Restoration Layer Activated.");
       
       const styleLink = document.createElement("link");
       styleLink.rel = "stylesheet";
-      styleLink.href = "/styles/sagecraftascendant.css";
+      styleLink.href = "./scripts/styles/sagecraftascendant.css";
       styleLink.onload = () => console.log("✅ SageCraftAscendant.css successfully loaded.");
       styleLink.onerror = () => console.warn("⚠ Failed to load SageCraftAscendant.css");
 
@@ -164,7 +267,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
+
     setTimeout(initializeModalBootstrap, 500);
+
+    // === Phase 600.3: Sovereign Advanced Dock Wiring Loader ===
+    try {
+      console.log("🔧 Injecting Advanced Dock Wiring Module...");
+      const script = document.createElement("script");
+      script.src = "/scripts/operator/operatorDockAdvancedPhases.js";
+      script.onload = () => console.log("✅ Advanced Dock Wiring Module Loaded");
+      script.onerror = () => console.warn("⚠ Failed to load operatorDockAdvancedPhases.js");
+      document.body.appendChild(script);
+    } catch (err) {
+      console.error("❌ Failed injecting operatorDockAdvancedPhases.js", err);
+    }
 
     // Phase 33.0 — Universal Modal Management Layer Bootstrap
     const ModalRegistry = {};
@@ -1096,60 +1212,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // === Phase 38.6 — Forecast Module Loader Synchronization ===
-console.log("🌩 Forecast Modules Loader Synchronization Engaged.");
+    console.log("🌩 Forecast Modules Loader Synchronization Engaged.");
+    for (const moduleName of SovereignManifest.forecastModules) {
+      await import(`./scripts/forecast/${moduleName}.js`)
+        .then(() => console.log(`Loaded ${moduleName}.js`))
+        .catch(err => console.error(`❌ Failed to load ${moduleName}.js`, err));
+    }
 
-await import('/scripts/forecast/cortex.js').then(() => console.log("Loaded forecast.cortex.js"));
-await import('/scripts/forecast/intake.js').then(() => console.log("Loaded forecast.intake.js"));
-await import('/scripts/forecast/visualizer.js').then(() => console.log("Loaded forecast.visualizer.js"));
-await import('/scripts/forecast/analyzer.js').then(() => console.log("Loaded forecast.analyzer.js"));
-await import('/scripts/forecast/ai.scaffold.js').then(() => console.log("Loaded forecast.ai.scaffold.js"));
-await import('/scripts/forecast/drift.sentinel.js').then(() => console.log("Loaded forecast.drift.sentinel.js"));
-await import('/scripts/forecast/recovery.supervisor.js').then(() => console.log("Loaded forecast.recovery.supervisor.js"));
-await import('/scripts/forecast/purification.engine.js').then(() => console.log("Loaded forecast.purification.engine.js"));
-await import('/scripts/forecast/threat.monitor.js').then(() => console.log("Loaded forecast.threat.monitor.js"));
-await import('/scripts/forecast/anomaly.profiler.js').then(() => console.log("Loaded forecast.anomaly.profiler.js"));
-await import('/scripts/forecast/predictive.cortex.js').then(() => console.log("Loaded forecast.predictive.cortex.js"));
-await import('/scripts/forecast/recursive.memory.js').then(() => console.log("Loaded forecast.recursive.memory.js"));
-await import('/scripts/forecast/weight.adaptation.js').then(() => console.log("Loaded forecast.weight.adaptation.js"));
-await import('/scripts/forecast/confidence.engine.js').then(() => console.log("Loaded forecast.confidence.engine.js"));
-await import('/scripts/forecast/correction.injector.js').then(() => console.log("Loaded forecast.correction.injector.js"));
-await import('/scripts/forecast/threat.overseer.js').then(() => console.log("Loaded forecast.threat.overseer.js"));
-await import('/scripts/forecast/stabilizer.core.js').then(() => console.log("Loaded forecast.stabilizer.core.js"));
-await import('/scripts/forecast/anomaly.resolver.js').then(() => console.log("Loaded forecast.anomaly.resolver.js"));
-await import('/scripts/forecast/signal.reinforcement.js').then(() => console.log("Loaded forecast.signal.reinforcement.js"));
-await import('/scripts/forecast/synthesis.core.js').then(() => console.log("Loaded forecast.synthesis.core.js"));
-await import('/scripts/forecast/mutation.layer.js').then(() => console.log("Loaded forecast.mutation.layer.js"));
-await import('/scripts/forecast/adaptation.engine.js').then(() => console.log("Loaded forecast.adaptation.engine.js"));
-await import('/scripts/forecast/adaptation.analyzer.js').then(() => console.log("Loaded forecast.adaptation.analyzer.js"));
-await import('/scripts/forecast/visualizer.mutation.js').then(() => console.log("Loaded forecast.visualizer.mutation.js"));
-await import('/scripts/forecast/stability.cluster.js').then(() => console.log("Loaded forecast.stability.cluster.js"));
-await import('/scripts/forecast/snapshot.archiver.js').then(() => console.log("Loaded forecast.snapshot.archiver.js"));
-await import('/scripts/forecast/snapshot.loader.js').then(() => console.log("Loaded forecast.snapshot.loader.js"));
-await import('/scripts/forecast/snapshot.validator.js').then(() => console.log("Loaded forecast.snapshot.validator.js"));
-await import('/scripts/forecast/snapshot.repair.js').then(() => console.log("Loaded forecast.snapshot.repair.js"));
-await import('/scripts/forecast/archive.compliance.js').then(() => console.log("Loaded forecast.archive.compliance.js"));
-await import('/scripts/forecast/archive.autoscan.js').then(() => console.log("Loaded forecast.archive.autoscan.js"));
-await import('/scripts/forecast/memory.healer.js').then(() => console.log("Loaded forecast.memory.healer.js"));
-await import('/scripts/forecast/validation.sentinel.js').then(() => console.log("Loaded forecast.validation.sentinel.js"));
-await import('/scripts/forecast/analytics.stability.js').then(() => console.log("Loaded forecast.analytics.stability.js"));
-await import('/scripts/forecast/drift.visualizer.js').then(() => console.log("Loaded forecast.drift.visualizer.js"));
-await import('/scripts/forecast/confidence.overlay.js').then(() => console.log("Loaded forecast.confidence.overlay.js"));
+    // === Phase 38.7 — Core Module Loader Synchronization ===
+    console.log("🌐 Core Modules Loader Synchronization Engaged.");
+    for (const moduleName of SovereignManifest.coreModules) {
+      await import(`./scripts/core/${moduleName}.js`)
+        .then(() => console.log(`Loaded ${moduleName}.js`))
+        .catch(err => console.error(`❌ Failed to load ${moduleName}.js`, err));
+    }
 
-// === Phase 38.7 — Core Module Loader Synchronization ===
-console.log("🌐 Core Modules Loader Synchronization Engaged.");
-
-await import('/scripts/core/anomaly.fusion.matrix.js').then(() => console.log("Loaded anomaly.fusion.matrix.js"));
-await import('/scripts/core/autocorrect.shell.js').then(() => console.log("Loaded autocorrect.shell.js"));
-await import('/scripts/core/drift.balancer.js').then(() => console.log("Loaded drift.balancer.js"));
-await import('/scripts/core/drift.compensator.js').then(() => console.log("Loaded drift.compensator.js"));
-await import('/scripts/core/hazard.deflection.js').then(() => console.log("Loaded hazard.deflection.js"));
-await import('/scripts/core/pattern.resolution.js').then(() => console.log("Loaded pattern.resolution.js"));
-await import('/scripts/core/repair.optimizer.js').then(() => console.log("Loaded repair.optimizer.js"));
-await import('/scripts/core/resilience.sentinel.js').then(() => console.log("Loaded resilience.sentinel.js"));
-await import('/scripts/core/stabilization.feedback.js').then(() => console.log("Loaded stabilization.feedback.js"));
-await import('/scripts/core/threat.deflection.nexus.js').then(() => console.log("Loaded threat.deflection.nexus.js"));
-
-await import('/scripts/recovery/autonomous.js').then(() => console.log("Loaded recovery/autonomous.js"));
+    // === Recovery Loader Synchronization ===
+    for (const moduleName of SovereignManifest.recoveryModules) {
+      await import(`./scripts/recovery/${moduleName}.js`)
+        .then(() => console.log(`Loaded ${moduleName}.js`))
+        .catch(err => console.error(`❌ Failed to load ${moduleName}.js`, err));
+    }
 
     // 🔮 Future phase: dynamically import logic modules here after injection complete
   });

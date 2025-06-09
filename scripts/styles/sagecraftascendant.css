@@ -1,0 +1,518 @@
+
+
+/* === Phase 400.0 — Sovereign Skin Ascension Root Layer === */
+
+/* Global Skin Variables */
+:root {
+  --color-bg-primary: radial-gradient(circle, #0a0a0f 0%, #000000 100%);
+  --color-accent: #cc99ff;
+  --color-deep-accent: #330044;
+  --color-text: #f5f5f5;
+  --color-subtext: #aaaaaa;
+  --color-warning: #ff5555;
+  --color-success: #44cc88;
+  --color-info: #3399ff;
+  --color-panel-bg: linear-gradient(180deg, #222 0%, #111 100%);
+  --color-panel-border: #333;
+  --color-header-bg: linear-gradient(90deg, #331144, #220033);
+  --color-footer-bg: linear-gradient(90deg, #220033, #110011);
+  --glow-pulse: 0 0 20px var(--color-accent);
+  --glow-heavy: 0 0 40px var(--color-accent);
+  --glow-inset: inset 0 0 20px var(--color-deep-accent);
+  --shadow-depth: 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* Sovereign Body Reset */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Sovereign Cinematic Fluid Layer */
+* {
+  transition: all 0.3s ease;
+}
+
+
+
+
+/* Sovereign Container Base */
+#sovereignContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: radial-gradient(circle, #0a0a0f 0%, #000000 100%);
+  color: #f5f5f5;
+  font-family: 'Montserrat', sans-serif;
+  padding: 20px;
+}
+
+/* Header Styling */
+#operatorHeader {
+  background: linear-gradient(90deg, #331144, #220033);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px #22003388, inset 0 0 20px #00000088;
+  text-align: center;
+  color: #f5f5f5;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px #330044;
+}
+
+/* Footer Styling */
+#operatorFooter {
+  background: linear-gradient(90deg, #220033, #110011);
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px #00000088;
+  text-align: center;
+  color: #aaaaaa;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85em;
+}
+
+/* Sovereign Dock Grid */
+#operatorDockGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+
+
+/* === Wave 79 — State Indicator Overlays === */
+
+/* Badge Container */
+#operatorDockGrid .dock-panel .state-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75em;
+  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.6);
+  z-index: 5;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* Base Dock Panel positioning fix for badge */
+#operatorDockGrid .dock-panel {
+  position: relative;
+}
+
+/* State Colors */
+.state-badge.active {
+  background: linear-gradient(90deg, #44cc88, #228855);
+  text-shadow: 0 0 4px #114422;
+}
+
+.state-badge.pending {
+  background: linear-gradient(90deg, #ffaa33, #cc7700);
+  text-shadow: 0 0 4px #552200;
+}
+
+.state-badge.warning {
+  background: linear-gradient(90deg, #ff5555, #cc0000);
+  text-shadow: 0 0 4px #440000;
+}
+
+.state-badge.error {
+  background: linear-gradient(90deg, #ff2222, #990000);
+  text-shadow: 0 0 4px #550000;
+}
+
+.state-badge.recovery {
+  background: linear-gradient(90deg, #3399ff, #0055aa);
+  text-shadow: 0 0 4px #002244;
+}
+
+
+/* === Wave 82 — Conflict Visualizer Styling === */
+
+/* Merge Visualization Container */
+#mergeVisualization {
+  background: linear-gradient(180deg, #111, #000);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 0 20px #22003388;
+}
+
+/* Section Titles */
+#mergeVisualization h4 {
+  font-family: 'Orbitron', sans-serif;
+  color: #cc99ff;
+  margin-bottom: 10px;
+}
+
+/* Delta Report */
+#deltaReport {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  box-shadow: inset 0 0 8px #22003388;
+}
+
+/* Conflict Report */
+#conflictReport {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #331111;
+  border: 1px solid #661111;
+  border-radius: 6px;
+  box-shadow: inset 0 0 8px #44000088;
+  color: #ff9999;
+}
+
+/* Arbitration Report */
+#arbitrationReport {
+  padding: 15px;
+  background: #112233;
+  border: 1px solid #335577;
+  border-radius: 6px;
+  box-shadow: inset 0 0 8px #00336688;
+  color: #99ccff;
+}
+
+/* Highlight Key Conflict Items */
+.conflictItem {
+  font-weight: bold;
+  color: #ff5555;
+}
+
+/* Arbitration Decisions */
+.arbitrationDecision {
+  font-weight: bold;
+  color: #33ccff;
+}
+
+/* === Wave 84 — Snapshot Manager Styling === */
+
+/* Snapshot Manager Container */
+#snapshotManager {
+  background: linear-gradient(180deg, #111, #000);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 0 20px #22003388;
+}
+
+/* Snapshot Controls Section */
+#snapshotControls {
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+#snapshotControls button {
+  background: linear-gradient(90deg, #331144, #220033);
+  color: #f5f5f5;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px #22003333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#snapshotControls button:hover {
+  background: linear-gradient(90deg, #441166, #330044);
+  box-shadow: 0 0 15px #cc99ff88, 0 0 30px #33114488;
+}
+
+/* Snapshot List Display */
+#snapshotList {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 15px;
+  color: #cccccc;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: inset 0 0 8px #22003388;
+  min-height: 80px;
+}
+
+/* === Wave 85 — Sovereign Operator Main Console Finalization === */
+
+/* Section Global Spacing */
+#panelContainer h3 {
+  font-family: 'Orbitron', sans-serif;
+  color: #cc99ff;
+  margin: 30px 0 15px 0;
+  text-align: center;
+  text-shadow: 0 0 8px #330044;
+}
+
+/* Panel Consistent Box Depth */
+#mergeVisualization, 
+#snapshotManager {
+  margin-bottom: 30px;
+  box-shadow: 0 0 25px #22003388;
+  transition: box-shadow 0.3s ease;
+}
+
+#mergeVisualization:hover, 
+#snapshotManager:hover {
+  box-shadow: 0 0 35px #331144aa;
+}
+
+/* Control Deck Panel Glow Accent */
+#navigationMenu {
+  box-shadow: 2px 0 15px #22003388, inset 0 0 20px #000000aa;
+}
+
+/* Operator Header Refinement */
+#operatorHeader h3 {
+  font-size: 1.6em;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px #330044, 0 0 25px #550077aa;
+}
+
+/* === Phase 300.3 — Visibility Baseline Stabilization === */
+
+.tab-section {
+  display: none;
+}
+
+
+/* === Phase 400.1 — Sovereign Control Deck Skin Injection === */
+
+/* Dock Toggle Bar Container */
+#dockToggleBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0 30px 0;
+  padding: 15px;
+  background: linear-gradient(90deg, #220033, #110011);
+  border: 1px solid #330044;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #22003388, inset 0 0 20px #00000088;
+  transition: all 0.4s ease;
+}
+
+/* Dock Toggle Buttons */
+#dockToggleBar button {
+  background: linear-gradient(90deg, #331144, #220033);
+  color: var(--color-text);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  font-size: 1em;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px #22003366, inset 0 0 8px #00000088;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Button Hover */
+#dockToggleBar button:hover {
+  background: linear-gradient(90deg, #552288, #330044);
+  box-shadow: 0 0 20px #cc99ff88, 0 0 30px #33114488;
+  transform: scale(1.05);
+}
+
+/* Button Active State */
+#dockToggleBar button:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 30px #cc99ffaa, inset 0 0 12px #220033aa;
+}
+
+
+/* === Phase 400.2 — Sovereign DockGrid Panel Styling Injection === */
+
+#operatorDockGrid .tab-section {
+  border: 1px solid var(--color-panel-border);
+  background: var(--color-panel-bg);
+  border-radius: 12px;
+  padding: 25px 20px;
+  box-shadow: 0 0 20px #22003388, inset 0 0 12px #00000088;
+  color: var(--color-text);
+  font-family: 'Orbitron', sans-serif;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+#operatorDockGrid .tab-section:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px #cc99ffaa, inset 0 0 20px #220033aa;
+  transition: all 0.3s ease;
+}
+
+#operatorDockGrid .tab-section h2 {
+  font-size: 1.6em;
+  color: var(--color-accent);
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px var(--color-deep-accent);
+}
+
+#operatorDockGrid .tab-section p {
+  font-size: 1em;
+  color: var(--color-subtext);
+  line-height: 1.5;
+}
+/* === Phase 400.3 — Sovereign Cinematic Fluidity Layer === */
+
+/* Global Smooth Hover Scaling Across Sovereign Panels */
+#operatorDockGrid .tab-section {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+#operatorDockGrid .tab-section:hover {
+  transform: scale(1.025);
+  box-shadow: 0 0 35px #cc99ffaa, inset 0 0 22px #220033aa;
+}
+
+/* Global Toggle Bar Animation */
+#dockToggleBar button {
+  transition: all 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#dockToggleBar button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 25px #cc99ff99, 0 0 40px #33114499;
+}
+
+#dockToggleBar button:active {
+  transform: scale(0.94);
+  box-shadow: 0 0 35px #cc99ffcc, inset 0 0 16px #220033cc;
+}
+
+/* Sovereign Container Pulse for Header */
+#operatorHeader {
+  animation: sovereignPulse 6s infinite alternate;
+}
+
+@keyframes sovereignPulse {
+  0% { box-shadow: 0 0 20px #330044; }
+  50% { box-shadow: 0 0 40px #550077, 0 0 60px #cc99ff55; }
+  100% { box-shadow: 0 0 20px #330044; }
+}
+
+/* Sovereign Container Pulse for Footer */
+#operatorFooter {
+  animation: footerPulse 8s infinite alternate;
+}
+
+@keyframes footerPulse {
+  0% { box-shadow: inset 0 0 15px #110011; }
+  50% { box-shadow: inset 0 0 30px #220033aa; }
+  100% { box-shadow: inset 0 0 15px #110011; }
+}
+
+
+/* === Phase 400.4 — Sovereign Grid Responsiveness & Adaptive Scaling Injection === */
+
+/* Base Sovereign Dock Grid Adaptive Scaling */
+#operatorDockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Adaptive Padding & Gaps for Tablet */
+@media (max-width: 1024px) {
+  #operatorDockGrid {
+    gap: 16px;
+    padding: 8px;
+  }
+}
+
+/* Adaptive Padding & Gaps for Mobile */
+@media (max-width: 768px) {
+  #operatorDockGrid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    padding: 5px;
+  }
+}
+
+/* Button Container Adaptive Wrapping */
+#dockToggleBar {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Button Size Scaling for Mobile */
+@media (max-width: 768px) {
+  #dockToggleBar button {
+    padding: 10px 18px;
+    font-size: 0.95em;
+  }
+}
+/* === Phase 400.7 — Sovereign Logo Scaling Refinement === */
+
+#operatorLogo img {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  margin: 20px auto;
+  display: block;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+/* === Phase 400.8 — Sovereign Header Centering & Font Styling === */
+
+.logo-banner-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.logo-icon {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.logo-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 2.2em;
+  letter-spacing: 1px;
+  color: var(--color-text);
+  text-shadow: 0 0 15px #330044, 0 0 25px #550077aa;
+}
+
+@media (max-width: 768px) {
+  .logo-icon {
+    max-width: 120px;
+  }
+  .logo-title {
+    font-size: 1.6em;
+  }
+}
