@@ -20,6 +20,14 @@ window.NeuralOperatorConsole = (function () {
         <button onclick="addOrbitFromUI()">➕ Add Orbit</button>
         <button onclick="removeOrbitFromUI()">🗑 Remove Orbit</button>
       </div>
+
+      <div class="console-section">
+        <h3>🧪 System Audit</h3>
+        <button onclick="NeuralAuditSentinel.auditWiring()">🧷 Audit Wiring</button>
+        <button onclick="console.log(NeuralDriftCore.getStatus())">🌪 Check Drift</button>
+        <button onclick="NeuralPanelSynthesis.synthesizePanels()">🧬 Synthesize Panels</button>
+        <button onclick="NeuralMeshIntegritySentinel.synchronizeDockMesh()">🔁 Rebuild Dock Mesh</button>
+      </div>
     `;
   }
 

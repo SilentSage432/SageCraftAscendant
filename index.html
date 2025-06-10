@@ -767,25 +767,15 @@ document.addEventListener("DOMContentLoaded", () => {
     <button class="orbit-btn" data-panel="#utilityHubConsole">🛠</button>
   </div>
 
-  <!-- 🧠 Sovereign Terminal Console -->
-  <section id="sovereignTerminal" class="holo-console terminal-console hidden" aria-hidden="true">
-    <header class="console-header">🧠 Sovereign Terminal</header>
-    <div class="console-body">
-      <pre id="terminalOutput" style="min-height: 160px;">:: Sovereign Console Initialized
-:: Type a command and press enter...</pre>
-      <input id="terminalInput" type="text" placeholder="> Enter command..." style="
-        width: 100%;
-        background: rgba(0,0,0,0.8);
-        color: #00ff99;
-        border: none;
-        padding: 10px;
-        margin-top: 10px;
-        font-family: monospace;
-        font-size: 1em;
-        border-radius: 6px;
-      " />
+  <!-- 🧙‍♂️ Sage Terminal Console -->
+  <div id="sageTerminal" class="holo-console console-active sage-terminal">
+    <div class="crystal-frame">
+      <div class="sage-glow"></div>
+      <div class="sage-output" id="sageOutputDisplay">
+        <!-- The Sage whispers will appear here -->
+      </div>
     </div>
-  </section>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -1094,6 +1084,8 @@ document.addEventListener("DOMContentLoaded", () => {
   <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
   <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
   <script src="scripts/bootstrap/bootstrapLoader.js"></script>
+
+  <script src="scripts/core/sovereignCodex.js"></script>
 
   <!-- Wiring logic loader -->
   <script src="scripts/bootstrap/wiring.js"></script>

@@ -1,3 +1,149 @@
+// === Phase 8000.8: Neural Panel Anomaly Scanner ===
+window.NeuralPanelAnomalyScanner = (function () {
+  function scanForPhantomPanels() {
+    const domPanels = Array.from(document.querySelectorAll(".holo-console")).map(p => p.id);
+    const registeredPanels = Object.values(window.NeuralOrbitRegistry?.registry || {}).map(o => `panel${o.key}`);
+    const phantoms = domPanels.filter(p => !registeredPanels.includes(p));
+    console.warn("👻 Phantom Panels Found:", phantoms);
+    return phantoms;
+  }
+
+  function scanForMissingPanels() {
+    const domPanels = Array.from(document.querySelectorAll(".holo-console")).map(p => p.id);
+    const registeredPanels = Object.values(window.NeuralOrbitRegistry?.registry || {}).map(o => `panel${o.key}`);
+    const missing = registeredPanels.filter(p => !domPanels.includes(p));
+    console.warn("🚫 Missing Panels (Registered but not in DOM):", missing);
+    return missing;
+  }
+
+  function runFullAnomalySweep() {
+    console.log("🧠 Running Full Panel Anomaly Sweep...");
+    const phantomPanels = scanForPhantomPanels();
+    const missingPanels = scanForMissingPanels();
+    // Log summary into volatility buffer
+    if (window.NeuralVolatilityBuffer?.recordVolatility) {
+      NeuralVolatilityBuffer.recordVolatility("anomalySweep", {
+        phantomCount: phantomPanels.length,
+        missingCount: missingPanels.length
+      });
+    }
+    return {
+      phantomPanels,
+      missingPanels
+    };
+  }
+
+  return {
+    scanForPhantomPanels,
+    scanForMissingPanels,
+    runFullAnomalySweep
+  };
+})();
+// === Phase 8000.8.1: Neural Anomaly Auto-Reconciler ===
+window.NeuralAnomalyAutoReconciler = (function () {
+  function autoPatchAnomalies() {
+    console.log("🔧 Starting Anomaly Auto-Reconciliation...");
+    
+    const phantomPanels = NeuralPanelAnomalyScanner.scanForPhantomPanels();
+    const missingPanels = NeuralPanelAnomalyScanner.scanForMissingPanels();
+
+    // Remove phantom panels from DOM
+    phantomPanels.forEach(id => {
+      const node = document.getElementById(id);
+      if (node) {
+        node.remove();
+        console.log(`🧹 Removed Phantom Panel: ${id}`);
+        if (window.NeuralVolatilityBuffer?.recordVolatility) {
+          NeuralVolatilityBuffer.recordVolatility("phantomPanelRemoved", { panelId: id });
+        }
+      }
+    });
+
+    // Regenerate missing panels via Panel Synthesis
+    missingPanels.forEach(id => {
+      const key = id.replace("panel", "");
+      const orbit = NeuralOrbitRegistry?.registry?.[key];
+      if (orbit) {
+        NeuralPanelSynthesis.createPanelForOrbit(orbit);
+        console.log(`🔁 Synthesized Missing Panel: ${id}`);
+        if (window.NeuralVolatilityBuffer?.recordVolatility) {
+          NeuralVolatilityBuffer.recordVolatility("missingPanelSynthesized", { panelId: id });
+        }
+      }
+    });
+
+    console.log("✅ Anomaly Reconciliation Complete.");
+  }
+
+  return {
+    autoPatchAnomalies
+  };
+})();
+
+// === Neural Volatility Buffer ===
+window.NeuralVolatilityBuffer = (function () {
+  let volatilityLog = [];
+  let maxEntries = 50;
+
+  function recordVolatility(eventType, payload = {}) {
+    const timestamp = new Date().toISOString();
+    const entry = { timestamp, eventType, ...payload };
+    volatilityLog.push(entry);
+    if (volatilityLog.length > maxEntries) {
+      volatilityLog.shift(); // Remove oldest entry
+    }
+    console.log(`⚠️ Volatility Recorded: ${eventType}`, payload);
+  }
+
+  function getVolatilityLog() {
+    return [...volatilityLog];
+  }
+
+  function clearVolatilityLog() {
+    volatilityLog = [];
+    console.log("🧼 Volatility Log Cleared.");
+  }
+
+  return {
+    recordVolatility,
+    getVolatilityLog,
+    clearVolatilityLog
+  };
+})();
+
+// === Neural Drift Pattern Engine ===
+window.NeuralDriftPatternEngine = (function () {
+  function analyzeDriftPatterns() {
+    const logs = NeuralVolatilityBuffer.getVolatilityLog();
+    const counts = {};
+
+    logs.forEach(entry => {
+      if (!counts[entry.eventType]) {
+        counts[entry.eventType] = 1;
+      } else {
+        counts[entry.eventType]++;
+      }
+    });
+
+    const total = logs.length;
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+    console.log("📊 Drift Pattern Summary:");
+    sorted.forEach(([event, count]) => {
+      console.log(`🔹 ${event}: ${count} (${((count / total) * 100).toFixed(1)}%)`);
+    });
+
+    return {
+      totalEvents: total,
+      frequencyMap: counts,
+      sortedPatterns: sorted
+    };
+  }
+
+  return {
+    analyzeDriftPatterns
+  };
+})();
 // === Phase 16016 — Dock Mesh Reconciliation Engine ===
 
 window.NeuralDockMeshReconciler = (function () {
@@ -130,10 +276,19 @@ window.NeuralDriftCore = (function() {
     };
   }
 
+  function startDriftSyncBus(intervalMs = 15000) {
+    console.log(`🌌 Drift Sync Bus Activated — syncing every ${intervalMs / 1000} seconds...`);
+    setInterval(() => {
+      const status = getStatus();
+      console.log("📡 Drift Sync Snapshot:", status);
+    }, intervalMs);
+  }
+
   return {
     registerActivation,
     registerError,
-    getStatus
+    getStatus,
+    startDriftSyncBus
   };
 })();
 
@@ -708,6 +863,18 @@ document.addEventListener("DOMContentLoaded", () => {
       window.SovereignSubsystems?.deltaAnalyzer?.toggle?.();
     });
   }
+
+  // === Phase 16017: Live Orbit Injection Test ===
+  NeuralOrbitInjectionBus.injectOrbit({
+    key: "loreCodex",
+    label: "Lore Codex",
+    icon: "icon-book.png",
+    modules: ["loreModule"]
+  });
+
+  // === Phase 16020: Gatekeeper Synchronization ===
+  console.log("🔐 Activating Gatekeeper — Loading persisted orbits...");
+  NeuralPersistenceSynchronizer.synchronizePersistence();
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
@@ -1253,6 +1420,19 @@ function NeuralUnifiedBootstrap() {
 
     // Start reconciliation loop to continuously verify mesh health
     NeuralDockMeshReconciler.startReconciliationLoop();
+
+    // === Phase 16021: Unified Neural Bootstrap Reconciliation ===
+    console.log("🔄 Phase 16021: Unified Bootstrap Reconciliation Activated");
+    NeuralDockMeshReconciler.runDockReconciliation();
+    NeuralMeshIntegritySentinel.autoSyncAfterBootstrap();
+    NeuralStateArchiveCore.saveState();
+
+    // === Phase 16022.1: Conditional Drift Sync Activation ===
+    if (!window.disableDriftBus) {
+      NeuralDriftCore.startDriftSyncBus();
+    } else {
+      console.log("🌙 Drift Sync Bus is currently disabled (window.disableDriftBus = true).");
+    }
 
     console.log("✅ Unified Bootstrap Sequence Complete.");
   }
