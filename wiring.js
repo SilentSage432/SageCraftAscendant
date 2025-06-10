@@ -1,3 +1,183 @@
+// === Phase 12001.0: Orbit Button Interval-Based Scanner and Dynamic Wiring ===
+setInterval(() => {
+  const orbitButtons = document.querySelectorAll('.orbit-btn');
+  console.log(`🛰️ Orbit Button Scanner: Found ${orbitButtons.length} orbit button(s).`);
+  orbitButtons.forEach((btn, index) => {
+    if (!btn.dataset.wired) {
+      btn.dataset.wired = "true";
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.target;
+        const panel = document.getElementById(target);
+        if (panel) {
+          panel.classList.toggle("hidden");
+          console.log(`🚀 Toggled panel '${target}'`);
+        } else {
+          console.warn(`⚠ Panel '${target}' not found.`);
+        }
+      });
+      console.log(`🔗 Wired orbit button ${index + 1} to '${btn.dataset.target}'`);
+    }
+  });
+}, 1000);
+// === Orbit Button Dynamic Wiring via MutationObserver ===
+const observer = new MutationObserver((mutationsList, observer) => {
+  const orbitButtons = document.querySelectorAll(".orbit-btn");
+  if (orbitButtons.length === 0) return;
+
+  console.log(`🔭 Orbit Buttons Detected: ${orbitButtons.length}`);
+  orbitButtons.forEach((btn, index) => {
+    if (!btn.dataset.bound) {
+      const panelId = btn.getAttribute("data-panel");
+      console.log(`🛰️ Wiring Button ${index + 1}: ID=${btn.id}, Target=${panelId}`);
+
+      btn.addEventListener("click", () => {
+        const target = document.getElementById(panelId);
+        if (target) {
+          const isVisible = !target.classList.contains("hidden");
+          target.classList.toggle("hidden", isVisible);
+          console.log(`🎯 ${panelId} toggled: ${isVisible ? "hidden" : "visible"}`);
+        } else {
+          console.warn(`⚠️ Panel ${panelId} not found in DOM.`);
+        }
+      });
+
+      btn.dataset.bound = "true"; // Mark as bound to avoid duplicate listeners
+    }
+  });
+
+  // Optional: Stop observing once buttons are wired
+  // observer.disconnect();
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+// === Runtime Activation Logic for Main Holo-Consoles ===
+document.addEventListener("DOMContentLoaded", () => {
+  // === Count Console Activation ===
+  const countConsole = document.getElementById("countConsole");
+  if (countConsole) {
+    const refreshBtn = countConsole.querySelector(".refresh-counts");
+    const itemsField = countConsole.querySelector(".count-items");
+    const categoriesField = countConsole.querySelector(".count-categories");
+    const recentList = countConsole.querySelector(".recent-items");
+    const syncField = countConsole.querySelector(".last-sync");
+
+    refreshBtn.addEventListener("click", () => {
+      const now = new Date().toLocaleTimeString();
+      syncField.textContent = now;
+      const count = Math.floor(Math.random() * 20) + 10;
+      const cats = Math.floor(count / 2);
+      itemsField.textContent = count;
+      categoriesField.textContent = cats;
+
+      recentList.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        const li = document.createElement("li");
+        li.textContent = `📦 Item_${Math.floor(Math.random() * 9999)}`;
+        recentList.appendChild(li);
+      }
+
+      console.log("📊 Count Console refreshed.");
+    });
+  }
+
+  // === Delta Analyzer Console ===
+  const deltaConsole = document.getElementById("deltaAnalyzerConsole");
+  if (deltaConsole) {
+    const scanBtn = deltaConsole.querySelector(".run-delta-scan");
+    const scanTime = deltaConsole.querySelector(".delta-scan-time");
+    const drift = deltaConsole.querySelector(".drift-events");
+    const spikes = deltaConsole.querySelector(".critical-spikes");
+    const deltaLog = deltaConsole.querySelector(".delta-log-entries");
+
+    scanBtn.addEventListener("click", () => {
+      const now = new Date().toLocaleTimeString();
+      scanTime.textContent = now;
+      const d = Math.floor(Math.random() * 5);
+      const s = Math.floor(Math.random() * 2);
+      drift.textContent = d;
+      spikes.textContent = s;
+
+      const li = document.createElement("li");
+      li.textContent = `⚠️ Detected ${d} drift, ${s} spikes @ ${now}`;
+      deltaLog.prepend(li);
+
+      console.log("🧮 Delta scan executed.");
+    });
+  }
+
+  // === Reporting Console ===
+  const reportConsole = document.getElementById("reportingHubConsole");
+  if (reportConsole) {
+    const reportBtn = reportConsole.querySelector(".generate-report");
+    const reportTime = reportConsole.querySelector(".last-report-time");
+    const reportLog = reportConsole.querySelector(".report-entries");
+
+    reportBtn.addEventListener("click", () => {
+      const now = new Date().toLocaleTimeString();
+      reportTime.textContent = now;
+
+      const li = document.createElement("li");
+      li.textContent = `📄 Report_${now.replace(/:/g, "-")}`;
+      reportLog.prepend(li);
+
+      console.log("📄 Report generated.");
+    });
+  }
+
+  // === Session Manager Console ===
+  const sessionConsole = document.getElementById("sessionManagerConsole");
+  if (sessionConsole) {
+    const backupTime = sessionConsole.querySelector(".last-backup-time");
+    const sessionList = sessionConsole.querySelector(".session-entries");
+
+    sessionConsole.querySelector(".trigger-backup").addEventListener("click", () => {
+      const now = new Date().toLocaleTimeString();
+      backupTime.textContent = now;
+
+      const li = document.createElement("li");
+      li.textContent = `🗃 Session_${now.replace(/:/g, "-")}`;
+      sessionList.prepend(li);
+
+      console.log("💾 Session archived.");
+    });
+
+    sessionConsole.querySelector(".trigger-restore").addEventListener("click", () => {
+      const first = sessionList.querySelector("li");
+      if (first && !first.classList.contains("faint")) {
+        alert(`Restored: ${first.textContent}`);
+        console.log("♻️ Session restored.");
+      } else {
+        alert("⚠️ No session found.");
+      }
+    });
+  }
+
+  // === Utility Console ===
+  const utilityConsole = document.getElementById("utilityHubConsole");
+  if (utilityConsole) {
+    const queueState = utilityConsole.querySelector(".utility-queue");
+    const utilityLog = utilityConsole.querySelector(".utility-entries");
+
+    utilityConsole.querySelector(".run-diagnostics").addEventListener("click", () => {
+      queueState.textContent = "Running Diagnostics...";
+      const li = document.createElement("li");
+      li.textContent = `[${new Date().toLocaleTimeString()}] Running diagnostics...`;
+      utilityLog.appendChild(li);
+
+      setTimeout(() => {
+        queueState.textContent = "Idle";
+        const done = document.createElement("li");
+        done.textContent = `[${new Date().toLocaleTimeString()}] ✅ All systems nominal.`;
+        utilityLog.appendChild(done);
+      }, 1200);
+    });
+
+    utilityConsole.querySelector(".clear-log").addEventListener("click", () => {
+      utilityLog.innerHTML = `<li class="faint">Awaiting operations...</li>`;
+      console.log("🧹 Utility log cleared.");
+    });
+  }
+});
 // === Phase 16016 — Dock Mesh Reconciliation Engine ===
 
 window.NeuralDockMeshReconciler = (function () {
@@ -1913,6 +2093,41 @@ function runHealthDiagnostics() {
     output.innerHTML = `<pre>${report}</pre>`;
   }, 400);
 }
+
+// === Phase 12000.0: Orbit Button Panel Toggle Handler ===
+// This logic ensures all .holo-console panels (including #sovereignTerminal) are toggled, only one is visible at a time.
+document.addEventListener("DOMContentLoaded", () => {
+  const orbitButtons = document.querySelectorAll(".orbit-btn");
+  console.log("🛰️ Orbit Button Scanner: Found", orbitButtons.length, "orbit button(s).");
+  orbitButtons.forEach(btn => {
+    const panelName = btn.getAttribute("data-panel");
+    btn.addEventListener("click", () => {
+      console.log("🛸 Orbit Button Clicked — Activating:", panelName);
+      const targetId = panelName;
+      // For legacy log:
+      // console.log(`🛰️ Orbit Button Clicked — Target: ${targetId}`);
+      const target = document.querySelector(targetId);
+      if (!target) {
+        console.warn(`⚠️ Panel not found for: ${targetId}`);
+        return;
+      }
+      // Log panel being hidden
+      document.querySelectorAll(".holo-console").forEach(consoleEl => {
+        if (consoleEl !== target) {
+          consoleEl.classList.add("hidden");
+          consoleEl.setAttribute("aria-hidden", "true");
+          console.log(`🔒 Hiding panel: ${consoleEl.id}`);
+        }
+      });
+      // Toggle visibility
+      const isHidden = target.classList.contains("hidden");
+      target.classList.toggle("hidden");
+      target.setAttribute("aria-hidden", !isHidden);
+      console.log(`${isHidden ? "🔓 Revealed" : "🔒 Hidden"} panel: ${targetId}`);
+    });
+    console.log("🔗 Wiring orbit button to panel:", panelName);
+  });
+});
 // === Phase 9000.0: Orbital Control Room Panel Switching ===
 function switchControlPanel(panelKey) {
   const panels = document.querySelectorAll('.control-panel');

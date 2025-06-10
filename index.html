@@ -27,9 +27,74 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body class="dark-theme electric-fantasy">
-  <!-- Sovereign Toolbar Mount Point -->
-  <div id="sovereignToolbarMount" class="sovereign-toolbar-container"></div>
+  <div class="logo-banner-flex">
+    <img src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" class="logo-icon" />
+    <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
+    <!-- HoloConsole DOM deployment -->
+    <section id="holoConsoleDock" class="holo-console-wrapper">
+      <div class="holo-console-panel" data-console="predictive">
+        <header class="holo-console-header">Predictive HUD</header>
+        <div class="holo-console-body">
+          <!-- Predictive HUD content will be injected here -->
+        </div>
+      </div>
+      <div class="holo-console-panel" data-console="analytics">
+        <header class="holo-console-header">Analytics Core</header>
+        <div class="holo-console-body">
+          <!-- Analytics Core content will be injected here -->
+        </div>
+      </div>
+      <div class="holo-console-panel" data-console="audit">
+        <header class="holo-console-header">Audit Module</header>
+        <div class="holo-console-body">
+          <!-- Audit Module content will be injected here -->
+        </div>
+      </div>
+    </section>
+    <!-- 🧪 Tools Console Panel -->
+    <section id="tools" class="holo-console hidden" aria-hidden="true">
+      <header class="console-header">🧰 Tools Console</header>
+      <div class="console-body">
+        <p>Tools and utilities for system diagnostics and maintenance will appear here.</p>
+      </div>
+    </section>
+    <div id="sovereignToolbarMount" class="sovereign-toolbar-container"></div>
+    <!-- Additional HoloConsole Sovereign Panels -->
+    <section class="holo-console" id="exceptionManager" data-title="Exception Manager"></section>
+    <section class="holo-console" id="progressDashboard" data-title="Progress Dashboard"></section>
+    <section class="holo-console" id="reportingHub" data-title="Reporting Hub"></section>
+    <section class="holo-console" id="masterExportHub" data-title="Master Export Hub"></section>
+    <section class="holo-console" id="utilityHub" data-title="Utility Hub"></section>
+    <section class="holo-console" id="sessionManager" data-title="Session Manager"></section>
+    <section class="holo-console" id="mappings" data-title="Mappings"></section>
+    <section class="holo-console" id="tools" data-title="Tools"></section>
+    <section class="holo-console" id="audit" data-title="Audit"></section>
+    <section class="holo-console" id="configPanel" data-title="Configuration Panel"></section>
+  </div>
+  <header id="sovereignHeader">
+  </header>
+  <!-- 🧭 Sovereign Ascendant Toolbar -->
+  <div id="sovereignToolbar" class="sovereign-toolbar"></div>
   <div id="orbitalDockContainer" class="orbital-dock"></div>
+
+  <!-- === ORBIT BUTTONS (ensure all present and correct) === -->
+  <div id="orbitButtonsBar" style="display:none">
+    <button class="orbit-btn" data-panel="#countConsole">📊</button>
+    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">🧮</button>
+    <button class="orbit-btn" data-panel="#reportingHubConsole">📄</button>
+    <button class="orbit-btn" data-panel="#sessionManagerConsole">📂</button>
+    <button class="orbit-btn" data-panel="#utilityHubConsole">🛠</button>
+    <button class="orbit-btn" data-panel="#sovereignTerminal">🧠</button>
+  </div>
+
+  <!-- HoloConsole Sovereign Panels (for SovereignToolbar toggling) -->
+  <div id="countConsole" class="holo-console hidden"></div>
+  <div id="toolsConsole" class="holo-console hidden"></div>
+  <div id="oracleConsole" class="holo-console hidden"></div>
+  <div id="auditConsole" class="holo-console hidden"></div>
+  <div id="mappingsConsole" class="holo-console hidden"></div>
+  <div id="progressDashboardConsole" class="holo-console hidden"></div>
+  <div id="masterExportHubConsole" class="holo-console hidden"></div>
 
 
   <!-- All legacy static Operator Console Panel and legacy tab-section panels removed.
@@ -37,12 +102,7 @@
   <div id="operatorConsole" class="tabcontent"></div>
 
 
-  <header class="topbar mystic-header" role="banner">
-    <div class="logo-banner-flex">
-      <img src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" class="logo-icon" />
-      <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
-    </div>
-  </header>
+
 
 
   <!-- Phase 125.8 — Predictive Overlay Remover -->
@@ -53,35 +113,88 @@
   </style>
 
   <main class="container neon-container" role="main">
-    <div id="sovereignToolbarMount" class="sovereign-toolbar">
-      <!-- Sovereign Toolbar Buttons will render dynamically here -->
-    </div>
     <!-- Phase 300.12 — Orbital Dock Visibility Mesh (legacy static dock-toggle bar removed) -->
     <div class="mobile-wrapper">
       <div class="fantasy-wrapper electric-vibe">
       </div>
     </div>
+    <!-- 🧱 Sovereign Dock Grid Container -->
+    <!-- === Unified Holo Console Grid (moved just above Sovereign Orbit Dock) === -->
+  <!-- === Unified Holo Console Grid (moved just above Sovereign Orbit Dock) === -->
+  <div id="consoleGrid" class="holo-console-grid" style="margin-top: 30px;">
+    <!-- Live Counts Console -->
+    <section id="countConsole" class="holo-console hidden" aria-hidden="true">
+      <header class="console-header">📊 Live Counts Console</header>
+      <div class="console-body">
+        <p><strong>Status:</strong> <span class="live-status">🟢 Online</span></p>
+        <p><strong>Last Sync:</strong> <span class="last-sync">Fetching...</span></p>
+        <p>🗂 <em>Items Tracked:</em> <span class="count-items">0</span></p>
+        <p>📦 <em>Active Categories:</em> <span class="count-categories">0</span></p>
+        <p>📍 <em>Recent Additions:</em></p>
+        <ul class="recent-items"><li class="faint">No data yet.</li></ul>
+        <button class="refresh-counts">🔄 Refresh Data</button>
+      </div>
+    </section>
 
+    <!-- Delta Analyzer Console -->
+    <section id="deltaAnalyzerConsole" class="holo-console hidden" aria-hidden="true">
+      <header class="console-header">🧮 Delta Analyzer Console</header>
+      <div class="console-body">
+        <p><strong>Status:</strong> <span class="delta-status">🟢 Monitoring</span></p>
+        <p><strong>Last Anomaly Scan:</strong> <span class="delta-scan-time">Fetching...</span></p>
+        <p>📈 <em>Drift Events Detected:</em> <span class="drift-events">0</span></p>
+        <p>🚨 <em>Critical Spikes:</em> <span class="critical-spikes">0</span></p>
+        <ul class="delta-log-entries"><li class="faint">Awaiting data...</li></ul>
+        <button class="run-delta-scan">🔁 Run Anomaly Scan</button>
+      </div>
+    </section>
 
+    <!-- Reporting Hub Console -->
+    <section id="reportingHubConsole" class="holo-console hidden" aria-hidden="true">
+      <header class="console-header">📄 Reporting Hub Console</header>
+      <div class="console-body">
+        <p><strong>Status:</strong> <span class="report-status">🟢 Ready</span></p>
+        <p><strong>Last Report:</strong> <span class="last-report-time">None</span></p>
+        <p>📝 <em>Recent Reports:</em></p>
+        <ul class="report-entries"><li class="faint">No reports generated yet.</li></ul>
+        <button class="generate-report">📤 Generate System Report</button>
+      </div>
+    </section>
 
+    <!-- Session Manager Console -->
+    <section id="sessionManagerConsole" class="holo-console hidden" aria-hidden="true">
+      <header class="console-header">📂 Session Manager Console</header>
+      <div class="console-body">
+        <p><strong>Status:</strong> <span class="session-status">🟢 Monitoring</span></p>
+        <p><strong>Last Backup:</strong> <span class="last-backup-time">N/A</span></p>
+        <p>💾 <em>Stored Sessions:</em></p>
+        <ul class="session-entries"><li class="faint">No archived sessions found.</li></ul>
+        <button class="trigger-backup">💾 Archive Current Session</button>
+        <button class="trigger-restore">♻️ Restore Last Session</button>
+      </div>
+    </section>
+
+    <!-- Utility Hub Console -->
+    <section id="utilityHubConsole" class="holo-console hidden" aria-hidden="true">
+    <!-- Sovereign Terminal Console (if not present, add for completeness) -->
+    <section id="sovereignTerminal" class="holo-console hidden" aria-hidden="true"></section>
+      <header class="console-header">🛠 Utility Hub Console</header>
+      <div class="console-body">
+        <p><strong>Status:</strong> <span class="utility-status">🟢 Online</span></p>
+        <p><strong>Command Queue:</strong> <span class="utility-queue">Idle</span></p>
+        <p>📚 <em>Utility Log:</em></p>
+        <ul class="utility-entries"><li class="faint">Awaiting operations...</li></ul>
+        <button class="run-diagnostics">🧪 Run Diagnostics</button>
+        <button class="clear-log">🧹 Clear Log</button>
+      </div>
+    </section>
+    <!-- Placeholders for other consoles (unchanged) -->
+    <section id="exceptionManagerConsole" class="holo-console hidden" aria-hidden="true"></section>
+    <section id="configPanelConsole" class="holo-console hidden" aria-hidden="true"></section>
+  </div>
 
   </main>
 
-<!-- Bind Drift Visualizer Button -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const launchDriftBtn = document.getElementById("launchDriftVisualizerBtn");
-  if (launchDriftBtn) {
-    launchDriftBtn.addEventListener("click", () => {
-      if (typeof window.renderForecastDriftChart === "function") {
-        window.renderForecastDriftChart();
-      } else {
-        alert("Drift Visualizer not available.");
-      }
-    });
-  }
-});
-</script>
 <!-- Phase 201.2 — Neural Intake Uploader binding -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -207,7 +320,10 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(`✅ Neural Intake contains ${parsed.length} rows. First 5 samples logged to console.`);
   });
 
-  document.getElementById("operatorTools").appendChild(validateIntakeBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(validateIntakeBtn);
+  }
 });
 </script>
 
@@ -244,7 +360,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📦 Neural Session archived successfully.");
   });
 
-  document.getElementById("operatorTools").appendChild(archiveIntakeBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(archiveIntakeBtn);
+  }
 });
 </script>
 
@@ -312,7 +431,10 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsText(file);
   });
 
-  document.getElementById("operatorTools").appendChild(replayBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(replayBtn);
+  }
 });
 </script>
 
@@ -345,7 +467,10 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(message);
   });
 
-  document.getElementById("operatorTools").appendChild(growthBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(growthBtn);
+  }
 });
 </script>
 
@@ -394,7 +519,10 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(message);
   });
 
-  document.getElementById("operatorTools").appendChild(stabilityBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(stabilityBtn);
+  }
 });
 </script>
 
@@ -443,7 +571,10 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(message);
   });
 
-  document.getElementById("operatorTools").appendChild(healthIndexBtn);
+  const operatorTools = document.getElementById("operatorTools");
+  if (operatorTools) {
+    operatorTools.appendChild(healthIndexBtn);
+  }
 });
 </script>
 
@@ -456,41 +587,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const categorySelect = document.getElementById("categorySelect");
   const addLiveItemBtn = document.getElementById("addLiveItem");
 
-  addLiveItemBtn.addEventListener("click", () => {
-    const itemNumber = scanInput.value.trim();
-    const qty = parseInt(liveQty.value);
-    const category = categorySelect.value;
+  if (addLiveItemBtn) {
+    addLiveItemBtn.addEventListener("click", () => {
+      const itemNumber = scanInput ? scanInput.value.trim() : "";
+      const qty = liveQty ? parseInt(liveQty.value) : NaN;
+      const category = categorySelect ? categorySelect.value : "";
 
-    if (!itemNumber || isNaN(qty) || qty <= 0) {
-      alert("Please enter valid item and quantity.");
-      return;
-    }
+      if (!itemNumber || isNaN(qty) || qty <= 0) {
+        alert("Please enter valid item and quantity.");
+        return;
+      }
 
-    // Phase 630.0 — Risk & Anomaly Signal Injection
-    const forecastEntry = {
-      timestamp: new Date().toISOString(),
-      itemNumber: itemNumber,
-      division: category,
-      onHandUnits: qty,
-      cycleCountUnits: 0,
-      shrinkUnits: 0,
-      itdSalesUnits: 0,
-      stabilityHint: "Stable",
-      riskSignal: "🟢 Stable",
-      anomalySignal: "⚪ Unanalyzed"
-    };
+      // Phase 630.0 — Risk & Anomaly Signal Injection
+      const forecastEntry = {
+        timestamp: new Date().toISOString(),
+        itemNumber: itemNumber,
+        division: category,
+        onHandUnits: qty,
+        cycleCountUnits: 0,
+        shrinkUnits: 0,
+        itdSalesUnits: 0,
+        stabilityHint: "Stable",
+        riskSignal: "🟢 Stable",
+        anomalySignal: "⚪ Unanalyzed"
+      };
 
-    if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
-      window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
-    }
+      if (typeof window.NeuralForecastMemoryCortex?.injectForecastRecord === "function") {
+        window.NeuralForecastMemoryCortex.injectForecastRecord(forecastEntry);
+      }
 
-    if (window.NeuralVisualSync?.refreshLiveTableFromCortex) {
-      window.NeuralVisualSync.refreshLiveTableFromCortex();
-    }
+      if (window.NeuralVisualSync?.refreshLiveTableFromCortex) {
+        window.NeuralVisualSync.refreshLiveTableFromCortex();
+      }
 
-    scanInput.value = "";
-    scanInput.focus();
-  });
+      if (scanInput) {
+        scanInput.value = "";
+        scanInput.focus();
+      }
+    });
+  }
 });
 </script>
 
@@ -569,20 +704,24 @@ document.addEventListener("DOMContentLoaded", () => {
       window.NeuralVisualSync.refreshLiveTableFromCortex();
     }
 
-    scanInput.value = "";
-    scanInput.focus();
+    if (scanInput) {
+      scanInput.value = "";
+      scanInput.focus();
+    }
   }
 
   // Attach modal buttons once for all modes:
   const bindModalButton = (btnId) => {
     const button = document.getElementById(btnId);
-    button?.addEventListener("click", () => {
-      const itemNumber = prompt("Enter Lowe's Item #");
-      const qty = parseInt(liveQty.value);
-      const category = categorySelect.value;
-      if (!itemNumber) return;
-      handleModalComplete(itemNumber, category, qty);
-    });
+    if (button) {
+      button.addEventListener("click", () => {
+        const itemNumber = prompt("Enter Lowe's Item #");
+        const qty = liveQty ? parseInt(liveQty.value) : 1;
+        const category = categorySelect ? categorySelect.value : "";
+        if (!itemNumber) return;
+        handleModalComplete(itemNumber, category, qty);
+      });
+    }
   };
 
   bindModalButton("modalBtnProduct");
@@ -606,6 +745,134 @@ document.addEventListener("DOMContentLoaded", () => {
     SageCraft Ascendant — Sovereign Codex </span> ⚡
   </footer>
 
+  <!-- 🌌 Sovereign Orbit Dock -->
+  <div id="sovereignOrbitDock" style="
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    display: flex;
+    gap: 16px;
+    background: rgba(30, 30, 48, 0.9);
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(153, 51, 255, 0.8);
+    backdrop-filter: blur(8px);
+  ">
+    <button class="orbit-btn" data-panel="#countConsole">📊</button>
+    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">🧮</button>
+    <button class="orbit-btn" data-panel="#reportingHubConsole">📄</button>
+    <button class="orbit-btn" data-panel="#sessionManagerConsole">📂</button>
+    <button class="orbit-btn" data-panel="#utilityHubConsole">🛠</button>
+  </div>
+
+  <!-- 🧠 Sovereign Terminal Console -->
+  <section id="sovereignTerminal" class="holo-console terminal-console hidden" aria-hidden="true">
+    <header class="console-header">🧠 Sovereign Terminal</header>
+    <div class="console-body">
+      <pre id="terminalOutput" style="min-height: 160px;">:: Sovereign Console Initialized
+:: Type a command and press enter...</pre>
+      <input id="terminalInput" type="text" placeholder="> Enter command..." style="
+        width: 100%;
+        background: rgba(0,0,0,0.8);
+        color: #00ff99;
+        border: none;
+        padding: 10px;
+        margin-top: 10px;
+        font-family: monospace;
+        font-size: 1em;
+        border-radius: 6px;
+      " />
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const terminal = document.getElementById("sovereignTerminal");
+      const input = document.getElementById("terminalInput");
+      const output = document.getElementById("terminalOutput");
+
+      if (terminal && input && output) {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            const cmd = input.value.trim();
+            if (!cmd) return;
+            output.textContent += `\n> ${cmd}`;
+            let response = "";
+
+            switch (cmd.toLowerCase()) {
+              case "help":
+                response = "Available commands: help, status, clear, credits, secret";
+                break;
+              case "status":
+                response = "All systems operational. No anomalies detected.";
+                break;
+              case "clear":
+                output.textContent = ":: Console cleared.";
+                input.value = "";
+                return;
+              case "credits":
+                response = "Sovereign Codex Framework — Created by Tyson & Sage";
+                break;
+              case "secret":
+                response = "🔮 You have awakened a deeper thread...";
+                break;
+              default:
+                response = "Unknown command. Type 'help' for options.";
+            }
+
+            output.textContent += `\n${response}`;
+            input.value = "";
+            output.scrollTop = output.scrollHeight;
+          }
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .orbit-btn {
+      background: radial-gradient(circle at center, #9933ff 0%, #2a003f 100%);
+      border: 2px solid #cc66ff;
+      color: #fff;
+      font-size: 1.5em;
+      padding: 10px 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(204, 102, 255, 0.7);
+    }
+    .orbit-btn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.9);
+      background: #cc66ff;
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const orbitButtons = document.querySelectorAll(".orbit-btn");
+      orbitButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("data-panel");
+          const target = document.querySelector(targetId);
+          if (!target) return;
+
+          document.querySelectorAll(".holo-console").forEach(console => {
+            if (console !== target) {
+              console.classList.add("hidden");
+              console.setAttribute("aria-hidden", "true");
+            }
+          });
+
+          target.classList.toggle("hidden");
+          target.setAttribute("aria-hidden", !target.classList.contains("hidden"));
+        });
+      });
+    });
+  </script>
+
   <script>
   // Dynamic Version Extractor
   (function() {
@@ -618,9 +885,15 @@ document.addEventListener("DOMContentLoaded", () => {
           found = version;
         }
       });
-      document.getElementById('versionInfo').innerText = found || "v? (not detected)";
+      const versionInfoEl = document.getElementById('versionInfo');
+      if (versionInfoEl) {
+        versionInfoEl.innerText = found || "v? (not detected)";
+      }
     } catch {
-      document.getElementById('versionInfo').innerText = "v? (error)";
+      const versionInfoEl = document.getElementById('versionInfo');
+      if (versionInfoEl) {
+        versionInfoEl.innerText = "v? (error)";
+      }
     }
   })();
   </script>
@@ -812,14 +1085,42 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   </div>
 
-  <!-- === External Libraries (unchanged) === -->
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- SheetJS (xlsx parser) -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
+  <!-- 🧠 Sovereign Toolbar Forge -->
+  <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
   <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
   <script src="scripts/bootstrap/bootstrapLoader.js"></script>
+
+  <!-- Wiring logic loader -->
+  <script src="scripts/bootstrap/wiring.js"></script>
+
+  <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleButtons = document.querySelectorAll(".dock-toggle-button");
+      toggleButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          const target = document.querySelector(button.getAttribute("data-target"));
+          if (!target) return;
+
+          const allConsoles = document.querySelectorAll(".holo-console");
+          allConsoles.forEach(console => {
+            if (console !== target) {
+              console.classList.add("hidden");
+              console.setAttribute("aria-hidden", "true");
+            }
+          });
+
+          target.classList.toggle("hidden");
+          target.setAttribute("aria-hidden", !target.classList.contains("hidden"));
+        });
+      });
+    });
+  </script>
 
 <!-- Phase 600.0 — Predictive HUD Deep Linkage Bootstrap -->
 <script>
@@ -948,6 +1249,55 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </div>
 
+<!-- Phase 900.1 — Sovereign Console Module: Tools -->
+<div id="sovereignConsole-tools" class="sovereign-console-panel" style="
+  display: none;
+  background: #1b1b2f;
+  border: 2px solid #9933ff;
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  font-family: monospace;
+  max-width: 90%;
+  margin: 20px auto;
+  box-shadow: 0 0 15px rgba(153, 51, 255, 0.8);
+">
+  <h3 style="margin-top: 0; color: #cc66ff;">🛠 Tools Console</h3>
+  <p>This is the dedicated Sovereign Console for Tools operations.</p>
+  <button onclick="alert('🔧 Tool A Activated')">Run Tool A</button>
+  <button onclick="alert('🔩 Tool B Activated')">Run Tool B</button>
+</div>
+
+  <!-- Phase 900.2 — Sovereign Console Module: Forecast -->
+<div id="sovereignConsole-forecast" class="sovereign-console-panel hidden" style="
+  display: none;
+  background: #1b1b2f;
+  border: 2px solid #9933ff;
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  font-family: monospace;
+  max-width: 90%;
+  margin: 20px auto;
+  box-shadow: 0 0 15px rgba(153, 51, 255, 0.8);
+">
+  <div class="console-header" style="display: flex; align-items: center; justify-content: space-between;">
+    <h2 style="margin: 0; color: #cc66ff;">🧠 Forecast Console</h2>
+    <button class="console-close" style="font-size: 1.2em; background: none; border: none; color: #fff; cursor: pointer;" onclick="SovereignToolbarRenderer.toggleConsole('forecast')">✖</button>
+  </div>
+  <div class="console-body" style="margin-top: 20px;">
+    <p>Welcome to the Forecast Console. Here you will find predictive diagnostics and anomaly visualizations.</p>
+    <ul class="console-feature-list" style="list-style: none; padding-left: 0; margin-top: 15px;">
+      <li style="margin-bottom: 8px;">📊 Drift Sentinels</li>
+      <li style="margin-bottom: 8px;">🌀 Predictive Cortex</li>
+      <li style="margin-bottom: 8px;">🧬 Recursive Memory Mapper</li>
+      <li style="margin-bottom: 8px;">🔮 Adaptive Confidence Overlay</li>
+    </ul>
+  </div>
+</div>
+
+
+
 <!-- Phase 200.13 — Forecast Drift Visualizer -->
 <div id="forecastDriftModal" style="
   display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
@@ -962,13 +1312,9 @@ document.addEventListener("DOMContentLoaded", () => {
     <canvas id="forecastDriftChart" width="400" height="250"></canvas>
     <div style="text-align:center; margin-top:15px;">
       <button id="closeDriftChartBtn">❌ Close</button>
-      <button id="generateForecastBtn" ...></button>
-      <canvas id="forecastDriftChart" width="600" height="300"></canvas>
-      <button onclick="SageCraftAscendant.ForecastDriftVisualizer.renderDriftChart()">📊 Render Forecast Drift Chart</button>
     </div>
   </div>
 </div>
-</script>
 <script>
 const predictiveHud = document.getElementById("brainDockHudPanel");
 const brainDockBtn = document.getElementById("brainDockButton");
@@ -1002,8 +1348,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const labels = cortex.map(f => f.timestamp.slice(11, 19));
     const states = cortex.map(f => {
-      if (f.state.match(/Stable/i)) return 1;
-      if (f.state.match(/Volatile|Surge|Regression/i)) return -1;
+      if (f.state && f.state.match(/Stable/i)) return 1;
+      if (f.state && f.state.match(/Volatile|Surge|Regression/i)) return -1;
       return 0;
     });
 
@@ -1032,7 +1378,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 });
-  </script>
+</script>
   <!-- DOM Sync Audit Utility -->
   <!-- <script type="module">
 
@@ -1123,5 +1469,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dockButtons.length > 0) {
     dockButtons[0].click();
   }
+});
+</script>
+
+<!-- Phase 900.2 — Sovereign Console Toggle Logic -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".sovereign-toolbar-container button[data-panel-id]");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panelId = btn.getAttribute("data-panel-id");
+      if (!panelId) return;
+      document.querySelectorAll(".sovereign-console-panel").forEach(p => p.style.display = "none");
+      const targetPanel = document.getElementById(panelId);
+      if (targetPanel) targetPanel.style.display = "block";
+    });
+  });
 });
 </script>

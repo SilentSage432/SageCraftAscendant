@@ -1,6 +1,7 @@
+// ✅ Sovereign Hook Activated — Renderer Ready for Deployment
 // === Phase 1903: Sovereign Toolbar Dynamic Renderer Bootstrap ===
 
-export function renderSovereignToolbar() {
+function renderSovereignToolbar() {
   console.log("🧭 Sovereign Toolbar Renderer Engaged...");
 
   const mountPoint = document.getElementById("sovereignToolbarMount");
@@ -24,39 +25,73 @@ export function renderSovereignToolbar() {
     { id: "mappings", label: "Mappings" },
     { id: "tools", label: "Tools" },
     { id: "audit", label: "Audit" },
-    { id: "configPanel", label: "Config" }
+    { id: "configPanel", label: "Config" },
+    { id: "forecastConsole", label: "Forecast Console" }
   ];
+
+  const toolbarWrapper = document.createElement("div");
+  toolbarWrapper.className = "sovereign-toolbar-container";
 
   buttonConfigs.forEach(cfg => {
     const btn = document.createElement("button");
+    btn.setAttribute("data-toggle-dock", cfg.id);
     btn.innerText = cfg.label;
     btn.className = "sovereign-toolbar-button";
     btn.addEventListener("click", () => {
-      const panel = document.getElementById(cfg.id);
-      if (!panel) {
-        console.warn(`⚠ Panel '${cfg.id}' not found for toolbar toggle.`);
+      // Remove active state from all buttons
+      document.querySelectorAll(".sovereign-toolbar-button").forEach(button => {
+        button.classList.remove("active");
+      });
+      btn.classList.add("active");
+
+      // Define dual panel types for future-proofing
+      const dockPanel = document.getElementById(cfg.id);
+      const holoConsole = document.getElementById(`${cfg.id}Console`);
+
+      // Hide all other panels (both types)
+      buttonConfigs.forEach(otherCfg => {
+        const otherDock = document.getElementById(otherCfg.id);
+        const otherConsole = document.getElementById(`${otherCfg.id}Console`);
+        if (otherDock && otherCfg.id !== cfg.id) {
+          otherDock.classList.add("hidden");
+          otherDock.style.display = 'none';
+        }
+        if (otherConsole && otherCfg.id !== cfg.id) {
+          otherConsole.classList.add("hidden");
+          otherConsole.style.display = 'none';
+        }
+      });
+
+      // Determine target panel to toggle
+      const target = holoConsole || dockPanel;
+      if (!target) {
+        console.warn(`⚠ No target found for toggle: Neither '${cfg.id}' nor '${cfg.id}Console' exists in DOM.`);
         return;
       }
 
-      const isHidden = panel.classList.contains("hidden");
+      const isHidden = target.classList.contains("hidden");
       if (isHidden) {
-        panel.classList.remove("hidden");
-        panel.style.display = 'block';
+        target.classList.remove("hidden");
+        target.style.display = 'block';
       } else {
-        panel.classList.add("hidden");
-        panel.style.display = 'none';
+        target.classList.add("hidden");
+        target.style.display = 'none';
       }
 
       console.log(`🔄 Toggled panel: ${cfg.label} → ${isHidden ? 'Visible' : 'Hidden'}`);
     });
-    mountPoint.appendChild(btn);
+    console.log(`🔘 Rendering button: ${cfg.label} (ID: ${cfg.id})`);
+    toolbarWrapper.appendChild(btn);
   });
 
+  mountPoint.appendChild(toolbarWrapper);
+
   console.log("✅ Sovereign Toolbar fully populated.");
+  console.log("🔗 Sovereign Toolbar Renderer Hook Confirmed.");
 }
 // === Phase 1906.4: Sovereign DOM Scaffold Temporal Correction Layer ===
 
-export function renderSovereignToolbarSafe() {
+function renderSovereignToolbarSafe() {
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       setTimeout(() => {
         renderSovereignToolbar();
@@ -75,8 +110,6 @@ class SovereignToolbarRenderer {
     renderSovereignToolbarSafe();
   }
 }
-
-export default SovereignToolbarRenderer;
 
 // Sovereign Subsystem Registration
 window.SovereignSubsystems = window.SovereignSubsystems || {};

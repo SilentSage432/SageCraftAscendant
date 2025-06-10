@@ -516,3 +516,150 @@ body {
     font-size: 1.6em;
   }
 }
+/* === Phase 1909 — Sovereign Toolbar Forge Styling === */
+
+.sovereign-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-panel-border);
+  box-shadow: 0 0 25px #22003388, inset 0 0 12px #00000088;
+  z-index: 1000;
+  position: relative;
+}
+
+.sovereign-btn {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #331144, #220033);
+  color: var(--color-text);
+  border: none;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  font-size: 0.95em;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px #22003366, inset 0 0 8px #00000088;
+  transition: all 0.3s ease;
+}
+
+.sovereign-btn:hover {
+  background: linear-gradient(90deg, #552288, #330044);
+  box-shadow: 0 0 20px var(--color-accent), 0 0 30px #331144aa;
+  transform: scale(1.05);
+}
+
+.sovereign-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 30px var(--color-accent), inset 0 0 12px #220033aa;
+}
+.sovereign-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 30px var(--color-accent), inset 0 0 12px #220033aa;
+}
+
+/* === Sovereign Toolbar Styles === */
+#sovereignHeader {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.sovereign-toolbar-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px;
+  background: #1e1e1e;
+  border-bottom: 2px solid #444;
+}
+
+.sovereign-toolbar-button {
+  padding: 6px 12px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #666;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.sovereign-toolbar-button:hover {
+  background: #555;
+}
+
+body {
+  padding-top: 60px; /* Space for the fixed header */
+}
+
+
+/* === Phase 400.5 — HoloConsole CSS Framework Layer === */
+
+.holo-console {
+  background: radial-gradient(circle at top left, rgba(51, 17, 68, 0.9), rgba(17, 0, 33, 0.95));
+  border: 1px solid var(--color-panel-border);
+  border-radius: 12px;
+  box-shadow: 0 0 30px #220033cc, inset 0 0 20px #00000088;
+  color: var(--color-text);
+  font-family: 'Orbitron', sans-serif;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 95%;
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.holo-console.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.holo-console h3 {
+  font-size: 1.6em;
+  color: var(--color-accent);
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px var(--color-deep-accent);
+  text-align: center;
+}
+
+.holo-console p {
+  font-size: 1em;
+  color: var(--color-subtext);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.holo-toggle {
+  display: inline-block;
+  margin: 0 auto 16px auto;
+  padding: 8px 18px;
+  background: linear-gradient(90deg, #331144, #220033);
+  color: var(--color-text);
+  border: none;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  font-size: 0.95em;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px #22003366, inset 0 0 8px #00000088;
+  transition: all 0.3s ease;
+}
+
+.holo-toggle:hover {
+  background: linear-gradient(90deg, #552288, #330044);
+  box-shadow: 0 0 20px var(--color-accent), 0 0 30px #331144aa;
+  transform: scale(1.05);
+}
+
+.holo-toggle:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 30px var(--color-accent), inset 0 0 12px #220033aa;
+}

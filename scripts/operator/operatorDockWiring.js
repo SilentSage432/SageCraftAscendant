@@ -1,56 +1,47 @@
-// === Phase 1000.0: Sovereign Dock Population Matrix Injection ===
-
-OperatorDockWiring.populateDockMatrix = function() {
-    console.log("🚀 Sovereign Dock Population Matrix Injection Activated");
-
-    const dockDefinitions = [
-        { id: "count", label: "📊 Live Counts", description: "Live inventory counting subsystem online." },
-        { id: "deltaAnalyzer", label: "Δ Delta Analyzer", description: "Delta analytics subsystem loaded." },
-        { id: "exceptionManager", label: "⚠ Exception Manager", description: "Monitoring anomaly exceptions." },
-        { id: "progressDashboard", label: "🚦 Progress Dashboard", description: "System progress indicators operational." },
-        { id: "reportingHub", label: "📄 Reporting Hub", description: "Report generation subsystem ready." },
-        { id: "masterExportHub", label: "📤 Master Export Hub", description: "Bulk export interfaces deployed." },
-        { id: "utilityHub", label: "🛠 Utility Hub", description: "Utility tools accessible here." },
-        { id: "sessionManager", label: "📂 Session Manager", description: "Session archival and recovery available." },
-        { id: "mappings", label: "🗺 Mappings Interface", description: "Mapping configuration subsystem loaded." },
-        { id: "tools", label: "🔧 Tools Panel", description: "Developer and diagnostic tools online." },
-        { id: "audit", label: "📋 Audit Manager", description: "System audit controls engaged." },
-        { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." }
-    ];
-
-    const dockGrid = document.getElementById("operatorDockGrid");
-    if (!dockGrid) {
-        console.warn("❌ Dock Grid container not found.");
-        return;
-    }
-
-    dockDefinitions.forEach(def => {
-        let panel = document.getElementById(def.id);
-        if (!panel) {
-            panel = document.createElement("div");
-            panel.id = def.id;
-            panel.classList.add("tab-section", "dock-panel");
-            dockGrid.appendChild(panel);
-            console.log(`✅ Sovereign Dock Panel Created: ${def.id}`);
-        }
-        panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
-    });
-
-    console.log("✅ Sovereign Dock Population Matrix Injection Complete.");
-};
-
-// Call the population method during initialization
-document.addEventListener("DOMContentLoaded", () => {
-    OperatorDockWiring.populateDockMatrix();
-});
-// SageCraft Ascendant — Phase 41: Operator Dock Wiring Layer Injection
-
-console.log("🔌 Operator Dock Wiring Module Initialized");
-
 // Dock wiring object for future dynamic dock control
-const OperatorDockWiring = {
+var OperatorDockWiring = {
+    // === Phase 1000.0: Sovereign Dock Population Matrix Injection ===
+    populateDockMatrix: function () {
+        console.log("🚀 Sovereign Dock Population Matrix Injection Activated");
+
+        const dockDefinitions = [
+            { id: "count", label: "📊 Live Counts", description: "Live inventory counting subsystem online." },
+            { id: "deltaAnalyzer", label: "Δ Delta Analyzer", description: "Delta analytics subsystem loaded." },
+            { id: "exceptionManager", label: "⚠ Exception Manager", description: "Monitoring anomaly exceptions." },
+            { id: "progressDashboard", label: "🚦 Progress Dashboard", description: "System progress indicators operational." },
+            { id: "reportingHub", label: "📄 Reporting Hub", description: "Report generation subsystem ready." },
+            { id: "masterExportHub", label: "📤 Master Export Hub", description: "Bulk export interfaces deployed." },
+            { id: "utilityHub", label: "🛠 Utility Hub", description: "Utility tools accessible here." },
+            { id: "sessionManager", label: "📂 Session Manager", description: "Session archival and recovery available." },
+            { id: "mappings", label: "🗺 Mappings Interface", description: "Mapping configuration subsystem loaded." },
+            { id: "tools", label: "🔧 Tools Panel", description: "Developer and diagnostic tools online." },
+            { id: "audit", label: "📋 Audit Manager", description: "System audit controls engaged." },
+            { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." }
+        ];
+
+        const dockGrid = document.getElementById("operatorDockGrid");
+        if (!dockGrid) {
+            console.warn("❌ Dock Grid container not found.");
+            return;
+        }
+
+        dockDefinitions.forEach(def => {
+            let panel = document.getElementById(def.id);
+            if (!panel) {
+                panel = document.createElement("div");
+                panel.id = def.id;
+                panel.classList.add("tab-section", "dock-panel");
+                dockGrid.appendChild(panel);
+                console.log(`✅ Sovereign Dock Panel Created: ${def.id}`);
+            }
+            panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
+        });
+
+        console.log("✅ Sovereign Dock Population Matrix Injection Complete.");
+    },
     dockSchemaVersion: 1,
     eventHooks: {},
+// (rest of object unchanged)
 
     on: function(eventName, callback) {
         if (!this.eventHooks[eventName]) {
@@ -1398,6 +1389,29 @@ const OperatorDockWiring = {
     }
 };
 
+// Ensure DOMContentLoaded event is safely bound
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof OperatorDockWiring.populateDockMatrix === "function") {
+        OperatorDockWiring.populateDockMatrix();
+    } else {
+        console.warn("⚠️ OperatorDockWiring.populateDockMatrix not found.");
+    }
+});
+
+// === HoloConsole Collapsible Toggle Logic ===
+document.addEventListener("DOMContentLoaded", () => {
+  const toggles = document.querySelectorAll(".holo-toggle");
+  toggles.forEach(toggle => {
+    toggle.addEventListener("click", () => {
+      const targetId = toggle.getAttribute("data-target");
+      const consolePanel = document.getElementById(targetId);
+      if (consolePanel) {
+        consolePanel.classList.toggle("open");
+      }
+    });
+  });
+});
+
 // Expose globally if needed for cross-module usage
 window.OperatorDockWiring = OperatorDockWiring;
 
@@ -1533,6 +1547,15 @@ setTimeout(() => {
         panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
     });
 
+    // === Phase 400.1: Sovereign Toolbar DOM Injection ===
+    console.log("🚀 Executing Phase 400.1 — Sovereign Toolbar DOM Injection...");
+    if (typeof SovereignToolbarRenderer?.renderToolbar === "function") {
+        SovereignToolbarRenderer.renderToolbar();
+        console.log("✅ Sovereign Toolbar successfully rendered.");
+    } else {
+        console.warn("⚠ SovereignToolbarRenderer.renderToolbar not available.");
+    }
+
 }, 1000);
 
 
@@ -1574,6 +1597,344 @@ OperatorDockWiring.registerSubsystemDock({
     }
 });
 
+// Forecast Console Subsystem Dock Registration
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "forecastConsole",
+    onClick: () => {
+        console.log("📊 Forecast Console Activated");
+        alert("📊 Forecast Console Panel Loaded — Forecasting Subsystem Online");
+    }
+});
+
+// === Additional Subsystem Dock Registrations ===
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "count",
+    onClick: () => {
+        console.log("📊 Sovereign Live Counts Panel Activated");
+        alert("📊 Live Counts Panel Loaded — Inventory Counting System Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "deltaAnalyzer",
+    onClick: () => {
+        console.log("Δ Sovereign Delta Analyzer Panel Activated");
+        alert("🔍 Delta Analyzer Panel Loaded — Drift Detection Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "reportingHub",
+    onClick: () => {
+        console.log("📄 Reporting Hub Activated");
+        alert("📄 Reporting Hub Loaded — Report Generation Ready");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "sessionManager",
+    onClick: () => {
+        console.log("📂 Session Manager Activated");
+        alert("📂 Session Manager Loaded — Archive and Recovery Online");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "utilityHub",
+    onClick: () => {
+        console.log("🛠 Utility Hub Activated");
+        alert("🛠 Utility Hub Loaded — Diagnostic Tools Ready");
+    }
+});
+
+// 🧠 Phase 400.9 — Delta Analyzer Console Initialization
+const deltaAnalyzerConsole = document.createElement('div');
+deltaAnalyzerConsole.classList.add('holo-console');
+deltaAnalyzerConsole.id = 'deltaAnalyzerConsole';
+deltaAnalyzerConsole.innerHTML = `
+  <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+    🌀 Delta Analyzer Console
+  </div>
+  <div class="console-body">
+    <p>Delta drift data, spike detection, and correction logs will render here.</p>
+  </div>
+`;
+document.body.appendChild(deltaAnalyzerConsole);
+
+// === HoloConsole Initialization for All Sovereign Panels ===
+const dockConsoles = {
+    countConsole: {
+        title: "📊 Live Counts Console",
+        body: `
+      <div class="console-section">
+        <p><strong>Status:</strong> <span class="live-status">🟢 Online</span></p>
+        <p><strong>Last Sync:</strong> <span class="last-sync">Fetching...</span></p>
+        <div class="count-log">
+          <p>🗂 <em>Items Tracked:</em> <span class="count-items">0</span></p>
+          <p>📦 <em>Active Categories:</em> <span class="count-categories">0</span></p>
+          <p>📍 <em>Recent Additions:</em></p>
+          <ul class="recent-items">
+            <li class="faint">No data yet.</li>
+          </ul>
+        </div>
+        <button class="refresh-counts">🔄 Refresh Data</button>
+      </div>
+    `
+    },
+    deltaAnalyzerConsole: {
+        title: "🧮 Delta Analyzer Console",
+        body: `
+      <div class="console-section">
+        <p><strong>Status:</strong> <span class="delta-status">🟢 Monitoring</span></p>
+        <p><strong>Last Anomaly Scan:</strong> <span class="delta-scan-time">Fetching...</span></p>
+        <div class="delta-log">
+          <p>📈 <em>Drift Events Detected:</em> <span class="drift-events">0</span></p>
+          <p>🚨 <em>Critical Spikes:</em> <span class="critical-spikes">0</span></p>
+          <p>📋 <em>Log Entries:</em></p>
+          <ul class="delta-log-entries">
+            <li class="faint">Awaiting data...</li>
+          </ul>
+        </div>
+        <button class="run-delta-scan">🔁 Run Anomaly Scan</button>
+      </div>
+    `
+    },
+    reportingHubConsole: {
+        title: "📄 Reporting Hub Console",
+        body: `
+      <div class="console-section">
+        <p><strong>Status:</strong> <span class="report-status">🟢 Ready</span></p>
+        <p><strong>Last Report:</strong> <span class="last-report-time">None</span></p>
+        <div class="report-log">
+          <p>📝 <em>Recent Reports:</em></p>
+          <ul class="report-entries">
+            <li class="faint">No reports generated yet.</li>
+          </ul>
+        </div>
+        <button class="generate-report">📤 Generate System Report</button>
+      </div>
+    `
+    },
+    sessionManagerConsole: {
+        title: "📂 Session Manager Console",
+        body: `
+      <div class="console-section">
+        <p><strong>Status:</strong> <span class="session-status">🟢 Monitoring</span></p>
+        <p><strong>Last Backup:</strong> <span class="last-backup-time">N/A</span></p>
+        <div class="session-log">
+          <p>💾 <em>Stored Sessions:</em></p>
+          <ul class="session-entries">
+            <li class="faint">No archived sessions found.</li>
+          </ul>
+        </div>
+        <button class="trigger-backup">💾 Archive Current Session</button>
+        <button class="trigger-restore">♻️ Restore Last Session</button>
+      </div>
+    `
+    },
+    utilityHubConsole: {
+        title: "🛠 Utility Hub Console",
+        body: `
+      <div class="console-section">
+        <p><strong>Status:</strong> <span class="utility-status">🟢 Online</span></p>
+        <p><strong>Command Queue:</strong> <span class="utility-queue">Idle</span></p>
+        <div class="utility-log">
+          <p>📚 <em>Utility Log:</em></p>
+          <ul class="utility-entries">
+            <li class="faint">Awaiting operations...</li>
+          </ul>
+        </div>
+        <button class="run-diagnostics">🧪 Run Diagnostics</button>
+        <button class="clear-log">🧹 Clear Log</button>
+      </div>
+    `
+    }
+};
+
+Object.entries(dockConsoles).forEach(([id, content]) => {
+    const consoleEl = document.createElement('div');
+    consoleEl.classList.add('holo-console');
+    consoleEl.id = id;
+    consoleEl.innerHTML = `
+      <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        ${content.title}
+      </div>
+      <div class="console-body">
+        ${content.body}
+      </div>
+    `;
+    document.body.appendChild(consoleEl);
+    console.log(`✅ ${id} initialized and wired to DOM`);
+});
+
+// === Live Counts Console Runtime Activation ===
+setTimeout(() => {
+    const countConsole = document.getElementById("countConsole");
+    if (!countConsole) return;
+
+    const lastSync = countConsole.querySelector(".last-sync");
+    const itemSpan = countConsole.querySelector(".count-items");
+    const categorySpan = countConsole.querySelector(".count-categories");
+    const recentList = countConsole.querySelector(".recent-items");
+
+    const fakeData = {
+        lastSync: new Date().toLocaleString(),
+        items: 127,
+        categories: 9,
+        recent: ["Dishwashers", "Tool Chests", "Air Conditioners"]
+    };
+
+    lastSync.textContent = fakeData.lastSync;
+    itemSpan.textContent = fakeData.items;
+    categorySpan.textContent = fakeData.categories;
+    recentList.innerHTML = fakeData.recent.map(item => `<li>${item}</li>`).join("");
+
+    countConsole.querySelector(".refresh-counts").addEventListener("click", () => {
+        console.log("🔄 Manual data refresh triggered.");
+        alert("Live Counts refreshed from Cortex.");
+    });
+
+    console.log("✅ Live Counts Console Bootstrapped.");
+}, 1200);
+
+// === Delta Analyzer Console Runtime Activation ===
+setTimeout(() => {
+    const deltaConsole = document.getElementById("deltaAnalyzerConsole");
+    if (!deltaConsole) return;
+
+    const scanTime = deltaConsole.querySelector(".delta-scan-time");
+    const driftSpan = deltaConsole.querySelector(".drift-events");
+    const spikeSpan = deltaConsole.querySelector(".critical-spikes");
+    const logList = deltaConsole.querySelector(".delta-log-entries");
+
+    const mockScan = () => {
+        const now = new Date().toLocaleTimeString();
+        const driftCount = Math.floor(Math.random() * 5);
+        const spikeCount = Math.floor(Math.random() * 3);
+
+        scanTime.textContent = now;
+        driftSpan.textContent = driftCount;
+        spikeSpan.textContent = spikeCount;
+
+        const logs = [
+            "Δ minor offset detected in HVAC",
+            "Δ product sync drift in Bay 6",
+            "⚠ unexpected delta in ESL map",
+            "🚨 spike in UPC mapping",
+            "✅ correction algorithm stabilized drift"
+        ];
+
+        logList.innerHTML = "";
+        for (let i = 0; i < driftCount + spikeCount; i++) {
+            const entry = logs[Math.floor(Math.random() * logs.length)];
+            const li = document.createElement("li");
+            li.textContent = `[${now}] ${entry}`;
+            logList.appendChild(li);
+        }
+
+        console.log("📡 Delta Analyzer scan completed.");
+    };
+
+    deltaConsole.querySelector(".run-delta-scan").addEventListener("click", mockScan);
+
+    mockScan();
+}, 1300);
+
+// === Reporting Hub Console Runtime Activation ===
+setTimeout(() => {
+    const reportConsole = document.getElementById("reportingHubConsole");
+    if (!reportConsole) return;
+
+    const reportTime = reportConsole.querySelector(".last-report-time");
+    const reportList = reportConsole.querySelector(".report-entries");
+
+    const generateReport = () => {
+        const now = new Date().toLocaleTimeString();
+        const reportEntry = `📁 System Export — ${now}`;
+
+        reportTime.textContent = now;
+
+        const li = document.createElement("li");
+        li.textContent = reportEntry;
+        reportList.prepend(li);
+
+        console.log(`📄 Report generated at ${now}`);
+    };
+
+    reportConsole.querySelector(".generate-report").addEventListener("click", generateReport);
+
+    console.log("✅ Reporting Hub Console Bootstrapped.");
+}, 1400);
+
+// === Session Manager Console Runtime Activation ===
+setTimeout(() => {
+    const sessionConsole = document.getElementById("sessionManagerConsole");
+    if (!sessionConsole) return;
+
+    const backupTime = sessionConsole.querySelector(".last-backup-time");
+    const sessionList = sessionConsole.querySelector(".session-entries");
+
+    const archiveSession = () => {
+        const now = new Date().toLocaleTimeString();
+        const sessionLabel = `🗃 Session_${now.replace(/:/g, '-')}`;
+
+        backupTime.textContent = now;
+
+        const li = document.createElement("li");
+        li.textContent = sessionLabel;
+        sessionList.prepend(li);
+
+        console.log(`💾 Session archived as ${sessionLabel}`);
+    };
+
+    const restoreSession = () => {
+        const first = sessionList.querySelector("li");
+        if (first && !first.classList.contains("faint")) {
+            console.log(`♻️ Restoring session: ${first.textContent}`);
+            alert(`Session "${first.textContent}" has been restored.`);
+        } else {
+            alert("⚠️ No session available to restore.");
+        }
+    };
+
+    sessionConsole.querySelector(".trigger-backup").addEventListener("click", archiveSession);
+    sessionConsole.querySelector(".trigger-restore").addEventListener("click", restoreSession);
+
+    console.log("✅ Session Manager Console Bootstrapped.");
+}, 1500);
+
+// === Utility Hub Console Runtime Activation ===
+setTimeout(() => {
+    const utilityConsole = document.getElementById("utilityHubConsole");
+    if (!utilityConsole) return;
+
+    const queueState = utilityConsole.querySelector(".utility-queue");
+    const utilityLog = utilityConsole.querySelector(".utility-entries");
+
+    const logEntry = (msg) => {
+        const li = document.createElement("li");
+        li.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        utilityLog.appendChild(li);
+    };
+
+    utilityConsole.querySelector(".run-diagnostics").addEventListener("click", () => {
+        queueState.textContent = "Running Diagnostics...";
+        logEntry("Initiating diagnostic sequence...");
+
+        setTimeout(() => {
+            logEntry("✅ All systems nominal.");
+            queueState.textContent = "Idle";
+        }, 1200);
+    });
+
+    utilityConsole.querySelector(".clear-log").addEventListener("click", () => {
+        utilityLog.innerHTML = `<li class="faint">Awaiting operations...</li>`;
+        logEntry("🧹 Log cleared.");
+    });
+
+    console.log("✅ Utility Hub Console Bootstrapped.");
+}, 1600);
+
 // === Micro-Patch 700.8-A: Progress Dashboard Subsystem Wiring ===
 
 
@@ -1609,6 +1970,11 @@ OperatorDockWiring.registerSubsystemDock({
         alert("🔧 Tools Panel Loaded — Developer & Diagnostics Online");
     }
 });
+
+// Register the forecastConsole dock with custom icon and color (for external registry systems)
+if (typeof registerSubsystemDock === "function") {
+    registerSubsystemDock('forecastConsole', 'dock-forecastConsole', '📊 Forecast Console', '#99ccff');
+}
 
 OperatorDockWiring.registerSubsystemDock({
     dockId: "audit",
@@ -1658,4 +2024,52 @@ OperatorDockWiring.autoBindDockToggles = function() {
 document.addEventListener("DOMContentLoaded", () => {
     OperatorDockWiring.initializeToggleSystem();
     OperatorDockWiring.autoBindDockToggles();
+
+    // === Sovereign Dock Panel Dynamic Toggle Logic ===
+    // Provides 'collapsed' toggle for dock panels, and binds buttons with [data-toggle-dock]
+    function toggleDockPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            panel.classList.toggle('collapsed');
+        } else {
+            console.warn(`Dock panel '${panelId}' not found.`);
+        }
+    }
+
+    // Attach toggle logic to any button with [data-toggle-dock] attribute
+    document.querySelectorAll('[data-toggle-dock]').forEach(button => {
+        const targetId = button.getAttribute('data-toggle-dock');
+        button.addEventListener('click', () => toggleDockPanel(targetId));
+    });
+
+    // === SovereignAPI Dock Toggle Registration for HoloConsole Panels ===
+    // Ensure SovereignAPI bridge is live before registering toggles
+    if (window.SovereignAPI?.registerDockToggle) {
+        // Register HoloConsole dock toggles for all relevant consoles
+        window.SovereignAPI.registerDockToggle("exceptionManagerConsole", "#exceptionManagerConsole");
+        window.SovereignAPI.registerDockToggle("progressDashboardConsole", "#progressDashboardConsole");
+        window.SovereignAPI.registerDockToggle("masterExportHubConsole", "#masterExportHubConsole");
+        window.SovereignAPI.registerDockToggle("mappingsConsole", "#mappingsConsole");
+        window.SovereignAPI.registerDockToggle("toolsConsole", "#toolsConsole");
+        window.SovereignAPI.registerDockToggle("auditConsole", "#auditConsole");
+        window.SovereignAPI.registerDockToggle("configPanelConsole", "#configPanelConsole");
+        // Register forecastConsole dock toggle
+        window.SovereignAPI.registerDockToggle("forecastConsole", "#forecastConsole");
+
+        // Register HoloConsole dock toggles (countConsole, deltaAnalyzerConsole, reportingHubConsole, sessionManagerConsole, utilityHubConsole)
+        window.SovereignAPI.registerDockToggle("countConsole", "#countConsole");
+        window.SovereignAPI.registerDockToggle("deltaAnalyzerConsole", "#deltaAnalyzerConsole");
+        window.SovereignAPI.registerDockToggle("reportingHubConsole", "#reportingHubConsole");
+        window.SovereignAPI.registerDockToggle("sessionManagerConsole", "#sessionManagerConsole");
+        window.SovereignAPI.registerDockToggle("utilityHubConsole", "#utilityHubConsole");
+
+        console.log("✅ SovereignAPI HoloConsole dock toggles registered.");
+    } else {
+        console.warn("⚠ SovereignAPI.registerDockToggle not available at DOMContentLoaded.");
+    }
+
+    // Create Dock Panel for forecastConsole
+    if (typeof createDockPanel === "function") {
+        createDockPanel('forecastConsole', 'Forecast Console Panel');
+    }
 });

@@ -682,6 +682,32 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("🧬 DOM Ready — Beginning Full Neural Bootstrap...");
   const bootstrap = NeuralUnifiedBootstrap();
   bootstrap.startBootstrapSequence();
+
+  // === Orbital Buttons Subsystem Wiring ===
+  const forecastBtn = document.getElementById("forecastBtn");
+  const reportingHubBtn = document.getElementById("reportingHubBtn");
+  const deltaAnalyzerBtn = document.getElementById("deltaAnalyzerBtn");
+
+  if (forecastBtn) {
+    forecastBtn.addEventListener("click", () => {
+      console.log("🌀 Forecast Button Clicked");
+      window.SovereignSubsystems?.forecastConsole?.toggle?.();
+    });
+  }
+
+  if (reportingHubBtn) {
+    reportingHubBtn.addEventListener("click", () => {
+      console.log("📊 Reporting Hub Button Clicked");
+      window.SovereignSubsystems?.reportingHub?.toggle?.();
+    });
+  }
+
+  if (deltaAnalyzerBtn) {
+    deltaAnalyzerBtn.addEventListener("click", () => {
+      console.log("🧮 Delta Analyzer Button Clicked");
+      window.SovereignSubsystems?.deltaAnalyzer?.toggle?.();
+    });
+  }
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
