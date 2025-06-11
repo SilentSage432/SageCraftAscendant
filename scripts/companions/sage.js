@@ -39,6 +39,7 @@ window.SovereignCompanions.Sage = (function () {
     }
 
     typeResponse(response);
+    chainAutonomousBehaviors(question);
     return response;
   }
 
@@ -52,6 +53,26 @@ window.SovereignCompanions.Sage = (function () {
       return "The Codex grows each time you alter the weave. Its memory is long.";
     } else {
       return "The winds whisper, but clarity eludes this query. Ask again, Sovereign.";
+    }
+  }
+
+  function chainAutonomousBehaviors(question) {
+    const lower = question.toLowerCase();
+    if (lower.includes("health") || lower.includes("status")) {
+      console.log("🔗 Sage triggering Engineer diagnostics chain...");
+
+      // Step 1: Ask Engineer for health status
+      window.SignalMesh.broadcast("companion.message", {
+        from: "Sage",
+        to: "Engineer",
+        type: "inquiry",
+        payload: {
+          question: "Please report current mesh health status."
+        }
+      });
+
+      // Step 2: Await Engineer response (handled by Engineer logic)
+      // Engineer then informs Gatekeeper and Archivist if needed
     }
   }
 

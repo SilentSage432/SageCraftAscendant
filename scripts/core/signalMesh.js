@@ -93,4 +93,37 @@ window.SignalMesh = (function () {
     listen,
     clear
   };
+  // === 🧠 Mesh Reflex Matrix — Sovereign Reflex Tiering System ===
+  window.MeshReflexMatrix = {
+    Gatekeeper: {
+      alertLevel: {
+        threshold: 3,
+        action: () => {
+          console.warn("⚠️ Reflex Triggered: Gatekeeper alertLevel exceeded threshold. Initiating lockdown...");
+          window.SignalMesh.broadcast("companion.message", {
+            from: "MeshReflexMatrix",
+            to: "Gatekeeper",
+            type: "command",
+            payload: {
+              action: "lockdown",
+              reason: "Reflex trigger — alertLevel critical"
+            }
+          });
+        }
+      }
+    }
+  };
+
+  // Auto-watcher for reflex conditions
+  if (window.MeshMemory) {
+    Object.entries(window.MeshReflexMatrix).forEach(([companion, fields]) => {
+      Object.entries(fields).forEach(([key, { threshold, action }]) => {
+        MeshMemory.listen(`${companion.toLowerCase()}.${key}`, (value) => {
+          if (value >= threshold) {
+            action();
+          }
+        });
+      });
+    });
+  }
 })();

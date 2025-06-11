@@ -47,6 +47,26 @@ window.SovereignCompanions.Gatekeeper = (function () {
     return Array.from(lockedPanels);
   }
 
+  // 🧠 Gatekeeper listens for escalation commands
+  if (window.SignalMesh) {
+    window.SignalMesh.listen("companion.message", (msg) => {
+      if (msg.to === "Gatekeeper" && msg.type === "command") {
+        console.log(`📡 Gatekeeper received message from ${msg.from}:`, msg);
+
+        if (msg.payload?.action === "raiseAlert") {
+          const current = window.MeshMemory?.get("gatekeeper.alertLevel") || 0;
+          const updated = current + 1;
+          if (window.MeshMemory) {
+            MeshMemory.set("gatekeeper.alertLevel", updated);
+          }
+          console.log(`🚨 Gatekeeper escalated alert level to ${updated} due to: ${msg.payload.reason}`);
+        }
+      }
+    });
+
+    window.SignalMesh.broadcast("companion.online", { name: "Gatekeeper" });
+  }
+
   return {
     lockPanel,
     unlockPanel,

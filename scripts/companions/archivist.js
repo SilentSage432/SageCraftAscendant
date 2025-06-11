@@ -66,6 +66,11 @@ window.SovereignCompanions.Archivist = (function () {
             });
           }
         }
+
+        if (msg.type === "command" && msg.payload?.action === "captureSnapshot") {
+          console.log("📝 Archivist executing snapshot capture from Engineer request...");
+          saveSnapshot(msg.payload.context || "Mesh-triggered Snapshot");
+        }
       }
     });
 

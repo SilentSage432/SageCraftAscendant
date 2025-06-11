@@ -58,6 +58,36 @@ window.SovereignCompanions.Engineer = (function () {
               type: "response",
               payload: { answer: `Current mesh health is: ${healthScore}` }
             });
+
+            // Begin autonomous behavior chain
+            if (window.SignalMesh && window.MeshMemory) {
+              const report = window.MeshMemory.get("engineer.lastAnomalyReport");
+              if (report && report.length > 0) {
+                console.warn("🚨 Engineer triggering alert escalation to Gatekeeper...");
+
+                // Step 1: Alert Gatekeeper
+                window.SignalMesh.broadcast("companion.message", {
+                  from: "Engineer",
+                  to: "Gatekeeper",
+                  type: "command",
+                  payload: {
+                    action: "raiseAlert",
+                    reason: "Mesh anomalies detected during health check."
+                  }
+                });
+
+                // Step 2: Instruct Archivist to snapshot
+                window.SignalMesh.broadcast("companion.message", {
+                  from: "Engineer",
+                  to: "Archivist",
+                  type: "command",
+                  payload: {
+                    action: "captureSnapshot",
+                    context: "Mesh anomaly sweep triggered by Sage request."
+                  }
+                });
+              }
+            }
           }
         }
       }
