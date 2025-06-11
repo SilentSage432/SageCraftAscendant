@@ -875,6 +875,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Phase 16020: Gatekeeper Synchronization ===
   console.log("🔐 Activating Gatekeeper — Loading persisted orbits...");
   NeuralPersistenceSynchronizer.synchronizePersistence();
+
+  // === Heartbeat System Initializer ===
+  if (window.MeshVitals) {
+    window.MeshVitals.startHeartbeat(); // 🫀 Begin global companion vitals monitoring
+  }
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {

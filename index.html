@@ -75,17 +75,6 @@
   </header>
   <!-- 🧭 Sovereign Ascendant Toolbar -->
   <div id="sovereignToolbar" class="sovereign-toolbar"></div>
-  <div id="orbitalDockContainer" class="orbital-dock"></div>
-
-  <!-- === ORBIT BUTTONS (ensure all present and correct) === -->
-  <div id="orbitButtonsBar" style="display:none">
-    <button class="orbit-btn" data-panel="#countConsole">📊</button>
-    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">🧮</button>
-    <button class="orbit-btn" data-panel="#reportingHubConsole">📄</button>
-    <button class="orbit-btn" data-panel="#sessionManagerConsole">📂</button>
-    <button class="orbit-btn" data-panel="#utilityHubConsole">🛠</button>
-    <button class="orbit-btn" data-panel="#sovereignTerminal">🧠</button>
-  </div>
 
   <!-- HoloConsole Sovereign Panels (for SovereignToolbar toggling) -->
   <div id="countConsole" class="holo-console hidden"></div>
@@ -1080,12 +1069,23 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- SheetJS (xlsx parser) -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
+
   <!-- 🧠 Sovereign Toolbar Forge -->
   <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
   <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
   <script src="scripts/bootstrap/bootstrapLoader.js"></script>
 
   <script src="scripts/core/sovereignCodex.js"></script>
+
+  <!-- Core Mesh System & Companions -->
+  <script src="scripts/core/signalMesh.js"></script>
+  <script src="scripts/core/meshVitals.js"></script>
+  <script src="scripts/core/companionMind.js"></script>
+
+  <!-- Companion Modules -->
+  <script src="scripts/companions/sage.js"></script>
+  <script src="scripts/companions/engineer.js"></script>
+  <script src="scripts/companions/archivist.js"></script>
 
   <!-- Wiring logic loader -->
   <script src="scripts/bootstrap/wiring.js"></script>

@@ -12,6 +12,9 @@ window.SovereignCompanions.Sage = (function () {
       this.logs.push(entry);
       if (this.logs.length > 100) this.logs.shift(); // keep last 100
       localStorage.setItem("codexLogs", JSON.stringify(this.logs));
+      if (window.SignalMesh) {
+        window.SignalMesh.broadcast("memory.codex.update", { source: "Sage", entry });
+      }
     },
 
     getLast(n = 1) {
@@ -25,8 +28,16 @@ window.SovereignCompanions.Sage = (function () {
 
   function ask(question) {
     CodexMemory.log(`Sovereign asked: "${question}"`);
+    if (window.MeshMemory) {
+      MeshMemory.set("sage.lastQuestion", question);
+    }
+
     const response = generateResponse(question);
     CodexMemory.log(`Sage replied: "${response}"`);
+    if (window.MeshMemory) {
+      MeshMemory.set("sage.lastResponse", response);
+    }
+
     typeResponse(response);
     return response;
   }
@@ -63,10 +74,69 @@ window.SovereignCompanions.Sage = (function () {
     }, 30);
   }
 
+  // SignalMesh Listener — Sage receives messages
+  if (window.SignalMesh) {
+    window.SignalMesh.listen("companion.message", (msg) => {
+      if (msg.to === "Sage") {
+        console.log(`📡 Sage received a message from ${msg.from}:`, msg);
+
+        if (msg.type === "inquiry" && msg.payload?.question) {
+          const reply = ask(msg.payload.question);
+          if (msg.from) {
+            window.SignalMesh.broadcast("companion.message", {
+              from: "Sage",
+              to: msg.from,
+              type: "response",
+              payload: { answer: reply }
+            });
+          }
+        }
+      }
+    });
+  }
+
+  // Broadcast registration
+  if (window.SignalMesh) {
+    window.SignalMesh.broadcast("companion.online", { name: "Sage" });
+  }
+
   return {
     ask,
     memory: CodexMemory
   };
+
+  // CompanionCognitionCore for Sage
+  if (window.CompanionMind) {
+    const SageMind = new CompanionMind("Sage", {
+      onThink(memory) {
+        const last = CodexMemory.getLast(1)[0];
+        if (last && last.message.includes("Sovereign asked")) {
+          console.log("🔮 Sage ponders the latest question...");
+        }
+        // Future: Add deeper reflection, pattern analysis, signal dispatch
+      }
+    });
+    SageMind.startThinking();
+
+    // React to MeshMemory updates
+    if (window.MeshMemory) {
+      MeshMemory.listen("sage.lastQuestion", (newQ) => {
+        console.log("🧠 Sage recalls a recent question:", newQ);
+      });
+
+      MeshMemory.listen("sage.lastResponse", (newR) => {
+        console.log("📜 Sage reflects on a recent response:", newR);
+      });
+    }
+  }
+
+  // MeshVitals registration
+  if (window.MeshVitals) {
+    window.MeshVitals.register("Sage", (confirm) => {
+      // Sage responds to heartbeat
+      confirm();
+    });
+  }
 })();
 
 // === Companion Manifest Router ===

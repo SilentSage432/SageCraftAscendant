@@ -2777,3 +2777,38 @@ h2, h3, p, label {
   margin: 0 !important;
   width: auto !important;
 }
+
+/* 🌌 Sovereign Orbit Cluster Styling */
+.orbit-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.orbit-node {
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+  color: #e0e0e0;
+  box-shadow: 0 0 10px rgba(173, 216, 230, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+.orbit-node:hover {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(173, 216, 230, 0.6);
+  transform: scale(1.05);
+}
+
+#sovereignToolbarMount {
+  display: none !important;
+}

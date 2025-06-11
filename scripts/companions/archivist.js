@@ -1,5 +1,3 @@
-
-
 // === Companion: The Archivist ===
 // Role: Codex memory manager and system historian
 
@@ -21,6 +19,10 @@ window.SovereignCompanions.Archivist = (function () {
     }
 
     window.SovereignCodexSnapshots.push(snapshot);
+    if (window.MeshMemory) {
+      MeshMemory.set("archivist.lastSnapshot", snapshot);
+      MeshMemory.set("archivist.totalSnapshots", window.SovereignCodexSnapshots.length);
+    }
     console.log("📝 Codex Snapshot Saved:", snapshot);
   }
 
@@ -33,9 +35,67 @@ window.SovereignCompanions.Archivist = (function () {
     return all.length ? all[all.length - 1] : null;
   }
 
+  // 🧠 Listen for Codex memory updates
+  if (window.SignalMesh) {
+    window.SignalMesh.listen("memory.codex.update", (payload) => {
+      saveSnapshot(`Auto Snapshot: ${payload.entry.message.substring(0, 50)}...`);
+    });
+  }
+
+  if (window.MeshVitals) {
+    window.MeshVitals.register("Archivist", (confirm) => {
+      // Archivist responds to heartbeat
+      confirm();
+    });
+  }
+
+  // SignalMesh Listener — Archivist receives messages
+  if (window.SignalMesh) {
+    window.SignalMesh.listen("companion.message", (msg) => {
+      if (msg.to === "Archivist") {
+        console.log(`📡 Archivist received message from ${msg.from}:`, msg);
+
+        if (msg.type === "inquiry" && msg.payload?.question) {
+          if (msg.payload.question === "How many snapshots are stored?") {
+            const total = getAllSnapshots().length;
+            window.SignalMesh.broadcast("companion.message", {
+              from: "Archivist",
+              to: msg.from,
+              type: "response",
+              payload: { answer: `There are ${total} snapshots currently stored.` }
+            });
+          }
+        }
+      }
+    });
+
+    // Broadcast registration
+    window.SignalMesh.broadcast("companion.online", { name: "Archivist" });
+  }
+
   return {
     saveSnapshot,
     getAllSnapshots,
     getLatestSnapshot
   };
+
+  // CompanionCognitionCore for Archivist
+  if (window.CompanionMind) {
+    const ArchivistMind = new CompanionMind("Archivist", {
+      onThink(memory) {
+        const latest = getLatestSnapshot();
+        if (latest) {
+          console.log("📚 Archivist reviews latest snapshot:", latest.label);
+        }
+        // Future: Detect patterns in snapshot frequency or anomalies
+      }
+    });
+    ArchivistMind.startThinking();
+    if (window.MeshMemory) {
+      MeshMemory.listen("archivist.requestSnapshot", (label) => {
+        console.log("📘 Archivist received external snapshot request:", label);
+        saveSnapshot(label || "Memory-Requested Snapshot");
+      });
+    }
+  }
 })();
