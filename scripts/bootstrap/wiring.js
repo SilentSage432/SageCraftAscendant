@@ -764,6 +764,10 @@ window.NeuralRegistryEditorCore = (function () {
 window.NeuralOrbitInjectionBus = (function () {
 
   function injectOrbit({ key, label, icon = "icon-default.png", modules = [] }) {
+    // Debug log for orbit injection
+    console.log("🔍 Orbit Injection Debug — Received Orbit:", {
+      key, label, icon, modules
+    });
     console.log(`🚀 Injecting Orbit: ${key}`);
 
     if (!key || !label || !icon) {
@@ -871,12 +875,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === Phase 16017: Live Orbit Injection Test ===
-  NeuralOrbitInjectionBus.injectOrbit({
-    key: "loreCodex",
-    label: "Lore Codex",
-    icon: "icon-book.png",
-    modules: ["loreModule"]
-  });
+  // Ensure loreCodex orbit is injected with all required properties
+  const loreCodexOrbit = {
+    key: 'loreCodex',
+    label: 'Lore Codex',
+    description: 'A dynamic codex containing deep lore archives and grimoire entries.',
+    panel: 'loreCodexPanel',
+    icon: '📖',
+    enabled: true,
+    modules: ['loreModule']
+  };
+  NeuralOrbitInjectionBus.injectOrbit(loreCodexOrbit);
 
   // === Phase 16020: Gatekeeper Synchronization ===
   console.log("🔐 Activating Gatekeeper — Loading persisted orbits...");

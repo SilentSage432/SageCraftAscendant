@@ -70,6 +70,11 @@
     <section class="holo-console" id="tools" data-title="Tools"></section>
     <section class="holo-console" id="audit" data-title="Audit"></section>
     <section class="holo-console" id="configPanel" data-title="Configuration Panel"></section>
+    <!-- 🔮 Oracle Subsystem Panel -->
+    <div id="oracle" class="holo-console hidden">
+      <h2>🔮 Oracle Subsystem</h2>
+      <div id="oracleOutput" class="console-output"></div>
+    </div>
   </div>
   <header id="sovereignHeader">
   </header>
@@ -89,6 +94,12 @@
   <!-- All legacy static Operator Console Panel and legacy tab-section panels removed.
        Only dynamic Control Deck injection point remains below. -->
   <div id="operatorConsole" class="tabcontent"></div>
+
+  <!-- Orbital Dock Container -->
+  <div id="orbitalDockContainer" class="dock-container"></div>
+
+  <!-- Dock Grid Container -->
+  <div id="dockGrid" class="dock-grid"></div>
 
 
 
@@ -1072,6 +1083,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- 🧠 Sovereign Toolbar Forge -->
   <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
+  <script src="scripts/bootstrap/bootstrapNeural.js"></script>
   <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
   <script src="scripts/bootstrap/bootstrapLoader.js"></script>
 

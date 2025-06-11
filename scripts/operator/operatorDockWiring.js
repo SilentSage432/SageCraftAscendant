@@ -1984,6 +1984,11 @@ OperatorDockWiring.registerSubsystemDock({
     }
 });
 
+// Register the 'oracle' subsystem dock using external registry if available
+if (typeof registerSubsystemDock === "function") {
+    registerSubsystemDock("oracle");
+}
+
 OperatorDockWiring.registerSubsystemDock({
     dockId: "oracle",
     onClick: () => {
