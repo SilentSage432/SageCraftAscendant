@@ -106,3 +106,14 @@ import('/scripts/operator/operatorDockWiring.js').then(module => {
 }).catch(err => {
   console.error("❌ Failed to load OperatorDockWiring module:", err);
 });
+
+// Neural Unified Bootstrap Loader
+import('/scripts/bootstrap/bootstrapNeural.js').then(module => {
+  if (typeof window.NeuralUnifiedBootstrap !== 'function') {
+    console.warn("⚠️ NeuralUnifiedBootstrap is not properly defined in bootstrapNeural.js.");
+  } else {
+    console.log("✅ NeuralUnifiedBootstrap registered successfully.");
+  }
+}).catch(err => {
+  console.error("❌ Failed to load bootstrapNeural.js:", err);
+});

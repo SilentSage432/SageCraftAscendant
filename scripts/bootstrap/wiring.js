@@ -835,8 +835,14 @@ window.NeuralOrbitRegistryValidator = (function () {
 })();
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🧬 DOM Ready — Beginning Full Neural Bootstrap...");
-  const bootstrap = NeuralUnifiedBootstrap();
-  bootstrap.startBootstrapSequence();
+  if (typeof NeuralUnifiedBootstrap === "function") {
+    const bootstrap = NeuralUnifiedBootstrap();
+    bootstrap.startBootstrapSequence();
+  } else if (typeof NeuralUnifiedBootstrap?.init === "function") {
+    NeuralUnifiedBootstrap.init();
+  } else {
+    console.warn("⚠️ NeuralUnifiedBootstrap not callable. Check definition.");
+  }
 
   // === Orbital Buttons Subsystem Wiring ===
   const forecastBtn = document.getElementById("forecastBtn");
