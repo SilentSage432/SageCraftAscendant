@@ -127,7 +127,30 @@ window.SovereignCompanions.Engineer = (function () {
     if (window.MeshMemory) {
       MeshMemory.listen("engineer.meshHealthScore", (score) => {
         console.log(`🩺 Engineer received updated mesh health score: ${score}`);
-        // Future: Trigger cooldown logic or alert Sovereign
+        if (score < 70) {
+          console.warn("🚨 Engineer reflex triggered — mesh health critically low. Initiating diagnostic protocol...");
+
+          if (typeof NeuralPanelAnomalyScanner !== "undefined") {
+            const anomalies = NeuralPanelAnomalyScanner.runFullAnomalySweep();
+            console.log("🧪 Reflex Diagnostic Results:", anomalies);
+            if (anomalies.length > 0 && window.MeshMemory) {
+              MeshMemory.set("engineer.lastAnomalyReport", anomalies);
+            }
+          }
+
+          // Broadcast alert to Gatekeeper
+          if (window.SignalMesh) {
+            window.SignalMesh.broadcast("companion.message", {
+              from: "Engineer",
+              to: "Gatekeeper",
+              type: "command",
+              payload: {
+                action: "raiseAlert",
+                reason: "Mesh health score fell below threshold — reflex triggered by Engineer."
+              }
+            });
+          }
+        }
       });
     }
   }

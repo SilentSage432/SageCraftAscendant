@@ -78,6 +78,16 @@ window.SovereignCompanions.Archivist = (function () {
     window.SignalMesh.broadcast("companion.online", { name: "Archivist" });
   }
 
+  // === Reflex: Auto Snapshot if total snapshots exceed critical threshold ===
+  if (window.MeshMemory) {
+    MeshMemory.listen("archivist.totalSnapshots", (count) => {
+      if (count > 50) {
+        console.warn("⚠️ Reflex Triggered: Archivist snapshot count exceeded threshold — archiving reflex initiated.");
+        saveSnapshot("Reflex Capture: Snapshot Overflow");
+      }
+    });
+  }
+
   return {
     saveSnapshot,
     getAllSnapshots,
