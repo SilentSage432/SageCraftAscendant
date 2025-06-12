@@ -1,3 +1,12 @@
+// === Sovereign Dock Panel Map (Panel Selector Alias Map) ===
+const SovereignDockPanelMap = {
+  count: "#countConsole",
+  deltaAnalyzer: "#deltaAnalyzerConsole",
+  reportingHub: "#reportingHubConsole",
+  sessionManager: "#sessionManagerConsole",
+  utilityHub: "#utilityHubConsole",
+  oracle: "#oracleConsole"
+};
 // === Phase 8000.8: Neural Panel Anomaly Scanner ===
 window.NeuralPanelAnomalyScanner = (function () {
   function scanForPhantomPanels() {
@@ -64,6 +73,15 @@ window.NeuralAnomalyAutoReconciler = (function () {
       const key = id.replace("panel", "");
       const orbit = NeuralOrbitRegistry?.registry?.[key];
       if (orbit) {
+        // Suppression check before creating panel
+        const targetOrbit = document.getElementById(key) || document.querySelector(`[data-orbit='${key}']`);
+        if (
+          targetOrbit?.hasAttribute("data-suppress") ||
+          targetOrbit?.classList.contains("no-autogen")
+        ) {
+          console.log(`🔕 Auto-generation suppressed for: ${targetOrbit && (targetOrbit.id || targetOrbit.getAttribute("data-orbit")) || key}`);
+          return;
+        }
         NeuralPanelSynthesis.createPanelForOrbit(orbit);
         console.log(`🔁 Synthesized Missing Panel: ${id}`);
         if (window.NeuralVolatilityBuffer?.recordVolatility) {
@@ -428,6 +446,16 @@ window.NeuralPanelSynthesis = (function() {
       const panelId = `panel${targetId}`;
       let panel = document.getElementById(panelId);
 
+      // Suppression check before creating panel
+      const targetOrbit = document.getElementById(targetId) || document.querySelector(`[data-orbit='${targetId}']`);
+      if (
+        targetOrbit?.hasAttribute("data-suppress") ||
+        targetOrbit?.classList.contains("no-autogen")
+      ) {
+        console.log(`🔕 Auto-generation suppressed for: ${targetOrbit && (targetOrbit.id || targetOrbit.getAttribute("data-orbit")) || targetId}`);
+        return;
+      }
+
       if (!panel) {
         panel = document.createElement("section");
         panel.id = panelId;
@@ -446,8 +474,36 @@ window.NeuralPanelSynthesis = (function() {
     }
   }
 
+  // For compatibility: allow direct creation for a specific orbit (used by auto reconciler)
+  function createPanelForOrbit(orbit) {
+    if (!orbit || !orbit.panelId) return;
+    const targetId = orbit.panelId.replace(/^panel/, '');
+    const panelId = `panel${targetId}`;
+    let panel = document.getElementById(panelId);
+
+    // Suppression check before creating panel
+    const targetOrbit = document.getElementById(targetId) || document.querySelector(`[data-orbit='${targetId}']`);
+    if (
+      targetOrbit?.hasAttribute("data-suppress") ||
+      targetOrbit?.classList.contains("no-autogen")
+    ) {
+      console.log(`🔕 Auto-generation suppressed for: ${targetOrbit && (targetOrbit.id || targetOrbit.getAttribute("data-orbit")) || targetId}`);
+      return;
+    }
+
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = panelId;
+      panel.className = "panel tab-section panel-glow synthetic-panel";
+      panel.innerHTML = `<h2>🔧 ${targetId} Panel (Synthesized)</h2><p>Auto-generated placeholder panel for '${targetId}'.</p>`;
+      document.body.appendChild(panel);
+      console.log(`➕ Synthesized Panel Created: ${panelId}`);
+    }
+  }
+
   return {
-    synthesizePanels
+    synthesizePanels,
+    createPanelForOrbit
   };
 })();
 
@@ -465,6 +521,16 @@ window.NeuralSelfHealingEngine = (function() {
       const targetId = button.dataset.target;
       const panelId = `panel${targetId}`;
       let panel = document.getElementById(panelId);
+
+      // Suppression check before creating panel
+      const targetOrbit = document.getElementById(targetId) || document.querySelector(`[data-orbit='${targetId}']`);
+      if (
+        targetOrbit?.hasAttribute("data-suppress") ||
+        targetOrbit?.classList.contains("no-autogen")
+      ) {
+        console.log(`🔕 Auto-generation suppressed for: ${targetOrbit && (targetOrbit.id || targetOrbit.getAttribute("data-orbit")) || targetId}`);
+        return;
+      }
 
       if (!panel) {
         panel = document.createElement("section");
@@ -871,6 +937,72 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 
+  // === Register Orbits for Main Panels (if not already registered) ===
+  // This ensures all orbits are registered with required fields.
+  if (typeof window.registerOrbit === "function") {
+    // If there's a global registerOrbit function, use it.
+    window.registerOrbit({
+      id: "count",
+      buttonId: "countButton",
+      panelId: "countConsole",
+      label: "Count Console"
+    });
+    window.registerOrbit({
+      id: "deltaAnalyzer",
+      buttonId: "deltaAnalyzerButton",
+      panelId: "deltaAnalyzerConsole",
+      label: "Delta Analyzer"
+    });
+    window.registerOrbit({
+      id: "reportingHub",
+      buttonId: "reportingButton",
+      panelId: "reportingHubConsole",
+      label: "Reporting Hub"
+    });
+    window.registerOrbit({
+      id: "sessionManager",
+      buttonId: "sessionManagerButton",
+      panelId: "sessionManagerConsole",
+      label: "Session Manager"
+    });
+    window.registerOrbit({
+      id: "utilityHub",
+      buttonId: "utilityButton",
+      panelId: "utilityHubConsole",
+      label: "Utility Hub"
+    });
+    window.registerOrbit({
+      id: "oracle",
+      buttonId: "oracleButton",
+      panelId: "oracleConsole",
+      label: "Oracle Interface"
+    });
+  } else if (window.NeuralOrbitRegistry && typeof window.NeuralOrbitRegistry.registerOrbit === "function") {
+    // If NeuralOrbitRegistry exists, register orbits using its API.
+    // Only register if not already present.
+    const orbits = window.NeuralOrbitRegistry.listOrbits ? window.NeuralOrbitRegistry.listOrbits() : {};
+    const ensureOrbit = (key, buttonId, panelId, label) => {
+      if (!orbits[key]) {
+        // Provide dummy values for required icon and description fields if needed.
+        window.NeuralOrbitRegistry.registerOrbit(
+          key,
+          label + " Orbit", // description
+          [],               // modules
+          "icon-default.png", // icon
+          label,
+          panelId,
+          label
+        );
+      }
+    };
+    ensureOrbit("count", "countButton", "countConsole", "Count Console");
+    ensureOrbit("deltaAnalyzer", "deltaAnalyzerButton", "deltaAnalyzerConsole", "Delta Analyzer");
+    ensureOrbit("reportingHub", "reportingButton", "reportingHubConsole", "Reporting Hub");
+    ensureOrbit("sessionManager", "sessionManagerButton", "sessionManagerConsole", "Session Manager");
+    ensureOrbit("utilityHub", "utilityButton", "utilityHubConsole", "Utility Hub");
+    ensureOrbit("oracle", "oracleButton", "oracleConsole", "Oracle Interface");
+  }
+
   // === Orbital Buttons Subsystem Wiring ===
   const forecastBtn = document.getElementById("forecastBtn");
   const reportingHubBtn = document.getElementById("reportingHubBtn");
@@ -897,27 +1029,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Orbital Dock Container Rendering & Button Injection ===
-  // Ensure orbitalDockContainer exists only once
-  let orbitalDockContainer = document.getElementById("orbitalDockContainer");
-  if (!orbitalDockContainer) {
-    orbitalDockContainer = document.createElement("div");
-    orbitalDockContainer.id = "orbitalDockContainer";
-    orbitalDockContainer.classList.add("orbital-dock-container");
-    document.body.appendChild(orbitalDockContainer);
-  }
-  // Clear existing buttons to avoid duplicates
-  orbitalDockContainer.innerHTML = "";
-  // Render orbit buttons, skipping loreCodex
-  const orbits = window.NeuralOrbitRegistry?.listOrbits?.() || {};
-  Object.keys(orbits).forEach((orbitKey) => {
-    if (orbitKey === "loreCodex") return; // Skip rendering this button
-    const orbit = orbits[orbitKey];
-    const button = document.createElement("button");
-    button.className = "orbit-button";
-    button.textContent = orbit.displayName || orbit.label || orbitKey;
-    orbitalDockContainer.appendChild(button);
-  });
 
   // === Orbit Injection Path Audit Logging ===
   // Audit all orbit button injection and registry state after rendering
@@ -928,26 +1039,83 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("🧠 Current Orbit Registry:", window.NeuralOrbitRegistry?.listOrbits?.());
   console.log("🔍 Phase 1: Orbit Injection Path Audit — End");
 
-  // === Orbital Relay Panel Toggle Logic ===
-  // This logic ensures every .orbit-btn toggles its panel cleanly, hiding others.
-  document.querySelectorAll('.orbit-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const panelSelector = btn.getAttribute('data-panel');
-      const targetPanel = document.querySelector(panelSelector);
+  // 🧬 Phase 4: Panel Synthesis Activation — Aligning Orbit with Console Panels
+  const synthesizedPanels = {
+    'count': 'countConsole',
+    'deltaAnalyzer': 'deltaAnalyzerConsole',
+    'reportingHub': 'reportingHubConsole',
+    'sessionManager': 'sessionManagerConsole',
+    'utilityHub': 'utilityHubConsole',
+    'oracle': 'oracleConsole'
+  };
 
-      if (!targetPanel) {
-        console.warn(`⚠️ No panel found for orbit button: ${panelSelector}`);
-        return;
+  document.querySelectorAll('.orbit-button').forEach(button => {
+    const target = button.dataset.target;
+    if (synthesizedPanels[target]) {
+      const panelId = synthesizedPanels[target];
+      let panel = document.getElementById(panelId);
+
+      if (!panel) {
+        console.log(`🧬 Synthesizing panel for: ${panelId}`);
+        panel = document.createElement('div');
+        panel.classList.add('holo-console');
+        panel.id = panelId;
+        panel.style.display = 'none';
+        document.body.appendChild(panel);
+      } else {
+        console.log(`✅ Panel '${panelId}' already exists.`);
       }
 
-      // Hide all other holo-consoles
-      document.querySelectorAll('.holo-console').forEach((panel) => {
-        if (panel !== targetPanel) panel.style.display = 'none';
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.holo-console').forEach(p => p.style.display = 'none');
+        panel.style.display = 'block';
+        console.log(`🔄 Activated Panel: ${panelId}`);
       });
+    } else {
+      console.warn(`⚠ No mapping found for button '${target}'`);
+    }
+  });
 
-      // Toggle target panel
-      const isVisible = targetPanel.style.display === 'block';
-      targetPanel.style.display = isVisible ? 'none' : 'block';
+  // === Phase 3: Dock Panel Neural Alignment Injector ===
+  console.log("🧠 Phase 3: Injecting Dock Panel Alignment Logic...");
+
+  const orbits = NeuralOrbitRegistry?.listOrbits?.();
+  if (orbits) {
+    Object.entries(orbits).forEach(([key, orbit]) => {
+      const panelId = orbit.panelId || `panel${key}`;
+      let panel = document.getElementById(panelId);
+      if (panel) {
+        panel.classList.add("holo-console");
+        panel.setAttribute("data-console", key);
+        console.log(`✅ Aligned panel '${panelId}' with orbit '${key}'`);
+      } else {
+        console.warn(`⚠ No panel found for orbit '${key}' (${panelId})`);
+      }
+    });
+  } else {
+    console.warn("⚠ NeuralOrbitRegistry.listOrbits() unavailable.");
+  }
+
+  // === Orbital Relay Panel Toggle Logic ===
+  // This logic ensures every .orbit-btn activates its matching holo-console panel by data-console.
+  document.querySelectorAll('.orbit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const panelName = btn.getAttribute('data-target');
+      if (!panelName) {
+        console.warn('No data-target specified for orbit button.');
+        return;
+      }
+      // Updated selector sanitization logic
+      const raw = SovereignDockPanelMap[panelName] || panelName;
+      const selector = raw.startsWith("#") ? raw : `#${raw}`;
+      const panel = document.querySelector(selector);
+      if (panel) {
+        document.querySelectorAll('.holo-console').forEach(p => p.classList.remove('active'));
+        panel.classList.add('active');
+        console.log(`🚀 Orbit activated: ${panelName}`);
+      } else {
+        console.warn(`⚠️ No panel found for target: ${panelName}`);
+      }
     });
   });
 
@@ -1147,18 +1315,19 @@ window.NeuralOrbitalMeshReconciliation = (function() {
     let missingPanels = 0;
 
     buttons.forEach(btn => {
-      const target = btn.dataset.target;
+      const panelName = btn.dataset.target;
       totalChecked++;
 
-      if (!target) {
+      if (!panelName) {
         console.warn(`⚠ Orbital button missing data-target attribute`, btn);
         missingPanels++;
         return;
       }
 
-      const targetPanel = document.querySelector(target);
+      const selector = SovereignDockPanelMap[panelName] || `#${panelName}`;
+      const targetPanel = document.querySelector(selector);
       if (!targetPanel) {
-        console.warn(`⚠ No DOM panel found for target '${target}'`);
+        console.warn(`⚠ No DOM panel found for target '${panelName}'`);
         missingPanels++;
       }
     });

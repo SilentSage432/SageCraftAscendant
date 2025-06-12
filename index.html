@@ -33,18 +33,13 @@
   <body class="liquid-glass-ui">
   <div class="logo-banner-flex">
     <div class="header-title">
-      <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" />
+      <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" style="max-width: 220px; height: auto;" />
       <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
     </div>
     <div id="sovereignToolbarMount" class="sovereign-toolbar-container"></div>
     <!-- Additional HoloConsole Sovereign Panels -->
     <!-- Sovereign Orbit Dock Console Panels -->
-    <section class="holo-console hidden" id="countConsole" aria-hidden="true"></section>
-    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true"></section>
     <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
-    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true"></section>
-    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true"></section>
-    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true"></section>
     <!-- 🔮 Oracle Subsystem Panel -->
     <div id="oracle" class="holo-console hidden">
       <h2>🔮 Oracle Subsystem</h2>
@@ -59,15 +54,61 @@
       <p>📊 Forecast analysis and anomaly data will appear here.</p>
     </div>
   </section>
-  <!-- 2. Alias Sections for count and deltaAnalyzer -->
-  <section id="count" class="holo-console hidden" aria-hidden="true">
-    <div data-alias="countConsole"></div>
-  </section>
-  <section id="deltaAnalyzer" class="holo-console hidden" aria-hidden="true">
-    <div data-alias="deltaAnalyzerConsole"></div>
-  </section>
-  <!-- 3. Dock Grid Stub -->
-  <div id="dockGrid" style="display: none;"></div>
+    <!-- 2. Full Panel Definitions for count and deltaAnalyzer -->
+    <section class="holo-console hidden" id="countConsole" aria-hidden="true">
+      <header class="console-header">🧮 Count Console</header>
+      <div class="console-body">Count Console is active.</div>
+    </section>
+    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true">
+      <header class="console-header">📊 Delta Analyzer</header>
+      <div class="console-body">Delta Analyzer active.</div>
+    </section>
+    <!-- 3. Dock Grid Stub -->
+    <div id="dockGrid" style="display: none;"></div>
+
+    <!-- Injected missing orbital panels -->
+    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true">
+      <header class="console-header">🗂 Reporting Hub</header>
+      <div class="console-body">Reporting system live.</div>
+    </section>
+
+    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true">
+      <header class="console-header">📋 Session Manager</header>
+      <div class="console-body">Session tracking and archival.</div>
+    </section>
+
+    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true">
+      <header class="console-header">🧰 Utility Hub</header>
+      <div class="console-body">Utility functions initialized.</div>
+    </section>
+
+    <section class="holo-console hidden" id="oracleConsole" aria-hidden="true">
+      <header class="console-header">🔮 Oracle Interface</header>
+      <div class="console-body">Awaiting divine insight...</div>
+    </section>
+
+    <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
+      <div id="sovereignOrbitDock" class="orbit-cluster">
+        <button class="orbit-btn" data-target="#countConsole">
+          <img src="assets/icons/icon-count.png" alt="Count Console" />
+        </button>
+        <button class="orbit-btn" data-target="#deltaAnalyzerConsole">
+          <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
+        </button>
+        <button class="orbit-btn" data-target="#reportingHubConsole">
+          <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
+        </button>
+        <button class="orbit-btn" data-target="#sessionManagerConsole">
+          <img src="assets/icons/icon-session.png" alt="Session Manager" />
+        </button>
+        <button class="orbit-btn" data-target="#utilityHubConsole">
+          <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
+        </button>
+        <button class="orbit-btn" data-target="#oracleConsole">
+          <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
+        </button>
+      </div>
+    </div>
   <header id="sovereignHeader">
   </header>
   <!-- 🧭 Sovereign Ascendant Toolbar -->
@@ -80,55 +121,8 @@
        Only dynamic Control Deck injection point remains below. -->
   <div id="operatorConsole" class="tabcontent"></div>
 
-  <!-- Orbital Dock Container -->
-  <div id="orbitalDockContainer" class="dock-container">
-    <button class="orbit-btn" data-panel="#countConsole" aria-label="Count Console">
-      <img src="assets/icons/icon-count.png" alt="Count Console" class="orbit-icon" />
-    </button>
-    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole" aria-label="Delta Analyzer Console">
-      <img src="assets/icons/icon-delta.png" alt="Delta Analyzer Console" class="orbit-icon" />
-    </button>
-    <button class="orbit-btn" data-panel="#pulseMonitorConsole" aria-label="Oracle">
-      <img src="assets/icons/icon-oracle.png" alt="Oracle Console" class="orbit-icon" />
-    </button>
-    <button class="orbit-btn" data-panel="#reportingHubConsole" aria-label="Reporting Hub Console">
-      <img src="assets/icons/icon-reporting.png" alt="Reporting Hub Console" class="orbit-icon" />
-    </button>
-    <button class="orbit-btn" data-panel="#sessionManagerConsole" aria-label="Session Manager Console">
-      <img src="assets/icons/icon-utility.png" alt="Session Manager Console" class="orbit-icon" />
-    </button>
-    <button class="orbit-btn" data-panel="#utilityHubConsole" aria-label="Utility Hub Console">
-      <img src="assets/icons/icon-count.png" alt="Utility Hub Console" class="orbit-icon" />
-    </button>
-  </div>
 
-  <!-- Dock Grid Container -->
-  <!-- Sovereign Orbit Dock Console Panel Definitions -->
-  <!--
-    <button class="orbit-btn" data-panel="#countConsole">🧮</button>
-    <section class="holo-console hidden" id="countConsole" aria-hidden="true"></section>
-
-    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">📊</button>
-    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true"></section>
-
-    <button class="orbit-btn" data-panel="#pulseMonitorConsole">🫀</button>
-    <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
-
-    <button class="orbit-btn" data-panel="#reportingHubConsole">🗂</button>
-    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true"></section>
-
-    <button class="orbit-btn" data-panel="#sessionManagerConsole">📋</button>
-    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true"></section>
-
-    <button class="orbit-btn" data-panel="#utilityHubConsole">🧰</button>
-    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true"></section>
-  -->
-
-
-
-
-
-  <!-- Phase 125.8 — Predictive Overlay Remover -->
+<!-- Phase 125.8 — Predictive Overlay Remover -->
   <style>
     #diagnosticOverlay, #dropboxStatusOverlay {
       display: none !important;
@@ -141,6 +135,12 @@
       margin: auto;
       padding: 10%;
       box-sizing: border-box;
+    }
+    .orbit-btn.active-orbit {
+      border: 2px solid #cc66ff;
+      box-shadow: 0 0 12px #cc66ff, inset 0 0 6px #cc66ff;
+      transform: scale(1.05);
+      transition: all 0.3s ease;
     }
   </style>
 
@@ -759,27 +759,54 @@ document.addEventListener("DOMContentLoaded", () => {
   </script>
 
 
+  
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("🧠 Orbit wiring script loaded");
+    setTimeout(() => {
       const orbitButtons = document.querySelectorAll(".orbit-btn");
+      console.log("🧩 Found orbit buttons:", orbitButtons.length);
+
       orbitButtons.forEach(btn => {
         btn.addEventListener("click", () => {
-          const targetId = btn.getAttribute("data-panel");
-          const target = document.querySelector(targetId);
-          if (!target) return;
+          const targetId = btn.getAttribute("data-target");
+          console.log("🛰 Orbit clicked → Target:", targetId);
 
-          document.querySelectorAll(".holo-console").forEach(console => {
-            if (console !== target) {
-              console.classList.add("hidden");
-              console.setAttribute("aria-hidden", "true");
+          const target = document.querySelector(targetId);
+          if (!target) {
+            console.warn("❌ Panel not found:", targetId);
+            return;
+          }
+
+          console.log("✅ Panel found:", target);
+
+          const allPanels = document.querySelectorAll(".holo-console");
+          console.log("🔍 Hiding other panels...");
+          allPanels.forEach(panel => {
+            if (panel !== target) {
+              panel.classList.add("hidden");
+              panel.setAttribute("aria-hidden", "true");
             }
           });
 
+          document.querySelectorAll(".orbit-btn").forEach(b => b.classList.remove("active-orbit"));
+
+          console.log("🔁 Toggling visibility for:", targetId);
           target.classList.toggle("hidden");
-          target.setAttribute("aria-hidden", !target.classList.contains("hidden"));
+
+          const isVisible = !target.classList.contains("hidden");
+          target.setAttribute("aria-hidden", !isVisible);
+
+          if (isVisible) {
+            btn.classList.add("active-orbit");
+            console.log("🌟 Activated:", targetId);
+          } else {
+            console.log("🌒 Hidden:", targetId);
+          }
         });
       });
-    });
+    }, 0);
+  });
   </script>
 
   <script>
@@ -1113,26 +1140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     🧠
   </div>
 
-  <!-- 🌌 Sovereign Orbit Dock -->
-  <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
-    <div id="sovereignOrbitDock" class="orbit-cluster">
-      <div class="orbit-btn" id="countButton">
-        <img src="assets/icons/icon-count.png" alt="Count Icon" />
-      </div>
-      <div class="orbit-btn" id="deltaButton">
-        <img src="assets/icons/icon-delta.png" alt="Delta Icon" />
-      </div>
-      <div class="orbit-btn" id="oracleButton">
-        <img src="assets/icons/icon-oracle.png" alt="Oracle Icon" />
-      </div>
-      <div class="orbit-btn" id="reportingButton">
-        <img src="assets/icons/icon-reporting.png" alt="Reporting Icon" />
-      </div>
-      <div class="orbit-btn" id="utilityButton">
-        <img src="assets/icons/icon-utility.png" alt="Utility Icon" />
-      </div>
-    </div>
-  </div>
 <!-- Phase 200.7 — Predictive HUD Isolation Container -->
 <div id="brainDockHudPanel" style="
   position: fixed;
@@ -1454,4 +1461,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-  <script src="scripts/liquidGlass/glassOrbitHandler.js"></script>
+  <!-- <script src="scripts/liquidGlass/scripts/liquidGlass/glassOrbitHandler.js"></script> -->

@@ -1,3 +1,13 @@
+// === Sovereign Dock Panel Map for Alias Resolution ===
+const SovereignDockPanelMap = {
+  count: "#countConsole",
+  deltaAnalyzer: "#deltaAnalyzerConsole",
+  reportingHub: "#reportingHubConsole",
+  sessionManager: "#sessionManagerConsole",
+  utilityHub: "#utilityHubConsole",
+  oracle: "#oracleConsole"
+};
+
 // Dock wiring object for future dynamic dock control
 var OperatorDockWiring = {
     // === Phase 1000.0: Sovereign Dock Population Matrix Injection ===
@@ -99,7 +109,8 @@ var OperatorDockWiring = {
         }
         const panels = state.panels || {};
         Object.keys(panels).forEach(id => {
-            const panel = document.getElementById(id);
+            const selector = SovereignDockPanelMap[id] || `#${id}`;
+            const panel = document.querySelector(selector);
             if (!panel) return;
             const dockInfo = panels[id];
 
@@ -249,7 +260,8 @@ var OperatorDockWiring = {
         }
         const panels = snapshot.panels || {};
         Object.keys(panels).forEach(id => {
-            const panel = document.getElementById(id);
+            const selector = SovereignDockPanelMap[id] || `#${id}`;
+            const panel = document.querySelector(selector);
             if (!panel) return;
             const dockInfo = panels[id];
 
