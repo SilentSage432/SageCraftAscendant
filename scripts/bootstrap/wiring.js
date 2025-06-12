@@ -535,15 +535,33 @@ window.NeuralAutoHealingForecast = (function() {
 window.NeuralOrbitRegistry = (function() {
   const orbits = {};
 
-  function registerOrbit(name, description, modules = []) {
+  function registerOrbit(name, description, modules = [], icon, label, panelId, panelTitle) {
     if (orbits[name]) {
       console.warn(`⚠ Orbit '${name}' is already registered.`);
+      return;
+    }
+    // --- Fallback injection logic for 'loreCodex' ---
+    // If the orbit is 'loreCodex', ensure required properties are present
+    if (name === 'loreCodex') {
+      label = label || 'Lore Codex';
+      icon = icon || '📜';
+      panelId = panelId || 'loreCodexConsole';
+      panelTitle = panelTitle || 'Lore Console';
+    }
+
+    // If label or icon are still missing, reject
+    if (!label || !icon) {
+      console.warn(`⚠ Orbit '${name}' rejected: Missing required properties.`);
       return;
     }
     orbits[name] = {
       description,
       modules,
-      registeredAt: new Date().toISOString()
+      registeredAt: new Date().toISOString(),
+      icon,
+      label,
+      panelId,
+      panelTitle
     };
     console.log(`🪐 Orbit Registered: ${name}`);
   }
@@ -586,16 +604,24 @@ window.NeuralRegistryPersistence = (function () {
 
   function loadRegistry() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        console.log("💾 Neural Orbit Registry Loaded:", parsed);
-        return parsed;
+      const registryJSON = localStorage.getItem("neuralOrbitRegistry");
+      if (!registryJSON) throw new Error("No registry JSON found");
+      let parsed;
+      try {
+        parsed = JSON.parse(registryJSON);
+      } catch (e) {
+        console.error("❌ Orbit registry failed to parse — Invalid JSON:", e);
+        return null;
       }
-    } catch (err) {
-      console.error("❌ Failed to load orbit registry:", err);
+      if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.orbits)) {
+        throw new Error("Invalid registry format");
+      }
+      return parsed;
+    } catch (e) {
+      console.warn("⚠ Failed to parse orbit registry. Resetting registry.", e);
+      localStorage.removeItem("neuralOrbitRegistry");
+      return { orbits: [] };
     }
-    return null;
   }
 
   function clearRegistry() {
@@ -763,12 +789,20 @@ window.NeuralRegistryEditorCore = (function () {
 
 window.NeuralOrbitInjectionBus = (function () {
 
-  function injectOrbit({ key, label, icon = "icon-default.png", modules = [] }) {
+  function injectOrbit({ key, label, icon = "icon-default.png", modules = [], description, panelId, panelTitle }) {
     // Debug log for orbit injection
     console.log("🔍 Orbit Injection Debug — Received Orbit:", {
-      key, label, icon, modules
+      key, label, icon, modules, description, panelId, panelTitle
     });
     console.log(`🚀 Injecting Orbit: ${key}`);
+
+    // Fallback injection logic for loreCodex before registering
+    if (key === 'loreCodex') {
+      label = label || 'Lore Codex';
+      icon = icon || '📜';
+      panelId = panelId || 'loreCodexConsole';
+      panelTitle = panelTitle || 'Lore Console';
+    }
 
     if (!key || !label || !icon) {
       console.error("❌ Invalid injection payload — key, label, and icon are required.");
@@ -780,8 +814,8 @@ window.NeuralOrbitInjectionBus = (function () {
       return;
     }
 
-    // Inject directly into registry
-    NeuralOrbitRegistry.registerOrbit(key, label, modules, icon);
+    // Inject directly into registry (pass all props, extra props are safely handled)
+    NeuralOrbitRegistry.registerOrbit(key, description, modules, icon, label, panelId, panelTitle);
     NeuralRegistryPersistence.saveRegistry(NeuralOrbitRegistry.registry);
     console.log(`✅ Orbit '${key}' injected and persisted.`);
 
@@ -839,14 +873,19 @@ window.NeuralOrbitRegistryValidator = (function () {
 })();
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🧬 DOM Ready — Beginning Full Neural Bootstrap...");
-  if (typeof NeuralUnifiedBootstrap === "function") {
-    const bootstrap = NeuralUnifiedBootstrap();
-    bootstrap.startBootstrapSequence();
-  } else if (typeof NeuralUnifiedBootstrap?.init === "function") {
-    NeuralUnifiedBootstrap.init();
-  } else {
-    console.warn("⚠️ NeuralUnifiedBootstrap not callable. Check definition.");
-  }
+  // Define NeuralUnifiedBootstrap if not already defined
+  window.NeuralUnifiedBootstrap = function() {
+    console.log("🧠 NeuralUnifiedBootstrap invoked.");
+    // Placeholder for actual unified bootstrap logic
+    // Future logic will go here to synchronize mesh, memory, and orbits
+  };
+  // Wait for NeuralUnifiedBootstrap.startBootstrapSequence to be available before invoking
+  const waitForBootstrap = setInterval(() => {
+    if (window.NeuralUnifiedBootstrap?.startBootstrapSequence) {
+      clearInterval(waitForBootstrap);
+      NeuralUnifiedBootstrap.startBootstrapSequence();
+    }
+  }, 50);
 
   // === Orbital Buttons Subsystem Wiring ===
   const forecastBtn = document.getElementById("forecastBtn");
@@ -873,6 +912,29 @@ document.addEventListener("DOMContentLoaded", () => {
       window.SovereignSubsystems?.deltaAnalyzer?.toggle?.();
     });
   }
+
+  // === Orbital Relay Panel Toggle Logic ===
+  // This logic ensures every .orbit-btn toggles its panel cleanly, hiding others.
+  document.querySelectorAll('.orbit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const panelSelector = btn.getAttribute('data-panel');
+      const targetPanel = document.querySelector(panelSelector);
+
+      if (!targetPanel) {
+        console.warn(`⚠️ No panel found for orbit button: ${panelSelector}`);
+        return;
+      }
+
+      // Hide all other holo-consoles
+      document.querySelectorAll('.holo-console').forEach((panel) => {
+        if (panel !== targetPanel) panel.style.display = 'none';
+      });
+
+      // Toggle target panel
+      const isVisible = targetPanel.style.display === 'block';
+      targetPanel.style.display = isVisible ? 'none' : 'block';
+    });
+  });
 
   // === Phase 16017: Live Orbit Injection Test ===
   // Ensure loreCodex orbit is injected with all required properties
