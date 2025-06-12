@@ -1129,6 +1129,65 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.MeshVitals) {
     window.MeshVitals.startHeartbeat(); // 🫀 Begin global companion vitals monitoring
   }
+
+  // === Predictive HUD Toggle Wiring ===
+  const brainButton = document.getElementById("brainDockButton");
+  const brainPanel = document.getElementById("brainDockHudPanel");
+
+  if (brainButton && brainPanel) {
+    brainButton.addEventListener("click", () => {
+      const isVisible = brainPanel.style.display === "block";
+      brainPanel.style.display = isVisible ? "none" : "block";
+    });
+  }
+  // === Predictive HUD Live Telemetry Simulation ===
+  // Predictive HUD panel message rotation logic (overrides previous HUD rotation).
+  const hudFeed = document.getElementById("brainHudLiveFeed");
+  const hudMessages = [
+    "🧬 Syncing cortical threads...",
+    "🔍 Scanning neural anomalies...",
+    "🛰 Rebalancing orbital telemetry...",
+    "💾 Writing memory snapshots...",
+    "⚡ Flux harmonics stable."
+  ];
+  let hudIndex = 0;
+
+  if (hudFeed) {
+    setInterval(() => {
+      hudFeed.textContent = hudMessages[hudIndex];
+      hudIndex = (hudIndex + 1) % hudMessages.length;
+    }, 3000);
+  }
+
+  // === Predictive HUD Metrics Live Simulation Injection ===
+  // Phase 10.2E — Simulated Neural Mesh Broadcast for HUD Sync
+  function simulateMeshBroadcastLoop() {
+    const broadcastMetrics = () => {
+      const metrics = {
+        risk: (Math.random() * 100).toFixed(1) + '%',
+        forecast: ['Clear', 'Moderate', 'Severe'][Math.floor(Math.random() * 3)],
+        anomalies: Math.floor(Math.random() * 5),
+        drift: ['Stable', 'Fluctuating', 'Erratic'][Math.floor(Math.random() * 3)],
+      };
+      const event = new CustomEvent('hudMetricsUpdate', { detail: metrics });
+      document.dispatchEvent(event);
+    };
+    setInterval(broadcastMetrics, 4000); // Broadcast every 4 seconds
+  }
+  simulateMeshBroadcastLoop(); // Initiate loop
+
+  // Enhance or add HUD listener for mesh broadcast sync
+  document.addEventListener('hudMetricsUpdate', (e) => {
+    const { risk, forecast, anomalies, drift } = e.detail;
+    const riskEl = document.getElementById('riskMetric');
+    const forecastEl = document.getElementById('forecastMetric');
+    const anomalyEl = document.getElementById('anomalyMetric');
+    const driftEl = document.getElementById('driftMetric');
+    if (riskEl) riskEl.textContent = risk;
+    if (forecastEl) forecastEl.textContent = forecast;
+    if (anomalyEl) anomalyEl.textContent = anomalies;
+    if (driftEl) driftEl.textContent = drift;
+  });
 });
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
@@ -1670,8 +1729,21 @@ function NeuralUnifiedBootstrap() {
     // Mesh refresh after state loaded
     NeuralMeshIntegritySentinel.synchronizeDockMesh();
 
-    // Restore last active panel session
-    NeuralSessionMemory.restoreLastPanel();
+    // Restore last active panel session only if the toggle is checked
+    const restoreToggle = document.getElementById("restoreLastPanelToggle");
+    const shouldRestore = restoreToggle?.checked;
+    if (shouldRestore) {
+      // Existing logic to restore the last panel
+      const lastPanelId = window.localStorage.getItem("lastActivePanel");
+      if (lastPanelId) {
+        const targetPanel = document.querySelector(lastPanelId);
+        if (targetPanel) {
+          targetPanel.style.display = "block";
+          targetPanel.setAttribute("aria-hidden", "false");
+          // Optional: Highlight the corresponding orbit
+        }
+      }
+    }
 
     // Start reconciliation loop to continuously verify mesh health
     NeuralDockMeshReconciler.startReconciliationLoop();

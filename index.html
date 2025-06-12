@@ -31,6 +31,33 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <body class="liquid-glass-ui">
+  <div style="position: fixed; top: 10px; right: 20px; z-index: 10000;">
+    <label style="font-family: monospace; color: #fff;">
+      <input type="checkbox" id="restoreToggle" checked />
+      🔁 Restore Last Panel
+    </label>
+  </div>
+</html>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("restoreToggle");
+      const restoreEnabled = localStorage.getItem("restoreEnabled") !== "false";
+      toggle.checked = restoreEnabled;
+
+      toggle.addEventListener("change", () => {
+        localStorage.setItem("restoreEnabled", toggle.checked);
+      });
+
+      // Intercept Neural persistence restoration
+      const originalRestore = window.NeuralMemory?.restoreLastPanel;
+      if (typeof originalRestore === "function") {
+        const shouldRestore = localStorage.getItem("restoreEnabled") !== "false";
+        if (shouldRestore) {
+          originalRestore();
+        }
+      }
+    });
+  </script>
   <div class="logo-banner-flex">
     <div class="header-title">
       <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" style="max-width: 220px; height: auto;" />
@@ -56,36 +83,249 @@
   </section>
     <!-- 2. Full Panel Definitions for count and deltaAnalyzer -->
     <section class="holo-console hidden" id="countConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">🧮 Count Console</header>
-      <div class="console-body">Count Console is active.</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>🧮 Count Console</h2>
+          <p>Track any metric or inventory manually.</p>
+
+          <div class="counter-display" id="countDisplay">0</div>
+
+          <div class="counter-controls">
+            <button onclick="updateCounter(1)">➕ Increment</button>
+            <button onclick="updateCounter(-1)">➖ Decrement</button>
+            <button onclick="resetCounter()">🔁 Reset</button>
+          </div>
+        </div>
+      </div>
     </section>
+  <style>
+    .counter-display {
+      font-size: 3rem;
+      margin: 1rem 0;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff;
+    }
+    .counter-controls button {
+      margin: 0.3rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #0ff;
+      color: #0ff;
+      cursor: pointer;
+    }
+    .counter-controls button:hover {
+      background: rgba(0,255,255,0.1);
+    }
+  </style>
     <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">📊 Delta Analyzer</header>
-      <div class="console-body">Delta Analyzer active.</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>📊 Delta Analyzer</h2>
+          <p>Compare two values and calculate the delta (A - B).</p>
+
+          <label>
+            Value A:
+            <input type="number" id="deltaValueA" placeholder="Enter Value A">
+          </label>
+          <label>
+            Value B:
+            <input type="number" id="deltaValueB" placeholder="Enter Value B">
+          </label>
+
+          <div class="delta-controls">
+            <button onclick="calculateDelta()">🔍 Analyze</button>
+            <button onclick="clearDeltaInputs()">🧼 Clear</button>
+          </div>
+
+          <div id="deltaResult" class="delta-result">Δ = 0</div>
+        </div>
+      </div>
     </section>
     <!-- 3. Dock Grid Stub -->
     <div id="dockGrid" style="display: none;"></div>
 
     <!-- Injected missing orbital panels -->
     <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">🗂 Reporting Hub</header>
-      <div class="console-body">Reporting system live.</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>📝 Reporting Hub</h2>
+          <p>Submit observations, reports, or logs below.</p>
+
+          <textarea id="reportInput" rows="4" placeholder="Enter your report..."></textarea>
+          
+          <div class="report-controls">
+            <button onclick="submitReport()">📤 Submit</button>
+            <button onclick="clearReports()">🧹 Clear All</button>
+          </div>
+
+          <ul id="reportLog" class="report-log"></ul>
+        </div>
+      </div>
     </section>
 
     <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">📋 Session Manager</header>
-      <div class="console-body">Session tracking and archival.</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>🧠 Session Manager</h2>
+          <p>Name and initiate your active session.</p>
+
+          <label>
+            Session Name:
+            <input type="text" id="sessionNameInput" placeholder="e.g., Forecast Sync 7">
+          </label>
+          <button onclick="startSession()">🚀 Start Session</button>
+
+          <div id="activeSessionDisplay" class="session-display"></div>
+        </div>
+      </div>
     </section>
 
     <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">🧰 Utility Hub</header>
-      <div class="console-body">Utility functions initialized.</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>🛠 Utility Hub</h2>
+          <p>Run quick diagnostics or utility functions.</p>
+
+          <div class="utility-controls">
+            <button onclick="triggerTestAlert()">🔔 Test Alert</button>
+            <button onclick="runDiagnosticLog()">📋 Log Diagnostic</button>
+            <button onclick="pingPanels()">📡 Ping Panels</button>
+          </div>
+
+          <pre id="utilityOutput" class="utility-output">Awaiting commands...</pre>
+        </div>
+      </div>
     </section>
+  <script>
+    function triggerTestAlert() {
+      alert("🔔 Alert triggered from Utility Hub!");
+      logUtility("Alert dispatched.");
+    }
+
+    function runDiagnosticLog() {
+      console.log("📋 Utility Hub Diagnostic: System online.");
+      logUtility("Logged system diagnostic to console.");
+    }
+
+    function pingPanels() {
+      const panels = document.querySelectorAll(".holo-console");
+      logUtility(`📡 Pinged ${panels.length} panels. Status: Responsive.`);
+    }
+
+    function logUtility(message) {
+      const output = document.getElementById("utilityOutput");
+      const timestamp = new Date().toLocaleTimeString();
+      output.textContent = `[${timestamp}] ${message}`;
+    }
+  </script>
+  <style>
+    .utility-controls button {
+      margin: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #ff69b4;
+      color: #ff69b4;
+      cursor: pointer;
+    }
+
+    .utility-controls button:hover {
+      background: rgba(255,105,180,0.1);
+    }
+
+    .utility-output {
+      background: rgba(255,255,255,0.05);
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      font-family: monospace;
+      color: #ff69b4;
+      border: 1px dashed #ff69b4;
+      white-space: pre-wrap;
+    }
+  </style>
 
     <section class="holo-console hidden" id="oracleConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">🔮 Oracle Interface</header>
-      <div class="console-body">Awaiting divine insight...</div>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>🔮 Oracle Console</h2>
+          <p>Consult the Silent Sage. Enter your query below:</p>
+
+          <label>
+            Your Inquiry:
+            <input type="text" id="oracleInput" placeholder="e.g., What is the state of the mesh?">
+          </label>
+          <button onclick="consultOracle()">🧙 Ask the Sage</button>
+
+          <div id="oracleResponse" class="oracle-output">Awaiting your question...</div>
+        </div>
+      </div>
     </section>
+  <script>
+    function consultOracle() {
+      const input = document.getElementById("oracleInput");
+      const response = document.getElementById("oracleResponse");
+      const question = input.value.trim();
+
+      if (!question) return;
+
+      const reply = generateMysticalResponse(question);
+      response.textContent = `🧙 Sage replies: "${reply}"`;
+      input.value = '';
+    }
+
+    function generateMysticalResponse(query) {
+      const responses = [
+        "The data whispers truths hidden in code.",
+        "All systems stabilize in time.",
+        "Beware the silent drift between panels.",
+        "Your path will align when the circuit is closed.",
+        "The mesh remembers more than you think."
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+  </script>
+  <style>
+    #oracleConsole input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 60%;
+      margin-right: 0.5rem;
+    }
+
+    #oracleConsole button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(128,0,128,0.05);
+      border: 1px solid #8a2be2;
+      color: #8a2be2;
+      cursor: pointer;
+    }
+
+    #oracleConsole button:hover {
+      background: rgba(138,43,226,0.1);
+    }
+
+    .oracle-output {
+      margin-top: 1rem;
+      font-family: serif;
+      font-style: italic;
+      color: #8a2be2;
+      text-shadow: 0 0 4px #8a2be2;
+    }
+  </style>
 
     <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
       <div id="sovereignOrbitDock" class="orbit-cluster">
@@ -124,6 +364,41 @@
 
 <!-- Phase 125.8 — Predictive Overlay Remover -->
   <style>
+    .report-controls button {
+      margin: 0.3rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #ffa500;
+      color: #ffa500;
+      cursor: pointer;
+    }
+
+    .report-controls button:hover {
+      background: rgba(255,165,0,0.1);
+    }
+
+    #reportInput {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .report-log {
+      list-style: none;
+      padding-left: 0;
+      color: #ffa500;
+      font-family: monospace;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .report-log li {
+      margin-bottom: 0.3rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px dashed #ffa500;
+    }
     #diagnosticOverlay, #dropboxStatusOverlay {
       display: none !important;
     }
@@ -1129,39 +1404,49 @@ document.addEventListener("DOMContentLoaded", () => {
     bottom: 20px;
     right: 20px;
     z-index: 10001;
-    background: #1b1b2f;
-    border: 2px solid #9933ff;
+    background: radial-gradient(circle, #2a003f 40%, #000 90%);
+    border: 2px solid #cc66ff;
     border-radius: 50%;
     padding: 12px;
-    box-shadow: 0 0 20px rgba(153, 51, 255, 0.8);
+    box-shadow: 0 0 12px #cc66ff, 0 0 18px #cc66ff inset;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   ">
     🧠
   </div>
+  <style>
+    #brainDockButton:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 18px #cc66ff, 0 0 24px #cc66ff inset;
+    }
+  </style>
 
 <!-- Phase 200.7 — Predictive HUD Isolation Container -->
 <div id="brainDockHudPanel" style="
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  background: linear-gradient(145deg, #1b1b2f, #2a003f);
-  border: 2px solid #9933ff;
-  border-radius: 12px;
-  padding: 14px 18px;
-  box-shadow: 0 0 25px rgba(153, 51, 255, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.05);
-  font-family: monospace;
-  color: #fff;
-  z-index: 10000;
-  width: 280px;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    background: linear-gradient(145deg, #1b1b2f, #2a003f);
+    border: 2px solid #cc66ff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 0 20px rgba(204, 102, 255, 0.7), inset 0 0 8px rgba(204, 102, 255, 0.5);
+    font-family: monospace;
+    color: #fff;
+    z-index: 10000;
+    width: 280px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: none;
 ">
   <h3 style="margin:0 0 12px 0; color:#cc66ff;">🧭 Predictive HUD</h3>
-  <div id="hudRisk" style="margin-bottom: 8px;">Risk: <span>Loading...</span></div>
-  <div id="hudForecast" style="margin-bottom: 8px;">Forecast: <span>Loading...</span></div>
-  <div id="hudAnomaly" style="margin-bottom: 8px;">Anomalies: <span>Loading...</span></div>
-  <div id="hudDrift" style="margin-bottom: 8px;">Drift: <span>Loading...</span></div>
+  <div class="hud-metrics">
+    <div class="hud-stat"><span class="label">🧠 RISK</span> <span id="riskMetric">No Data</span></div>
+    <div class="hud-stat"><span class="label">📈 FORECAST</span> <span id="forecastMetric">No Data</span></div>
+    <div class="hud-stat"><span class="label">☢️ ANOMALIES</span> <span id="anomalyMetric">No Data</span></div>
+    <div class="hud-stat"><span class="label">🌀 DRIFT</span> <span id="driftMetric">Idle</span></div>
+  </div>
+  <!-- Live HUD feed for displaying live data updates -->
+  <div id="brainHudLiveFeed" class="hud-feed-text" style="margin-top:18px; text-align:center; font-size:1.05em; color:#cc99ff;">Initializing...</div>
 <!-- Phase 35 — Unified Orbital Event Mesh Injection -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1462,3 +1747,128 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
   <!-- <script src="scripts/liquidGlass/scripts/liquidGlass/glassOrbitHandler.js"></script> -->
+  <script>
+    // 🧮 Count Console Counter Logic
+    let counter = 0;
+    const countDisplay = document.getElementById('countDisplay');
+
+    function updateCounter(amount) {
+      counter += amount;
+      if (countDisplay) countDisplay.textContent = counter;
+    }
+
+    function resetCounter() {
+      counter = 0;
+      if (countDisplay) countDisplay.textContent = counter;
+    }
+
+    // 📊 Delta Analyzer Logic
+    function calculateDelta() {
+      const a = parseFloat(document.getElementById('deltaValueA').value);
+      const b = parseFloat(document.getElementById('deltaValueB').value);
+      const delta = (isNaN(a) || isNaN(b)) ? 'Invalid input' : a - b;
+      document.getElementById('deltaResult').textContent = `Δ = ${delta}`;
+    }
+
+    function clearDeltaInputs() {
+      document.getElementById('deltaValueA').value = '';
+      document.getElementById('deltaValueB').value = '';
+      document.getElementById('deltaResult').textContent = 'Δ = 0';
+    }
+  </script>
+  <style>
+    .delta-result {
+      font-size: 2rem;
+      margin-top: 1rem;
+      color: #f0f;
+      text-shadow: 0 0 5px #f0f;
+    }
+
+    .delta-controls button {
+      margin: 0.3rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #f0f;
+      color: #f0f;
+      cursor: pointer;
+    }
+
+    .delta-controls button:hover {
+      background: rgba(255,0,255,0.1);
+    }
+
+    #deltaAnalyzerConsole input {
+      margin: 0.3rem 0.5rem;
+      padding: 0.4rem;
+      width: 120px;
+      font-size: 1rem;
+    }
+  </style>
+  <script>
+    function submitReport() {
+      const input = document.getElementById('reportInput');
+      const log = document.getElementById('reportLog');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const timestamp = new Date().toLocaleString();
+      const entry = document.createElement('li');
+      entry.textContent = `[${timestamp}] ${text}`;
+      log.appendChild(entry);
+      input.value = '';
+    }
+
+    function clearReports() {
+      document.getElementById('reportLog').innerHTML = '';
+    }
+    // Session Manager logic
+    function startSession() {
+      const input = document.getElementById('sessionNameInput');
+      const sessionName = input.value.trim();
+      if (!sessionName) return;
+
+      const timestamp = new Date().toLocaleString();
+      const display = document.getElementById('activeSessionDisplay');
+      display.textContent = `📌 Active Session: "${sessionName}" started at ${timestamp}`;
+      input.value = '';
+    }
+  </script>
+  <style>
+    .session-display {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #00ffff;
+      font-family: monospace;
+      text-shadow: 0 0 4px #0ff;
+    }
+
+    #sessionNameInput {
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      padding: 0.4rem;
+      width: 200px;
+      font-size: 1rem;
+    }
+
+    #sessionManagerConsole button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: rgba(0,255,255,0.05);
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      cursor: pointer;
+    }
+
+    #sessionManagerConsole button:hover {
+      background: rgba(0,255,255,0.1);
+    }
+  </style>
+  <script>
+    function closeConsole(button) {
+      const panel = button.closest(".holo-console");
+      if (panel) {
+        panel.setAttribute("aria-hidden", "true");
+        panel.style.display = "none";
+      }
+    }
+  </script>
