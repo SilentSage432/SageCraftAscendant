@@ -1,0 +1,311 @@
+:root {
+  --glow-color: rgba(153, 236, 255, 0.4);     /* icy blue */
+  --bg-color: rgba(26, 28, 32, 0.75);         /* midnight graphite */
+  --text-color: #e4f5ff;                      /* lunar silver */
+  --accent-color: rgba(79, 255, 212, 0.6);    /* opal green */
+  --alert-color: #ff4477;                     /* crimson pulse */
+}
+
+/* 🧬 Phase 18000.1 — Liquid Fluidity Skin Initialization */
+
+.liquid-pane {
+  backdrop-filter: blur(12px) brightness(1.1);
+  background: var(--bg-color);
+  border: 1px solid var(--glow-color);
+  border-radius: 12px;
+  box-shadow: 0 0 12px var(--glow-color);
+  transition: all 0.3s ease-in-out;
+}
+
+.liquid-pane:hover {
+  background: var(--accent-color);
+  box-shadow: 0 0 16px var(--accent-color);
+}
+
+.orbit-btn {
+  transition: all 0.3s ease-in-out;
+  border-radius: 50%;
+  background: var(--bg-color);
+  box-shadow: 0 0 6px var(--glow-color);
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.orbit-btn:hover {
+  background: var(--accent-color);
+  box-shadow: 0 0 12px var(--accent-color);
+  transform: scale(1.05);
+}
+
+.pulse {
+  animation: pulseEffect 0.6s ease-out;
+}
+
+@keyframes pulseEffect {
+  0% {
+    box-shadow: 0 0 0px var(--accent-color);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(79, 255, 212, 0.5);
+    transform: scale(1.07);
+  }
+  100% {
+    box-shadow: 0 0 0px var(--accent-color);
+    transform: scale(1);
+  }
+}
+
+/* 🧬 Phase 18000.3 — Orbital Halo + Memory Bloom Animations */
+
+.orbit-btn.halo {
+  box-shadow: 0 0 0px var(--accent-color);
+  animation: haloPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes haloPulse {
+  0% {
+    box-shadow: 0 0 0px var(--accent-color);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--accent-color);
+  }
+  100% {
+    box-shadow: 0 0 0px var(--accent-color);
+  }
+}
+
+.memory-bloom {
+  position: absolute;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background-image: url('/scripts/liquidGlass/visualAssets/glyph-bloom.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.75;
+  animation: bloomFlicker 3s ease-in-out infinite;
+}
+
+@keyframes bloomFlicker {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+/* 🧬 Phase 18002 — Gravitational Orbit Behavior */
+
+/* .orbit-cluster {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  animation: orbitFloat 6s ease-in-out infinite;
+} */
+
+.orbit-btn.orbiting {
+  position: absolute;
+  animation: floatIdle 6s ease-in-out infinite;
+  transform-origin: center center;
+  left: var(--orbit-left, 0px);
+  top: var(--orbit-top, 0px);
+}
+
+/* @keyframes freeOrbit {
+  0% {
+    transform: rotate(0deg) translateX(60px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(60px) rotate(-360deg);
+  }
+} */
+
+@keyframes floatIdle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes orbitFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes orbitalSpin {
+  0% {
+    transform: rotate(0deg) translateX(40px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(40px) rotate(-360deg);
+  }
+}
+
+/* 🧬 Phase 18003.3 — Visual Bloom Behavior on Engagement */
+
+.orbit-btn.bloomed {
+  box-shadow:
+    0 0 12px var(--accent-color),
+    0 0 24px var(--accent-color),
+    0 0 36px var(--accent-color);
+  background: radial-gradient(circle at center, var(--accent-color), transparent 70%);
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.orbit-btn.bloomed::after {
+  content: '✧';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1.2rem;
+  color: var(--accent-color);
+  animation: bloomGlyphPulse 1.6s infinite ease-in-out;
+}
+
+@keyframes bloomGlyphPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
+/* 🧬 Phase 18004 — Memory Bloom Behavior Tracking Engine */
+
+.orbit-btn[data-bloom-count]::before {
+  content: attr(data-bloom-count);
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--accent-color);
+  border-radius: 50%;
+  padding: 4px 6px;
+  font-size: 0.65rem;
+  color: var(--text-color);
+  pointer-events: none;
+  box-shadow: 0 0 6px var(--accent-color);
+  backdrop-filter: blur(3px);
+}
+
+.orbit-btn.bloomed[data-bloom-count]::before {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  font-weight: bold;
+}
+/* 🧬 Phase 18004.5 — Companion + Glyph Float Sync */
+
+.liquid-pane.float {
+  animation: paneFloatIdle 8s ease-in-out infinite;
+}
+
+.memory-bloom.float {
+  animation: bloomFlickerFloat 7s ease-in-out infinite;
+}
+
+@keyframes paneFloatIdle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes bloomFlickerFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  50% {
+    transform: translate(-50%, -54%) scale(1.05);
+  }
+}
+
+/* 🔧 Custom Variables for Orbit Positioning */
+:root {
+  --orbit-left: 20vw;
+  --orbit-top: 30vh;
+}
+
+/* 🧬 Phase 18004.8 — Layout Normalization + Logo Scaling */
+
+#mainLogo {
+  max-width: 180px;
+  margin: 40px auto;
+  display: block;
+  filter: drop-shadow(0 0 8px var(--glow-color));
+  transition: transform 0.3s ease-in-out;
+}
+
+body {
+  margin: 0;
+  padding: 0 20px;
+  overflow-x: hidden;
+  background: rgba(10, 12, 14, 0.9);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* 🧬 Phase 18004.9 — Orbit Visibility and Layout Reinforcement */
+
+.orbit-cluster {
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 28px !important;
+  flex-wrap: wrap;
+  padding: 40px 20px;
+  z-index: 1000;
+}
+
+.orbit-btn {
+  position: relative !important;
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at center, rgba(153, 236, 255, 0.3), rgba(26, 28, 32, 0.8)) !important;
+  box-shadow: 0 0 12px var(--glow-color) !important;
+  color: var(--text-color) !important;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.orbit-btn:hover {
+  background: var(--accent-color) !important;
+  box-shadow: 0 0 18px var(--accent-color) !important;
+  transform: scale(1.08);
+}
+
+.orbit-btn.active {
+  background: var(--accent-color) !important;
+  box-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+  transform: scale(1.1);
+}
