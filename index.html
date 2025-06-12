@@ -41,7 +41,6 @@
 
   <!-- 🔌 Dock Panel Scaffolding Injected — Phase 12.0 -->
   <div id="exceptionManager" class="holo-console dock-panel"></div>
-  <div id="count" class="holo-console dock-panel"></div>
   <div id="deltaAnalyzer" class="holo-console dock-panel"></div>
   <div id="reportingHub" class="holo-console dock-panel"></div>
   <div id="sessionManager" class="holo-console dock-panel">
@@ -58,20 +57,11 @@
   <div id="audit" class="holo-console dock-panel"></div>
   <div id="configPanel" class="holo-console dock-panel"></div>
 
+  <!--
   <div id="countConsole" class="holo-console" data-panel="count">
-    <h3>Live Counts</h3>
-    <!-- Predictive HUD-style status scaffold -->
-    <div class="hud-status">
-      <p>Status: <span id="dockStatusText">Initializing...</span></p>
-      <p>Last Sync: <span id="lastSync">--:--</span></p>
-      <p>Items: <span id="itemSpan">0</span></p>
-      <p>Categories: <span id="categorySpan">0</span></p>
-      <ul id="recentList">
-        <li>No recent entries</li>
-      </ul>
-    </div>
-    <button class="refresh-counts">🔄 Refresh</button>
+    ... (legacy, replaced by unified consolePanelGroup below)
   </div>
+  -->
 
   <!-- 🧠 Predictive HUD Anchors -->
   <div id="predictiveHUD">
@@ -84,28 +74,29 @@
     <ul id="recentList" class="hud-log"></ul>
   </div>
 
+  <!--
   <div id="deltaAnalyzerConsole" class="holo-console" data-panel="deltaAnalyzer">
-    <h3>Delta Analyzer</h3>
-    <button class="run-delta-scan">Run Delta Scan</button>
+    ... (legacy, replaced by unified consolePanelGroup below)
   </div>
+  -->
 
+  <!--
   <div id="reportingHubConsole" class="holo-console" data-panel="reportingHub">
-    <h3>Reporting Hub</h3>
-    <ul class="report-list"></ul>
+    ... (legacy, replaced by unified consolePanelGroup below)
   </div>
+  -->
 
+  <!--
   <div id="sessionManagerConsole" class="holo-console" data-panel="sessionManager">
-    <h3>Session Manager</h3>
-    <button class="trigger-backup">📦 Archive Session</button>
-    <button class="trigger-restore">♻️ Restore Session</button>
-    <span class="last-backup-time">N/A</span>
-    <ul class="session-entries"></ul>
+    ... (legacy, replaced by unified consolePanelGroup below)
   </div>
+  -->
 
+  <!--
   <div id="utilityHubConsole" class="holo-console" data-panel="utilityHub">
-    <h3>Utility Hub</h3>
-    <p>🛠 Utilities ready.</p>
+    ... (legacy, replaced by unified consolePanelGroup below)
   </div>
+  -->
 </body>
 </html>
   <script>
@@ -421,22 +412,22 @@
 
   <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
     <div id="sovereignOrbitDock" class="orbit-cluster">
-      <button class="orbit-btn" data-target="#countConsole">
+      <button class="orbit-btn" data-target="countConsole">
         <img src="assets/icons/icon-count.png" alt="Count Console" />
       </button>
-      <button class="orbit-btn" data-target="#deltaAnalyzerConsole">
+      <button class="orbit-btn" data-target="deltaAnalyzerConsole">
         <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
       </button>
-      <button class="orbit-btn" data-target="#reportingHubConsole">
+      <button class="orbit-btn" data-target="reportingHubConsole">
         <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
       </button>
-      <button class="orbit-btn" data-target="#sessionManagerConsole">
+      <button class="orbit-btn" data-target="sessionManagerConsole">
         <img src="assets/icons/icon-session.png" alt="Session Manager" />
       </button>
-      <button class="orbit-btn" data-target="#utilityHubConsole">
+      <button class="orbit-btn" data-target="utilityHubConsole">
         <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
       </button>
-      <button class="orbit-btn" data-target="#oracleConsole">
+      <button class="orbit-btn" data-target="oracleConsole">
         <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
       </button>
     </div>
@@ -589,8 +580,32 @@
     </div>
     <!-- 🧱 Sovereign Dock Grid Container -->
     <!-- === Unified Holo Console Grid (moved just above Sovereign Orbit Dock) === -->
-  <!-- === Unified Holo Console Grid (moved just above Sovereign Orbit Dock) === -->
-
+    <!-- 🧠 Reintegrated Console Panel Group -->
+    <div id="consolePanelGroup" style="position: relative; z-index: 10; margin-top: 30px;">
+      <div id="deltaAnalyzerConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="reportingHubConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="sessionManagerConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="utilityHubConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="exceptionManagerConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="masterExportHubConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="progressDashboardConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="mappingsConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="toolsConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="auditConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="oracleConsole" class="holo-console hidden"
+        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+    </div>
+    <!-- 🧠 End Console Panel Group -->
   </main>
 
 <!-- Phase 201.2 — Neural Intake Uploader binding -->
@@ -1207,38 +1222,21 @@ document.addEventListener("DOMContentLoaded", () => {
       orbitButtons.forEach(btn => {
         btn.addEventListener("click", () => {
           const targetId = btn.getAttribute("data-target");
-          console.log("🛰 Orbit clicked → Target:", targetId);
+          const target = document.getElementById(targetId);
+          if (!target) return;
 
-          const target = document.querySelector(targetId);
-          if (!target) {
-            console.warn("❌ Panel not found:", targetId);
-            return;
-          }
+          const isActive = target.classList.contains("console-active");
 
-          console.log("✅ Panel found:", target);
-
-          const allPanels = document.querySelectorAll(".holo-console");
-          console.log("🔍 Hiding other panels...");
-          allPanels.forEach(panel => {
-            if (panel !== target) {
-              panel.classList.add("hidden");
-              panel.setAttribute("aria-hidden", "true");
-            }
+          // Hide all panels and deactivate all orbit buttons
+          document.querySelectorAll(".holo-console").forEach(panel => {
+            panel.classList.remove("console-active");
           });
-
           document.querySelectorAll(".orbit-btn").forEach(b => b.classList.remove("active-orbit"));
 
-          console.log("🔁 Toggling visibility for:", targetId);
-          target.classList.toggle("hidden");
-
-          const isVisible = !target.classList.contains("hidden");
-          target.setAttribute("aria-hidden", !isVisible);
-
-          if (isVisible) {
+          if (!isActive) {
+            // Only activate if it wasn’t already active
+            target.classList.add("console-active");
             btn.classList.add("active-orbit");
-            console.log("🌟 Activated:", targetId);
-          } else {
-            console.log("🌒 Hidden:", targetId);
           }
         });
       });
@@ -1487,6 +1485,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- Wiring logic loader -->
   <script src="scripts/bootstrap/wiring.js"></script>
+  <!-- 🧼 Live Inventory Panel Force-Hide Patch -->
+  <script>
+    // Patch: Force-hide #countConsole on DOMContentLoaded for legacy/stray panels
+    window.addEventListener("DOMContentLoaded", () => {
+      const liveInventoryPanel = document.querySelector("#countConsole");
+      if (liveInventoryPanel) {
+        liveInventoryPanel.classList.add("hidden");
+        liveInventoryPanel.style.display = "none";
+        liveInventoryPanel.style.opacity = "0";
+        liveInventoryPanel.style.height = "0px";
+        liveInventoryPanel.style.margin = "0px";
+        liveInventoryPanel.style.padding = "0px";
+        liveInventoryPanel.style.position = "absolute";
+        console.log("🧼 Live Inventory Panel force-hidden on load.");
+      } else {
+        console.warn("⚠️ Could not locate Live Inventory Panel for cleanup.");
+      }
+    });
+  </script>
 
   <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
   <script>
@@ -1968,6 +1985,29 @@ document.addEventListener("DOMContentLoaded", () => {
       width: 120px;
       font-size: 1rem;
     }
+
+    /* === Normalize Holo Console Panels === */
+    .holo-console {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      position: absolute !important;
+      z-index: -1 !important;
+    }
+
+    .holo-console.console-active {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      height: auto !important;
+      margin: auto !important;
+      padding: 20px !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
   </style>
   <script>
     function submitReport() {
@@ -1996,6 +2036,33 @@ document.addEventListener("DOMContentLoaded", () => {
       const display = document.getElementById('activeSessionDisplay');
       display.textContent = `📌 Active Session: "${sessionName}" started at ${timestamp}`;
       input.value = '';
+    }
+
+    // Updated closeConsole function with full panel reset and orbit button sync
+    function closeConsole(button) {
+      const panel = button.closest(".holo-console");
+      if (!panel) return;
+
+      // Prevent focus-related aria-hidden issue
+      button.blur();
+
+      panel.classList.remove("console-active");
+      panel.classList.add("hidden");
+      panel.setAttribute("aria-hidden", "true");
+
+      // Reset styling from .console-active override
+      panel.style.display = "none";
+      panel.style.visibility = "hidden";
+      panel.style.opacity = "0";
+      panel.style.height = "0px";
+      panel.style.margin = "0px";
+      panel.style.padding = "0px";
+      panel.style.position = "absolute";
+      panel.style.zIndex = "-1";
+
+      // Remove active class from any orbit buttons linked to this panel
+      const orbitButtons = document.querySelectorAll(`.orbit-btn[data-target="${panel.id}"]`);
+      orbitButtons.forEach(btn => btn.classList.remove("active-orbit"));
     }
   </script>
   <style>
