@@ -1400,6 +1400,31 @@ function renderLiveSystemStatusUI() {
   riskBlock.appendChild(riskList);
   statusContainer.appendChild(riskBlock);
 }
+
+// 🧭 Phase 11.7 — HUD Drift Meter Logic
+function updateDriftMeter(value) {
+  const driftElement = document.querySelector('#driftMeterStatus');
+  if (!driftElement) return;
+  if (value === 0) {
+    driftElement.textContent = 'Idle';
+  } else if (value < 20) {
+    driftElement.textContent = 'Nominal Drift';
+  } else if (value < 50) {
+    driftElement.textContent = 'Elevated Drift';
+  } else {
+    driftElement.textContent = 'Critical Drift';
+  }
+}
+
+// 🔄 Simulated Drift Updates for now (to be replaced with backend broadcast tie-in)
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    setInterval(() => {
+      const randomDrift = Math.floor(Math.random() * 70); // Simulate drift values
+      updateDriftMeter(randomDrift);
+    }, 4000);
+  }, 0);
+});
 // === Phase 8000.5: Live Refresh Synchronization Engine ===
 let refreshIntervalId = null;
 
@@ -1535,6 +1560,86 @@ function NeuralUnifiedBootstrap() {
     startBootstrapSequence
   };
 }
+
+// === Phase 16022: Neural Mesh Reflex Signal System (Experimental) ===
+window.NeuralMeshReflex = {
+  broadcastSignal({ type, message, level, timestamp }) {
+    const payload = {
+      type: type || 'info',
+      message: message || 'No message',
+      level: level || 'low',
+      timestamp: timestamp || Date.now()
+    };
+
+    console.log(`🧠 Reflex Signal → [${payload.level.toUpperCase()}] ${payload.type}: ${payload.message}`);
+
+    // Placeholder for future integration:
+    // HUD update, panel injection, terminal broadcast
+    const event = new CustomEvent('ReflexSignalBroadcast', { detail: payload });
+    document.dispatchEvent(event);
+  }
+};
+
+// === NeuralMeshReflex Memory Storage Extension ===
+NeuralMeshReflex._pulseMemory = [];
+
+NeuralMeshReflex.rememberPulse = function (signal) {
+  NeuralMeshReflex._pulseMemory.unshift(signal);
+  if (NeuralMeshReflex._pulseMemory.length > 5) {
+    NeuralMeshReflex._pulseMemory.pop();
+  }
+};
+
+// Modify the existing broadcastSignal function to include memory:
+const originalBroadcast = NeuralMeshReflex.broadcastSignal;
+NeuralMeshReflex.broadcastSignal = function (signal) {
+  NeuralMeshReflex.rememberPulse(signal);
+  originalBroadcast(signal);
+};
+
+// === NeuralMeshReflex: Pulse Memory Display (HUD Integration) ===
+NeuralMeshReflex.cycleMemoryDisplay = function () {
+  const hudMemorySlot = document.getElementById("hudMemorySlot");
+  if (!hudMemorySlot || !NeuralMeshReflex._pulseMemory.length) return;
+
+  let index = 0;
+  setInterval(() => {
+    hudMemorySlot.textContent = NeuralMeshReflex._pulseMemory[index] || "Awaiting Pulse...";
+    index = (index + 1) % NeuralMeshReflex._pulseMemory.length;
+  }, 3000); // rotate every 3 seconds
+};
+
+// Auto-trigger on DOM load
+document.addEventListener("DOMContentLoaded", () => {
+  NeuralMeshReflex.cycleMemoryDisplay();
+});
+
+// 🧠 Phase 11.5 — Mesh Reflex Signal Injector
+// Simulate backend signal updates for HUD
+const reflexSignals = [
+  { risk: "Low", forecast: "Stable", anomaly: "None", drift: "Nominal" },
+  { risk: "Medium", forecast: "Shifting", anomaly: "Mild", drift: "Oscillating" },
+  { risk: "High", forecast: "Volatile", anomaly: "Detected", drift: "Erratic" },
+  { risk: "Critical", forecast: "Severe", anomaly: "Rupture", drift: "Critical" }
+];
+
+let reflexIndex = 0;
+
+setInterval(() => {
+  const nextSignal = reflexSignals[reflexIndex % reflexSignals.length];
+  reflexIndex++;
+
+  const hudRiskLevel = document.getElementById("hudRiskLevel");
+  const hudForecastLevel = document.getElementById("hudForecastLevel");
+  const hudAnomalyStatus = document.getElementById("hudAnomalyStatus");
+  const hudDriftStatus = document.getElementById("hudDriftStatus");
+
+  if (hudRiskLevel) hudRiskLevel.textContent = nextSignal.risk;
+  if (hudForecastLevel) hudForecastLevel.textContent = nextSignal.forecast;
+  if (hudAnomalyStatus) hudAnomalyStatus.textContent = nextSignal.anomaly;
+  if (hudDriftStatus) hudDriftStatus.textContent = nextSignal.drift;
+
+}, 5000); // Signal refresh every 5 seconds
 // === Phase 53: Neural Operator Console Logging Redirect ===
 (function() {
   const consoleOutput = document.getElementById("neuralConsoleOutput");

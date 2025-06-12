@@ -1,4 +1,22 @@
 // === Sovereign Dock Panel Map for Alias Resolution ===
+
+// === Utility: SafeBind for Robust Event Listener Attachment ===
+function SafeBind(selector, event, handler) {
+  const el = document.getElementById(selector);
+  if (el) {
+    el.addEventListener(event, handler);
+    console.log(`✅ Bound ${event} to #${selector}`);
+  } else {
+    console.warn(`⚠️ SafeBind failed — element #${selector} not found.`);
+  }
+}
+// Example usage for SafeBind, replacing direct addEventListener calls:
+// SafeBind("scanTime", "click", handleScanTime);
+// SafeBind("driftSpan", "click", handleDriftSpan);
+// SafeBind("spikeSpan", "click", handleSpikeSpan);
+// SafeBind("logList", "click", handleLogList);
+// SafeBind("sessionManagerBtn", "click", openSessionManager);
+// SafeBind("someOtherBtn", "click", handleOtherAction);
 const SovereignDockPanelMap = {
   count: "#countConsole",
   deltaAnalyzer: "#deltaAnalyzerConsole",
@@ -1788,6 +1806,7 @@ setTimeout(() => {
     const itemSpan = countConsole.querySelector(".count-items");
     const categorySpan = countConsole.querySelector(".count-categories");
     const recentList = countConsole.querySelector(".recent-items");
+    const dockStatusText = document.querySelector(".dock-status-text");
 
     const fakeData = {
         lastSync: new Date().toLocaleString(),
@@ -1796,10 +1815,39 @@ setTimeout(() => {
         recent: ["Dishwashers", "Tool Chests", "Air Conditioners"]
     };
 
-    lastSync.textContent = fakeData.lastSync;
-    itemSpan.textContent = fakeData.items;
-    categorySpan.textContent = fakeData.categories;
-    recentList.innerHTML = fakeData.recent.map(item => `<li>${item}</li>`).join("");
+    if (lastSync) lastSync.textContent = fakeData.lastSync;
+    if (itemSpan) itemSpan.textContent = fakeData.items;
+    if (categorySpan) categorySpan.textContent = fakeData.categories;
+    if (recentList) {
+      recentList.innerHTML = fakeData.recent.map(item => `<li>${item}</li>`).join("");
+    } else {
+      console.warn("⚠️ recentList element not found.");
+    }
+
+    // 🧪 Phase 11.7B — Predictive HUD Display Validation Hook
+    console.group("🧠 Predictive HUD Display Validation");
+
+    const dockStatusTextEl = document.querySelector(".dock-status-text");
+    const lastSyncEl = document.querySelector(".hud-last-sync");
+    const itemSpanEl = document.querySelector(".hud-item-count");
+    const categorySpanEl = document.querySelector(".hud-category-count");
+    const recentListEl = document.querySelector(".hud-recent-list");
+
+    const hudElements = {
+      dockStatusText: dockStatusTextEl,
+      lastSync: lastSyncEl,
+      itemSpan: itemSpanEl,
+      categorySpan: categorySpanEl,
+      recentList: recentListEl
+    };
+    Object.entries(hudElements).forEach(([key, el]) => {
+      if (!el) {
+        console.warn(`⚠️ HUD element "${key}" is missing or null.`);
+      } else {
+        console.log(`✅ HUD element "${key}" is present.`);
+      }
+    });
+    console.groupEnd();
 
     countConsole.querySelector(".refresh-counts").addEventListener("click", () => {
         console.log("🔄 Manual data refresh triggered.");
@@ -1807,6 +1855,34 @@ setTimeout(() => {
     });
 
     console.log("✅ Live Counts Console Bootstrapped.");
+    console.log("🧪 Revalidating HUD element bindings...");
+    ["dockStatusText", "lastSync", "itemSpan", "categorySpan", "recentList"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.warn(`⚠️ Revalidation: Element "${id}" still missing from DOM.`);
+      } else {
+        console.log(`✅ Revalidation: Element "${id}" successfully located.`);
+      }
+    });
+
+    // === Replace mockScan invocation with HUD readiness check ===
+    setTimeout(() => {
+      if (
+        dockStatusText &&
+        lastSync &&
+        itemSpan &&
+        categorySpan &&
+        recentList
+      ) {
+        console.log("✅ All HUD elements confirmed. Proceeding with mockScan.");
+        // If mockScan is defined in this scope, call it; else, define a no-op.
+        if (typeof mockScan === "function") {
+          mockScan();
+        }
+      } else {
+        console.warn("⚠️ Skipping mockScan — HUD elements still not ready.");
+      }
+    }, 1800);
 }, 1200);
 
 // === Delta Analyzer Console Runtime Activation ===
@@ -1819,14 +1895,32 @@ setTimeout(() => {
     const spikeSpan = deltaConsole.querySelector(".critical-spikes");
     const logList = deltaConsole.querySelector(".delta-log-entries");
 
+    // DOM-ready check before HUD element access
     const mockScan = () => {
+        if (!document.readyState || document.readyState !== 'complete') {
+            console.warn("⏳ DOM not fully ready — deferring HUD binding.");
+            setTimeout(() => mockScan(), 100);
+            return;
+        }
         const now = new Date().toLocaleTimeString();
         const driftCount = Math.floor(Math.random() * 5);
         const spikeCount = Math.floor(Math.random() * 3);
 
-        scanTime.textContent = now;
-        driftSpan.textContent = driftCount;
-        spikeSpan.textContent = spikeCount;
+        if (scanTime) {
+          scanTime.textContent = now;
+        } else {
+          console.warn("⚠️ Element not found for text assignment: scanTime");
+        }
+        if (driftSpan) {
+          driftSpan.textContent = driftCount;
+        } else {
+          console.warn("⚠️ Element not found for text assignment: driftSpan");
+        }
+        if (spikeSpan) {
+          spikeSpan.textContent = spikeCount;
+        } else {
+          console.warn("⚠️ Element not found for text assignment: spikeSpan");
+        }
 
         const logs = [
             "Δ minor offset detected in HVAC",
@@ -1836,18 +1930,44 @@ setTimeout(() => {
             "✅ correction algorithm stabilized drift"
         ];
 
-        logList.innerHTML = "";
-        for (let i = 0; i < driftCount + spikeCount; i++) {
-            const entry = logs[Math.floor(Math.random() * logs.length)];
-            const li = document.createElement("li");
-            li.textContent = `[${now}] ${entry}`;
-            logList.appendChild(li);
+        if (logList) {
+          logList.innerHTML = "";
+          for (let i = 0; i < driftCount + spikeCount; i++) {
+              const entry = logs[Math.floor(Math.random() * logs.length)];
+              const li = document.createElement("li");
+              li.textContent = `[${now}] ${entry}`;
+              logList.appendChild(li);
+          }
+        } else {
+          console.warn("⚠️ Element not found for log list assignment: logList");
         }
 
         console.log("📡 Delta Analyzer scan completed.");
     };
 
-    deltaConsole.querySelector(".run-delta-scan").addEventListener("click", mockScan);
+    const deltaScanBtn = deltaConsole?.querySelector(".run-delta-scan");
+    if (deltaScanBtn) {
+      deltaScanBtn.addEventListener("click", mockScan);
+      console.log("✅ Delta scan button wired.");
+    } else {
+      console.warn("⚠️ Delta scan button not found — skipping listener attachment.");
+    }
+
+    // Example of replacing direct addEventListener calls with SafeBind for robust error handling
+    // Replace the following lines (if they exist elsewhere in the file or are added in the future):
+    // document.getElementById("scanTime").addEventListener("click", handleScanTime);
+    // document.getElementById("driftSpan").addEventListener("click", handleDriftSpan);
+    // document.getElementById("spikeSpan").addEventListener("click", handleSpikeSpan);
+    // document.getElementById("logList").addEventListener("click", handleLogList);
+    // document.getElementById("sessionManagerBtn").addEventListener("click", openSessionManager);
+    // document.getElementById("someOtherBtn").addEventListener("click", handleOtherAction);
+    // With:
+    // SafeBind("scanTime", "click", handleScanTime);
+    // SafeBind("driftSpan", "click", handleDriftSpan);
+    // SafeBind("spikeSpan", "click", handleSpikeSpan);
+    // SafeBind("logList", "click", handleLogList);
+    // SafeBind("sessionManagerBtn", "click", openSessionManager);
+    // SafeBind("someOtherBtn", "click", handleOtherAction);
 
     mockScan();
 }, 1300);
@@ -1866,9 +1986,15 @@ setTimeout(() => {
 
         reportTime.textContent = now;
 
-        const li = document.createElement("li");
-        li.textContent = reportEntry;
-        reportList.prepend(li);
+        // Find the correct report list within the reporting hub console
+        const reportListEl = reportConsole.querySelector(".report-entries");
+        if (reportListEl) {
+            const li = document.createElement("li");
+            li.textContent = `Report Generated @ ${now}`;
+            reportListEl.prepend(li);
+        } else {
+            console.warn("⚠️ .report-entries not found — skipping report entry injection.");
+        }
 
         console.log(`📄 Report generated at ${now}`);
     };
@@ -1881,10 +2007,18 @@ setTimeout(() => {
 // === Session Manager Console Runtime Activation ===
 setTimeout(() => {
     const sessionConsole = document.getElementById("sessionManagerConsole");
-    if (!sessionConsole) return;
+    if (!sessionConsole) {
+        console.warn("⚠️ sessionManagerConsole not found.");
+        return;
+    }
 
     const backupTime = sessionConsole.querySelector(".last-backup-time");
     const sessionList = sessionConsole.querySelector(".session-entries");
+
+    if (!backupTime || !sessionList) {
+        console.warn("⚠️ Missing sessionManagerConsole sub-elements.");
+        return;
+    }
 
     const archiveSession = () => {
         const now = new Date().toLocaleTimeString();
@@ -1909,8 +2043,14 @@ setTimeout(() => {
         }
     };
 
-    sessionConsole.querySelector(".trigger-backup").addEventListener("click", archiveSession);
-    sessionConsole.querySelector(".trigger-restore").addEventListener("click", restoreSession);
+    const backupBtn = sessionConsole.querySelector(".trigger-backup");
+    const restoreBtn = sessionConsole.querySelector(".trigger-restore");
+
+    if (backupBtn) backupBtn.addEventListener("click", archiveSession);
+    else console.warn("⚠️ Backup button not found.");
+
+    if (restoreBtn) restoreBtn.addEventListener("click", restoreSession);
+    else console.warn("⚠️ Restore button not found.");
 
     console.log("✅ Session Manager Console Bootstrapped.");
 }, 1500);
@@ -2041,6 +2181,42 @@ OperatorDockWiring.autoBindDockToggles = function() {
 document.addEventListener("DOMContentLoaded", () => {
     OperatorDockWiring.initializeToggleSystem();
     OperatorDockWiring.autoBindDockToggles();
+
+    // === Phase 11.6 — Operator Signal Uplink Indicator ===
+    // 🛰️ Phase 11.6 — Operator Signal Uplink Indicator
+    const uplinkPulse = document.getElementById("uplinkIndicator");
+
+    if (uplinkPulse) {
+      setInterval(() => {
+        uplinkPulse.classList.add("active");
+        setTimeout(() => {
+          uplinkPulse.classList.remove("active");
+        }, 500); // Pulse duration
+      }, 5000); // Match reflex update loop
+    }
+
+    // === Phase 11.2: NeuralMeshReflex Broadcast → Predictive HUD Integration ===
+    document.addEventListener('ReflexSignalBroadcast', (e) => {
+      const { type, message, level } = e.detail || {};
+
+      console.log(`📡 ReflexSignal Received — Type: ${type} | Level: ${level} | Message: ${message}`);
+
+      const hudMessagePanel = document.querySelector('#predictiveHUD .hud-message');
+      const hudRisk = document.querySelector('#predictiveHUD .hud-risk');
+      const hudAnomaly = document.querySelector('#predictiveHUD .hud-anomaly');
+      const hudForecast = document.querySelector('#predictiveHUD .hud-forecast');
+
+      if (hudMessagePanel) hudMessagePanel.textContent = message || '—';
+      if (hudRisk && type === 'risk') hudRisk.textContent = level;
+      if (hudAnomaly && type === 'anomaly') hudAnomaly.textContent = level;
+      if (hudForecast && type === 'forecast') hudForecast.textContent = level;
+
+      // Optional: Flash effect for visual feedback
+      document.querySelector('#predictiveHUD')?.classList.add('hud-flash');
+      setTimeout(() => {
+        document.querySelector('#predictiveHUD')?.classList.remove('hud-flash');
+      }, 1200);
+    });
 
     // === Sovereign Dock Panel Dynamic Toggle Logic ===
     // Provides 'collapsed' toggle for dock panels, and binds buttons with [data-toggle-dock]

@@ -37,6 +37,76 @@
       🔁 Restore Last Panel
     </label>
   </div>
+  <!-- 🔧 Phase 11.9 — Injected Dock Panel Anchors -->
+
+  <!-- 🔌 Dock Panel Scaffolding Injected — Phase 12.0 -->
+  <div id="exceptionManager" class="holo-console dock-panel"></div>
+  <div id="count" class="holo-console dock-panel"></div>
+  <div id="deltaAnalyzer" class="holo-console dock-panel"></div>
+  <div id="reportingHub" class="holo-console dock-panel"></div>
+  <div id="sessionManager" class="holo-console dock-panel">
+    <div class="last-backup-time"></div>
+    <ul class="session-entries"></ul>
+    <button class="trigger-backup">Backup</button>
+    <button class="trigger-restore">Restore</button>
+  </div>
+  <div id="utilityHub" class="holo-console dock-panel"></div>
+  <div id="progressDashboard" class="holo-console dock-panel"></div>
+  <div id="masterExportHub" class="holo-console dock-panel"></div>
+  <div id="mappings" class="holo-console dock-panel"></div>
+  <div id="tools" class="holo-console dock-panel"></div>
+  <div id="audit" class="holo-console dock-panel"></div>
+  <div id="configPanel" class="holo-console dock-panel"></div>
+
+  <div id="countConsole" class="holo-console" data-panel="count">
+    <h3>Live Counts</h3>
+    <!-- Predictive HUD-style status scaffold -->
+    <div class="hud-status">
+      <p>Status: <span id="dockStatusText">Initializing...</span></p>
+      <p>Last Sync: <span id="lastSync">--:--</span></p>
+      <p>Items: <span id="itemSpan">0</span></p>
+      <p>Categories: <span id="categorySpan">0</span></p>
+      <ul id="recentList">
+        <li>No recent entries</li>
+      </ul>
+    </div>
+    <button class="refresh-counts">🔄 Refresh</button>
+  </div>
+
+  <!-- 🧠 Predictive HUD Anchors -->
+  <div id="predictiveHUD">
+    <div id="dockStatusText" class="hud-label"></div>
+    <div id="lastSync" class="hud-label"></div>
+    <div>
+      Items: <span id="itemSpan" class="hud-value"></span>
+      Categories: <span id="categorySpan" class="hud-value"></span>
+    </div>
+    <ul id="recentList" class="hud-log"></ul>
+  </div>
+
+  <div id="deltaAnalyzerConsole" class="holo-console" data-panel="deltaAnalyzer">
+    <h3>Delta Analyzer</h3>
+    <button class="run-delta-scan">Run Delta Scan</button>
+  </div>
+
+  <div id="reportingHubConsole" class="holo-console" data-panel="reportingHub">
+    <h3>Reporting Hub</h3>
+    <ul class="report-list"></ul>
+  </div>
+
+  <div id="sessionManagerConsole" class="holo-console" data-panel="sessionManager">
+    <h3>Session Manager</h3>
+    <button class="trigger-backup">📦 Archive Session</button>
+    <button class="trigger-restore">♻️ Restore Session</button>
+    <span class="last-backup-time">N/A</span>
+    <ul class="session-entries"></ul>
+  </div>
+
+  <div id="utilityHubConsole" class="holo-console" data-panel="utilityHub">
+    <h3>Utility Hub</h3>
+    <p>🛠 Utilities ready.</p>
+  </div>
+</body>
 </html>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -97,6 +167,20 @@
             <button onclick="updateCounter(-1)">➖ Decrement</button>
             <button onclick="resetCounter()">🔁 Reset</button>
           </div>
+
+          <!-- Predictive HUD and count refresh markup -->
+          <div class="status-bar">
+            <span class="dock-status" id="dockStatusText">Status: Operational</span>
+            <span class="last-sync">Last Sync: <span class="last-sync-time" id="lastSync">--:--</span></span>
+          </div>
+          <div class="hud-data">
+            <span>Items: <span class="item-count" id="itemSpan">0</span></span>
+            <span>Categories: <span class="category-count" id="categorySpan">0</span></span>
+          </div>
+          <ul class="recent-activity" id="recentList">
+            <li>No recent activity</li>
+          </ul>
+          <button class="refresh-counts">🔄 Refresh Counts</button>
         </div>
       </div>
     </section>
@@ -273,6 +357,14 @@
         </div>
       </div>
     </section>
+    <!-- Micro-injected missing panels for Sovereign Console -->
+    <div id="exceptionManagerConsole" class="holo-console"></div>
+    <div id="progressDashboardConsole" class="holo-console"></div>
+    <div id="masterExportHubConsole" class="holo-console"></div>
+    <div id="mappingsConsole" class="holo-console"></div>
+    <div id="toolsConsole" class="holo-console"></div>
+    <div id="auditConsole" class="holo-console"></div>
+    <div id="configPanelConsole" class="holo-console"></div>
   <script>
     function consultOracle() {
       const input = document.getElementById("oracleInput");
@@ -327,28 +419,98 @@
     }
   </style>
 
-    <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
-      <div id="sovereignOrbitDock" class="orbit-cluster">
-        <button class="orbit-btn" data-target="#countConsole">
-          <img src="assets/icons/icon-count.png" alt="Count Console" />
-        </button>
-        <button class="orbit-btn" data-target="#deltaAnalyzerConsole">
-          <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
-        </button>
-        <button class="orbit-btn" data-target="#reportingHubConsole">
-          <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
-        </button>
-        <button class="orbit-btn" data-target="#sessionManagerConsole">
-          <img src="assets/icons/icon-session.png" alt="Session Manager" />
-        </button>
-        <button class="orbit-btn" data-target="#utilityHubConsole">
-          <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
-        </button>
-        <button class="orbit-btn" data-target="#oracleConsole">
-          <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
-        </button>
-      </div>
+  <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
+    <div id="sovereignOrbitDock" class="orbit-cluster">
+      <button class="orbit-btn" data-target="#countConsole">
+        <img src="assets/icons/icon-count.png" alt="Count Console" />
+      </button>
+      <button class="orbit-btn" data-target="#deltaAnalyzerConsole">
+        <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
+      </button>
+      <button class="orbit-btn" data-target="#reportingHubConsole">
+        <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
+      </button>
+      <button class="orbit-btn" data-target="#sessionManagerConsole">
+        <img src="assets/icons/icon-session.png" alt="Session Manager" />
+      </button>
+      <button class="orbit-btn" data-target="#utilityHubConsole">
+        <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
+      </button>
+      <button class="orbit-btn" data-target="#oracleConsole">
+        <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
+      </button>
     </div>
+  </div>
+  <!-- Fallback Dock Grid Container -->
+  <div id="dockGrid" class="dock-grid hidden">
+    <!-- Panels will populate here dynamically -->
+  </div>
+  <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Panel IDs & class
+    const expectedPanels = [
+      { id: "countConsole", className: "holo-console" },
+      { id: "deltaAnalyzerConsole", className: "holo-console" },
+      { id: "reportingHubConsole", className: "holo-console" },
+      { id: "sessionManagerConsole", className: "holo-console" },
+      { id: "utilityHubConsole", className: "holo-console" },
+      { id: "oracleConsole", className: "holo-console" },
+    ];
+    // Find the sovereignOrbitDock node
+    const dock = document.getElementById("sovereignOrbitDock");
+    if (dock) {
+      // Find last console panel after the dock (if any) to insert after
+      let insertAfter = dock.parentNode;
+      // Gather all direct siblings after #sovereignOrbitDock
+      let next = dock.parentNode.nextSibling;
+      let lastConsole = null;
+      while (next) {
+        if (next.nodeType === 1 && next.classList && next.classList.contains("holo-console")) {
+          lastConsole = next;
+        }
+        next = next.nextSibling;
+      }
+      // Insert missing panels after the last known console, or after dock
+      let insertParent = dock.parentNode.parentNode;
+      let insertRef = dock.parentNode.nextSibling;
+      // Check for each panel
+      expectedPanels.forEach(panel => {
+        if (!document.getElementById(panel.id)) {
+          // Create and insert the missing panel
+          const div = document.createElement("div");
+          div.id = panel.id;
+          div.className = panel.className;
+          insertParent.insertBefore(div, insertRef);
+        }
+      });
+    }
+    // Predictive HUD DOM structure
+    function createPredictiveHudDom() {
+      const hud = document.createElement("div");
+      hud.id = "predictiveHud";
+      hud.className = "hud-container";
+      hud.innerHTML = `
+        <div id="dockStatusText">Dock: N/A</div>
+        <div id="lastSync">Last Sync: N/A</div>
+        <div>Items: <span id="itemSpan">0</span></div>
+        <div>Categories: <span id="categorySpan">0</span></div>
+        <ul id="recentList"></ul>
+      `;
+      return hud;
+    }
+    let predictiveHud = document.getElementById("predictiveHud");
+    if (!predictiveHud) {
+      // Try to find a container to append it to
+      const container = document.getElementById("predictiveHud") || document.body;
+      if (container && container.id === "predictiveHud") {
+        // Already present, do nothing
+      } else if (container && container.tagName === "BODY") {
+        container.appendChild(createPredictiveHudDom());
+      }
+    }
+  });
+  </script>
   <header id="sovereignHeader">
   </header>
   <!-- 🧭 Sovereign Ascendant Toolbar -->
@@ -1354,20 +1516,21 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 // Phase 600.0 — Predictive HUD Deep Linkage Bootstrap
 document.addEventListener("DOMContentLoaded", () => {
+  // Predictive HUD element bindings
+  const hudRiskLevel = document.getElementById("riskMetric");
+  const hudForecastLevel = document.getElementById("forecastMetric");
+  const hudAnomalyStatus = document.getElementById("anomalyMetric");
+  const hudDriftStatus = document.getElementById("driftMetric");
+
   function updatePredictiveHUD() {
     const cortex = window.NeuralForecastMemoryCortex?.getForecastHistory?.() || [];
     const total = cortex.length;
 
-    const hudRisk = document.querySelector("#hudRisk span");
-    const hudForecast = document.querySelector("#hudForecast span");
-    const hudAnomaly = document.querySelector("#hudAnomaly span");
-    const hudDrift = document.querySelector("#hudDrift span");
-
     if (total === 0) {
-      hudRisk.textContent = "No data";
-      hudForecast.textContent = "No data";
-      hudAnomaly.textContent = "No data";
-      hudDrift.textContent = "Idle";
+      if (hudRiskLevel) hudRiskLevel.textContent = "No data";
+      if (hudForecastLevel) hudForecastLevel.textContent = "No data";
+      if (hudAnomalyStatus) hudAnomalyStatus.textContent = "No data";
+      if (hudDriftStatus) hudDriftStatus.textContent = "Idle";
       return;
     }
 
@@ -1384,10 +1547,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxCategory = Object.values(categoryCounts).reduce((a, b) => Math.max(a, b), 0);
     const anomalyFlag = maxCategory > (total * 0.5) ? "Elevated" : "Nominal";
 
-    hudRisk.textContent = `${volatilityRate}% Volatile`;
-    hudForecast.textContent = `${total} records`;
-    hudAnomaly.textContent = anomalyFlag;
-    hudDrift.textContent = "Sync OK";
+    // Null checks and field updates
+    if (hudRiskLevel) hudRiskLevel.textContent = volatilityRate ? `${volatilityRate}% Volatile` : "Unknown";
+    if (hudForecastLevel) hudForecastLevel.textContent = total ? `${total} records` : "Pending";
+    if (hudAnomalyStatus) hudAnomalyStatus.textContent = anomalyFlag || "Idle";
+    if (hudDriftStatus) hudDriftStatus.textContent = "Sync OK";
   }
 
   // Initial HUD update on page load
