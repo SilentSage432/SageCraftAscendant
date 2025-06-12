@@ -921,274 +921,42 @@ window.NeuralOrbitRegistryValidator = (function () {
   };
 
 })();
+// === Panel Restoration and Toggle State Logic ===
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🧬 DOM Ready — Beginning Full Neural Bootstrap...");
-  // Define NeuralUnifiedBootstrap if not already defined
-  window.NeuralUnifiedBootstrap = function() {
-    console.log("🧠 NeuralUnifiedBootstrap invoked.");
-    // Placeholder for actual unified bootstrap logic
-    // Future logic will go here to synchronize mesh, memory, and orbits
-  };
-  // Wait for NeuralUnifiedBootstrap.startBootstrapSequence to be available before invoking
-  const waitForBootstrap = setInterval(() => {
-    if (window.NeuralUnifiedBootstrap?.startBootstrapSequence) {
-      clearInterval(waitForBootstrap);
-      NeuralUnifiedBootstrap.startBootstrapSequence();
-    }
-  }, 50);
+  // --- Refined Panel Restoration Logic ---
+  const restoreToggle = document.getElementById("restoreToggle");
+  const storedPanel = localStorage.getItem("lastActivePanel");
+  const shouldRestore = restoreToggle && restoreToggle.checked;
 
-  // === Register Orbits for Main Panels (if not already registered) ===
-  // This ensures all orbits are registered with required fields.
-  if (typeof window.registerOrbit === "function") {
-    // If there's a global registerOrbit function, use it.
-    window.registerOrbit({
-      id: "count",
-      buttonId: "countButton",
-      panelId: "countConsole",
-      label: "Count Console"
-    });
-    window.registerOrbit({
-      id: "deltaAnalyzer",
-      buttonId: "deltaAnalyzerButton",
-      panelId: "deltaAnalyzerConsole",
-      label: "Delta Analyzer"
-    });
-    window.registerOrbit({
-      id: "reportingHub",
-      buttonId: "reportingButton",
-      panelId: "reportingHubConsole",
-      label: "Reporting Hub"
-    });
-    window.registerOrbit({
-      id: "sessionManager",
-      buttonId: "sessionManagerButton",
-      panelId: "sessionManagerConsole",
-      label: "Session Manager"
-    });
-    window.registerOrbit({
-      id: "utilityHub",
-      buttonId: "utilityButton",
-      panelId: "utilityHubConsole",
-      label: "Utility Hub"
-    });
-    window.registerOrbit({
-      id: "oracle",
-      buttonId: "oracleButton",
-      panelId: "oracleConsole",
-      label: "Oracle Interface"
-    });
-  } else if (window.NeuralOrbitRegistry && typeof window.NeuralOrbitRegistry.registerOrbit === "function") {
-    // If NeuralOrbitRegistry exists, register orbits using its API.
-    // Only register if not already present.
-    const orbits = window.NeuralOrbitRegistry.listOrbits ? window.NeuralOrbitRegistry.listOrbits() : {};
-    const ensureOrbit = (key, buttonId, panelId, label) => {
-      if (!orbits[key]) {
-        // Provide dummy values for required icon and description fields if needed.
-        window.NeuralOrbitRegistry.registerOrbit(
-          key,
-          label + " Orbit", // description
-          [],               // modules
-          "icon-default.png", // icon
-          label,
-          panelId,
-          label
-        );
-      }
-    };
-    ensureOrbit("count", "countButton", "countConsole", "Count Console");
-    ensureOrbit("deltaAnalyzer", "deltaAnalyzerButton", "deltaAnalyzerConsole", "Delta Analyzer");
-    ensureOrbit("reportingHub", "reportingButton", "reportingHubConsole", "Reporting Hub");
-    ensureOrbit("sessionManager", "sessionManagerButton", "sessionManagerConsole", "Session Manager");
-    ensureOrbit("utilityHub", "utilityButton", "utilityHubConsole", "Utility Hub");
-    ensureOrbit("oracle", "oracleButton", "oracleConsole", "Oracle Interface");
-  }
-
-  // === Orbital Buttons Subsystem Wiring ===
-  const forecastBtn = document.getElementById("forecastBtn");
-  const reportingHubBtn = document.getElementById("reportingHubBtn");
-  const deltaAnalyzerBtn = document.getElementById("deltaAnalyzerBtn");
-
-  if (forecastBtn) {
-    forecastBtn.addEventListener("click", () => {
-      console.log("🌀 Forecast Button Clicked");
-      window.SovereignSubsystems?.forecastConsole?.toggle?.();
-    });
-  }
-
-  if (reportingHubBtn) {
-    reportingHubBtn.addEventListener("click", () => {
-      console.log("📊 Reporting Hub Button Clicked");
-      window.SovereignSubsystems?.reportingHub?.toggle?.();
-    });
-  }
-
-  if (deltaAnalyzerBtn) {
-    deltaAnalyzerBtn.addEventListener("click", () => {
-      console.log("🧮 Delta Analyzer Button Clicked");
-      window.SovereignSubsystems?.deltaAnalyzer?.toggle?.();
-    });
-  }
-
-
-  // === Orbit Injection Path Audit Logging ===
-  // Audit all orbit button injection and registry state after rendering
-  console.log("🔍 Phase 1: Orbit Injection Path Audit — Begin");
-  document.querySelectorAll(".orbit-button").forEach((btn, index) => {
-    console.log(`🛰️ Orbit Button #${index + 1}:`, btn);
-  });
-  console.log("🧠 Current Orbit Registry:", window.NeuralOrbitRegistry?.listOrbits?.());
-  console.log("🔍 Phase 1: Orbit Injection Path Audit — End");
-
-  // 🧬 Phase 4: Panel Synthesis Activation — Aligning Orbit with Console Panels
-  const synthesizedPanels = {
-    'count': 'countConsole',
-    'deltaAnalyzer': 'deltaAnalyzerConsole',
-    'reportingHub': 'reportingHubConsole',
-    'sessionManager': 'sessionManagerConsole',
-    'utilityHub': 'utilityHubConsole',
-    'oracle': 'oracleConsole'
-  };
-
-  document.querySelectorAll('.orbit-button').forEach(button => {
-    const target = button.dataset.target;
-    if (synthesizedPanels[target]) {
-      const panelId = synthesizedPanels[target];
-      let panel = document.getElementById(panelId);
-
-      if (!panel) {
-        console.log(`🧬 Synthesizing panel for: ${panelId}`);
-        panel = document.createElement('div');
-        panel.classList.add('holo-console');
-        panel.id = panelId;
-        panel.style.display = 'none';
-        document.body.appendChild(panel);
+  if (shouldRestore && storedPanel) {
+    const targetPanel = document.querySelector(storedPanel);
+    if (targetPanel) {
+      console.log("🔁 Restoring last active panel:", storedPanel);
+      if (typeof window.togglePanelVisibility === "function") {
+        window.togglePanelVisibility(storedPanel);
+      } else if (typeof togglePanelVisibility === "function") {
+        togglePanelVisibility(storedPanel);
       } else {
-        console.log(`✅ Panel '${panelId}' already exists.`);
-      }
-
-      button.addEventListener('click', () => {
-        document.querySelectorAll('.holo-console').forEach(p => p.style.display = 'none');
-        panel.style.display = 'block';
-        console.log(`🔄 Activated Panel: ${panelId}`);
-      });
-    } else {
-      console.warn(`⚠ No mapping found for button '${target}'`);
-    }
-  });
-
-  // === Phase 3: Dock Panel Neural Alignment Injector ===
-  console.log("🧠 Phase 3: Injecting Dock Panel Alignment Logic...");
-
-  const orbits = NeuralOrbitRegistry?.listOrbits?.();
-  if (orbits) {
-    Object.entries(orbits).forEach(([key, orbit]) => {
-      const panelId = orbit.panelId || `panel${key}`;
-      let panel = document.getElementById(panelId);
-      if (panel) {
-        panel.classList.add("holo-console");
-        panel.setAttribute("data-console", key);
-        console.log(`✅ Aligned panel '${panelId}' with orbit '${key}'`);
-      } else {
-        console.warn(`⚠ No panel found for orbit '${key}' (${panelId})`);
-      }
-    });
-  } else {
-    console.warn("⚠ NeuralOrbitRegistry.listOrbits() unavailable.");
-  }
-
-  // === Orbital Relay Panel Toggle Logic ===
-  // This logic ensures every .orbit-btn activates its matching holo-console panel by data-console.
-  document.querySelectorAll('.orbit-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const panelName = btn.getAttribute('data-target');
-      if (!panelName) {
-        console.warn('No data-target specified for orbit button.');
-        return;
-      }
-      // Updated selector sanitization logic
-      const raw = SovereignDockPanelMap[panelName] || panelName;
-      const selector = raw.startsWith("#") ? raw : `#${raw}`;
-      const panel = document.querySelector(selector);
-      if (panel) {
+        // fallback: show/hide logic
         document.querySelectorAll('.holo-console').forEach(p => p.classList.remove('active'));
-        panel.classList.add('active');
-        console.log(`🚀 Orbit activated: ${panelName}`);
-      } else {
-        console.warn(`⚠️ No panel found for target: ${panelName}`);
+        targetPanel.classList.add('active');
       }
-    });
-  });
-
-  // === Phase 16017: Live Orbit Injection Test ===
-
-  // === Phase 16020: Gatekeeper Synchronization ===
-  console.log("🔐 Activating Gatekeeper — Loading persisted orbits...");
-  NeuralPersistenceSynchronizer.synchronizePersistence();
-
-  // === Heartbeat System Initializer ===
-  if (window.MeshVitals) {
-    window.MeshVitals.startHeartbeat(); // 🫀 Begin global companion vitals monitoring
+    } else {
+      console.warn("⚠ Stored panel ID not found in DOM, skipping restore:", storedPanel);
+    }
+  } else {
+    console.log("🚫 Panel restoration skipped — toggle is off or no panel stored.");
   }
-
-  // === Predictive HUD Toggle Wiring ===
-  const brainButton = document.getElementById("brainDockButton");
-  const brainPanel = document.getElementById("brainDockHudPanel");
-
-  if (brainButton && brainPanel) {
-    brainButton.addEventListener("click", () => {
-      const isVisible = brainPanel.style.display === "block";
-      brainPanel.style.display = isVisible ? "none" : "block";
-    });
-  }
-  // === Predictive HUD Live Telemetry Simulation ===
-  // Predictive HUD panel message rotation logic (overrides previous HUD rotation).
-  const hudFeed = document.getElementById("brainHudLiveFeed");
-  const hudMessages = [
-    "🧬 Syncing cortical threads...",
-    "🔍 Scanning neural anomalies...",
-    "🛰 Rebalancing orbital telemetry...",
-    "💾 Writing memory snapshots...",
-    "⚡ Flux harmonics stable."
-  ];
-  let hudIndex = 0;
-
-  if (hudFeed) {
-    setInterval(() => {
-      hudFeed.textContent = hudMessages[hudIndex];
-      hudIndex = (hudIndex + 1) % hudMessages.length;
-    }, 3000);
-  }
-
-  // === Predictive HUD Metrics Live Simulation Injection ===
-  // Phase 10.2E — Simulated Neural Mesh Broadcast for HUD Sync
-  function simulateMeshBroadcastLoop() {
-    const broadcastMetrics = () => {
-      const metrics = {
-        risk: (Math.random() * 100).toFixed(1) + '%',
-        forecast: ['Clear', 'Moderate', 'Severe'][Math.floor(Math.random() * 3)],
-        anomalies: Math.floor(Math.random() * 5),
-        drift: ['Stable', 'Fluctuating', 'Erratic'][Math.floor(Math.random() * 3)],
-      };
-      const event = new CustomEvent('hudMetricsUpdate', { detail: metrics });
-      document.dispatchEvent(event);
-    };
-    setInterval(broadcastMetrics, 4000); // Broadcast every 4 seconds
-  }
-  simulateMeshBroadcastLoop(); // Initiate loop
-
-  // Enhance or add HUD listener for mesh broadcast sync
-  document.addEventListener('hudMetricsUpdate', (e) => {
-    const { risk, forecast, anomalies, drift } = e.detail;
-    const riskEl = document.getElementById('riskMetric');
-    const forecastEl = document.getElementById('forecastMetric');
-    const anomalyEl = document.getElementById('anomalyMetric');
-    const driftEl = document.getElementById('driftMetric');
-    if (riskEl) riskEl.textContent = risk;
-    if (forecastEl) forecastEl.textContent = forecast;
-    if (anomalyEl) anomalyEl.textContent = anomalies;
-    if (driftEl) driftEl.textContent = drift;
-  });
 });
+
+// --- Update toggle listener to immediately store state changes ---
+const restoreToggle = document.getElementById("restoreToggle");
+if (restoreToggle) {
+  restoreToggle.addEventListener("change", () => {
+    console.log("🔧 Restore toggle changed:", restoreToggle.checked);
+    localStorage.setItem("restoreToggleState", restoreToggle.checked);
+  });
+}
 // === Phase 57: Neural Module Loader Bootstrap ===
 window.NeuralModuleRegistry = (function() {
   const modules = {};
