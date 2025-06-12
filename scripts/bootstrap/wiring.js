@@ -540,14 +540,6 @@ window.NeuralOrbitRegistry = (function() {
       console.warn(`⚠ Orbit '${name}' is already registered.`);
       return;
     }
-    // --- Fallback injection logic for 'loreCodex' ---
-    // If the orbit is 'loreCodex', ensure required properties are present
-    if (name === 'loreCodex') {
-      label = label || 'Lore Codex';
-      icon = icon || '📜';
-      panelId = panelId || 'loreCodexConsole';
-      panelTitle = panelTitle || 'Lore Console';
-    }
 
     // If label or icon are still missing, reject
     if (!label || !icon) {
@@ -796,14 +788,6 @@ window.NeuralOrbitInjectionBus = (function () {
     });
     console.log(`🚀 Injecting Orbit: ${key}`);
 
-    // Fallback injection logic for loreCodex before registering
-    if (key === 'loreCodex') {
-      label = label || 'Lore Codex';
-      icon = icon || '📜';
-      panelId = panelId || 'loreCodexConsole';
-      panelTitle = panelTitle || 'Lore Console';
-    }
-
     if (!key || !label || !icon) {
       console.error("❌ Invalid injection payload — key, label, and icon are required.");
       return;
@@ -913,6 +897,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // === Orbital Dock Container Rendering & Button Injection ===
+  // Ensure orbitalDockContainer exists only once
+  let orbitalDockContainer = document.getElementById("orbitalDockContainer");
+  if (!orbitalDockContainer) {
+    orbitalDockContainer = document.createElement("div");
+    orbitalDockContainer.id = "orbitalDockContainer";
+    orbitalDockContainer.classList.add("orbital-dock-container");
+    document.body.appendChild(orbitalDockContainer);
+  }
+  // Clear existing buttons to avoid duplicates
+  orbitalDockContainer.innerHTML = "";
+  // Render orbit buttons, skipping loreCodex
+  const orbits = window.NeuralOrbitRegistry?.listOrbits?.() || {};
+  Object.keys(orbits).forEach((orbitKey) => {
+    if (orbitKey === "loreCodex") return; // Skip rendering this button
+    const orbit = orbits[orbitKey];
+    const button = document.createElement("button");
+    button.className = "orbit-button";
+    button.textContent = orbit.displayName || orbit.label || orbitKey;
+    orbitalDockContainer.appendChild(button);
+  });
+
+  // === Orbit Injection Path Audit Logging ===
+  // Audit all orbit button injection and registry state after rendering
+  console.log("🔍 Phase 1: Orbit Injection Path Audit — Begin");
+  document.querySelectorAll(".orbit-button").forEach((btn, index) => {
+    console.log(`🛰️ Orbit Button #${index + 1}:`, btn);
+  });
+  console.log("🧠 Current Orbit Registry:", window.NeuralOrbitRegistry?.listOrbits?.());
+  console.log("🔍 Phase 1: Orbit Injection Path Audit — End");
+
   // === Orbital Relay Panel Toggle Logic ===
   // This logic ensures every .orbit-btn toggles its panel cleanly, hiding others.
   document.querySelectorAll('.orbit-btn').forEach((btn) => {
@@ -937,17 +952,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === Phase 16017: Live Orbit Injection Test ===
-  // Ensure loreCodex orbit is injected with all required properties
-  const loreCodexOrbit = {
-    key: 'loreCodex',
-    label: 'Lore Codex',
-    description: 'A dynamic codex containing deep lore archives and grimoire entries.',
-    panel: 'loreCodexPanel',
-    icon: '📖',
-    enabled: true,
-    modules: ['loreModule']
-  };
-  NeuralOrbitInjectionBus.injectOrbit(loreCodexOrbit);
 
   // === Phase 16020: Gatekeeper Synchronization ===
   console.log("🔐 Activating Gatekeeper — Loading persisted orbits...");

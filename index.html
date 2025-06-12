@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SageCraft Ascendant — Sovereign Codex</title>
   <!-- <link rel="stylesheet" href="scripts/styles/sagecraftascendant.css?v=1.0.0"> -->
-  <link rel="stylesheet" href="scripts/liquidGlass/liquidGlass.css">
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon/icon-192.png" type="image/png" />
   <!-- <meta name="theme-color" content="#1e1e2f" /> -->
@@ -18,62 +17,13 @@
   <!-- iOS Splash Screen (Portrait) -->
   <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/ph.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-</head>
-  <style>
-    body {
-      background-color: #0a0a14;
-      color: #e4f5ff;
-      font-family: 'Cinzel', serif;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    .logo-banner-flex {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px 20px;
-    }
-
-    .logo-title {
-      font-size: 1.8rem;
-      color: #e4f5ff;
-      margin-top: 10px;
-      text-align: center;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
-    }
-
-    .holo-console-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
-      padding: 40px;
-    }
-
-    .holo-console {
-      background: rgba(26, 28, 32, 0.8);
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid #444;
-      box-shadow: 0 0 10px rgba(153, 51, 255, 0.3);
-    }
-
-    .holo-console.hidden {
-      display: none !important;
-    }
-
-    footer {
-      padding: 30px;
-      text-align: center;
-      color: #888;
-    }
-  </style>
-</head>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+  <!-- LiquidGlass styles should be loaded after all other head links -->
+  <link rel="stylesheet" href="scripts/liquidGlass/liquidGlass.css">
   <meta name="theme-color" content="#2a003f" />
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
@@ -82,48 +32,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <body class="liquid-glass-ui">
   <div class="logo-banner-flex">
-    <img src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" class="logo-icon" style="max-width: 220px; height: auto; margin: 0 auto;" />
-    <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
-    <!-- HoloConsole DOM deployment -->
-    <section id="holoConsoleDock" class="holo-console-wrapper">
-      <div class="holo-console-panel" data-console="predictive">
-        <header class="holo-console-header">Predictive HUD</header>
-        <div class="holo-console-body">
-          <!-- Predictive HUD content will be injected here -->
-        </div>
-      </div>
-      <div class="holo-console-panel" data-console="analytics">
-        <header class="holo-console-header">Analytics Core</header>
-        <div class="holo-console-body">
-          <!-- Analytics Core content will be injected here -->
-        </div>
-      </div>
-      <div class="holo-console-panel" data-console="audit">
-        <header class="holo-console-header">Audit Module</header>
-        <div class="holo-console-body">
-          <!-- Audit Module content will be injected here -->
-        </div>
-      </div>
-    </section>
-    <!-- 🧪 Tools Console Panel -->
-    <section id="tools" class="holo-console hidden" aria-hidden="true">
-      <header class="console-header">🧰 Tools Console</header>
-      <div class="console-body">
-        <p>Tools and utilities for system diagnostics and maintenance will appear here.</p>
-      </div>
-    </section>
+    <div class="header-title">
+      <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" />
+      <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
+    </div>
     <div id="sovereignToolbarMount" class="sovereign-toolbar-container"></div>
     <!-- Additional HoloConsole Sovereign Panels -->
-    <section class="holo-console" id="exceptionManager" data-title="Exception Manager"></section>
-    <section class="holo-console" id="progressDashboard" data-title="Progress Dashboard"></section>
-    <section class="holo-console" id="reportingHub" data-title="Reporting Hub"></section>
-    <section class="holo-console" id="masterExportHub" data-title="Master Export Hub"></section>
-    <section class="holo-console" id="utilityHub" data-title="Utility Hub"></section>
-    <section class="holo-console" id="sessionManager" data-title="Session Manager"></section>
-    <section class="holo-console" id="mappings" data-title="Mappings"></section>
-    <section class="holo-console" id="tools" data-title="Tools"></section>
-    <section class="holo-console" id="audit" data-title="Audit"></section>
-    <section class="holo-console" id="configPanel" data-title="Configuration Panel"></section>
+    <!-- Sovereign Orbit Dock Console Panels -->
+    <section class="holo-console hidden" id="countConsole" aria-hidden="true"></section>
+    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true"></section>
+    <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
+    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true"></section>
+    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true"></section>
+    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true"></section>
     <!-- 🔮 Oracle Subsystem Panel -->
     <div id="oracle" class="holo-console hidden">
       <h2>🔮 Oracle Subsystem</h2>
@@ -153,13 +74,6 @@
   <div id="sovereignToolbar" class="sovereign-toolbar"></div>
 
   <!-- HoloConsole Sovereign Panels (for SovereignToolbar toggling) -->
-  <div id="countConsole" class="holo-console hidden"></div>
-  <div id="toolsConsole" class="holo-console hidden"></div>
-  <div id="oracleConsole" class="holo-console hidden"></div>
-  <div id="auditConsole" class="holo-console hidden"></div>
-  <div id="mappingsConsole" class="holo-console hidden"></div>
-  <div id="progressDashboardConsole" class="holo-console hidden"></div>
-  <div id="masterExportHubConsole" class="holo-console hidden"></div>
 
 
   <!-- All legacy static Operator Console Panel and legacy tab-section panels removed.
@@ -167,10 +81,48 @@
   <div id="operatorConsole" class="tabcontent"></div>
 
   <!-- Orbital Dock Container -->
-  <div id="orbitalDockContainer" class="dock-container"></div>
+  <div id="orbitalDockContainer" class="dock-container">
+    <button class="orbit-btn" data-panel="#countConsole" aria-label="Count Console">
+      <img src="assets/icons/icon-count.png" alt="Count Console" class="orbit-icon" />
+    </button>
+    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole" aria-label="Delta Analyzer Console">
+      <img src="assets/icons/icon-delta.png" alt="Delta Analyzer Console" class="orbit-icon" />
+    </button>
+    <button class="orbit-btn" data-panel="#pulseMonitorConsole" aria-label="Oracle">
+      <img src="assets/icons/icon-oracle.png" alt="Oracle Console" class="orbit-icon" />
+    </button>
+    <button class="orbit-btn" data-panel="#reportingHubConsole" aria-label="Reporting Hub Console">
+      <img src="assets/icons/icon-reporting.png" alt="Reporting Hub Console" class="orbit-icon" />
+    </button>
+    <button class="orbit-btn" data-panel="#sessionManagerConsole" aria-label="Session Manager Console">
+      <img src="assets/icons/icon-utility.png" alt="Session Manager Console" class="orbit-icon" />
+    </button>
+    <button class="orbit-btn" data-panel="#utilityHubConsole" aria-label="Utility Hub Console">
+      <img src="assets/icons/icon-count.png" alt="Utility Hub Console" class="orbit-icon" />
+    </button>
+  </div>
 
   <!-- Dock Grid Container -->
-  <div id="dockGrid" class="dock-grid"></div>
+  <!-- Sovereign Orbit Dock Console Panel Definitions -->
+  <!--
+    <button class="orbit-btn" data-panel="#countConsole">🧮</button>
+    <section class="holo-console hidden" id="countConsole" aria-hidden="true"></section>
+
+    <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">📊</button>
+    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true"></section>
+
+    <button class="orbit-btn" data-panel="#pulseMonitorConsole">🫀</button>
+    <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
+
+    <button class="orbit-btn" data-panel="#reportingHubConsole">🗂</button>
+    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true"></section>
+
+    <button class="orbit-btn" data-panel="#sessionManagerConsole">📋</button>
+    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true"></section>
+
+    <button class="orbit-btn" data-panel="#utilityHubConsole">🧰</button>
+    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true"></section>
+  -->
 
 
 
@@ -180,6 +132,15 @@
   <style>
     #diagnosticOverlay, #dropboxStatusOverlay {
       display: none !important;
+    }
+    .orbit-btn img.orbit-icon {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      padding: 10%;
+      box-sizing: border-box;
     }
   </style>
 
@@ -741,9 +702,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   </div>
 
-  <footer style="text-align:center; margin-top:30px; font-size:12px; color:#a366ff; font-family:'Share Tech Mono', monospace;">
-    SageCraft Ascendant — Sovereign Codex </span> ⚡
-  </footer>
 
 
   <!-- 🧙‍♂️ Sage Terminal Console -->
@@ -800,37 +758,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   </script>
 
-  <style>
-    .orbit-btn {
-      width: 60px;
-      height: 60px;
-      background: radial-gradient(circle at center, #5a7cff 0%, #0e1a3b 100%);
-      border: 2px solid #88aaff;
-      color: #fff;
-      font-size: 0;
-      padding: 0;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 18px rgba(88, 144, 255, 0.6), inset 0 0 8px rgba(88, 144, 255, 0.4);
-      position: absolute;
-      animation: softFloat 6s ease-in-out infinite alternate;
-    }
-
-    .orbit-btn:hover {
-      transform: scale(1.2);
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(200, 240, 255, 0.8);
-    }
-
-    @keyframes softFloat {
-      0% {
-        transform: translateY(0px) scale(1);
-      }
-      100% {
-        transform: translateY(-6px) scale(1.02);
-      }
-    }
-  </style>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -1189,16 +1116,23 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- 🌌 Sovereign Orbit Dock -->
   <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
     <div id="sovereignOrbitDock" class="orbit-cluster">
-      <button class="orbit-btn" data-panel="#countConsole">🧮</button>
-      <button class="orbit-btn" data-panel="#deltaAnalyzerConsole">📊</button>
-      <button class="orbit-btn" data-panel="#pulseMonitorConsole">🫀</button>
-      <button class="orbit-btn" data-panel="#reportingHubConsole">🗂</button>
-      <button class="orbit-btn" data-panel="#sessionManagerConsole">📋</button>
-      <button class="orbit-btn" data-panel="#utilityHubConsole">🧰</button>
+      <div class="orbit-btn" id="countButton">
+        <img src="assets/icons/icon-count.png" alt="Count Icon" />
+      </div>
+      <div class="orbit-btn" id="deltaButton">
+        <img src="assets/icons/icon-delta.png" alt="Delta Icon" />
+      </div>
+      <div class="orbit-btn" id="oracleButton">
+        <img src="assets/icons/icon-oracle.png" alt="Oracle Icon" />
+      </div>
+      <div class="orbit-btn" id="reportingButton">
+        <img src="assets/icons/icon-reporting.png" alt="Reporting Icon" />
+      </div>
+      <div class="orbit-btn" id="utilityButton">
+        <img src="assets/icons/icon-utility.png" alt="Utility Icon" />
+      </div>
     </div>
   </div>
-</script>
-</script>
 <!-- Phase 200.7 — Predictive HUD Isolation Container -->
 <div id="brainDockHudPanel" style="
   position: fixed;
@@ -1520,3 +1454,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+  <script src="scripts/liquidGlass/glassOrbitHandler.js"></script>
