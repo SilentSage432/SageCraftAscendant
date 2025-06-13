@@ -1508,13 +1508,51 @@ function injectLiveOrbit() {
 // (Locate this section in your file; add the following after sessionManagerConsole wiring)
 
 // --- Sage Feed Console Initialization and Wiring ---
-const sageFeedConsole = document.getElementById("sageFeedConsole");
-if (sageFeedConsole) {
-    console.log("🧬 Sage Feed Console initialized and wired to DOM.");
-    // Placeholder for future memory feed or interaction logic
-} else {
-    console.warn("⚠️ Sage Feed Console not found in DOM.");
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const sageFeedConsole = document.getElementById("sageFeedConsole");
+
+    if (sageFeedConsole) {
+        const feedInput = sageFeedConsole.querySelector(".feed-input");
+        const submitBtn = sageFeedConsole.querySelector(".submit-feed");
+
+        if (submitBtn && feedInput) {
+            submitBtn.addEventListener("click", () => {
+                const message = feedInput.value.trim();
+                if (message) {
+                    console.log(`📡 Sage Feed received: "${message}"`);
+                    alert(`Sage Feed received: "${message}"`);
+                    feedInput.value = "";
+                } else {
+                    console.warn("⚠️ No input detected in Sage Feed.");
+                }
+            });
+        } else {
+            console.warn("⚠️ Feed input or submit button missing in Sage Feed Console.");
+        }
+
+        console.log("✅ Sage Feed Console wired successfully.");
+    } else {
+        console.warn("⚠️ Sage Feed Console not found in DOM.");
+    }
+
+    // --- Sage Feed Orbit Button Wiring ---
+    const sageFeedOrbit = document.getElementById("orbit-sageFeed");
+    // sageFeedConsole already declared above
+    if (sageFeedOrbit && sageFeedConsole) {
+      sageFeedOrbit.addEventListener("click", () => {
+        const isVisible = sageFeedConsole.style.display === "block";
+        sageFeedConsole.classList.toggle("hidden", isVisible);
+        sageFeedConsole.style.display = isVisible ? "none" : "block";
+        sageFeedConsole.style.opacity = isVisible ? 0 : 1;
+        sageFeedConsole.style.visibility = isVisible ? "hidden" : "visible";
+        sageFeedConsole.style.zIndex = 9999;
+        sageFeedConsole.style.transform = "none";
+        console.log(`🔁 Sage Feed Console ${isVisible ? "hidden" : "revealed"}.`);
+      });
+    } else {
+      console.warn("⚠️ Sage Feed Orbit or Console not found in DOM.");
+    }
+});
 
 // === Phase 43: Orbital Router Activation Mesh ===
 

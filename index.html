@@ -268,14 +268,6 @@
       <div class="utility-log"></div>
     </div>
 
-    <!-- 🧠 Sage Feed Console Interface -->
-    <div id="sageFeedConsoleWrapper" class="holo-console dock-panel hidden">
-      <h2>🧠 Sage Feed Console</h2>
-      <p class="console-desc">Direct injection to Sage Memory Engine. Enter encoded lore, trigger phrases, or neural directives.</p>
-      <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>
-      <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
-      <div id="sageFeedLog" class="sage-feed-log"></div>
-    </div>
 
     <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true">
       <button class="panel-close" onclick="closeConsole(this)">✖️</button>
@@ -467,6 +459,9 @@
       <button class="orbit-btn" data-target="oracleConsole">
         <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
       </button>
+      <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
+        <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console">
+      </button>
     </div>
   </div>
   <!-- Fallback Dock Grid Container -->
@@ -550,6 +545,14 @@
   <!-- All legacy static Operator Console Panel and legacy tab-section panels removed.
        Only dynamic Control Deck injection point remains below. -->
   <div id="operatorConsole" class="tabcontent"></div>
+  <!-- 🧠 Sage Feed Console Interface -->
+  <div id="sageFeedConsoleWrapper" class="holo-console dock-panel hidden">
+    <h2>🧠 Sage Feed Console</h2>
+    <p class="console-desc">Direct injection to Sage Memory Engine. Enter encoded lore, trigger phrases, or neural directives.</p>
+    <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>
+    <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
+    <div id="sageFeedLog" class="sage-feed-log"></div>
+  </div>
 
 
 <!-- Phase 125.8 — Predictive Overlay Remover -->
