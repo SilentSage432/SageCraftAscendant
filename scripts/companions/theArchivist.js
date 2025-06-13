@@ -1,4 +1,5 @@
 import { Companion } from './companionCore.js';
+import { GrimoireMemory } from '../grimoire/grimoireMemory.js';
 
 export const TheArchivist = new Companion("archivist", "The Archivist", "lore guardian");
 
@@ -30,4 +31,15 @@ TheArchivist.speak = function (message) {
 // Archivist-specific behavior: flag inconsistent lore
 TheArchivist.flagInconsistency = function (entryId, note) {
   console.warn(`📍 Inconsistency flagged in entry '${entryId}': ${note}`);
+};
+
+const baseAbsorb = TheArchivist.absorbMemory.bind(TheArchivist);
+TheArchivist.absorbMemory = function (memory) {
+  baseAbsorb(memory);
+  GrimoireMemory.recordEntry({
+    title: memory.title || "Memory absorbed",
+    content: memory.content,
+    origin: this.name,
+    tags: ["archivist", "companion"]
+  });
 };

@@ -1,4 +1,5 @@
 import { Companion } from './companionCore.js';
+import { GrimoireMemory } from '../grimoire/grimoireMemory.js';
 
 export const SilentSage = new Companion("silentSage", "The Silent Sage", "narrator");
 
@@ -25,4 +26,15 @@ SilentSage.updateState = function () {
 // Optional: Add custom Sage speech flavor
 SilentSage.speak = function (message) {
   console.log(`🧙‍♂️ [Silent Sage whispers] “${message}”`);
+};
+
+const baseAbsorb = SilentSage.absorbMemory.bind(SilentSage);
+SilentSage.absorbMemory = function (memory) {
+  baseAbsorb(memory);
+  GrimoireMemory.recordEntry({
+    title: memory.title || "Memory absorbed",
+    content: memory.content,
+    origin: this.name,
+    tags: ["sage", "companion"]
+  });
 };

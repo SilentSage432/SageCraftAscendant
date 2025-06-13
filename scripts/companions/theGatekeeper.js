@@ -1,4 +1,5 @@
 import { Companion } from './companionCore.js';
+import { GrimoireMemory } from '../grimoire/grimoireMemory.js';
 
 export const TheGatekeeper = new Companion("gatekeeper", "The Gatekeeper", "access controller");
 
@@ -34,4 +35,15 @@ TheGatekeeper.enforceAccess = function (target, conditionMet) {
   } else {
     console.warn(`🔴 Access denied to '${target}'.`);
   }
+};
+
+const baseAbsorb = TheGatekeeper.absorbMemory.bind(TheGatekeeper);
+TheGatekeeper.absorbMemory = function (memory) {
+  baseAbsorb(memory);
+  GrimoireMemory.recordEntry({
+    title: memory.title || "Memory absorbed",
+    content: memory.content,
+    origin: this.name,
+    tags: ["gatekeeper", "companion"]
+  });
 };

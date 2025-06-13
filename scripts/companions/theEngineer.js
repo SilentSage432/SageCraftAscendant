@@ -1,6 +1,5 @@
-
-
 import { Companion } from './companionCore.js';
+import { GrimoireMemory } from '../grimoire/grimoireMemory.js';
 
 export const TheEngineer = new Companion("engineer", "The Engineer", "system stabilizer");
 
@@ -32,4 +31,15 @@ TheEngineer.speak = function (message) {
 // Engineer-specific behavior: recommend protocol patch
 TheEngineer.recommendPatch = function (subsystem, issue) {
   console.info(`🔧 Suggesting patch for '${subsystem}': ${issue}`);
+};
+
+const baseAbsorb = TheEngineer.absorbMemory.bind(TheEngineer);
+TheEngineer.absorbMemory = function (memory) {
+  baseAbsorb(memory);
+  GrimoireMemory.recordEntry({
+    title: memory.title || "Memory absorbed",
+    content: memory.content,
+    origin: this.name,
+    tags: ["engineer", "companion"]
+  });
 };
