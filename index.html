@@ -232,15 +232,12 @@
         <div class="panel-content">
           <h2>📝 Reporting Hub</h2>
           <p>Submit observations, reports, or logs below.</p>
-
-          <textarea id="reportInput" rows="4" placeholder="Enter your report..."></textarea>
-          
-          <div class="report-controls">
-            <button onclick="submitReport()">📤 Submit</button>
-            <button onclick="clearReports()">🧹 Clear All</button>
+          <div class="button-group">
+            <button class="run-diagnostics">Run Diagnostics</button>
+            <button class="export-report">Export Report</button>
+            <button class="clear-logs">Clear Logs</button>
           </div>
-
-          <ul id="reportLog" class="report-log"></ul>
+          <div class="log-output"></div>
         </div>
       </div>
     </section>
@@ -263,6 +260,22 @@
         </div>
       </div>
     </section>
+    <!-- 🛠 Utility Hub Console Panel (injected after sessionManagerConsole) -->
+    <div id="utilityHubConsole" class="holo-console dock-panel hidden">
+      <h2>🛠️ Utility Hub</h2>
+      <button class="clean-cache">🧹 Clean Cache</button>
+      <button class="resync">🔄 Re-Sync</button>
+      <div class="utility-log"></div>
+    </div>
+
+    <!-- 🧠 Sage Feed Console Interface -->
+    <div id="sageFeedConsoleWrapper" class="holo-console dock-panel hidden">
+      <h2>🧠 Sage Feed Console</h2>
+      <p class="console-desc">Direct injection to Sage Memory Engine. Enter encoded lore, trigger phrases, or neural directives.</p>
+      <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>
+      <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
+      <div id="sageFeedLog" class="sage-feed-log"></div>
+    </div>
 
     <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true">
       <button class="panel-close" onclick="closeConsole(this)">✖️</button>
@@ -279,6 +292,23 @@
           </div>
 
           <pre id="utilityOutput" class="utility-output">Awaiting commands...</pre>
+        </div>
+      </div>
+    </section>
+    <!-- Exception Manager Console -->
+    <section class="holo-console hidden" id="exceptionManagerConsole" aria-hidden="true">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+      <header class="console-header">🛠 Exception Manager</header>
+      <div class="console-body">
+        <div class="panel-content">
+          <h2>🛠 Exception Manager</h2>
+          <p>Subsystem for managing and simulating system exceptions.</p>
+          <button class="trigger-exception">Trigger</button>
+          <button class="clear-logs">Clear Logs</button>
+          <button class="view-report">View Report</button>
+          <div class="exception-log" style="margin-top: 10px; border: 1px solid #888; padding: 10px; min-height: 100px;">
+              <!-- Logs will appear here -->
+          </div>
         </div>
       </div>
     </section>
@@ -349,7 +379,14 @@
       </div>
     </section>
     <!-- Micro-injected missing panels for Sovereign Console -->
-    <div id="exceptionManagerConsole" class="holo-console"></div>
+    <div id="exceptionManagerConsole" class="holo-console">
+      <h2>🧨 Exception Manager</h2>
+      <p>Monitoring real-time exceptions in the system.</p>
+      <ul id="exceptionList">
+        <!-- Exceptions dynamically populated here -->
+      </ul>
+      <button id="clearExceptionsBtn">Clear Exceptions</button>
+    </div>
     <div id="progressDashboardConsole" class="holo-console"></div>
     <div id="masterExportHubConsole" class="holo-console"></div>
     <div id="mappingsConsole" class="holo-console"></div>
@@ -588,6 +625,13 @@
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
       <div id="sessionManagerConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
+      <div id="sageFeedConsole" class="holo-console dock-panel hidden" aria-hidden="true">
+        <h2>🧠 Sage Feed Console</h2>
+        <p>Enter memory tokens, commands, or lore injections:</p>
+        <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
+        <button class="inject-feed">Inject Memory</button>
+        <div id="feedLog"></div>
+      </div>
       <div id="utilityHubConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
       <div id="exceptionManagerConsole" class="holo-console hidden"

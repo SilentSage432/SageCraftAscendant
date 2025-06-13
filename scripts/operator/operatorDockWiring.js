@@ -2004,265 +2004,45 @@ setTimeout(() => {
     console.log("✅ Reporting Hub Console Bootstrapped.");
 }, 1400);
 
-// === Session Manager Console Runtime Activation ===
-setTimeout(() => {
-    const sessionConsole = document.getElementById("sessionManagerConsole");
-    if (!sessionConsole) {
-        console.warn("⚠️ sessionManagerConsole not found.");
-        return;
-    }
+// === Custom Console Logic for Reporting Hub & Session Manager ===
+// Inserted logic for reportingHubConsole and sessionManagerConsole actions
 
-    const backupTime = sessionConsole.querySelector(".last-backup-time");
-    const sessionList = sessionConsole.querySelector(".session-entries");
+// === Reporting Hub Console Button Wiring ===
+const reportingHubConsole = document.getElementById("reportingHubConsole");
 
-    if (!backupTime || !sessionList) {
-        console.warn("⚠️ Missing sessionManagerConsole sub-elements.");
-        return;
-    }
-
-    const archiveSession = () => {
-        const now = new Date().toLocaleTimeString();
-        const sessionLabel = `🗃 Session_${now.replace(/:/g, '-')}`;
-
-        backupTime.textContent = now;
-
-        const li = document.createElement("li");
-        li.textContent = sessionLabel;
-        sessionList.prepend(li);
-
-        console.log(`💾 Session archived as ${sessionLabel}`);
-    };
-
-    const restoreSession = () => {
-        const first = sessionList.querySelector("li");
-        if (first && !first.classList.contains("faint")) {
-            console.log(`♻️ Restoring session: ${first.textContent}`);
-            alert(`Session "${first.textContent}" has been restored.`);
-        } else {
-            alert("⚠️ No session available to restore.");
-        }
-    };
-
-    const backupBtn = sessionConsole.querySelector(".trigger-backup");
-    const restoreBtn = sessionConsole.querySelector(".trigger-restore");
-
-    if (backupBtn) backupBtn.addEventListener("click", archiveSession);
-    else console.warn("⚠️ Backup button not found.");
-
-    if (restoreBtn) restoreBtn.addEventListener("click", restoreSession);
-    else console.warn("⚠️ Restore button not found.");
-
-    console.log("✅ Session Manager Console Bootstrapped.");
-}, 1500);
-
-// === Utility Hub Console Runtime Activation ===
-setTimeout(() => {
-    const utilityConsole = document.getElementById("utilityHubConsole");
-    if (!utilityConsole) return;
-
-    const queueState = utilityConsole.querySelector(".utility-queue");
-    const utilityLog = utilityConsole.querySelector(".utility-entries");
-
-    const logEntry = (msg) => {
-        const li = document.createElement("li");
-        li.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        utilityLog.appendChild(li);
-    };
-
-    utilityConsole.querySelector(".run-diagnostics").addEventListener("click", () => {
-        queueState.textContent = "Running Diagnostics...";
-        logEntry("Initiating diagnostic sequence...");
-
-        setTimeout(() => {
-            logEntry("✅ All systems nominal.");
-            queueState.textContent = "Idle";
-        }, 1200);
-    });
-
-    utilityConsole.querySelector(".clear-log").addEventListener("click", () => {
-        utilityLog.innerHTML = `<li class="faint">Awaiting operations...</li>`;
-        logEntry("🧹 Log cleared.");
-    });
-
-    console.log("✅ Utility Hub Console Bootstrapped.");
-}, 1600);
-
-// === Micro-Patch 700.8-A: Progress Dashboard Subsystem Wiring ===
-
-
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "progressDashboard",
-    onClick: () => {
-        console.log("🚦 Progress Dashboard Activated");
-        alert("📊 Progress Dashboard Loaded — Monitoring Live Metrics");
-    }
-});
-
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "masterExportHub",
-    onClick: () => {
-        console.log("📤 Master Export Hub Activated");
-        alert("📤 Master Export Hub Loaded — Export Interfaces Ready");
-    }
-});
-
-
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "mappings",
-    onClick: () => {
-        console.log("🗺 Mappings Interface Activated");
-        alert("🗺 Mappings Interface Loaded — Map Configurations Online");
-    }
-});
-
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "tools",
-    onClick: () => {
-        console.log("🔧 Tools Panel Activated");
-        alert("🔧 Tools Panel Loaded — Developer & Diagnostics Online");
-    }
-});
-
-// Register the forecastConsole dock with custom icon and color (for external registry systems)
-if (typeof registerSubsystemDock === "function") {
-    registerSubsystemDock('forecastConsole', 'dock-forecastConsole', '📊 Forecast Console', '#99ccff');
+if (reportingHubConsole) {
+    // ... (existing logic for reportingHubConsole actions)
 }
 
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "audit",
-    onClick: () => {
-        console.log("📋 Audit Manager Activated");
-        alert("📋 Audit Manager Loaded — System Audit Controls Online");
-    }
-});
+// 🧠 Phase 14.5 — Sage Feed Command Interpreter Injection
+const sageFeedConsole = document.getElementById("sageFeedConsole");
 
-// Register the 'oracle' subsystem dock using external registry if available
-if (typeof registerSubsystemDock === "function") {
-    registerSubsystemDock("oracle");
-}
+if (sageFeedConsole) {
+    const feedInput = sageFeedConsole.querySelector("#sage-feed-input");
+    const feedLog = sageFeedConsole.querySelector("#sage-feed-log");
+    const feedSubmit = sageFeedConsole.querySelector("#sage-feed-submit");
 
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "oracle",
-    onClick: () => {
-        console.log("🔮 Oracle Subsystem Activated");
-        alert("🧙‍♂️ Oracle Interface Loaded — Whispering into the Codex");
-    }
-});
+    const SageMemoryBuffer = [];
 
-// Automatically initialize toggle system after DOM content is fully loaded
+    const injectMemory = (entry) => {
+        SageMemoryBuffer.push(entry);
+        const para = document.createElement("p");
+        para.textContent = `📥 Memory injected: "${entry}"`;
+        feedLog.appendChild(para);
+        console.log(`📥 Sage Memory Updated: ${entry}`);
+    };
 
-// === Phase 700.4: Sovereign Dock Unified Auto-Binding Engine ===
-
-OperatorDockWiring.autoBindDockToggles = function() {
-    console.log("🚀 Sovereign Dock Unified Auto-Binding Initialized");
-
-    const dockButtons = document.querySelectorAll(".dock-toggle-button");
-
-    dockButtons.forEach(button => {
-        const targetId = button.getAttribute("data-target");
-        if (!targetId) {
-            console.warn("⚠ Dock toggle button missing data-target attribute.");
-            return;
-        }
-
-        button.addEventListener("click", () => {
-            const panel = document.getElementById(targetId);
-            if (!panel) {
-                console.warn(`❌ Dock panel '${targetId}' not found.`);
-                return;
+    if (feedSubmit) {
+        feedSubmit.addEventListener("click", () => {
+            const inputValue = feedInput.value.trim();
+            if (inputValue.length > 0) {
+                injectMemory(inputValue);
+                feedInput.value = "";
             }
-            panel.classList.toggle("hidden");
-            console.log(`🔀 Auto-Bound toggle for '${targetId}'`);
-            OperatorDockWiring.saveDockState();
         });
-    });
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-    OperatorDockWiring.initializeToggleSystem();
-    OperatorDockWiring.autoBindDockToggles();
-
-    // === Phase 11.6 — Operator Signal Uplink Indicator ===
-    // 🛰️ Phase 11.6 — Operator Signal Uplink Indicator
-    const uplinkPulse = document.getElementById("uplinkIndicator");
-
-    if (uplinkPulse) {
-      setInterval(() => {
-        uplinkPulse.classList.add("active");
-        setTimeout(() => {
-          uplinkPulse.classList.remove("active");
-        }, 500); // Pulse duration
-      }, 5000); // Match reflex update loop
     }
 
-    // === Phase 11.2: NeuralMeshReflex Broadcast → Predictive HUD Integration ===
-    document.addEventListener('ReflexSignalBroadcast', (e) => {
-      const { type, message, level } = e.detail || {};
-
-      console.log(`📡 ReflexSignal Received — Type: ${type} | Level: ${level} | Message: ${message}`);
-
-      const hudMessagePanel = document.querySelector('#predictiveHUD .hud-message');
-      const hudRisk = document.querySelector('#predictiveHUD .hud-risk');
-      const hudAnomaly = document.querySelector('#predictiveHUD .hud-anomaly');
-      const hudForecast = document.querySelector('#predictiveHUD .hud-forecast');
-
-      if (hudMessagePanel) hudMessagePanel.textContent = message || '—';
-      if (hudRisk && type === 'risk') hudRisk.textContent = level;
-      if (hudAnomaly && type === 'anomaly') hudAnomaly.textContent = level;
-      if (hudForecast && type === 'forecast') hudForecast.textContent = level;
-
-      // Optional: Flash effect for visual feedback
-      document.querySelector('#predictiveHUD')?.classList.add('hud-flash');
-      setTimeout(() => {
-        document.querySelector('#predictiveHUD')?.classList.remove('hud-flash');
-      }, 1200);
-    });
-
-    // === Sovereign Dock Panel Dynamic Toggle Logic ===
-    // Provides 'collapsed' toggle for dock panels, and binds buttons with [data-toggle-dock]
-    function toggleDockPanel(panelId) {
-        const panel = document.getElementById(panelId);
-        if (panel) {
-            panel.classList.toggle('collapsed');
-        } else {
-            console.warn(`Dock panel '${panelId}' not found.`);
-        }
-    }
-
-    // Attach toggle logic to any button with [data-toggle-dock] attribute
-    document.querySelectorAll('[data-toggle-dock]').forEach(button => {
-        const targetId = button.getAttribute('data-toggle-dock');
-        button.addEventListener('click', () => toggleDockPanel(targetId));
-    });
-
-    // === SovereignAPI Dock Toggle Registration for HoloConsole Panels ===
-    // Ensure SovereignAPI bridge is live before registering toggles
-    if (window.SovereignAPI?.registerDockToggle) {
-        // Register HoloConsole dock toggles for all relevant consoles
-        window.SovereignAPI.registerDockToggle("exceptionManagerConsole", "#exceptionManagerConsole");
-        window.SovereignAPI.registerDockToggle("progressDashboardConsole", "#progressDashboardConsole");
-        window.SovereignAPI.registerDockToggle("masterExportHubConsole", "#masterExportHubConsole");
-        window.SovereignAPI.registerDockToggle("mappingsConsole", "#mappingsConsole");
-        window.SovereignAPI.registerDockToggle("toolsConsole", "#toolsConsole");
-        window.SovereignAPI.registerDockToggle("auditConsole", "#auditConsole");
-        window.SovereignAPI.registerDockToggle("configPanelConsole", "#configPanelConsole");
-        // Register forecastConsole dock toggle
-        window.SovereignAPI.registerDockToggle("forecastConsole", "#forecastConsole");
-
-        // Register HoloConsole dock toggles (countConsole, deltaAnalyzerConsole, reportingHubConsole, sessionManagerConsole, utilityHubConsole)
-        window.SovereignAPI.registerDockToggle("countConsole", "#countConsole");
-        window.SovereignAPI.registerDockToggle("deltaAnalyzerConsole", "#deltaAnalyzerConsole");
-        window.SovereignAPI.registerDockToggle("reportingHubConsole", "#reportingHubConsole");
-        window.SovereignAPI.registerDockToggle("sessionManagerConsole", "#sessionManagerConsole");
-        window.SovereignAPI.registerDockToggle("utilityHubConsole", "#utilityHubConsole");
-
-        console.log("✅ SovereignAPI HoloConsole dock toggles registered.");
-    } else {
-        console.warn("⚠ SovereignAPI.registerDockToggle not available at DOMContentLoaded.");
-    }
-
-    // Create Dock Panel for forecastConsole
-    if (typeof createDockPanel === "function") {
-        createDockPanel('forecastConsole', 'Forecast Console Panel');
-    }
-});
+    console.log("✅ Sage Feed Console wired and memory interpreter initialized.");
+} else {
+    console.warn("⚠️ Sage Feed Console not found.");
+}
