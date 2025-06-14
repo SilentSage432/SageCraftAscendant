@@ -1976,33 +1976,21 @@ setTimeout(() => {
     mockScan();
 }, 1300);
 
-// === Whisperer Orbit Button Toggle Logic ===
-// Wire up the Whisperer orbit button to toggle the threshold panel
-const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
-const whispererPanel = document.getElementById("whispererThreshold");
+// === Whisperer Orbit Button Toggle Logic (Refactored for DOMContentLoaded) ===
+document.addEventListener("DOMContentLoaded", () => {
+  const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
+  const whispererConsolePanel = document.getElementById("whispererConsolePanel");
 
-if (whispererOrbitBtn && whispererPanel) {
-  whispererOrbitBtn.addEventListener("click", () => {
-    whispererPanel.classList.toggle("hidden");
-  });
-}
-
-// === Whisperer Orbit Button: Toggle Whisperer Console Panel ===
-document.getElementById("whispererOrbitBtn")?.addEventListener("click", () => {
-  toggleConsolePanel("whispererConsolePanel");
+  if (whispererOrbitBtn && whispererConsolePanel) {
+    console.log("🌀 Whisperer orbit wired successfully.");
+    whispererOrbitBtn.addEventListener("click", () => {
+      whispererConsolePanel.classList.toggle("hidden");
+      console.log("👁️ Whisperer panel toggled.");
+    });
+  } else {
+    console.warn("⚠️ Whisperer orbit or console panel not found in DOM.");
+  }
 });
-
-// === Whisperer Orbit Button Toggle Logic ===
-// Wire up the Whisperer orbit button to toggle the threshold panel
-const whispererOrbit = document.getElementById("orbitWhisperer");
-const whispererConsole = document.getElementById("whispererConsole");
-
-if (whispererOrbit && whispererConsole) {
-  whispererOrbit.addEventListener("click", () => {
-    togglePanel(whispererConsole);
-  });
-  console.log("🔗 Whisperer orbit wired to mesh.");
-}
 
 // 🧠 Whisperer Observer State Activation
 function logPanelActivity(panelId, action) {
