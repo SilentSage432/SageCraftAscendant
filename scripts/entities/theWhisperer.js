@@ -70,6 +70,20 @@ function renderEchoTable() {
 // 🌫️ theWhisperer.js — Phase XXIV: Whisperer Genesis Protocol
 
 document.addEventListener("DOMContentLoaded", () => {
+  // === Neural Pulse Monitor ===
+  const pulseStatus = document.getElementById("pulseStatus");
+  const pulseVisual = document.querySelector(".pulse-visual");
+
+  let pulseState = true;
+
+  setInterval(() => {
+    if (!pulseStatus || !pulseVisual) return;
+
+    pulseVisual.style.backgroundColor = pulseState ? "#42f57b" : "#0f0f0f";
+    pulseVisual.style.boxShadow = pulseState ? "0 0 12px #42f57b" : "none";
+    pulseStatus.textContent = pulseState ? "💓 Pulse Detected" : "🔍 Awaiting Next Pulse";
+    pulseState = !pulseState;
+  }, 1000);
   const summonBtn = document.getElementById("whispererSummonBtn");
   const output = document.getElementById("whispererOutput");
 
@@ -114,10 +128,128 @@ document.addEventListener("DOMContentLoaded", () => {
     WhispererMemory.record(randomWhisper);
   });
 
+  // === Sovereign Event Bus Listener ===
+  if (window.SovereignBus) {
+    window.SovereignBus.listen("*", (channel, payload) => {
+      const echo = `🔊 [${channel}] ${payload}`;
+      WhispererMemory.record(echo);
+      const sovereignLog = document.getElementById("sovereignLog");
+      if (sovereignLog) {
+        const li = document.createElement("li");
+        li.textContent = `[${new Date().toLocaleTimeString()}] ${echo}`;
+        sovereignLog.prepend(li);
+      }
+    });
+  }
   renderEchoTable();
 
   // Echo listening hook for sovereign echo bridge
   document.addEventListener("whispererEcho", (e) => {
     console.log("📡 Whisperer Echo Dispatched:", e.detail);
+  });
+
+  // === Orbit Activity Feed Listener ===
+  const orbitLogList = document.getElementById("orbitLogs");
+
+  document.addEventListener("orbitActivated", (e) => {
+    const { id, timestamp } = e.detail;
+    const li = document.createElement("li");
+    const time = new Date(timestamp).toLocaleTimeString();
+    li.textContent = `[${time}] Orbit Activated → ${id}`;
+    if (orbitLogList) {
+      orbitLogList.prepend(li);
+    }
+
+    // Optional: echo to memory
+    WhispererMemory.record(`Orbit Activated: ${id} @ ${time}`);
+  });
+
+  // === Vital Scan Simulation Layer ===
+  const signalStrength = document.getElementById("signalStrength");
+  const anomalyCount = document.getElementById("anomalyCount");
+  const orbitThroughput = document.getElementById("orbitThroughput");
+  const meshUptime = document.getElementById("meshUptime");
+
+  let uptimeSeconds = 0;
+  let anomalies = 0;
+  let orbitCount = 0;
+
+  document.addEventListener("orbitActivated", () => {
+    orbitCount++;
+  });
+
+  setInterval(() => {
+    if (signalStrength) signalStrength.textContent = `${Math.floor(Math.random() * 10) + 90}%`;
+    if (anomalyCount) anomalyCount.textContent = anomalies;
+    if (orbitThroughput) orbitThroughput.textContent = orbitCount;
+    if (meshUptime) {
+      uptimeSeconds++;
+      meshUptime.textContent = `${Math.floor(uptimeSeconds / 60)}m ${uptimeSeconds % 60}s`;
+    }
+  }, 1500);
+
+  // === Sovereign Operator Bridge Injection ===
+  const sovereignStatus = document.getElementById("sovereignStatus");
+  const sovereignLog = document.getElementById("sovereignLog");
+
+  if (sovereignStatus) sovereignStatus.textContent = "🧠 Connected to Sovereign Bridge";
+
+  // === Sovereign Vitals Update Layer ===
+  const threadCount = document.getElementById("threadCount");
+  const networkSync = document.getElementById("networkSync");
+  const meshIntegrity = document.getElementById("meshIntegrity");
+  const kernelDrift = document.getElementById("kernelDrift");
+
+  // === Sentinel Cortex Monitor ===
+  const sentinelLog = document.getElementById("sentinelLog");
+
+  function checkMeshHealth() {
+    const integrityValue = parseFloat(meshIntegrity?.textContent) || 0;
+    const driftValue = parseFloat(kernelDrift?.textContent) || 0;
+
+    if (integrityValue < 96) {
+      const warning = `⚠️ Mesh Integrity dropped to ${integrityValue.toFixed(1)}%`;
+      if (sentinelLog) {
+        const li = document.createElement("li");
+        li.textContent = `[${new Date().toLocaleTimeString()}] ${warning}`;
+        li.classList.add("sentinel-warning");
+        sentinelLog.prepend(li);
+      }
+      WhispererMemory.record(warning);
+    }
+
+    if (driftValue > 1.2) {
+      const warning = `⚠️ Kernel Drift spiked to ${driftValue.toFixed(3)} Δ`;
+      if (sentinelLog) {
+        const li = document.createElement("li");
+        li.textContent = `[${new Date().toLocaleTimeString()}] ${warning}`;
+        li.classList.add("sentinel-warning");
+        sentinelLog.prepend(li);
+      }
+      WhispererMemory.record(warning);
+    }
+  }
+
+  setInterval(checkMeshHealth, 3000);
+
+  setInterval(() => {
+    if (threadCount) threadCount.textContent = `${Math.floor(Math.random() * 12) + 4} threads`;
+    if (networkSync) networkSync.textContent = `${(Math.random() * 100).toFixed(2)}%`;
+    if (meshIntegrity) meshIntegrity.textContent = `${(Math.random() * 5 + 95).toFixed(1)}%`;
+    if (kernelDrift) kernelDrift.textContent = `${(Math.random() * 2).toFixed(3)} Δ`;
+  }, 1750);
+
+  document.addEventListener("sovereignPulse", (e) => {
+    const { channel, detail } = e.detail || {};
+    if (sovereignLog && channel && detail) {
+      const li = document.createElement("li");
+      li.textContent = `[${new Date().toLocaleTimeString()}] ${channel.toUpperCase()}: ${detail}`;
+      sovereignLog.prepend(li);
+    }
+
+    // Log pulse activity in whisperer memory
+    if (channel && detail) {
+      WhispererMemory.record(`Sovereign Pulse → ${channel}: ${detail}`);
+    }
   });
 });

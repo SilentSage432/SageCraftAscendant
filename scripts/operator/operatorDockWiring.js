@@ -1986,17 +1986,54 @@ setTimeout(() => {
 
 // === Whisperer Orbit Button Toggle Logic (Refactored for DOMContentLoaded) ===
 document.addEventListener("DOMContentLoaded", () => {
+  // Orbit buttons: handle all elements with data-orbit attribute
+  const orbitButtons = document.querySelectorAll("[data-orbit]");
+  orbitButtons.forEach(btn => {
+    const targetId = btn.getAttribute("data-orbit");
+    if (!targetId) return;
+    const consolePanel = document.getElementById(targetId);
+    if (!consolePanel) {
+      console.warn(`⚠️ Orbit target panel '${targetId}' not found in DOM.`);
+      return;
+    }
+    btn.addEventListener("click", () => {
+      // Toggle visibility or set active state
+      consolePanel.classList.toggle("hidden");
+      logPanelActivity(targetId, "Toggled");
+      // Dispatch orbitActivated event after activation
+      const orbitTargetId = targetId;
+      document.dispatchEvent(new CustomEvent("orbitActivated", {
+        detail: {
+          id: orbitTargetId,
+          timestamp: Date.now()
+        }
+      }));
+    });
+  });
+
+  // Legacy: Whisperer orbit button fallback for explicit IDs
   const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
   const whispererConsolePanel = document.getElementById("whispererConsole");
-
   if (whispererOrbitBtn && whispererConsolePanel) {
     console.log("🌀 Whisperer orbit wired successfully.");
-    whispererOrbitBtn.addEventListener("click", () => {
-      whispererConsolePanel.classList.toggle("hidden");
-      logPanelActivity("whispererConsole", "Toggled");
-    });
+    // Remove duplicate event if already handled above
+    // (If both data-orbit and explicit ID present, skip duplicate)
+    if (!whispererOrbitBtn.hasAttribute("data-orbit")) {
+      whispererOrbitBtn.addEventListener("click", () => {
+        whispererConsolePanel.classList.toggle("hidden");
+        logPanelActivity("whispererConsole", "Toggled");
+        // Dispatch orbitActivated event for whispererConsole
+        document.dispatchEvent(new CustomEvent("orbitActivated", {
+          detail: {
+            id: "whispererConsole",
+            timestamp: Date.now()
+          }
+        }));
+      });
+    }
   } else {
-    console.warn("⚠️ Whisperer orbit or console panel not found in DOM.");
+    if (!orbitButtons.length)
+      console.warn("⚠️ Whisperer orbit or console panel not found in DOM.");
   }
 });
 

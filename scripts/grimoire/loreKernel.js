@@ -14,6 +14,9 @@ const LoreKernel = {
     }
     this.rebuildIndex();
     console.log("🧬 LoreKernel initialized with", entries.length, "entries.");
+    if (window.SovereignBus) {
+      SovereignBus.emit("lore.kernel", `Initialized with ${entries.length} entries.`);
+    }
   },
 
   rebuildIndex() {
@@ -34,6 +37,9 @@ const LoreKernel = {
     }
     this.entries.push(entry);
     this.index[entry.id] = entry;
+    if (window.SovereignBus) {
+      SovereignBus.emit("lore.kernel", `Entry added: ${entry.id}`);
+    }
   },
 
   hasEntry(id) {

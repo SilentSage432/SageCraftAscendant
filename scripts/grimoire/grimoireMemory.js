@@ -15,6 +15,10 @@ export const GrimoireMemory = {
     };
     this.entries.push(entry);
     console.log(`📖 [Grimoire Entry Recorded] "${title}" by ${origin}${locked ? " [LOCKED]" : ""}`);
+    // 🧠 Emit lore recording event
+    if (window.SovereignBus) {
+      SovereignBus.emit("grimoire.record", `Entry "${title}" recorded by ${origin}`);
+    }
   },
 
   evaluateUnlocks(companions = {}) {

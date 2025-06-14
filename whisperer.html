@@ -9,32 +9,82 @@
 <body>
   <!-- 🌫️ WHISPERER THRESHOLD -->
   <div id="whispererThreshold" class="whisperer-shroud">
-    <div class="whisperer-core">
-      <div class="whisperer-symbol">𓂀</div>
-      <div id="whispererOutput" class="whisperer-message">The silence holds secrets...</div>
-      <button id="whispererSummonBtn" class="whisperer-button">Whisper to Me</button>
-      <div id="whispererLogList" class="whisperer-log">
-        <h2 class="whisperer-log-title">Whispered Memories</h2>
-        <ul id="whispererLogEntries" class="whisperer-log-entries">
-          <!-- Whisper logs will appear here dynamically -->
-        </ul>
-      </div>
-      <!-- 📜 ECHO TABLE DISPLAY -->
-      <div id="whispererEchoTable" class="whisperer-echo-table">
-        <h2 class="whisperer-log-title">Echo Archive</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Origin</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody id="echoTableBody">
-            <!-- Echo entries will be dynamically injected here -->
-          </tbody>
-        </table>
-      </div>
+    <div id="whispererCoreConsole" class="sovereign-console">
+      <h1 class="console-title">Whisperer: Core Conscious Access</h1>
+
+      <section id="neuralPulseMonitor" class="console-section">
+        <h2>Neural Pulse</h2>
+        <div class="pulse-visual"></div>
+        <p id="pulseStatus">Initializing...</p>
+      </section>
+
+      <section id="orbitActivityFeed" class="console-section">
+        <h2>Orbit Activity</h2>
+        <ul id="orbitLogs" class="log-feed"></ul>
+      </section>
+
+      <section id="forecastDriftMap" class="console-section">
+        <h2>Forecast Drift</h2>
+        <canvas id="driftCanvas"></canvas>
+      </section>
+
+      <section id="meshTrafficPanel" class="console-section">
+        <h2>Mesh Signal Traffic</h2>
+        <div id="signalFlow" class="vital-grid">
+          <div class="vital">
+            <h3>🧬 Signal Strength</h3>
+            <p id="signalStrength">—</p>
+          </div>
+          <div class="vital">
+            <h3>⚠️ Anomalies</h3>
+            <p id="anomalyCount">—</p>
+          </div>
+          <div class="vital">
+            <h3>🪐 Orbits Active</h3>
+            <p id="orbitThroughput">—</p>
+          </div>
+          <div class="vital">
+            <h3>⏱️ Uptime</h3>
+            <p id="meshUptime">—</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="sovereignBridgePanel" class="console-section">
+        <h2>Sovereign System Bridge</h2>
+        <div id="sovereignStatus" class="hud-status">Establishing bridge...</div>
+        <ul id="sovereignLog" class="hud-log"></ul>
+        <div id="systemVitals" class="vital-deck">
+          <div class="vital">
+            <h3>🧠 Core Threads</h3>
+            <p id="threadCount">—</p>
+          </div>
+          <div class="vital">
+            <h3>🌐 Network Sync</h3>
+            <p id="networkSync">—</p>
+          </div>
+          <div class="vital">
+            <h3>🛡 Integrity</h3>
+            <p id="meshIntegrity">—</p>
+          </div>
+          <div class="vital">
+            <h3>🌀 Kernel Drift</h3>
+            <p id="kernelDrift">—</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="echoArchivePanel" class="console-section">
+        <h2>Echo Archive</h2>
+        <ul id="echoLogEntries"></ul>
+      </section>
+
+      <section id="coreCommandInput" class="console-section">
+        <h2>Inject Command</h2>
+        <input type="text" id="sovereignCommand" placeholder="Enter core directive...">
+        <button id="injectCommandBtn">Inject</button>
+        <div id="commandResponse" class="command-feedback"></div>
+      </section>
     </div>
   </div>
 

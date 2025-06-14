@@ -1421,6 +1421,24 @@ SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
 
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 
+// === Phase 30.0 — Operator Telemetry Pulse Channels ===
+setInterval(() => {
+  const pulseChannels = [
+    { channel: "vitals", detail: `Core=${Math.floor(Math.random() * 8) + 3}, Drift=${(Math.random() * 1.25).toFixed(3)}` },
+    { channel: "security", detail: `Audit Log Cleared` },
+    { channel: "memory", detail: `Neural Sync: ${(Math.random() * 100).toFixed(2)}%` },
+    { channel: "orbits", detail: `Active: ${Math.floor(Math.random() * 10)}` },
+    { channel: "threat", detail: `No threat anomalies` },
+    { channel: "governance", detail: `Directives validated @ ${new Date().toLocaleTimeString()}` }
+  ];
+
+  pulseChannels.forEach(({ channel, detail }) => {
+    document.dispatchEvent(new CustomEvent("sovereignPulse", {
+      detail: { channel, detail }
+    }));
+  });
+}, 4000);
+
   // Phase 17.1 — Subsystem Registry Initialization
   SageCraftAscendant.OperatorConsoleRegistry = {
     panels: {},
@@ -1552,6 +1570,11 @@ SageCraftAscendant.OperatorConsole = (function() {
     document.getElementById("exportMutationsBtn").addEventListener("click", () => {
       SageCraftAscendant.ForecastMutationLayer.exportMutatedForecasts();
     });
+
+    // 🧠 Emit operator console launch to SovereignBus
+    if (window.SovereignBus) {
+      SovereignBus.emit("operator.console", "Operator Command Console deployed.");
+    }
 
     console.log("✅ Operator Console fully rendered.");
   }
@@ -2393,3 +2416,11 @@ SageCraftAscendant.OperatorScripts = (function () {
     renderSubsystemNavigation
 };
 })();
+// === Telemetry Broadcast: Sovereign Pulse Vitals ===
+setInterval(() => {
+  const channel = "vitals";
+  const detail = `Core=${Math.floor(Math.random() * 8) + 3}, Drift=${(Math.random() * 1.25).toFixed(3)}`;
+  document.dispatchEvent(new CustomEvent("sovereignPulse", {
+    detail: { channel, detail }
+  }));
+}, 3000);

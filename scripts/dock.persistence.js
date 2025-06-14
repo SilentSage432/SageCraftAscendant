@@ -48,6 +48,10 @@ SageCraftAscendant.DockPersistence = (function () {
       SageCraftAscendant.DynamicOrbitalDock.renderDynamicDock();
     }
     console.log("🚀 Neural Dock restored from persisted registry.");
+    // 🧠 Emit dock restoration pulse to SovereignBus
+    if (window.SovereignBus) {
+      SovereignBus.emit("dock.persistence", "Neural Dock restored from persisted registry.");
+    }
   }
 
   return {

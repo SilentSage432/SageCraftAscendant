@@ -85,6 +85,11 @@ if (window.gatekeeperCore) {
 // Phase XXV-N — Echo Sync Calibration
 console.log("🔄 Echo Sync Calibration Initialized.");
 
+// 🧠 Emit memory bridge sync pulse
+if (window.SovereignBus) {
+  SovereignBus.emit("neuralMemoryBridge", "Echo Sync Calibration Initialized.");
+}
+
 for (let core in NeuralMemoryBridge.memoryCores) {
   const ref = NeuralMemoryBridge.memoryCores[core];
   if (typeof ref?.onEchoCalibration === "function") {
