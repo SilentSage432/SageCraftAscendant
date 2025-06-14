@@ -489,3 +489,13 @@ html {
     filter: drop-shadow(0 0 20px rgba(0, 255, 200, 1));
   }
 }
+
+/* 🧬 Phase 18008 — Whisperer Icon Radiance Enhancement */
+.orbit-btn.whisperer-orbit img {
+  filter: brightness(1.6) contrast(1.2) saturate(1.4) drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+  transition: filter 0.3s ease-in-out;
+}
+
+.orbit-btn.whisperer-orbit:hover img {
+  filter: brightness(1.8) contrast(1.4) saturate(1.6) drop-shadow(0 0 16px rgba(255, 255, 255, 0.8));
+}

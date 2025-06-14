@@ -269,6 +269,25 @@ export const GrimoireMemory = {
     }
   },
 
+  syncFromWhisperer(echoLogs = []) {
+    echoLogs.forEach(echo => {
+      const exists = this.entries.some(e => e.title === echo.title && e.origin === echo.origin);
+      if (!exists) {
+        this.recordEntry({
+          ...echo,
+          category: "systemEchoes",
+          tags: [...(echo.tags || []), "whisperer"],
+          locked: true,
+          unlockCondition: {
+            type: "manual"
+          }
+        });
+      }
+    });
+    this.saveToLocalStorage();
+    console.log(`👁️ Synced ${echoLogs.length} Whisperer echoes to Grimoire.`);
+  },
+
   syncFromSageFeed(feedData = []) {
     feedData.forEach(item => {
       const exists = this.entries.some(e => e.title === item.title && e.origin === item.origin);

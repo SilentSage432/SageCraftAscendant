@@ -6,6 +6,12 @@ const LoreKernel = {
 
   initialize(entries = []) {
     this.entries = entries;
+    // Bind Whisper-tagged entries with echo ID structure
+    for (const entry of entries) {
+      if (entry.tags?.includes("whisper") && !entry.id.startsWith("whisper-")) {
+        entry.id = `whisper-${entry.id}`;
+      }
+    }
     this.rebuildIndex();
     console.log("🧬 LoreKernel initialized with", entries.length, "entries.");
   },

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +13,28 @@
       <div class="whisperer-symbol">𓂀</div>
       <div id="whispererOutput" class="whisperer-message">The silence holds secrets...</div>
       <button id="whispererSummonBtn" class="whisperer-button">Whisper to Me</button>
+      <div id="whispererLogList" class="whisperer-log">
+        <h2 class="whisperer-log-title">Whispered Memories</h2>
+        <ul id="whispererLogEntries" class="whisperer-log-entries">
+          <!-- Whisper logs will appear here dynamically -->
+        </ul>
+      </div>
+      <!-- 📜 ECHO TABLE DISPLAY -->
+      <div id="whispererEchoTable" class="whisperer-echo-table">
+        <h2 class="whisperer-log-title">Echo Archive</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Origin</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="echoTableBody">
+            <!-- Echo entries will be dynamically injected here -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

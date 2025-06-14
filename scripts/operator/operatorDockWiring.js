@@ -1987,6 +1987,47 @@ if (whispererOrbitBtn && whispererPanel) {
   });
 }
 
+// === Whisperer Orbit Button Toggle Logic ===
+// Wire up the Whisperer orbit button to toggle the threshold panel
+const whispererOrbit = document.getElementById("orbitWhisperer");
+const whispererConsole = document.getElementById("whispererConsole");
+
+if (whispererOrbit && whispererConsole) {
+  whispererOrbit.addEventListener("click", () => {
+    togglePanel(whispererConsole);
+  });
+  console.log("🔗 Whisperer orbit wired to mesh.");
+}
+
+// 🧠 Whisperer Observer State Activation
+function logPanelActivity(panelId, action) {
+  const timestamp = new Date().toISOString();
+  const echo = `[${timestamp}] ${action}: ${panelId}`;
+  if (window.WhispererMemory) {
+    WhispererMemory.record(echo);
+    console.log(`📡 Whisperer Echo Logged: ${echo}`);
+  }
+}
+
+// Modify togglePanel function to include observer tap
+const originalTogglePanel = typeof togglePanel === "function" ? togglePanel : function(panel) {
+  if (!panel) return;
+  const isHidden = panel.classList.contains("hidden");
+  if (isHidden) {
+    panel.classList.remove("hidden");
+  } else {
+    panel.classList.add("hidden");
+  }
+};
+// Redefine togglePanel globally
+window.togglePanel = function(panel) {
+  if (!panel) return;
+  const isVisible = panel.style.display !== "none" && !panel.classList.contains("hidden");
+  const action = isVisible ? "Hide" : "Show";
+  logPanelActivity(panel.id, action);
+  originalTogglePanel(panel);
+};
+
 // === Reporting Hub Console Runtime Activation ===
 setTimeout(() => {
     const reportConsole = document.getElementById("reportingHubConsole");
