@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +30,49 @@
       <button id="next-page">Next ⟶</button>
     </div>
   </div>
+
+  <section class="grimoire-filter-panel">
+    <h2>🔍 Filter Entries</h2>
+    <label>
+      Tag:
+      <input type="text" id="filterTag" placeholder="e.g. rune" />
+    </label>
+    <label>
+      Origin:
+      <input type="text" id="filterOrigin" placeholder="e.g. The Engineer" />
+    </label>
+    <label>
+      Locked:
+      <select id="filterLocked">
+        <option value="">Any</option>
+        <option value="true">Locked</option>
+        <option value="false">Unlocked</option>
+      </select>
+    </label>
+    <label>
+      Archived:
+      <select id="filterArchived">
+        <option value="">Any</option>
+        <option value="true">Archived</option>
+        <option value="false">Active</option>
+      </select>
+    </label>
+    <button onclick="
+      const tag = document.getElementById('filterTag').value.trim();
+      const origin = document.getElementById('filterOrigin').value.trim();
+      const locked = document.getElementById('filterLocked').value;
+      const archived = document.getElementById('filterArchived').value;
+
+      const criteria = {};
+      if (tag) criteria.tag = tag;
+      if (origin) criteria.origin = origin;
+      if (locked !== '') criteria.locked = locked === 'true';
+      if (archived !== '') criteria.archived = archived === 'true';
+
+      const results = GrimoireMemory.applyFilter(criteria);
+      GrimoireMemory.renderTableTo('grimoireTablePanel', results);
+    ">Apply Filter</button>
+  </section>
 
   <script src="scripts/sagecraftascendant/sageGrimoire.js"></script>
 </body>
