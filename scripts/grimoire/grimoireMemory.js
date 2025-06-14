@@ -29,6 +29,13 @@ export const GrimoireMemory = {
           console.log(`🔓 [Grimoire Entry Unlocked] "${entry.title}" via ${companion} reaching state "${state}"`);
         }
       }
+      else if (type === "loreChain") {
+        const prerequisite = this.entries.find(e => e.title === entry.unlockCondition.dependsOn);
+        if (prerequisite && !prerequisite.locked) {
+          entry.locked = false;
+          console.log(`🔗 [Grimoire Entry Unlocked] "${entry.title}" via lore chain dependency "${prerequisite.title}"`);
+        }
+      }
 
       // Future unlockCondition types can be handled here (e.g., tagTrigger, manual)
     });
@@ -46,6 +53,25 @@ export const GrimoireMemory = {
     return this.entries.find(entry => entry.id === id);
   },
 
+  editEntry(id, newContent) {
+    const entry = this.getEntryById(id);
+    if (entry) {
+      entry.content = newContent;
+      entry.timestamp = new Date().toISOString();
+      console.log(`✏️ [Grimoire Entry Edited] "${entry.title}"`);
+      this.saveToLocalStorage();
+    }
+  },
+
+  archiveEntry(id) {
+    const entry = this.getEntryById(id);
+    if (entry) {
+      entry.archived = true;
+      console.log(`📦 [Grimoire Entry Archived] "${entry.title}"`);
+      this.saveToLocalStorage();
+    }
+  },
+
   renderTo(containerId = "grimoirePanelContent") {
     const container = document.getElementById(containerId);
     if (!container) {
@@ -56,6 +82,8 @@ export const GrimoireMemory = {
     container.innerHTML = "";
 
     this.entries.forEach(entry => {
+      if (entry.archived) return;
+
       const entryEl = document.createElement("div");
       entryEl.className = "grimoire-entry" + (entry.locked ? " locked" : "");
 
@@ -72,6 +100,29 @@ export const GrimoireMemory = {
       contentEl.className = "grimoire-content";
       contentEl.textContent = entry.locked ? "This memory is currently locked." : entry.content;
       entryEl.appendChild(contentEl);
+
+      // --- Edit Button ---
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "✏️ Edit";
+      editBtn.onclick = () => {
+        const newContent = prompt("Edit memory content:", entry.content);
+        if (newContent !== null) {
+          this.editEntry(entry.id, newContent);
+          this.renderTo(containerId);
+        }
+      };
+      entryEl.appendChild(editBtn);
+
+      // --- Archive Button ---
+      const archiveBtn = document.createElement("button");
+      archiveBtn.textContent = "📦 Archive";
+      archiveBtn.onclick = () => {
+        if (confirm(`Are you sure you want to archive "${entry.title}"?`)) {
+          this.archiveEntry(entry.id);
+          this.renderTo(containerId);
+        }
+      };
+      entryEl.appendChild(archiveBtn);
 
       container.appendChild(entryEl);
     });
@@ -136,6 +187,18 @@ GrimoireMemory.recordEntry({
   origin: "The Archivist",
   tags: ["origin", "lore", "echo"],
   locked: false
+});
+
+GrimoireMemory.recordEntry({
+  title: "The Rune’s Echo",
+  content: "The echo of the lost rune resonates only after its inscription is deciphered.",
+  origin: "The Engineer",
+  tags: ["rune", "echo", "follow-up"],
+  locked: true,
+  unlockCondition: {
+    type: "loreChain",
+    dependsOn: "The Lost Rune"
+  }
 });
 
 GrimoireMemory.saveToLocalStorage();
