@@ -75,5 +75,38 @@ export const GrimoireMemory = {
 
       container.appendChild(entryEl);
     });
-  }
+  },
+
+  saveToLocalStorage() {
+    try {
+      const data = JSON.stringify(this.entries);
+      localStorage.setItem("grimoireEntries", data);
+      console.log("💾 Grimoire entries saved to localStorage.");
+    } catch (err) {
+      console.error("Failed to save Grimoire entries:", err);
+    }
+  },
+
+  loadFromLocalStorage() {
+    try {
+      const data = localStorage.getItem("grimoireEntries");
+      if (!data) return;
+      const parsed = JSON.parse(data);
+      this.entries = parsed;
+      console.log("📥 Grimoire entries loaded from localStorage.");
+    } catch (err) {
+      console.error("Failed to load Grimoire entries:", err);
+    }
+  },
 };
+
+// --- GrimoireMemory: Inject "The First Echo" Entry ---
+GrimoireMemory.loadFromLocalStorage();
+GrimoireMemory.recordEntry({
+  title: "The First Echo",
+  content: "In the silence before the stars aligned, a single whisper awakened the forge of thought.",
+  origin: "The Archivist",
+  tags: ["origin", "lore", "echo"],
+  locked: false
+});
+GrimoireMemory.saveToLocalStorage();
