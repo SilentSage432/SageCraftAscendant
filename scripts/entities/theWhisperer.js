@@ -37,35 +37,6 @@ const WhispererMemory = {
 
 WhispererMemory.load(); // Initialize memory on load
 
-function renderEchoTable() {
-  const echoTable = document.getElementById("echoTableBody");
-  if (!echoTable) {
-    console.warn("📭 Echo Table body not found.");
-    return;
-  }
-
-  const echoes = WhispererMemory.getAll().slice().reverse();
-
-  for (const { entry, timestamp } of echoes) {
-    const tr = document.createElement("tr");
-
-    const timeCell = document.createElement("td");
-    timeCell.textContent = new Date(timestamp).toLocaleString();
-
-    const originCell = document.createElement("td");
-    originCell.textContent = "The Whisperer";
-
-    const msgCell = document.createElement("td");
-    msgCell.textContent = entry;
-
-    tr.appendChild(timeCell);
-    tr.appendChild(originCell);
-    tr.appendChild(msgCell);
-    echoTable.appendChild(tr);
-  }
-
-  console.log(`📡 Rendered ${echoes.length} echoes into the Echo Table.`);
-}
 
 // 🌫️ theWhisperer.js — Phase XXIV: Whisperer Genesis Protocol
 
@@ -141,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  renderEchoTable();
 
   // Echo listening hook for sovereign echo bridge
   document.addEventListener("whispererEcho", (e) => {
