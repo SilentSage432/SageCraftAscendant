@@ -87,21 +87,49 @@ export const GrimoireMemory = {
     }
   },
 
-  loadFromLocalStorage() {
+  loadFromLocalStorage(companions = {}) {
     try {
       const data = localStorage.getItem("grimoireEntries");
       if (!data) return;
       const parsed = JSON.parse(data);
       this.entries = parsed;
+      this.evaluateUnlocks(companions);
       console.log("📥 Grimoire entries loaded from localStorage.");
     } catch (err) {
       console.error("Failed to load Grimoire entries:", err);
     }
   },
+
+  syncFromSageFeed(feedData = []) {
+    feedData.forEach(item => {
+      const exists = this.entries.some(e => e.title === item.title && e.origin === item.origin);
+      if (!exists) {
+        this.recordEntry(item);
+      }
+    });
+    this.saveToLocalStorage();
+    console.log(`🔁 Synced ${feedData.length} entries from Sage Feed.`);
+  },
 };
 
-// --- GrimoireMemory: Inject "The First Echo" Entry ---
-GrimoireMemory.loadFromLocalStorage();
+// --- GrimoireMemory: Inject Entries with Locked Unlock Condition ---
+GrimoireMemory.loadFromLocalStorage({
+  silentSage: { state: "awakened" }
+});
+
+GrimoireMemory.recordEntry({
+  title: "The Lost Rune",
+  content: "Etched in forgotten dialect, this rune holds secrets known only to the awakened Silent Sage.",
+  origin: "The Gatekeeper",
+  tags: ["rune", "forgotten", "sage"],
+  locked: true,
+  unlockCondition: {
+    type: "companionState",
+    companion: "silentSage",
+    state: "awakened"
+  }
+});
+
 GrimoireMemory.recordEntry({
   title: "The First Echo",
   content: "In the silence before the stars aligned, a single whisper awakened the forge of thought.",
@@ -109,4 +137,5 @@ GrimoireMemory.recordEntry({
   tags: ["origin", "lore", "echo"],
   locked: false
 });
+
 GrimoireMemory.saveToLocalStorage();
