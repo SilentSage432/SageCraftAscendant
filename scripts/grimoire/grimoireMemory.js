@@ -81,6 +81,31 @@ export const GrimoireMemory = {
 
     container.innerHTML = "";
 
+    // --- Dynamic Tag Filter UI ---
+    const allTags = [...new Set(this.entries.flatMap(entry => entry.tags))].sort();
+    if (allTags.length > 0) {
+      const filterWrapper = document.createElement("div");
+      filterWrapper.className = "grimoire-filter-wrapper";
+
+      const filterLabel = document.createElement("label");
+      filterLabel.textContent = "Filter by Tag: ";
+      filterLabel.setAttribute("for", "grimoireTagFilter");
+      filterWrapper.appendChild(filterLabel);
+
+      const tagSelect = document.createElement("select");
+      tagSelect.id = "grimoireTagFilter";
+      tagSelect.innerHTML = `<option value="">-- All Tags --</option>` + allTags.map(tag => `<option value="${tag}">${tag}</option>`).join("");
+
+      tagSelect.addEventListener("change", () => {
+        const selectedTag = tagSelect.value;
+        const filtered = selectedTag ? this.applyFilter({ tag: selectedTag }) : this.entries;
+        this.renderTableTo(containerId, filtered);
+      });
+
+      filterWrapper.appendChild(tagSelect);
+      container.appendChild(filterWrapper);
+    }
+
     this.entries.forEach(entry => {
       if (entry.archived) return;
 
@@ -185,6 +210,46 @@ export const GrimoireMemory = {
         <th>Actions</th>
       </tr>
     `;
+    // --- Add column sorting behavior ---
+    const headers = thead.querySelectorAll("th");
+    let currentSortColumn = null;
+    let ascending = true;
+
+    headers.forEach((header, index) => {
+      header.style.cursor = "pointer";
+      header.addEventListener("click", () => {
+        const keyMap = ["title", "origin", "tags", "status", "timestamp"];
+        const key = keyMap[index];
+
+        if (!key) return;
+
+        ascending = currentSortColumn === key ? !ascending : true;
+        currentSortColumn = key;
+
+        const sortedEntries = [...(entries || this.entries)].sort((a, b) => {
+          let aVal = a[key] || "";
+          let bVal = b[key] || "";
+
+          if (key === "tags") {
+            aVal = aVal.join(", ");
+            bVal = bVal.join(", ");
+          } else if (key === "status") {
+            aVal = a.archived ? "Archived" : a.locked ? "Locked" : "Unlocked";
+            bVal = b.archived ? "Archived" : b.locked ? "Locked" : "Unlocked";
+          } else if (key === "timestamp") {
+            aVal = new Date(a.timestamp).getTime();
+            bVal = new Date(b.timestamp).getTime();
+            // For timestamps, sort numerically
+            return ascending ? aVal - bVal : bVal - aVal;
+          }
+
+          return ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+
+        this.renderTableTo(containerId, sortedEntries);
+      });
+    });
+    // --- End sorting behavior ---
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
