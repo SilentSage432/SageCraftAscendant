@@ -1,7 +1,7 @@
 export const GrimoireMemory = {
   entries: [],
 
-  recordEntry({ title, content, origin = "Unknown", tags = [], locked = false, unlockCondition = null }) {
+  recordEntry({ title, content, origin = "Unknown", tags = [], locked = false, unlockCondition = null, category = "Uncategorized" }) {
     const entry = {
       id: `entry_${Date.now()}`,
       title,
@@ -10,6 +10,7 @@ export const GrimoireMemory = {
       tags,
       locked,
       unlockCondition,
+      category,
       timestamp: new Date().toISOString()
     };
     this.entries.push(entry);
@@ -129,12 +130,9 @@ export const GrimoireMemory = {
       // --- Edit Button ---
       const editBtn = document.createElement("button");
       editBtn.textContent = "✏️ Edit";
-      editBtn.onclick = () => {
-        const newContent = prompt("Edit memory content:", entry.content);
-        if (newContent !== null) {
-          this.editEntry(entry.id, newContent);
-          this.renderTo(containerId);
-        }
+      editBtn.onclick = (e) => {
+        e.stopPropagation();
+        populateEditorModal(entry);
       };
       entryEl.appendChild(editBtn);
 
@@ -149,8 +147,103 @@ export const GrimoireMemory = {
       };
       entryEl.appendChild(archiveBtn);
 
+      // --- Modal Detail View on Entry Click ---
+      entryEl.addEventListener("click", () => {
+        const modal = document.getElementById("grimoireDetailModal");
+        document.getElementById("modalEntryTitle").textContent = entry.title + (entry.locked ? " 🔒" : "");
+        document.getElementById("modalEntryMeta").textContent = `From: ${entry.origin} • ${new Date(entry.timestamp).toLocaleString()}`;
+        document.getElementById("modalEntryContent").textContent = entry.content;
+        document.getElementById("modalEntryTags").textContent = "Tags: " + (entry.tags.length ? entry.tags.join(", ") : "None");
+        document.getElementById("modalEntryUnlock").textContent = entry.locked
+          ? `Unlock Condition: ${entry.unlockCondition ? JSON.stringify(entry.unlockCondition) : "Unknown"}`
+          : "";
+        modal.classList.remove("hidden");
+      });
+
       container.appendChild(entryEl);
     });
+
+    // --- Modal Template Injection ---
+    if (!document.getElementById("grimoireDetailModal")) {
+      const modal = document.createElement("div");
+      modal.id = "grimoireDetailModal";
+      modal.className = "grimoire-modal hidden";
+      modal.innerHTML = `
+        <div class="grimoire-modal-content">
+          <span class="grimoire-close-button" id="closeGrimoireModal">&times;</span>
+          <h2 id="modalEntryTitle"></h2>
+          <p id="modalEntryMeta"></p>
+          <p id="modalEntryContent"></p>
+          <p id="modalEntryTags"></p>
+          <p id="modalEntryUnlock"></p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      document.getElementById("closeGrimoireModal").onclick = () => {
+        modal.classList.add("hidden");
+      };
+    }
+
+    // --- Lore Entry Editor Modal ---
+    if (!document.getElementById("grimoireEditorModal")) {
+      const editorModal = document.createElement("div");
+      editorModal.id = "grimoireEditorModal";
+      editorModal.className = "grimoire-modal hidden";
+      editorModal.innerHTML = `
+        <div class="grimoire-modal-content">
+          <span class="grimoire-close-button" id="closeEditorModal">&times;</span>
+          <h2>Edit Grimoire Entry</h2>
+          <label for="editorTitle">Title:</label>
+          <input type="text" id="editorTitle" />
+
+          <label for="editorContent">Content:</label>
+          <textarea id="editorContent" rows="5"></textarea>
+
+          <label for="editorTags">Tags (comma separated):</label>
+          <input type="text" id="editorTags" />
+
+          <button id="saveEditorBtn">💾 Save</button>
+        </div>
+      `;
+      document.body.appendChild(editorModal);
+
+      document.getElementById("closeEditorModal").onclick = () => {
+        editorModal.classList.add("hidden");
+      };
+    }
+
+    // --- Populate Editor Modal Function ---
+    function populateEditorModal(entry) {
+      document.getElementById("editorTitle").value = entry.title;
+      document.getElementById("editorContent").value = entry.content;
+      document.getElementById("editorTags").value = entry.tags.join(", ");
+
+      document.getElementById("saveEditorBtn").onclick = () => {
+        entry.title = document.getElementById("editorTitle").value;
+        entry.content = document.getElementById("editorContent").value;
+        entry.tags = document.getElementById("editorTags").value.split(",").map(t => t.trim());
+        entry.timestamp = new Date().toISOString();
+
+        GrimoireMemory.saveToLocalStorage();
+        GrimoireMemory.renderTo();
+        document.getElementById("grimoireEditorModal").classList.add("hidden");
+      };
+
+      document.getElementById("grimoireEditorModal").classList.remove("hidden");
+    }
+  },
+
+  initializeFromKernel(kernelEntries = []) {
+    kernelEntries.forEach(entry => {
+      const exists = this.entries.some(e => e.title === entry.title && e.origin === entry.origin);
+      if (!exists) {
+        this.entries.push(entry);
+      }
+    });
+    this.evaluateUnlocks();
+    this.saveToLocalStorage();
+    console.log(`🧠 Grimoire synchronized from Lore Kernel with ${kernelEntries.length} entries.`);
   },
 
   saveToLocalStorage() {
@@ -205,6 +298,7 @@ export const GrimoireMemory = {
         <th>Title</th>
         <th>Origin</th>
         <th>Tags</th>
+        <th>Category</th>
         <th>Status</th>
         <th>Timestamp</th>
         <th>Actions</th>
@@ -218,7 +312,7 @@ export const GrimoireMemory = {
     headers.forEach((header, index) => {
       header.style.cursor = "pointer";
       header.addEventListener("click", () => {
-        const keyMap = ["title", "origin", "tags", "status", "timestamp"];
+        const keyMap = ["title", "origin", "tags", "category", "status", "timestamp"];
         const key = keyMap[index];
 
         if (!key) return;
@@ -268,6 +362,10 @@ export const GrimoireMemory = {
       const tagsCell = document.createElement("td");
       tagsCell.textContent = entry.tags.join(", ");
       row.appendChild(tagsCell);
+
+      const categoryCell = document.createElement("td");
+      categoryCell.textContent = entry.category;
+      row.appendChild(categoryCell);
 
       const statusCell = document.createElement("td");
       statusCell.textContent = entry.archived ? "Archived" : entry.locked ? "Locked" : "Unlocked";
@@ -327,6 +425,10 @@ export const GrimoireMemory = {
       filtered = filtered.filter(entry => entry.archived === criteria.archived);
     }
 
+    if (criteria.category) {
+      filtered = filtered.filter(entry => entry.category === criteria.category);
+    }
+
     return filtered;
   },
 };
@@ -370,3 +472,7 @@ GrimoireMemory.recordEntry({
 });
 
 GrimoireMemory.saveToLocalStorage();
+
+// --- Phase XXXI: Kernel Bootstrap Integration ---
+import { LoreKernel } from "./loreKernel.js";
+GrimoireMemory.initializeFromKernel(LoreKernel.entries);

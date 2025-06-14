@@ -31,6 +31,9 @@
     </div>
   </div>
 
+  <!-- Rendered Grimoire Table Output -->
+  <div id="grimoirePanelContent" class="grimoire-rendered-output"></div>
+
   <section class="grimoire-filter-panel">
     <h2>🔍 Filter Entries</h2>
     <label>
@@ -74,6 +77,44 @@
     ">Apply Filter</button>
   </section>
 
-  <script src="scripts/sagecraftascendant/sageGrimoire.js"></script>
+
+  <!-- Lore Entry Editor Modal -->
+  <div id="grimoireEditorModal" class="grimoire-modal hidden">
+    <div class="grimoire-modal-content">
+      <span class="grimoire-close-button" id="closeGrimoireEditor">&times;</span>
+      <h2 id="editorModalTitle">📝 Edit Lore Entry</h2>
+
+      <label for="editorTitle">Title:</label>
+      <input type="text" id="editorTitle" />
+
+      <label for="editorContent">Content:</label>
+      <textarea id="editorContent" rows="6"></textarea>
+
+      <label for="editorOrigin">Origin:</label>
+      <input type="text" id="editorOrigin" />
+
+      <label for="editorTags">Tags (comma-separated):</label>
+      <input type="text" id="editorTags" />
+
+      <label for="editorCategory">Category:</label>
+      <input type="text" id="editorCategory" />
+
+      <label for="editorLocked">Locked:</label>
+      <select id="editorLocked">
+        <option value="false">Unlocked</option>
+        <option value="true">Locked</option>
+      </select>
+
+      <button id="saveGrimoireEntry">💾 Save Entry</button>
+    </div>
+  </div>
 </body>
+<script type="module">
+  import { GrimoireMemory } from './scripts/grimoire/grimoireMemory.js';
+
+  document.addEventListener("DOMContentLoaded", () => {
+    GrimoireMemory.loadFromLocalStorage();
+    GrimoireMemory.renderTo("grimoirePanelContent");
+  });
+</script>
 </html>
