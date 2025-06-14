@@ -1987,6 +1987,11 @@ if (whispererOrbitBtn && whispererPanel) {
   });
 }
 
+// === Whisperer Orbit Button: Toggle Whisperer Console Panel ===
+document.getElementById("whispererOrbitBtn")?.addEventListener("click", () => {
+  toggleConsolePanel("whispererConsolePanel");
+});
+
 // === Whisperer Orbit Button Toggle Logic ===
 // Wire up the Whisperer orbit button to toggle the threshold panel
 const whispererOrbit = document.getElementById("orbitWhisperer");

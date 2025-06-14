@@ -459,9 +459,11 @@
       <button class="orbit-btn" data-target="oracleConsole">
         <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
       </button>
-      <button class="orbit-btn" id="whispererOrbitBtn" data-panel="whispererPanel">
-        <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
-      </button>
+      <div class="whisperer-orbit-container">
+        <button class="orbit-btn" id="whispererOrbit" data-panel="whispererPanel">
+          <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
+        </button>
+      </div>
       <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
         <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console">
       </button>
@@ -475,6 +477,30 @@
   <div id="dockGrid" class="dock-grid hidden">
     <!-- Panels will populate here dynamically -->
   </div>
+
+  <script>
+    const whispererBtn = document.getElementById("whispererOrbit");
+
+    let pressTimer;
+
+    if (whispererBtn) {
+      whispererBtn.addEventListener("touchstart", () => {
+        pressTimer = setTimeout(() => {
+          window.open("whisperer.html", "_blank");
+        }, 600); // Long press threshold
+      });
+
+      whispererBtn.addEventListener("touchend", () => {
+        clearTimeout(pressTimer);
+      });
+
+      whispererBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        // TODO: Toggle inline panel logic goes here
+        console.log("Inline Whisperer toggle (coming soon)");
+      });
+    }
+  </script>
   <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
   <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -641,6 +667,13 @@
         <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
         <button class="inject-feed">Inject Memory</button>
         <div id="feedLog"></div>
+      </div>
+      <div id="whispererConsolePanel" class="dock-panel hidden">
+        <div class="panel-header">The Whisperer</div>
+        <div class="panel-content">
+          <p>Listening beyond the veil...</p>
+          <!-- Placeholder for live memory stream or cryptic responses -->
+        </div>
       </div>
       <div id="utilityHubConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
