@@ -161,6 +161,109 @@ export const GrimoireMemory = {
     this.saveToLocalStorage();
     console.log(`🔁 Synced ${feedData.length} entries from Sage Feed.`);
   },
+  // --- Render a sortable table of all entries ---
+  renderTableTo(containerId = "grimoireTablePanel", entries = null) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.warn(`Grimoire table container "${containerId}" not found.`);
+      return;
+    }
+
+    container.innerHTML = "";
+
+    const table = document.createElement("table");
+    table.className = "grimoire-table";
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = `
+      <tr>
+        <th>Title</th>
+        <th>Origin</th>
+        <th>Tags</th>
+        <th>Status</th>
+        <th>Timestamp</th>
+        <th>Actions</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    (entries || this.entries).forEach(entry => {
+      const row = document.createElement("tr");
+
+      const titleCell = document.createElement("td");
+      titleCell.textContent = entry.title;
+      row.appendChild(titleCell);
+
+      const originCell = document.createElement("td");
+      originCell.textContent = entry.origin;
+      row.appendChild(originCell);
+
+      const tagsCell = document.createElement("td");
+      tagsCell.textContent = entry.tags.join(", ");
+      row.appendChild(tagsCell);
+
+      const statusCell = document.createElement("td");
+      statusCell.textContent = entry.archived ? "Archived" : entry.locked ? "Locked" : "Unlocked";
+      row.appendChild(statusCell);
+
+      const timeCell = document.createElement("td");
+      timeCell.textContent = new Date(entry.timestamp).toLocaleString();
+      row.appendChild(timeCell);
+
+      const actionsCell = document.createElement("td");
+
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "✏️";
+      editBtn.onclick = () => {
+        const newContent = prompt("Edit memory content:", entry.content);
+        if (newContent !== null) {
+          this.editEntry(entry.id, newContent);
+          this.renderTableTo(containerId);
+        }
+      };
+      actionsCell.appendChild(editBtn);
+
+      const archiveBtn = document.createElement("button");
+      archiveBtn.textContent = "📦";
+      archiveBtn.onclick = () => {
+        if (confirm(`Archive "${entry.title}"?`)) {
+          this.archiveEntry(entry.id);
+          this.renderTableTo(containerId);
+        }
+      };
+      actionsCell.appendChild(archiveBtn);
+
+      row.appendChild(actionsCell);
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+  },
+
+  applyFilter(criteria = {}) {
+    let filtered = this.entries;
+
+    if (criteria.tag) {
+      filtered = filtered.filter(entry => entry.tags.includes(criteria.tag));
+    }
+
+    if (criteria.origin) {
+      filtered = filtered.filter(entry => entry.origin === criteria.origin);
+    }
+
+    if (typeof criteria.locked === "boolean") {
+      filtered = filtered.filter(entry => entry.locked === criteria.locked);
+    }
+
+    if (typeof criteria.archived === "boolean") {
+      filtered = filtered.filter(entry => entry.archived === criteria.archived);
+    }
+
+    return filtered;
+  },
 };
 
 // --- GrimoireMemory: Inject Entries with Locked Unlock Condition ---

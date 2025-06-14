@@ -462,6 +462,10 @@
       <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
         <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console">
       </button>
+      <!-- 🪐 Grimoire Orbit Button -->
+      <button class="orbit-btn" data-target="grimoireConsole" title="Grimoire Console">
+        <img src="assets/icons/icon-grimoire-glyph.png" alt="Grimoire Console" />
+      </button>
     </div>
   </div>
   <!-- Fallback Dock Grid Container -->
@@ -653,6 +657,26 @@
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
     </div>
     <!-- 🧠 End Console Panel Group -->
+    <!-- 📖 Grimoire Console Panel -->
+    <section id="grimoireConsole" class="holo-console hidden" aria-hidden="true">
+      <h2 class="console-title">📖 Grimoire Console</h2>
+      <div id="grimoirePanelContent">
+        <p>Select a memory node to review its imprint...</p>
+      </div>
+      <!-- Lore Archive Table Panel: injected below main lore log panel -->
+      <section id="grimoireTablePanel" class="grimoire-table-panel">
+        <h2>📚 Lore Archive Table</h2>
+        <!-- Table will be rendered here by JS -->
+      </section>
+    </section>
+<!-- Grimoire Lore Table Render Trigger -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.GrimoireMemory && typeof GrimoireMemory.renderTableTo === "function") {
+      GrimoireMemory.renderTableTo("grimoireTablePanel");
+    }
+  });
+</script>
   </main>
 
 <!-- Phase 201.2 — Neural Intake Uploader binding -->

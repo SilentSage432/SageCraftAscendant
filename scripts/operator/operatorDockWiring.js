@@ -1437,6 +1437,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const consolePanel = document.getElementById(targetId);
       if (consolePanel) {
         consolePanel.classList.toggle("open");
+        // --- Render GrimoireMemory if toggling grimoireConsole ---
+        if (targetId === "grimoireConsole" && typeof GrimoireMemory !== "undefined" && typeof GrimoireMemory.renderTo === "function") {
+          GrimoireMemory.renderTo();
+        }
       }
     });
   });

@@ -45,7 +45,14 @@ window.TerminalCommands = {
     const c = companions[companionId];
     if (!c) return console.warn(`No such companion: ${companionId}`);
     console.log(c.statusReport());
-  }
+  },
+
+  revealGrimoire() {
+    const sigil = document.getElementById("grimoireSigil");
+    if (!sigil) return console.warn("Grimoire sigil element not found.");
+    sigil.classList.add("visible");
+    console.log("📖 Grimoire sigil revealed.");
+  },
 };
 
 console.log("🧠 TerminalCommands loaded. Use TerminalCommands.recordLore(), injectMemory(), listLore(), and more.");
