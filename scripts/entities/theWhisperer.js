@@ -1,4 +1,5 @@
 // 🧠 Whisperer Memory Core Genesis — Phase XXV-A
+console.log("👁️ theWhisperer.js module online — Echo functions standing by.");
 const WhispererMemory = {
   _log: [],
 
@@ -7,6 +8,8 @@ const WhispererMemory = {
     const memory = { entry, timestamp };
     this._log.push(memory);
     console.log(`🪬 [Whisperer Log Entry] ${entry} @ ${timestamp}`);
+    const echoEvent = new CustomEvent("whispererEcho", { detail: memory });
+    document.dispatchEvent(echoEvent);
     this.save();
   },
 
@@ -112,4 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderEchoTable();
+
+  // Echo listening hook for sovereign echo bridge
+  document.addEventListener("whispererEcho", (e) => {
+    console.log("📡 Whisperer Echo Dispatched:", e.detail);
+  });
 });

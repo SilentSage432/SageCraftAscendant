@@ -460,8 +460,8 @@
         <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
       </button>
       <div class="whisperer-orbit-container">
-        <button id="whispererOrbitBtn" class="orbit-btn">
-          <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Orbit Icon" />
+        <button id="whispererOrbitBtn" class="orbit-btn" onclick="window.open('whisperer.html', '_blank')">
+          <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Orbit Icon" style="pointer-events: none;" />
         </button>
       </div>
       <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
@@ -479,27 +479,29 @@
   </div>
 
   <script>
-    const whispererBtn = document.getElementById("whispererOrbit");
+    document.addEventListener("DOMContentLoaded", () => {
+      const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
 
-    let pressTimer;
+      if (!whispererOrbitBtn) return;
 
-    if (whispererBtn) {
-      whispererBtn.addEventListener("touchstart", () => {
+      let pressTimer;
+
+      whispererOrbitBtn.addEventListener("touchstart", () => {
         pressTimer = setTimeout(() => {
           window.open("whisperer.html", "_blank");
         }, 600); // Long press threshold
       });
 
-      whispererBtn.addEventListener("touchend", () => {
+      whispererOrbitBtn.addEventListener("touchend", () => {
         clearTimeout(pressTimer);
       });
 
-      whispererBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        // TODO: Toggle inline panel logic goes here
-        console.log("Inline Whisperer toggle (coming soon)");
+      whispererOrbitBtn.addEventListener("dblclick", () => {
+        window.open("whisperer.html", "_blank");
       });
-    }
+
+      // Do not override click behavior — it's handled globally
+    });
   </script>
   <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
   <script>
@@ -667,12 +669,6 @@
         <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
         <button class="inject-feed">Inject Memory</button>
         <div id="feedLog"></div>
-      </div>
-      <div id="whispererConsolePanel" class="dock-panel hidden">
-        <div class="panel-header">The Whisperer</div>
-        <div class="panel-content">
-          <p>Listening beyond the veil...</p>
-        </div>
       </div>
       <div id="utilityHubConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>

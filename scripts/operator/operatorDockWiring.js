@@ -1642,6 +1642,14 @@ OperatorDockWiring.registerSubsystemDock({
 
 // === Additional Subsystem Dock Registrations ===
 OperatorDockWiring.registerSubsystemDock({
+    dockId: "whispererConsole",
+    onClick: () => {
+        console.log("👁 Whisperer Console Activated");
+        alert("🧠 Whisperer Mesh Online — Listening Beyond the Veil...");
+    },
+    visible: false
+});
+OperatorDockWiring.registerSubsystemDock({
     dockId: "count",
     onClick: () => {
         console.log("📊 Sovereign Live Counts Panel Activated");
@@ -1979,18 +1987,35 @@ setTimeout(() => {
 // === Whisperer Orbit Button Toggle Logic (Refactored for DOMContentLoaded) ===
 document.addEventListener("DOMContentLoaded", () => {
   const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
-  const whispererConsolePanel = document.getElementById("whispererConsolePanel");
+  const whispererConsolePanel = document.getElementById("whispererConsole");
 
   if (whispererOrbitBtn && whispererConsolePanel) {
     console.log("🌀 Whisperer orbit wired successfully.");
     whispererOrbitBtn.addEventListener("click", () => {
       whispererConsolePanel.classList.toggle("hidden");
-      console.log("👁️ Whisperer panel toggled.");
+      logPanelActivity("whispererConsole", "Toggled");
     });
   } else {
     console.warn("⚠️ Whisperer orbit or console panel not found in DOM.");
   }
 });
+
+// === Whisperer Orbit Listener Fallback (using SafeBind) ===
+setTimeout(() => {
+    const panel = document.getElementById("whispererConsole");
+    if (!panel) {
+      console.warn("⚠️ [SafeBind] whispererConsole panel not found.");
+      return;
+    }
+  
+    const toggleWhispererPanel = () => {
+      panel.classList.toggle("hidden");
+      logPanelActivity("whispererConsole", "Toggled");
+      console.log("👁️ Whisperer panel toggled.");
+    };
+  
+    SafeBind("whispererOrbitBtn", "click", toggleWhispererPanel);
+  }, 1800);
 
 // 🧠 Whisperer Observer State Activation
 function logPanelActivity(panelId, action) {
