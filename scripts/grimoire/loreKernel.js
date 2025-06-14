@@ -55,4 +55,25 @@ const LoreKernel = {
   }
 };
 
+
+// NeuralMesh Whisperer registration
+if (window?.NeuralMesh?.registerEntity) {
+  NeuralMesh.registerEntity("whisperer", {
+    activate: () => {
+      const threshold = document.getElementById("whispererThreshold");
+      if (threshold) threshold.classList.remove("hidden");
+    },
+    transmit: (msg) => {
+      console.log("🕯️ Whisperer received transmission:", msg);
+      // Future: respond with cryptic lore or delayed output
+    },
+    fetchMemory: () => {
+      return LoreKernel.entries.filter(e => e.tags?.includes("whisper"));
+    }
+  });
+  console.log("🔗 Whisperer registered with Neural Mesh.");
+} else {
+  console.warn("⚠️ NeuralMesh not found. Whisperer registration skipped.");
+}
+
 export { LoreKernel };

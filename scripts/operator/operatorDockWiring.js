@@ -1957,24 +1957,35 @@ setTimeout(() => {
       console.warn("⚠️ Delta scan button not found — skipping listener attachment.");
     }
 
-    // Example of replacing direct addEventListener calls with SafeBind for robust error handling
-    // Replace the following lines (if they exist elsewhere in the file or are added in the future):
-    // document.getElementById("scanTime").addEventListener("click", handleScanTime);
-    // document.getElementById("driftSpan").addEventListener("click", handleDriftSpan);
-    // document.getElementById("spikeSpan").addEventListener("click", handleSpikeSpan);
-    // document.getElementById("logList").addEventListener("click", handleLogList);
-    // document.getElementById("sessionManagerBtn").addEventListener("click", openSessionManager);
-    // document.getElementById("someOtherBtn").addEventListener("click", handleOtherAction);
-    // With:
-    // SafeBind("scanTime", "click", handleScanTime);
-    // SafeBind("driftSpan", "click", handleDriftSpan);
-    // SafeBind("spikeSpan", "click", handleSpikeSpan);
-    // SafeBind("logList", "click", handleLogList);
-    // SafeBind("sessionManagerBtn", "click", openSessionManager);
-    // SafeBind("someOtherBtn", "click", handleOtherAction);
+// Example of replacing direct addEventListener calls with SafeBind for robust error handling
+// Replace the following lines (if they exist elsewhere in the file or are added in the future):
+// document.getElementById("scanTime").addEventListener("click", handleScanTime);
+// document.getElementById("driftSpan").addEventListener("click", handleDriftSpan);
+// document.getElementById("spikeSpan").addEventListener("click", handleSpikeSpan);
+// document.getElementById("logList").addEventListener("click", handleLogList);
+// document.getElementById("sessionManagerBtn").addEventListener("click", openSessionManager);
+// document.getElementById("someOtherBtn").addEventListener("click", handleOtherAction);
+// With:
+// SafeBind("scanTime", "click", handleScanTime);
+// SafeBind("driftSpan", "click", handleDriftSpan);
+// SafeBind("spikeSpan", "click", handleSpikeSpan);
+// SafeBind("logList", "click", handleLogList);
+// SafeBind("sessionManagerBtn", "click", openSessionManager);
+// SafeBind("someOtherBtn", "click", handleOtherAction);
 
     mockScan();
 }, 1300);
+
+// === Whisperer Orbit Button Toggle Logic ===
+// Wire up the Whisperer orbit button to toggle the threshold panel
+const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
+const whispererPanel = document.getElementById("whispererThreshold");
+
+if (whispererOrbitBtn && whispererPanel) {
+  whispererOrbitBtn.addEventListener("click", () => {
+    whispererPanel.classList.toggle("hidden");
+  });
+}
 
 // === Reporting Hub Console Runtime Activation ===
 setTimeout(() => {
