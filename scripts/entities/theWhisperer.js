@@ -1,4 +1,61 @@
 // === Early whispererVitals hook to capture events before DOMContentLoaded ===
+
+import { classifyLogEntry } from "../systems/logClassifier.js";
+
+// === Sovereign Tier Override Infrastructure — Phase 16010.1 ===
+const OPERATOR_TIERS = {
+  INITIATE: 0,
+  APPRENTICE: 1,
+  ASCENDANT: 2,
+  SOVEREIGN: 3
+};
+
+let currentOperatorTier = OPERATOR_TIERS.SOVEREIGN; // default for development
+console.log("🔐 Sovereign Tier Override Infrastructure Initialized. Current Tier:", Object.keys(OPERATOR_TIERS)[currentOperatorTier]);
+
+// SovereignAuth overlay login listener
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("sovereignAuthBtn");
+  const input = document.getElementById("sovereignPass");
+
+  if (loginBtn && input) {
+    loginBtn.addEventListener("click", () => {
+      const pass = input.value?.trim();
+      if (window.SovereignAuth?.login) {
+        window.SovereignAuth.login(pass);
+      } else {
+        console.warn("🚫 SovereignAuth not available.");
+      }
+    });
+  }
+
+  // === Sovereign Login Panel Activation Script — Phase 16011.7 ===
+  const overlay = document.getElementById("sovereignLoginOverlay");
+  const overlayBtn = document.getElementById("triggerLoginOverlay");
+
+  if (overlay && overlayBtn) {
+    overlayBtn.addEventListener("click", () => {
+      overlay.style.display = "flex";
+    });
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.style.display = "none";
+      }
+    });
+  }
+
+  console.log("🧠 Sovereign Login Overlay UI injection completed.");
+});
+
+// Listen for SovereignAuth login success
+window.addEventListener("sovereignAuthGranted", (e) => {
+  const newTier = e?.detail?.tier;
+  if (typeof newTier === "number") {
+    currentOperatorTier = newTier;
+    console.log(`✅ Operator tier elevated to: ${Object.keys(OPERATOR_TIERS)[newTier]}`);
+  }
+});
 window.addEventListener("DOMContentLoaded", () => {
   // Ensure whispererVitals is captured even if SovereignBus fires early
   if (window.SovereignBus?.on) {
@@ -24,8 +81,24 @@ window.addEventListener("DOMContentLoaded", () => {
 // 🧠 Whisperer Memory Core Genesis — Phase XXV-A
 console.log("👁️ theWhisperer.js module online — Echo functions standing by.");
 
+// Access check helper for operator tiers
+function hasAccess(requiredTier = OPERATOR_TIERS.INITIATE) {
+  return currentOperatorTier >= requiredTier;
+}
+
 // ✅ Canonical SovereignBus listener for Whisperer Vitals (now globally available)
 function renderWhispererVitals(data) {
+  data.type = classifyLogEntry(data); // Classify log type based on content
+  // --- Classification logic and access gate ---
+  const type = data?.type || "vitals";
+  const tierRequired = data?.tierRequired || OPERATOR_TIERS.INITIATE;
+  const urgency = data?.urgency || "normal";
+
+  if (!hasAccess(tierRequired)) {
+    console.warn(`🔒 Tier restriction: ${Object.keys(OPERATOR_TIERS).find(key => OPERATOR_TIERS[key] === tierRequired)} required.`);
+    return;
+  }
+
   const container = document.getElementById("whispererConsoleOutput");
   if (!container) {
     console.warn("🚫 whispererConsoleOutput not found.");
@@ -33,16 +106,86 @@ function renderWhispererVitals(data) {
   }
 
   const div = document.createElement("div");
-  div.className = "log-entry vitals";
+  div.className = `log-entry vitals log-${type}`;
   div.style.color = "#00ffcc";
   div.style.fontFamily = "monospace";
   div.style.padding = "4px";
+  // Add data-log-type attribute
+  div.setAttribute("data-log-type", type);
 
   const timestamp = new Date().toLocaleTimeString();
   const module = data?.module || "Unknown";
   const status = data?.status || "No status";
 
-  div.textContent = `[${timestamp}] ${module}: ${status}`;
+  // Tier-based enhancements
+  switch (currentOperatorTier) {
+    case OPERATOR_TIERS.SOVEREIGN:
+      div.style.borderLeft = "4px solid #ffd700";
+      div.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
+      div.style.textShadow = "0 0 4px #ffd700";
+      div.textContent = `👑 [${timestamp}] ${module}: ${status}`;
+      break;
+    case OPERATOR_TIERS.ASCENDANT:
+      div.style.borderLeft = "4px solid #7fffd4";
+      div.textContent = `🔮 [${timestamp}] ${module}: ${status}`;
+      break;
+    case OPERATOR_TIERS.APPRENTICE:
+      div.style.borderLeft = "4px solid #00ffcc";
+      div.textContent = `✨ [${timestamp}] ${module}: ${status}`;
+      break;
+    default:
+      div.style.borderLeft = "4px solid gray";
+      div.textContent = `[${timestamp}] ${module}: ${status}`;
+  }
+
+  // === Signal Profile Visualization Enhancer — Phase 16010.2 ===
+  const strength = (typeof data?.signalStrength === "number") ? data.signalStrength : null;
+  if (strength !== null) {
+    const strengthBadge = document.createElement("span");
+    strengthBadge.textContent = ` ${strength}% `;
+    strengthBadge.style.marginLeft = "0.5em";
+    strengthBadge.style.padding = "0 6px";
+    strengthBadge.style.borderRadius = "4px";
+    strengthBadge.style.fontWeight = "bold";
+    strengthBadge.style.color = "#000";
+
+    if (strength < 60) {
+      strengthBadge.style.backgroundColor = "#ff4d4f"; // red
+    } else if (strength < 85) {
+      strengthBadge.style.backgroundColor = "#faad14"; // yellow
+    } else {
+      strengthBadge.style.backgroundColor = "#52c41a"; // green
+    }
+
+    // Attach the badge just after the main text content
+    div.appendChild(strengthBadge);
+  }
+
+  // Add metadata log badge
+  const metaSpan = document.createElement("span");
+  metaSpan.textContent = ` ⏱ ${new Date().toLocaleTimeString()} `;
+  metaSpan.style.fontSize = "0.75em";
+  metaSpan.style.opacity = "0.6";
+  metaSpan.style.marginLeft = "1em";
+  div.appendChild(metaSpan);
+
+  // Optional: show tier visually in log for quick audit
+  const tierBadge = document.createElement("span");
+  tierBadge.textContent = ` [Tier: ${Object.keys(OPERATOR_TIERS).find(key => OPERATOR_TIERS[key] === currentOperatorTier)}]`;
+  tierBadge.style.fontSize = "0.75em";
+  tierBadge.style.marginLeft = "1em";
+  tierBadge.style.opacity = "0.5";
+  div.appendChild(tierBadge);
+
+  // --- Urgency-based visual cue handling ---
+  if (urgency === "high") {
+    div.style.border = "2px solid #ff4d4f";
+    div.style.animation = "flashBorder 1s infinite alternate";
+  } else if (urgency === "low") {
+    div.style.opacity = "0.6";
+  }
+
+  // div.textContent = `[${timestamp}] ${module}: ${status}`; // original line removed/commented out
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
@@ -55,8 +198,10 @@ const WhispererMemory = {
   _log: [],
 
   record(entry) {
+    // Optional filtering logic placeholder:
+    if (entry?.tierRequired && currentOperatorTier < entry.tierRequired) return;
     const timestamp = new Date().toISOString();
-    const memory = { entry, timestamp };
+    const memory = { entry, timestamp, type: entry?.type || "echo", tierRequired: entry?.tierRequired || 0 };
     this._log.push(memory);
     console.log(`🪬 [Whisperer Log Entry] ${entry} @ ${timestamp}`);
     const echoEvent = new CustomEvent("whispererEcho", { detail: memory });
@@ -222,19 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("✅ whispererConsoleOutput FOUND and ready.");
       }
     }, 1000);
-    window.SovereignBus.listen("whispererVitals", (data) => {
-      console.log("📡 [whispererVitals - SovereignBus.listen()] Received:", data);
-      const liveOutput = document.getElementById("whispererConsoleOutput");
-      if (liveOutput) {
-        const pre = document.createElement("pre");
-        pre.textContent = `[${new Date().toLocaleTimeString()}] Vitals:\n${JSON.stringify(data, null, 2)}`;
-        pre.classList.add("log-entry", "vitals");
-        liveOutput.appendChild(pre);
-        liveOutput.scrollTop = liveOutput.scrollHeight;
-      } else {
-        console.warn("🚫 whispererConsoleOutput not found.");
-      }
-    });
+    // (Removed redundant SovereignBus.listen("whispererVitals", ...) block)
   }
 
   // Echo listening hook for sovereign echo bridge

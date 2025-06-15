@@ -124,6 +124,10 @@
     });
   </script>
   <div class="logo-banner-flex">
+    <div id="operatorTierStatus" class="operator-tier-status sovereign-active">
+      <span class="tier-badge">🛡 SOVEREIGN</span>
+      <span id="authStatusLight" class="status-light status-authenticated" title="Authenticated"></span>
+    </div>
     <div class="header-title">
       <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" style="max-width: 220px; height: auto;" />
       <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
@@ -1927,6 +1931,28 @@ document.addEventListener("DOMContentLoaded", () => {
     <button id="runFullSystemAuditBtn" style="display:block; margin:5px 0;">Full System Audit</button>
     <button id="runWiringAuditBtn" style="display:block; margin:5px 0;">Wiring Audit</button>
     <button id="runAutoHealingBtn" style="display:block; margin:5px 0;">Auto Healing</button>
+  </div>
+
+  <!-- 🧠 Phase 16011 — Sovereign Operator Access -->
+  <div id="operatorLoginOverlay" class="sovereign-overlay hidden">
+    <div class="login-panel">
+      <h2>🧬 Sovereign Operator Access</h2>
+      <input type="text" id="operatorUsername" placeholder="Operator ID" />
+      <input type="password" id="operatorPassword" placeholder="Access Key" />
+      <button id="operatorLoginBtn">Authenticate</button>
+      <div id="loginFeedback" class="login-feedback"></div>
+    </div>
+  </div>
+
+  <!-- 🛡️ Sovereign Operator Login Overlay -->
+  <div id="sovereignLoginOverlay" class="sovereign-login-overlay hidden">
+    <div class="login-panel">
+      <h2>Sovereign Operator Access</h2>
+      <p class="login-subtext">Tier Override Required</p>
+      <input type="password" id="sovereignLoginInput" placeholder="Enter Override Key..." />
+      <button id="sovereignLoginBtn">Authenticate</button>
+      <div id="sovereignLoginFeedback" class="login-feedback"></div>
+    </div>
   </div>
 
   <!-- Orbit Removal Panel Handlers -->
