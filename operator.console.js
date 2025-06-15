@@ -1,3 +1,6 @@
+// === NeuralOperatorConsole Namespace Initialization ===
+window.NeuralOperatorConsole = window.NeuralOperatorConsole || {};
+
 // === Wave 107 — Sovereign Anomaly Recovery Wiring ===
 // Expose global triggerAnomalyRecovery() function for Control Deck binding
 window.triggerAnomalyRecovery = async function() {
@@ -18,8 +21,11 @@ window.triggerAnomalyRecovery = async function() {
     alert("❌ Anomaly Recovery Failed. See console for details.");
   }
 };
+// ✅ Ensure OperatorConsole exists before using
+window.SageCraftAscendant = window.SageCraftAscendant || {};
+SageCraftAscendant.OperatorConsole = SageCraftAscendant.OperatorConsole || {};
 // === Phase 27.2 — Neural Macro Console Panel Injection ===
-SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container) {
+NeuralOperatorConsole.renderMacroConsolePanel = function (container) {
   if (!container) return;
 
   const section = document.createElement("div");
@@ -138,7 +144,7 @@ SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container
 SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
   id: 'macroConsole',
   label: 'Macro Console',
-  render: SageCraftAscendant.OperatorConsole.renderMacroConsolePanel
+  render: NeuralOperatorConsole.renderMacroConsolePanel
 });
 // === Phase 27.1 — Neural Hotkey Macro Channel Bootstrap ===
 SageCraftAscendant.NeuralMacroCodex = (function() {
@@ -1522,59 +1528,93 @@ SageCraftAscendant.OperatorConsole = (function() {
     container.appendChild(section);
   };
 
+  // === Operator Command Bridge: renderOperatorConsole ===
   function renderOperatorConsole() {
-    const operatorTools = document.getElementById("operatorTools");
-    if (!operatorTools) {
-      console.warn("⚠ Operator Tools Panel not found.");
-      return;
+    // Find or create the main operator console panel container.
+    let panel = document.getElementById("operatorConsolePanel");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.id = "operatorConsolePanel";
+      document.body.appendChild(panel);
     }
+    panel.innerHTML = "";
 
-    operatorTools.innerHTML = '';  // Clear existing buttons
+    // Main header
+    const header = document.createElement("h2");
+    header.textContent = "🛠 Operator Command Bridge";
+    header.style.color = "#cc99ff";
+    panel.appendChild(header);
 
-    const controls = [
-      { label: "🧪 Audit Integrity Scan", action: () => NeuralAuditSentinel?.auditWiring() },
-      { label: "🛡 Run Self-Healing Engine", action: () => NeuralSelfHealingEngine?.runSelfHealing() },
-      { label: "🌀 Clear Forecast History", action: () => NeuralForecastEngine?.clearForecast() },
-      { label: "🧠 Start Cortex Loop", action: () => NeuralCortexEngine?.startCortexLoop() },
-      { label: "🪐 Validate Orbital Mesh", action: () => NeuralOrbitalMeshReconciliation?.validateOrbitalMesh() },
-      { label: "⚖ Reset Supervisor Escalation", action: () => NeuralOperatorOverride?.resetSupervisorEscalation() },
-      { label: "🛠 Rebuild Orbital Mesh", action: () => NeuralOperatorOverride?.manualMeshRebuild() },
-      { label: "💾 Save Memory Snapshot", action: () => NeuralTemporalRollbackCore?.saveSnapshot() },
-      { label: "📂 List Snapshots", action: () => listSnapshots() },
-      { label: "🧹 Clear Snapshots", action: () => clearSnapshots() }
-    ];
+    // Orbit Manager Section
+    const orbitSection = document.createElement("div");
+    orbitSection.classList.add("console-section");
+    const orbitHeader = document.createElement("h3");
+    orbitHeader.textContent = "🪐 Orbit Manager";
+    orbitSection.appendChild(orbitHeader);
+    // Example content: List current orbits
+    const orbitList = document.createElement("div");
+    orbitList.style.border = "1px solid #555";
+    orbitList.style.background = "#111";
+    orbitList.style.padding = "10px";
+    orbitList.style.marginBottom = "10px";
+    orbitSection.appendChild(orbitList);
+    const orbits = SageCraftAscendant.OrbitRegistry?.listOrbits?.() || {};
+    if (Object.keys(orbits).length === 0) {
+      orbitList.textContent = "No orbits registered.";
+    } else {
+      Object.values(orbits).forEach(orbit => {
+        const entry = document.createElement("div");
+        entry.textContent = `🛰 ${orbit.label} [${orbit.panelId}]`;
+        orbitList.appendChild(entry);
+      });
+    }
+    panel.appendChild(orbitSection);
 
-    controls.forEach(ctrl => {
-      const btn = document.createElement("button");
-      btn.innerText = ctrl.label;
-      btn.addEventListener("click", ctrl.action);
-      operatorTools.appendChild(btn);
-    });
+    // System Audit Section
+    const auditSection = document.createElement("div");
+    auditSection.classList.add("console-section");
+    const auditHeader = document.createElement("h3");
+    auditHeader.textContent = "🧪 System Audit";
+    auditSection.appendChild(auditHeader);
+    const auditBtn = document.createElement("button");
+    auditBtn.textContent = "🔎 Run Integrity Scan";
+    auditBtn.onclick = () => {
+      const result = SageCraftAscendant.NeuralMeshDiagnostics?.runIntegrityScan();
+      alert(JSON.stringify(result, null, 2));
+    };
+    auditSection.appendChild(auditBtn);
+    panel.appendChild(auditSection);
 
-    // === Phase 6.1: Mutation Control Panel Injection ===
-    const mutationSection = document.createElement("div");
-    mutationSection.style.marginTop = "30px";
-    mutationSection.innerHTML = `
-      <h3 style="color:#cc66ff;">⚙ Forecast Mutation Simulator</h3>
-      <label>Mutation Factor (%): <input id="mutationFactorInput" type="number" value="15" min="1" max="50" style="width:80px;"></label><br>
-      <label>Scenarios: <input id="mutationScenariosInput" type="number" value="5" min="1" max="50" style="width:80px;"></label><br>
-      <button id="runMutationBtn" style="margin-top:10px;">🧪 Run Forecast Mutation</button>
-      <button id="exportMutationsBtn" style="margin-top:10px;">📤 Export Mutated Forecasts</button>
-    `;
-    operatorTools.appendChild(mutationSection);
+    // Additional: Placeholder for future bridge controls
+    const info = document.createElement("div");
+    info.style.marginTop = "20px";
+    info.style.color = "#aaa";
+    info.textContent = "Operator Command Bridge ready. Add more controls as needed.";
+    panel.appendChild(info);
 
-    document.getElementById("runMutationBtn").addEventListener("click", () => {
-      const factor = parseFloat(document.getElementById("mutationFactorInput").value) / 100;
-      const scenarios = parseInt(document.getElementById("mutationScenariosInput").value);
-      SageCraftAscendant.ForecastMutationLayer.mutateSynthesizedForecast(factor, scenarios);
-    });
+    console.log("✅ Operator Command Bridge rendered in #operatorConsolePanel.");
 
-    document.getElementById("exportMutationsBtn").addEventListener("click", () => {
-      SageCraftAscendant.ForecastMutationLayer.exportMutatedForecasts();
-    });
-
-    console.log("✅ Operator Console fully rendered.");
+    // === Phase 30.0 — Neural Command Bridge Injection ===
+    const bridge = document.createElement("div");
+    bridge.id = "neuralCommandBridge";
+    bridge.style.position = "fixed";
+    bridge.style.bottom = "0";
+    bridge.style.left = "0";
+    bridge.style.width = "100%";
+    bridge.style.background = "black";
+    bridge.style.color = "white";
+    bridge.style.zIndex = "9999";
+    bridge.style.padding = "5px 10px";
+    bridge.style.fontSize = "14px";
+    bridge.innerText = "🔮 Neural Command Bridge Online";
+    document.body.appendChild(bridge);
   }
+
+  // Expose the renderOperatorConsole method
+  return {
+    renderOperatorConsole,
+    // ...other methods can be exposed as needed
+  };
 
   // Phase 9.3 — Live Orbit Injection Console
   SageCraftAscendant.OperatorConsole.registerOrbitInjectionControls = function () {

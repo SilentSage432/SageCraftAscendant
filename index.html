@@ -101,6 +101,21 @@
   -->
 </script>
   <script src="core/sovereignEventBus.js"></script>
+</div>
+</div>
+<div id="neuralCommandBridge" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
+  <h3 style="margin-top:0;">🧠 Neural Command Bridge Online</h3>
+  
+  <div style="display:flex; flex-wrap:wrap; gap:12px;">
+    <button onclick="NeuralAuditSentinel.auditWiring()">✅ Audit Integrity Scan</button>
+    <button onclick="SelfHealingEngine.run()">♻ Self-Healing Engine</button>
+    <button onclick="toggleCortexLoop()">🧠 Cortex Loop Control</button>
+    <button onclick="injectOrbit()">🛰 Orbit Injection Utility</button>
+    <button onclick="adjustGovernance()">⚙ Governance Thresholds</button>
+  </div>
+
+  <div id="commandBridgeOutput" style="margin-top:10px; color:#ccc; font-size:0.9em;"></div>
+</div>
 </body>
 </html>
   <script>
@@ -571,6 +586,11 @@
     <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>
     <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
     <div id="sageFeedLog" class="sage-feed-log"></div>
+  </div>
+
+  <!-- Neural Operator Console Panel -->
+  <div id="operatorConsolePanel" class="console-section">
+    <!-- Neural Operator Console will render here -->
   </div>
 
 
@@ -1596,6 +1616,9 @@ document.addEventListener("DOMContentLoaded", () => {
   <script src="scripts/companions/engineer.js"></script>
   <script src="scripts/companions/archivist.js"></script>
 
+  <!-- Operator Command Console (module) -->
+  <script type="module" src="scripts/operator.console.js"></script>
+
   <!-- Wiring logic loader -->
   <script src="scripts/bootstrap/wiring.js"></script>
   <!-- 🧼 Live Inventory Panel Force-Hide Patch -->
@@ -1614,6 +1637,24 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("🧼 Live Inventory Panel force-hidden on load.");
       } else {
         console.warn("⚠️ Could not locate Live Inventory Panel for cleanup.");
+      }
+    });
+  </script>
+
+  <!-- Phase 7000.1 — Sovereign Command Bridge Presence Validator -->
+  <script>
+    // Phase 7000.1 — Sovereign Command Bridge Presence Validator
+    document.addEventListener("DOMContentLoaded", () => {
+      const cb = document.getElementById("neuralCommandBridge");
+      if (!cb) {
+        console.warn("[SOVEREIGN:BridgeCheck] ⚠️ Command Bridge not found in DOM. This may indicate a missing bridge injection or early load order issue.");
+      } else {
+        console.log("[SOVEREIGN:BridgeCheck] ✅ Command Bridge found. Forcing hidden...");
+        // Always start hidden; only show when gear icon is clicked
+        // cb.style.display = "block";
+        cb.style.display = "none";
+        cb.style.visibility = "visible";
+        cb.style.zIndex = 9999;
       }
     });
   </script>
@@ -1696,25 +1737,54 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-  <div id="brainDockButton" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10001;
-    background: radial-gradient(circle, #2a003f 40%, #000 90%);
-    border: 2px solid #cc66ff;
-    border-radius: 50%;
-    padding: 12px;
-    box-shadow: 0 0 12px #cc66ff, 0 0 18px #cc66ff inset;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  ">
-    🧠
-  </div>
+  <div id="commandBridgeToggle" class="command-bridge-toggle" onclick="toggleCommandBridge()" style="bottom: 65px;">⚙️</div>
+  <script>
+    function toggleCommandBridge() {
+      const bridge = document.getElementById('neuralCommandBridge');
+      if (!bridge) return;
+      const isVisible = bridge.style.display !== 'none';
+      bridge.style.display = isVisible ? 'none' : 'block';
+    }
+
+    // Optional: Start hidden if needed
+    // document.addEventListener("DOMContentLoaded", () => {
+    //   const bridge = document.getElementById('neuralCommandBridge');
+    //   if (bridge) bridge.style.display = 'none';
+    // });
+  </script>
+
+<!-- 🧭 HUD Toggle Button -->
+<div id="brainDockButton" class="hud-toggle-icon" onclick="toggleHudPanel()">🧭</div>
   <style>
-    #brainDockButton:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 18px #cc66ff, 0 0 24px #cc66ff inset;
+    .command-bridge-toggle {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      z-index: 9999;
+      cursor: pointer;
+      background: radial-gradient(circle, #2a003f 40%, #000 90%);
+      color: #00ffcc;
+      padding: 10px 12px;
+      border-radius: 50%;
+      border: 2px solid #00ffcc;
+      box-shadow: 0 0 12px #00ffcc, 0 0 18px #00ffcc inset;
+      font-size: 1.3rem;
+      transition: all 0.3s ease;
+    }
+    .hud-toggle-icon {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      z-index: 9999;
+      cursor: pointer;
+      background: radial-gradient(circle, #2a003f 40%, #000 90%);
+      color: #cc66ff;
+      padding: 10px 12px;
+      border-radius: 50%;
+      border: 2px solid #cc66ff;
+      box-shadow: 0 0 12px #cc66ff, 0 0 18px #cc66ff inset;
+      font-size: 1.3rem;
+      transition: all 0.3s ease;
     }
   </style>
 
@@ -1744,42 +1814,16 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
   <!-- Live HUD feed for displaying live data updates -->
   <div id="brainHudLiveFeed" class="hud-feed-text" style="margin-top:18px; text-align:center; font-size:1.05em; color:#cc99ff;">Initializing...</div>
-<!-- Phase 35 — Unified Orbital Event Mesh Injection -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const hudMap = {
-    hudAuditModules: "#count",
-    hudAnalysis: "#deltaAnalyzer",
-    hudReporting: "#reportingHub",
-    hudUtility: "#utilityHub",
-    hudControl: "#tools",
-    hudMasterExport: "#masterExportHub",
-    hudSessionManager: "#sessionManager",
-    hudMappingManager: "#mappings",
-    hudAdvancedTools: "#advancedTools",
-    hudAuditRotation: "#audit",
-    hudConfigPanel: "#configPanel",
-    hudOperatorConsole: "#operatorConsolePanel",
-    hudDiagnostics: "#diagnosticsModal",
-    hudDropbox: "#dropboxModal"
-  };
+</div>
 
-  document.querySelectorAll(".orbital-btn").forEach(btn => {
-    const targetSelector = hudMap[btn.id];
-    if (targetSelector) {
-      btn.addEventListener("click", () => {
-        const targetPanel = document.querySelector(targetSelector);
-        if (targetPanel) {
-          targetPanel.scrollIntoView({ behavior: "smooth" });
-        } else {
-          console.warn(`⚠ Target panel '${targetSelector}' not found for button '${btn.id}'`);
-        }
-      });
-    } else {
-      console.warn(`⚠ No mapping found for button '${btn.id}'`);
-    }
-  });
-});
+<!-- 🧭 HUD Visibility Toggle Logic -->
+<script>
+  function toggleHudPanel() {
+    const hud = document.getElementById("brainDockHudPanel");
+    if (!hud) return;
+    const isVisible = hud.style.display !== 'none';
+    hud.style.display = isVisible ? 'none' : 'block';
+  }
 </script>
 </div>
 
