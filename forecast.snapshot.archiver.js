@@ -23,6 +23,11 @@ SageCraftAscendant.ForecastSnapshotArchiver = (function() {
     a.click();
     URL.revokeObjectURL(url);
 
+    window.SovereignBus?.emit("whispererVitals", {
+      source: "SnapshotArchiver",
+      status: "📦 Cortex snapshot archive complete.",
+      timestamp: new Date().toISOString()
+    });
     console.log("📦 Cortex snapshot archive complete.");
   }
 

@@ -1535,23 +1535,29 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("⚠️ Sage Feed Console not found in DOM.");
     }
 
-    // --- Sage Feed Orbit Button Wiring ---
-    const sageFeedOrbit = document.getElementById("orbit-sageFeed");
-    // sageFeedConsole already declared above
-    if (sageFeedOrbit && sageFeedConsole) {
-      sageFeedOrbit.addEventListener("click", () => {
-        const isVisible = sageFeedConsole.style.display === "block";
-        sageFeedConsole.classList.toggle("hidden", isVisible);
-        sageFeedConsole.style.display = isVisible ? "none" : "block";
-        sageFeedConsole.style.opacity = isVisible ? 0 : 1;
-        sageFeedConsole.style.visibility = isVisible ? "hidden" : "visible";
-        sageFeedConsole.style.zIndex = 9999;
-        sageFeedConsole.style.transform = "none";
-        console.log(`🔁 Sage Feed Console ${isVisible ? "hidden" : "revealed"}.`);
+    // --- Unified Orbit Button Wiring for All .orbit-btn ---
+    document.querySelectorAll('.orbit-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+        const panel = document.getElementById(targetId);
+        
+        // Debugging log
+        console.log("🌀 Orbit clicked — Target ID:", targetId);
+
+        // Hide all panels
+        document.querySelectorAll('.holo-console').forEach(p => {
+          p.style.display = 'none';
+        });
+
+        // Show target panel
+        if (panel) {
+          panel.style.display = 'block';
+          console.log("✅ Activated panel:", targetId);
+        } else {
+          console.warn("⚠️ Panel not found:", targetId);
+        }
       });
-    } else {
-      console.warn("⚠️ Sage Feed Orbit or Console not found in DOM.");
-    }
+    });
 });
 
 // === Phase 43: Orbital Router Activation Mesh ===

@@ -34,6 +34,13 @@ SageCraftAscendant.ForecastMutationLayer = (function() {
     localStorage.setItem("SageCraftMutatedForecasts", JSON.stringify(allScenarios));
     alert(`✅ ${scenarios} Mutation Scenarios Generated.`);
     console.table(allScenarios);
+    if (window.SovereignBus) {
+      window.SovereignBus.emit("whispererVitals", {
+        module: "ForecastMutationLayer",
+        message: `Generated ${scenarios} mutation scenarios.`,
+        preview: allScenarios.slice(0, 3)  // send preview of first 3 mutations
+      });
+    }
   }
 
   function exportMutatedForecasts() {

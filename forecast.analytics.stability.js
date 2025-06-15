@@ -37,6 +37,17 @@ SageCraftAscendant.ForecastStabilityAnalytics = (function () {
     console.groupEnd();
 
     alert(`✅ Stability Index: ${stabilityIndex.toFixed(1)}%\nVolatility Index: ${volatilityIndex.toFixed(1)}%\nConflicts: ${conflictingCount}`);
+
+    // Emit to Whisperer Console if available
+    if (window.SovereignBus) {
+      window.SovereignBus.emit("whispererVitals", {
+        type: "StabilityIndex",
+        stable: stabilityIndex.toFixed(1),
+        volatile: volatilityIndex.toFixed(1),
+        conflict: conflictIndex.toFixed(1),
+        total: total
+      });
+    }
   }
 
   return {

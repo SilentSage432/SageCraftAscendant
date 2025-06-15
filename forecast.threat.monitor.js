@@ -36,6 +36,15 @@ SageCraftAscendant.PredictiveThreatMonitor = (function() {
 
     console.table(report);
     alert("✅ Predictive Threat Monitor complete. Check console for detailed report.");
+
+    if (window.SovereignBus) {
+      window.SovereignBus.emit("whispererVitals", {
+        source: "ThreatMonitor",
+        type: "threatSummary",
+        payload: report
+      });
+    }
+
     return report;
   }
 

@@ -17,6 +17,14 @@ SageCraftAscendant.ForecastCortex = (function() {
     forecastMemory.push(healedRecord);
     console.log("🧠 Forecast Record Injected:", healedRecord);
 
+    if (window.SovereignBus) {
+      window.SovereignBus.emit("whispererVitals", {
+        source: "ForecastCortex",
+        type: "forecastRecord",
+        payload: healedRecord
+      });
+    }
+
     // Auto-run injection hooks
     if (typeof onInjectionHook === "function") {
       onInjectionHook(healedRecord);

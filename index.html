@@ -40,22 +40,24 @@
   <!-- 🔧 Phase 11.9 — Injected Dock Panel Anchors -->
 
   <!-- 🔌 Dock Panel Scaffolding Injected — Phase 12.0 -->
-  <div id="exceptionManager" class="holo-console dock-panel"></div>
-  <div id="deltaAnalyzer" class="holo-console dock-panel"></div>
-  <div id="reportingHub" class="holo-console dock-panel"></div>
-  <div id="sessionManager" class="holo-console dock-panel">
-    <div class="last-backup-time"></div>
-    <ul class="session-entries"></ul>
-    <button class="trigger-backup">Backup</button>
-    <button class="trigger-restore">Restore</button>
+  <div class="dock-wrapper">
+    <div id="exceptionManager" class="holo-console dock-panel"></div>
+    <div id="deltaAnalyzer" class="holo-console dock-panel"></div>
+    <div id="reportingHub" class="holo-console dock-panel"></div>
+    <div id="sessionManager" class="holo-console dock-panel">
+      <div class="last-backup-time"></div>
+      <ul class="session-entries"></ul>
+      <button class="trigger-backup">Backup</button>
+      <button class="trigger-restore">Restore</button>
+    </div>
+    <div id="utilityHub" class="holo-console dock-panel"></div>
+    <div id="progressDashboard" class="holo-console dock-panel"></div>
+    <div id="masterExportHub" class="holo-console dock-panel"></div>
+    <div id="mappings" class="holo-console dock-panel"></div>
+    <div id="tools" class="holo-console dock-panel"></div>
+    <div id="audit" class="holo-console dock-panel"></div>
+    <div id="configPanel" class="holo-console dock-panel"></div>
   </div>
-  <div id="utilityHub" class="holo-console dock-panel"></div>
-  <div id="progressDashboard" class="holo-console dock-panel"></div>
-  <div id="masterExportHub" class="holo-console dock-panel"></div>
-  <div id="mappings" class="holo-console dock-panel"></div>
-  <div id="tools" class="holo-console dock-panel"></div>
-  <div id="audit" class="holo-console dock-panel"></div>
-  <div id="configPanel" class="holo-console dock-panel"></div>
 
   <!--
   <div id="countConsole" class="holo-console" data-panel="count">
@@ -97,6 +99,8 @@
     ... (legacy, replaced by unified consolePanelGroup below)
   </div>
   -->
+</script>
+  <script src="core/sovereignEventBus.js"></script>
 </body>
 </html>
   <script>
@@ -460,8 +464,8 @@
         <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
       </button>
       <div class="whisperer-orbit-container">
-        <button id="whispererOrbitBtn" class="orbit-btn" onclick="window.open('whisperer.html', '_blank')">
-          <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Orbit Icon" style="pointer-events: none;" />
+        <button class="orbit-btn" data-target="whispererConsole" title="The Whisperer Console">
+          <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
         </button>
       </div>
       <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
@@ -478,31 +482,7 @@
     <!-- Panels will populate here dynamically -->
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
-
-      if (!whispererOrbitBtn) return;
-
-      let pressTimer;
-
-      whispererOrbitBtn.addEventListener("touchstart", () => {
-        pressTimer = setTimeout(() => {
-          window.open("whisperer.html", "_blank");
-        }, 600); // Long press threshold
-      });
-
-      whispererOrbitBtn.addEventListener("touchend", () => {
-        clearTimeout(pressTimer);
-      });
-
-      whispererOrbitBtn.addEventListener("dblclick", () => {
-        window.open("whisperer.html", "_blank");
-      });
-
-      // Do not override click behavior — it's handled globally
-    });
-  </script>
+  <!-- Whisperer Orbit external navigation logic removed; now handled via data-target like other orbits -->
   <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
   <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -588,6 +568,8 @@
     <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
     <div id="sageFeedLog" class="sage-feed-log"></div>
   </div>
+
+
 
 
 <!-- Phase 125.8 — Predictive Overlay Remover -->
@@ -698,6 +680,31 @@
       <section id="grimoireTablePanel" class="grimoire-table-panel">
         <h2>📚 Lore Archive Table</h2>
         <!-- Table will be rendered here by JS -->
+      </section>
+    </section>
+    <!-- 🌫️ WHISPERER CONSOLE PANEL -->
+    <section id="whispererConsole" class="holo-console panel">
+      <h2 class="console-title">🌀 Whisperer Console</h2>
+
+      <!-- Whisperer Console Output (ensure this exists and is first in the panel) -->
+      <div id="whispererConsoleOutput" class="console-output"></div>
+
+      <section id="neuralPulseMonitor" class="console-section">
+        <h3>Neural Pulse</h3>
+        <div class="pulse-visual"></div>
+        <p id="pulseStatus">Initializing...</p>
+      </section>
+
+      <section id="echoArchivePanel" class="console-section">
+        <h3>Echo Archive</h3>
+        <ul id="echoLogEntries"></ul>
+      </section>
+
+      <section id="coreCommandInput" class="console-section">
+        <h3>Inject Command</h3>
+        <input type="text" id="sovereignCommand" placeholder="Enter core directive...">
+        <button id="injectCommandBtn">Inject</button>
+        <div id="commandResponse" class="command-feedback"></div>
       </section>
     </section>
 <!-- Grimoire Lore Table Render Trigger -->
@@ -1606,6 +1613,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   </script>
+
+  <!-- 🌀 Whisperer Entity Module -->
+  <script type="module" src="scripts/entities/theWhisperer.js"></script>
 
   <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
   <script>

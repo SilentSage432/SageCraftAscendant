@@ -8,6 +8,11 @@ SageCraftAscendant.MutationScenarioVisualizer = (function() {
 
   function renderMutationVisualizer() {
     const data = JSON.parse(localStorage.getItem("SageCraftMutatedForecasts") || "[]");
+    window.SovereignBus?.emit("whispererVitals", {
+      source: "MutationVisualizer",
+      entryCount: data.length,
+      timestamp: new Date().toISOString()
+    });
     if (data.length === 0) {
       alert("⚠ No mutated forecasts available.");
       return;
@@ -19,6 +24,10 @@ SageCraftAscendant.MutationScenarioVisualizer = (function() {
       const scenario = record.mutatedScenario;
       if (!scenarioMap[scenario]) scenarioMap[scenario] = [];
       scenarioMap[scenario].push(parseFloat(record.mutatedRisk));
+      window.SovereignBus?.emit("whispererVitals", {
+        scenario,
+        latestRisk: record.mutatedRisk
+      });
     });
 
     const labels = Array.from({ length: Object.values(scenarioMap)[0].length }, (_, i) => `Entry ${i + 1}`);

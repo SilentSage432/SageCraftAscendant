@@ -39,11 +39,26 @@ SageCraftAscendant.ForecastMemoryHealer = (function () {
 
     if (modified) {
       console.log("🧬 Forecast record healed:", healed);
+      // Emit healed record to Whisperer Console
+      if (window.SovereignBus) {
+        window.SovereignBus.emit("whispererVitals", {
+          type: "MemoryHealer",
+          message: "Forecast memory healed",
+          payload: healed
+        });
+      }
     }
 
     return healed;
   }
 
   return { healForecastRecord };
-
+  // Emit healed record to Whisperer Console
+  if (window.SovereignBus) {
+    window.SovereignBus.emit("whispererVitals", {
+      type: "MemoryHealer",
+      message: "Forecast memory healed",
+      payload: healed
+    });
+  }
 })();

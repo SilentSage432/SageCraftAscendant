@@ -28,6 +28,14 @@ SageCraftAscendant.CortexRecoverySupervisor = (function() {
       if (!entry.hasOwnProperty("anomalySignal")) {
         entry.anomalySignal = "⚪ Unanalyzed";
         repaired++;
+        if (window.SovereignBus?.emit) {
+          window.SovereignBus.emit("whispererVitals", {
+            module: "CortexRecoverySupervisor",
+            status: "✅ Cortex Repair Complete",
+            repairedFields: repaired,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
     });
 

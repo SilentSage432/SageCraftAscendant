@@ -23,7 +23,8 @@ const SovereignDockPanelMap = {
   reportingHub: "#reportingHubConsole",
   sessionManager: "#sessionManagerConsole",
   utilityHub: "#utilityHubConsole",
-  oracle: "#oracleConsole"
+  oracle: "#oracleConsole",
+  whisperer: "#whispererConsole"
 };
 
 // Dock wiring object for future dynamic dock control
@@ -1430,6 +1431,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // === HoloConsole Collapsible Toggle Logic ===
 document.addEventListener("DOMContentLoaded", () => {
+  // Holo toggle logic
   const toggles = document.querySelectorAll(".holo-toggle");
   toggles.forEach(toggle => {
     toggle.addEventListener("click", () => {
@@ -1441,6 +1443,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (targetId === "grimoireConsole" && typeof GrimoireMemory !== "undefined" && typeof GrimoireMemory.renderTo === "function") {
           GrimoireMemory.renderTo();
         }
+      }
+    });
+  });
+
+  // === Orbit Button Registration (data-target based) ===
+  document.querySelectorAll('[data-target]').forEach(button => {
+    const targetId = button.getAttribute("data-target");
+    button.addEventListener("click", () => {
+      const panel = document.getElementById(targetId);
+      if (panel) {
+        panel.classList.remove("hidden");
+        console.log(`🚀 Dock Panel "${targetId}" activated.`);
+      } else {
+        console.warn(`❌ Dock Panel "${targetId}" not found in DOM.`);
       }
     });
   });
@@ -1689,6 +1705,15 @@ OperatorDockWiring.registerSubsystemDock({
     }
 });
 
+// === Register subsystem alias "whisperer" for "whispererConsole" ===
+// Register the Whisperer subsystem dock for orbit button support
+registerSubsystemDock({
+  orbit: 'whisperer',
+  panelId: 'whispererConsole',
+  title: 'The Whisperer',
+  icon: 'assets/icons/icon-whisperer-glyph.png'
+});
+
 // 🧠 Phase 400.9 — Delta Analyzer Console Initialization
 const deltaAnalyzerConsole = document.createElement('div');
 deltaAnalyzerConsole.classList.add('holo-console');
@@ -1790,6 +1815,22 @@ const dockConsoles = {
         <button class="clear-log">🧹 Clear Log</button>
       </div>
     `
+    },
+    whispererConsole: {
+        title: "🧠 Whisperer Console",
+        body: `
+        <div class="console-section">
+          <p><strong>Status:</strong> <span class="whisperer-status">🟢 Listening</span></p>
+          <p><strong>Time Origin Message:</strong> <span class="origin-message">Awaiting...</span></p>
+          <div class="whisperer-log">
+            <p>📡 <em>Captured Signals:</em></p>
+            <ul class="whisperer-entries">
+              <li class="faint">No transmissions received.</li>
+            </ul>
+          </div>
+          <button class="trigger-whisper-sync">🔁 Sync Whisperer</button>
+        </div>
+      `
     }
 };
 
@@ -1808,6 +1849,31 @@ Object.entries(dockConsoles).forEach(([id, content]) => {
     document.body.appendChild(consoleEl);
     console.log(`✅ ${id} initialized and wired to DOM`);
 });
+
+// Ensure Whisperer Console is appended
+if (!document.getElementById("whispererConsole")) {
+  const whispererConsoleEl = document.createElement("div");
+  whispererConsoleEl.classList.add("holo-console");
+  whispererConsoleEl.id = "whispererConsole";
+  whispererConsoleEl.innerHTML = `
+    <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      🧠 Whisperer Console
+    </div>
+    <div class="console-body">
+      <p><strong>Status:</strong> <span class="whisperer-status">🟢 Listening</span></p>
+      <p><strong>Time Origin Message:</strong> <span class="origin-message">Awaiting...</span></p>
+      <div class="whisperer-log">
+        <p>📡 <em>Captured Signals:</em></p>
+        <ul class="whisperer-entries">
+          <li class="faint">No transmissions received.</li>
+        </ul>
+      </div>
+      <button class="trigger-whisper-sync">🔁 Sync Whisperer</button>
+    </div>
+  `;
+  document.body.appendChild(whispererConsoleEl);
+  console.log("✅ Whisperer Console initialized and wired to DOM");
+}
 
 // === Live Counts Console Runtime Activation ===
 setTimeout(() => {
@@ -1985,175 +2051,45 @@ setTimeout(() => {
 }, 1300);
 
 // === Whisperer Orbit Button Toggle Logic (Refactored for DOMContentLoaded) ===
-document.addEventListener("DOMContentLoaded", () => {
-  // Orbit buttons: handle all elements with data-orbit attribute
-  const orbitButtons = document.querySelectorAll("[data-orbit]");
-  orbitButtons.forEach(btn => {
-    const targetId = btn.getAttribute("data-orbit");
-    if (!targetId) return;
-    const consolePanel = document.getElementById(targetId);
-    if (!consolePanel) {
-      console.warn(`⚠️ Orbit target panel '${targetId}' not found in DOM.`);
-      return;
-    }
-    btn.addEventListener("click", () => {
-      // Toggle visibility or set active state
-      consolePanel.classList.toggle("hidden");
-      logPanelActivity(targetId, "Toggled");
-      // Dispatch orbitActivated event after activation
-      const orbitTargetId = targetId;
-      document.dispatchEvent(new CustomEvent("orbitActivated", {
-        detail: {
-          id: orbitTargetId,
-          timestamp: Date.now()
-        }
-      }));
-    });
-  });
 
-  // Legacy: Whisperer orbit button fallback for explicit IDs
-  const whispererOrbitBtn = document.getElementById("whispererOrbitBtn");
-  const whispererConsolePanel = document.getElementById("whispererConsole");
-  if (whispererOrbitBtn && whispererConsolePanel) {
-    console.log("🌀 Whisperer orbit wired successfully.");
-    // Remove duplicate event if already handled above
-    // (If both data-orbit and explicit ID present, skip duplicate)
-    if (!whispererOrbitBtn.hasAttribute("data-orbit")) {
-      whispererOrbitBtn.addEventListener("click", () => {
-        whispererConsolePanel.classList.toggle("hidden");
-        logPanelActivity("whispererConsole", "Toggled");
-        // Dispatch orbitActivated event for whispererConsole
-        document.dispatchEvent(new CustomEvent("orbitActivated", {
-          detail: {
-            id: "whispererConsole",
-            timestamp: Date.now()
-          }
-        }));
-      });
-    }
-  } else {
-    if (!orbitButtons.length)
-      console.warn("⚠️ Whisperer orbit or console panel not found in DOM.");
-  }
+// --- Begin: Dock Bindings and initializeDockBindings ---
+// Central dockBindings registry for orbit<->panel mapping.
+const dockBindings = [
+  // Example: { orbit: "count", panelId: "countConsole" },
+  // Add more as needed.
+];
+
+// Add whisperer mapping if not already present
+if (!dockBindings.some(b => b.orbit === "whisperer" && b.panelId === "whispererConsole")) {
+  dockBindings.push({
+    orbit: "whisperer",
+    panelId: "whispererConsole",
+  });
+}
+
+// === Trace: Log the dockBindings registry for verification ===
+console.log("🧩 Dock Subsystem Registry:");
+dockBindings.forEach(sub => {
+  console.log(`🔹 Orbit: ${sub.orbit}, Panel: ${sub.panelId}`);
 });
 
-// === Whisperer Orbit Listener Fallback (using SafeBind) ===
-setTimeout(() => {
-    const panel = document.getElementById("whispererConsole");
-    if (!panel) {
-      console.warn("⚠️ [SafeBind] whispererConsole panel not found.");
-      return;
+// === Orbit Button to Dock Panel Toggle Logic ===
+// This block ensures any [data-orbit] button opens its corresponding dock panel reliably.
+document.querySelectorAll('[data-orbit]').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const orbitTarget = button.getAttribute('data-orbit');
+    console.log(`🌀 Orbit clicked: ${orbitTarget}`);
+
+    // Check if a matching dock panel exists
+    const dockPanel = document.getElementById(`${orbitTarget}Console`);
+    if (dockPanel) {
+      console.log(`🚪 Opening dock panel: ${orbitTarget}Console`);
+      // Hide all other panels first
+      document.querySelectorAll('.dock-panel').forEach(panel => panel.classList.add('hidden'));
+      // Show the target panel
+      dockPanel.classList.remove('hidden');
+    } else {
+      console.warn(`❌ No matching dock panel found for: ${orbitTarget}Console`);
     }
-  
-    const toggleWhispererPanel = () => {
-      panel.classList.toggle("hidden");
-      logPanelActivity("whispererConsole", "Toggled");
-      console.log("👁️ Whisperer panel toggled.");
-    };
-  
-    SafeBind("whispererOrbitBtn", "click", toggleWhispererPanel);
-  }, 1800);
-
-// 🧠 Whisperer Observer State Activation
-function logPanelActivity(panelId, action) {
-  const timestamp = new Date().toISOString();
-  const echo = `[${timestamp}] ${action}: ${panelId}`;
-  if (window.WhispererMemory) {
-    WhispererMemory.record(echo);
-    console.log(`📡 Whisperer Echo Logged: ${echo}`);
-  }
-}
-
-// Modify togglePanel function to include observer tap
-const originalTogglePanel = typeof togglePanel === "function" ? togglePanel : function(panel) {
-  if (!panel) return;
-  const isHidden = panel.classList.contains("hidden");
-  if (isHidden) {
-    panel.classList.remove("hidden");
-  } else {
-    panel.classList.add("hidden");
-  }
-};
-// Redefine togglePanel globally
-window.togglePanel = function(panel) {
-  if (!panel) return;
-  const isVisible = panel.style.display !== "none" && !panel.classList.contains("hidden");
-  const action = isVisible ? "Hide" : "Show";
-  logPanelActivity(panel.id, action);
-  originalTogglePanel(panel);
-};
-
-// === Reporting Hub Console Runtime Activation ===
-setTimeout(() => {
-    const reportConsole = document.getElementById("reportingHubConsole");
-    if (!reportConsole) return;
-
-    const reportTime = reportConsole.querySelector(".last-report-time");
-    const reportList = reportConsole.querySelector(".report-entries");
-
-    const generateReport = () => {
-        const now = new Date().toLocaleTimeString();
-        const reportEntry = `📁 System Export — ${now}`;
-
-        reportTime.textContent = now;
-
-        // Find the correct report list within the reporting hub console
-        const reportListEl = reportConsole.querySelector(".report-entries");
-        if (reportListEl) {
-            const li = document.createElement("li");
-            li.textContent = `Report Generated @ ${now}`;
-            reportListEl.prepend(li);
-        } else {
-            console.warn("⚠️ .report-entries not found — skipping report entry injection.");
-        }
-
-        console.log(`📄 Report generated at ${now}`);
-    };
-
-    reportConsole.querySelector(".generate-report").addEventListener("click", generateReport);
-
-    console.log("✅ Reporting Hub Console Bootstrapped.");
-}, 1400);
-
-// === Custom Console Logic for Reporting Hub & Session Manager ===
-// Inserted logic for reportingHubConsole and sessionManagerConsole actions
-
-// === Reporting Hub Console Button Wiring ===
-const reportingHubConsole = document.getElementById("reportingHubConsole");
-
-if (reportingHubConsole) {
-    // ... (existing logic for reportingHubConsole actions)
-}
-
-// 🧠 Phase 14.5 — Sage Feed Command Interpreter Injection
-const sageFeedConsole = document.getElementById("sageFeedConsole");
-
-if (sageFeedConsole) {
-    const feedInput = sageFeedConsole.querySelector("#sage-feed-input");
-    const feedLog = sageFeedConsole.querySelector("#sage-feed-log");
-    const feedSubmit = sageFeedConsole.querySelector("#sage-feed-submit");
-
-    const SageMemoryBuffer = [];
-
-    const injectMemory = (entry) => {
-        SageMemoryBuffer.push(entry);
-        const para = document.createElement("p");
-        para.textContent = `📥 Memory injected: "${entry}"`;
-        feedLog.appendChild(para);
-        console.log(`📥 Sage Memory Updated: ${entry}`);
-    };
-
-    if (feedSubmit) {
-        feedSubmit.addEventListener("click", () => {
-            const inputValue = feedInput.value.trim();
-            if (inputValue.length > 0) {
-                injectMemory(inputValue);
-                feedInput.value = "";
-            }
-        });
-    }
-
-    console.log("✅ Sage Feed Console wired and memory interpreter initialized.");
-} else {
-    console.warn("⚠️ Sage Feed Console not found.");
-}
+  });
+});

@@ -59,6 +59,20 @@
     }, heartbeatInterval);
   }
 
+  // SovereignBus Test Emit (Whisperer Console Injection)
+  if (window.SovereignBus?.emit) {
+    setInterval(() => {
+      window.SovereignBus.emit("whispererVitals", {
+        signalStrength: Math.floor(Math.random() * 10) + 90,
+        uptime: Math.floor(Math.random() * 100),
+        drift: (Math.random() * 0.1).toFixed(3),
+        integrity: (Math.random() * 5 + 95).toFixed(2),
+        threads: Math.floor(Math.random() * 10 + 1),
+        source: "MeshVitals"
+      });
+    }, 6000); // emit every 6 seconds
+  }
+
   // Expose globally
   window.MeshVitals = {
     register,

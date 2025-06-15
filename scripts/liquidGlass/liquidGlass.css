@@ -499,3 +499,21 @@ html {
 .orbit-btn.whisperer-orbit:hover img {
   filter: brightness(1.8) contrast(1.4) saturate(1.6) drop-shadow(0 0 16px rgba(255, 255, 255, 0.8));
 }
+
+/* 🧬 Phase 18010 — Whisperer Console Output Stream */
+#whispererConsoleOutput {
+  background: rgba(10, 12, 14, 0.6);
+  color: var(--text-color);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.95rem;
+  padding: 12px 16px;
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 0 8px var(--glow-color);
+  border-radius: 8px;
+  white-space: pre-line;
+  overflow-y: auto;
+  max-height: 300px;
+  line-height: 1.4;
+  margin-top: 16px;
+  animation: scanPulse 5s infinite linear;
+}

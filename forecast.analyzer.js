@@ -59,6 +59,11 @@ SageCraftAscendant.ForecastAnalyzer = (function() {
     // 🧠 Emit signal report to Sovereign Neural Event Bus
     if (window.SovereignBus) {
       SovereignBus.emit("forecast.analyzer", `Signal report generated: ${JSON.stringify(signalReport)}`);
+      SovereignBus.emit("whispererVitals", {
+        coreTemp: `${(36 + Math.random() * 3).toFixed(1)}°C`,
+        signal: `${(90 + Math.random() * 10).toFixed(0)}%`,
+        drift: `${(Math.random() * 0.01).toFixed(3)}Δ`
+      });
     }
     return signalReport;
   }

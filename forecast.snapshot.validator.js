@@ -42,6 +42,15 @@ SageCraftAscendant.ForecastSnapshotValidator = (function() {
           alert("✅ Snapshot validated successfully.");
         }
 
+        // Emit validation result to SovereignBus
+        if (typeof window.SovereignBus !== "undefined") {
+          window.SovereignBus.emit("whispererVitals", {
+            module: "SnapshotValidator",
+            result: errors.length > 0 ? "❌ Invalid" : "✅ Valid",
+            issues: errors.length
+          });
+        }
+
       } catch (err) {
         console.error("❌ Failed to parse snapshot:", err);
         alert("⚠ Failed to parse snapshot file.");

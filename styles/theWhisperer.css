@@ -118,7 +118,6 @@
   background-color: #90cfff;
   border-radius: 6px;
 }
-
 /* --- Panel Title Glow Enhancement --- */
 .console-section h2 {
   color: #90cfff;
@@ -127,7 +126,6 @@
     0 0 8px #60b0ff,
     0 0 12px #4080ff;
 }
-
 /* --- Title & Header Glow Enhancements --- */
 .console-title,
 .sovereign-console h1,
@@ -153,4 +151,21 @@
     0 0 4px #90cfff,
     0 0 10px #60b0ff,
     0 0 14px #4080ff;
+}
+
+#whispererConsoleOutput {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid #60b0ff;
+  color: #b6d6ff;
+  font-family: 'Courier New', monospace;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  box-shadow:
+    0 0 4px #90cfff,
+    0 0 10px #60b0ff,
+    0 0 18px #4080ff;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
 }
