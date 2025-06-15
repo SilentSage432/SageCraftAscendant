@@ -52,15 +52,25 @@ const SovereignAuth = (() => {
 
   updateTierDisplay();
 
+  const toggleLoginPanel = () => {
+    const wrapper = document.getElementById("sovereignLoginWrapper");
+    if (wrapper) {
+      const isVisible = wrapper.style.display === "block";
+      wrapper.style.display = isVisible ? "none" : "block";
+    }
+  };
+
   return {
     login,
     getTier,
     hasAccess,
-    TIERS: operatorTiers
+    TIERS: operatorTiers,
+    toggleLoginPanel
   };
 })();
 
 window.SovereignAuth = SovereignAuth;
+window.toggleLoginPanel = SovereignAuth.toggleLoginPanel;
 
 // Optional: Export for ES module environments
 // export default SovereignAuth;

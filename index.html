@@ -1596,6 +1596,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <script src="scripts/liquidGlass/glassMemory.js"></script>
 
+  <script src="scripts/systems/sovereignAuth.js"></script>
+
 
   <!-- 🧠 Sovereign Toolbar Forge -->
   <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
@@ -1978,7 +1980,10 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <!-- 🧠 Phase 16011 — Sovereign Operator Access -->
-  <div id="operatorLoginOverlay" class="sovereign-overlay hidden">
+  <div id="operatorLoginTrigger" onclick="toggleLoginPanel()">👤</div>
+
+<div id="sovereignLoginWrapper" style="display: none;">
+  <div id="operatorLoginOverlay" class="sovereign-overlay">
     <div class="login-panel">
       <h2>🧬 Sovereign Operator Access</h2>
       <input type="text" id="operatorUsername" placeholder="Operator ID" />
@@ -1987,6 +1992,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div id="loginFeedback" class="login-feedback"></div>
     </div>
   </div>
+</div>
 
   <!-- 🛡️ Sovereign Operator Login Overlay -->
   <div id="sovereignLoginOverlay" class="sovereign-login-overlay hidden">
@@ -2285,3 +2291,5 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   </script>
+</body>
+</html>
