@@ -103,6 +103,121 @@
   <script src="core/sovereignEventBus.js"></script>
 </div>
 </div>
+<!-- 🛠 Dev Console Toggle -->
+<div id="devConsoleToggle" onclick="toggleDevConsole()" style="
+  position: fixed;
+  bottom: 115px;
+  left: 20px;
+  z-index: 9999;
+  background: #222;
+  color: #00ffff;
+  padding: 6px 12px;
+  font-family: monospace;
+  border: 1px solid #00ffff;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00ffff;
+">
+  🛠 Dev Console
+</div>
+
+<!-- 🧪 Dev Console Panel -->
+  <div id="devConsolePanel" style="
+  display: none;
+  position: fixed;
+  bottom: 175px;
+  left: 20px;
+  z-index: 9998;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid #00ffff;
+  padding: 12px;
+  border-radius: 8px;
+  width: 320px;
+  max-width: 90vw;
+  font-family: monospace;
+  color: #0ff;
+">
+  <label for="devDirectiveInput">Directive JSON:</label>
+  <select id="directivePresetSelect" onchange="loadDirectivePreset()" style="margin-bottom: 6px; width: 100%;">
+    <option value="">🔽 Load Saved Directive...</option>
+    <option value="dockManager.reinitialize">🌀 dockManager → reinitialize()</option>
+    <option value="meshVitals.sync">⚙️ meshVitals → sync()</option>
+    <option value="utilityHub.flushCache">♻️ utilityHub → flushCache()</option>
+  </select>
+  <div style="margin-bottom: 6px;">
+    <button onclick="saveCurrentDirectiveAsPreset()" style="margin-right: 6px;">💾 Save as Preset</button>
+    <button onclick="deleteSelectedPreset()">🗑️ Delete Preset</button>
+  </div>
+  <textarea id="devDirectiveInput" style="width: 100%; height: 80px; margin-top: 6px;"></textarea>
+  <button onclick="dispatchDevDirective()" style="
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: #00ffff;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  ">🚀 Dispatch</button>
+</pre>
+  <pre id="devConsoleLog" style="margin-top:10px; max-height:150px; overflow:auto; font-size:0.85em; background:#111; color:#0ff; padding:8px; border-radius:6px;"></pre>
+  <pre id="feedbackConsole" style="
+    margin-top: 6px;
+    height: 150px;
+    overflow-y: auto;
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #0f0;
+  "></pre>
+</pre>
+  <!-- 🫀 Agent Lifeline Monitor Panel -->
+  <div id="agentLifelinePanel" style="
+    margin-top: 10px;
+    border: 1px solid #888;
+    padding: 8px;
+    border-radius: 5px;
+    background: #1b1b1b;
+    color: #9cf;
+    font-family: monospace;
+    font-size: 0.8em;
+  ">
+    <b>🫀 Agent Lifeline Monitor</b>
+    <ul id="agentLifelineList" style="margin-top: 6px; padding-left: 16px;"></ul>
+    <button onclick="refreshAgentLifeline()" style="
+      margin-top: 6px;
+      background: #222;
+      color: #9cf;
+      border: 1px solid #555;
+      padding: 4px 8px;
+      font-size: 0.75em;
+      cursor: pointer;
+      border-radius: 4px;
+    ">
+      🔁 Refresh Lifeline
+    </button>
+  </div>
+  <!-- 🕯️ Anomaly Sanctum Panel -->
+  <div id="anomalySanctumPanel" style="display: none; background: #111; border: 1px solid #444; padding: 10px; margin-top: 8px;">
+    <h4 style="margin: 0; color: #f66;">🕯️ Anomaly Sanctum</h4>
+    <ul id="anomalyList" style="margin: 6px 0 0; padding-left: 1em; font-size: 0.85em; color: #ccc;"></ul>
+    <button onclick="restoreLastAnomaly()" style="
+      margin-top: 6px;
+      background: #222;
+      color: #9cf;
+      border: 1px solid #555;
+      padding: 4px 8px;
+      font-size: 0.75em;
+      cursor: pointer;
+      border-radius: 4px;
+    ">
+      ☠️ Raise Forgotten
+    </button>
+  </div>
+</div>
+
 <div id="neuralCommandBridge" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
   <h3 style="margin-top:0;">🧠 Neural Command Bridge Online</h3>
   
@@ -117,6 +232,284 @@
   <div id="commandBridgeOutput" style="margin-top:10px; color:#ccc; font-size:0.9em;"></div>
 </div>
 </body>
+<script>
+  function toggleDevConsole() {
+    const panel = document.getElementById("devConsolePanel");
+    if (panel) {
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+  }
+
+</script>
+<script>
+  // Directive Presets for Dev Console (now localStorage-based)
+  function getStoredPresets() {
+    return JSON.parse(localStorage.getItem("directivePresets") || "{}");
+  }
+
+  function updatePresetDropdown() {
+    const select = document.getElementById("directivePresetSelect");
+    const presets = getStoredPresets();
+
+    // Clear and rebuild
+    select.innerHTML = `<option value="">🔽 Load Saved Directive...</option>`;
+    for (const key in presets) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = key;
+      select.appendChild(option);
+    }
+  }
+
+  function saveCurrentDirectiveAsPreset() {
+    const name = prompt("Enter preset name (e.g., meshVitals.sync):");
+    if (!name) return;
+    try {
+      const raw = document.getElementById("devDirectiveInput").value;
+      const json = JSON.parse(raw);
+      const presets = getStoredPresets();
+      presets[name] = json;
+      localStorage.setItem("directivePresets", JSON.stringify(presets));
+      updatePresetDropdown();
+      alert("✅ Preset saved.");
+    } catch {
+      alert("❌ Invalid JSON — cannot save.");
+    }
+  }
+
+  function deleteSelectedPreset() {
+    const select = document.getElementById("directivePresetSelect");
+    const key = select.value;
+    if (!key) return;
+    const presets = getStoredPresets();
+    if (!presets[key]) return;
+    delete presets[key];
+    localStorage.setItem("directivePresets", JSON.stringify(presets));
+    updatePresetDropdown();
+    alert("🗑️ Preset deleted.");
+  }
+
+  function loadDirectivePreset() {
+    const key = document.getElementById("directivePresetSelect").value;
+    const presets = getStoredPresets();
+    if (presets[key]) {
+      document.getElementById("devDirectiveInput").value =
+        JSON.stringify(presets[key], null, 2);
+    }
+  }
+
+  // Initialize dropdown on load
+  updatePresetDropdown();
+
+  function dispatchDevDirective() {
+    try {
+      const raw = document.getElementById("devDirectiveInput").value;
+      const directive = JSON.parse(raw);
+      if (window.SovereignBus?.emit) {
+        window.SovereignBus.emit("agentDirective", directive);
+        alert("✅ Directive dispatched.");
+      } else {
+        alert("❌ SovereignBus not found.");
+      }
+    } catch (err) {
+      alert("❌ Invalid JSON input.");
+    }
+  }
+
+  // 🛰 Listen for Agent Responses and log them in the Dev Console
+  // --- Agent Lifeline Monitor logic ---
+  // The Hollow Warden anomaly handler
+  const agentStatusMap = {};
+  const anomalyLog = [];
+
+  function refreshAgentLifeline() {
+    renderAgentLifeline();
+  }
+
+  // Auto memory: Store seen agents
+  function updateAgentLifeline(directive) {
+    const key = directive?.target;
+    if (!key) return;
+
+    const now = Date.now();
+    agentStatusMap[key] = now;
+    storeAgentMemory();
+    renderAgentLifeline();
+  }
+
+  function storeAgentMemory() {
+    try {
+      localStorage.setItem("agentMemory", JSON.stringify(agentStatusMap));
+    } catch (e) {
+      console.warn("Failed to store agent memory:", e);
+    }
+  }
+
+  function restoreAgentMemory() {
+    try {
+      const stored = JSON.parse(localStorage.getItem("agentMemory") || "{}");
+      Object.assign(agentStatusMap, stored);
+      renderAgentLifeline();
+    } catch (e) {
+      console.warn("Failed to restore agent memory:", e);
+    }
+  }
+
+  function renderAgentLifeline() {
+    const list = document.getElementById("agentLifelineList");
+    if (!list) return;
+
+    list.innerHTML = "";
+    const now = Date.now();
+
+    Object.keys(agentStatusMap).forEach((key) => {
+      const lastPing = agentStatusMap[key];
+      const secondsAgo = Math.floor((now - lastPing) / 1000);
+
+      let status = "✅ ONLINE";
+      let cssClass = "agent-status-online";
+
+      if (secondsAgo > 30) {
+        status = "❌ MISSING";
+        cssClass = "agent-status-missing";
+      } else if (secondsAgo > 10) {
+        status = "⚠️ IDLE";
+        cssClass = "agent-status-idle";
+      }
+
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${status} — ${secondsAgo}s ago`;
+      li.className = cssClass;
+      list.appendChild(li);
+    });
+  }
+
+  function sweepGhostAgents() {
+    const now = Date.now();
+    const purged = [];
+
+    Object.entries(agentStatusMap).forEach(([key, timestamp]) => {
+      const age = now - timestamp;
+      if (age > 120000) {
+        purged.push(key);
+        anomalyLog.unshift({ key, timestamp });
+        delete agentStatusMap[key];
+      }
+    });
+
+    if (purged.length > 0) {
+      storeAgentMemory();
+      renderAgentLifeline();
+      renderAnomalySanctum();
+      logToFeedbackConsole(`☠️ Hollow Warden purged ${purged.length} ghost agent(s): ${purged.join(", ")}`);
+    }
+  }
+
+  function pulseWardenGlyph(active) {
+  const glyph = document.getElementById("wardenGlyph");
+  if (!glyph) return;
+  glyph.style.color = active ? "#f44" : "#444";
+  glyph.style.transform = active ? "scale(1.2)" : "scale(1)";
+}
+
+function toggleAnomalySanctum() {
+  const panel = document.getElementById("anomalySanctumPanel");
+  if (!panel) return;
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+
+function renderAnomalySanctum() {
+  const list = document.getElementById("anomalyList");
+  if (!list) return;
+  list.innerHTML = "";
+
+  anomalyLog.slice(0, 10).forEach((entry) => {
+    const li = document.createElement("li");
+    const time = new Date(entry.timestamp).toLocaleTimeString();
+    li.textContent = `${entry.key} — ${time}`;
+    list.appendChild(li);
+  });
+
+  const panel = document.getElementById("anomalySanctumPanel");
+  const hasAnomalies = anomalyLog.length > 0;
+
+  if (panel) panel.style.display = hasAnomalies ? "block" : "none";
+  pulseWardenGlyph(hasAnomalies);
+}
+
+  function renderAnomalySanctum() {
+    const list = document.getElementById("anomalyList");
+    if (!list) return;
+    list.innerHTML = "";
+
+    anomalyLog.slice(0, 10).forEach((entry) => {
+      const li = document.createElement("li");
+      const time = new Date(entry.timestamp).toLocaleTimeString();
+      li.textContent = `${entry.key} — ${time}`;
+      list.appendChild(li);
+    });
+
+    // Reveal the panel if it has content
+    document.getElementById("anomalySanctumPanel").style.display = anomalyLog.length > 0 ? "block" : "none";
+  }
+
+  function restoreLastAnomaly() {
+    const entry = anomalyLog.shift();
+    if (!entry) return alert("No anomalies to restore.");
+    agentStatusMap[entry.key] = Date.now();
+    renderAgentLifeline();
+    renderAnomalySanctum();
+    storeAgentMemory();
+    logToFeedbackConsole(`⚡ Restored forgotten agent: ${entry.key}`);
+  }
+
+  setInterval(sweepGhostAgents, 90000);
+
+  // Restore on load
+  restoreAgentMemory();
+
+  if (window.SovereignBus?.on) {
+    SovereignBus.on("agentResponse", (response) => {
+      console.log("🛰 Agent Response Received:", response);
+      appendDevLog(response);
+
+      const summary = response.directive?.target + "." + response.directive?.action;
+      const status = response.status?.toUpperCase() || "UNKNOWN";
+      logToFeedbackConsole(`${status} — ${summary}`);
+
+      // Lifeline update
+      updateAgentLifeline(response.directive);
+    });
+  }
+  function logToFeedbackConsole(msg) {
+    const logBox = document.getElementById("feedbackConsole");
+    if (!logBox) return;
+    const timestamp = new Date().toLocaleTimeString();
+    const line = `[${timestamp}] ${msg}`;
+    logBox.textContent += line + "\n";
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function appendDevLog(response) {
+    const logEl = document.getElementById("devConsoleLog");
+    if (!logEl) return;
+
+    const timestamp = new Date().toLocaleTimeString();
+    const status = response.status?.toUpperCase() || "UNKNOWN";
+    const summary = response.directive?.action
+      ? `${response.directive.target}.${response.directive.action}()`
+      : "No action";
+
+    let symbol = "🔷";
+    if (status === "SUCCESS") symbol = "✅";
+    else if (status === "ERROR") symbol = "❌";
+    else if (status === "UNHANDLED") symbol = "⚠️";
+
+    const line = `[${timestamp}] ${symbol} ${status} — ${summary}`;
+    const existing = logEl.textContent.trim();
+    logEl.textContent = line + "\n" + existing;
+  }
+</script>
 </html>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -373,6 +766,34 @@
       border: 1px dashed #ff69b4;
       white-space: pre-wrap;
     }
+
+    @keyframes pulseGreen {
+  0% { color: #0f0; transform: scale(1); }
+  50% { color: #6f6; transform: scale(1.05); }
+  100% { color: #0f0; transform: scale(1); }
+}
+
+@keyframes pulseYellow {
+  0% { color: #ff0; transform: scale(1); }
+  50% { color: #ffb; transform: scale(1.05); }
+  100% { color: #ff0; transform: scale(1); }
+}
+
+@keyframes pulseRed {
+  0% { color: #f00; transform: scale(1); }
+  50% { color: #f88; transform: scale(1.05); }
+  100% { color: #f00; transform: scale(1); }
+}
+
+.agent-status-online {
+  animation: pulseGreen 1.5s infinite;
+}
+.agent-status-idle {
+  animation: pulseYellow 2s infinite;
+}
+.agent-status-missing {
+  animation: pulseRed 2.2s infinite;
+}
   </style>
 
     <section class="holo-console hidden" id="oracleConsole" aria-hidden="true">
@@ -570,6 +991,19 @@
   </script>
   <header id="sovereignHeader">
   </header>
+
+  <div id="wardenGlyph" onclick="toggleAnomalySanctum()" title="The Hollow Warden watches..." style="
+  position: absolute;
+  top: 58px;
+  left: 12px;
+  font-size: 1.4em;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.4s ease;
+">
+  ☠️
+</div>
   <!-- 🧭 Sovereign Ascendant Toolbar -->
   <div id="sovereignToolbar" class="sovereign-toolbar"></div>
 

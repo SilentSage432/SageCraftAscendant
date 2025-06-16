@@ -73,6 +73,30 @@
     }, 6000); // emit every 6 seconds
   }
 
+  // 🧠 Phase 400.1 — Sovereign Diagnostic Relay Subsystem
+  if (window.SovereignBus?.registerFeedback) {
+    window.SovereignBus.registerFeedback("meshVitals", (payload) => {
+      console.log(`🧠 Feedback received by MeshVitals:`, payload);
+
+      if (payload?.action === "runMeshDiagnostic") {
+        console.log("🔍 Running MeshVitals diagnostic...");
+        const diagnostics = Object.entries(registered).map(([name, entry]) => ({
+          module: name,
+          lastSeen: new Date(entry.lastSeen).toLocaleTimeString(),
+          responsive: Date.now() - entry.lastSeen < heartbeatInterval * 2
+        }));
+
+        window.SovereignBus.emit("meshVitalsDiagnostics", {
+          diagnostics,
+          timestamp: new Date().toISOString(),
+          source: "MeshVitals"
+        });
+
+        console.log("📡 meshVitalsDiagnostics emitted.");
+      }
+    });
+  }
+
   // Expose globally
   window.MeshVitals = {
     register,
