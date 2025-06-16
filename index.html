@@ -199,23 +199,42 @@
       🔁 Refresh Lifeline
     </button>
   </div>
-  <!-- 🕯️ Anomaly Sanctum Panel -->
-  <div id="anomalySanctumPanel" style="display: none; background: #111; border: 1px solid #444; padding: 10px; margin-top: 8px;">
-    <h4 style="margin: 0; color: #f66;">🕯️ Anomaly Sanctum</h4>
-    <ul id="anomalyList" style="margin: 6px 0 0; padding-left: 1em; font-size: 0.85em; color: #ccc;"></ul>
-    <button onclick="restoreLastAnomaly()" style="
-      margin-top: 6px;
-      background: #222;
-      color: #9cf;
-      border: 1px solid #555;
-      padding: 4px 8px;
-      font-size: 0.75em;
-      cursor: pointer;
-      border-radius: 4px;
-    ">
-      ☠️ Raise Forgotten
-    </button>
-  </div>
+</div>
+<!-- 📖 Sanctum Lore Archive Panel -->
+</div>
+<div id="anomalySanctumPanel" style="
+  position: fixed;
+  top: 90px;
+  left: 10px;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #111;
+  color: #eee;
+  border: 1px solid #555;
+  padding: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  display: none;
+  z-index: 9999;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+">
+  <h3 style="margin-top: 0; color: #9ff;">🕯️ Anomaly Sanctum</h3>
+</ul>
+<button onclick="exportAnomalyCodex()" style="
+  margin-top: 12px;
+  padding: 6px 10px;
+  font-size: 0.75em;
+  background: #222;
+  color: #9ff;
+  border: 1px solid #444;
+  cursor: pointer;
+">📦 Export Memory Codex</button>
+<label style="display:block; margin-top:10px; font-size:0.75em; color:#aaa;">
+  📥 Import Lore Codex:
+  <input type="file" onchange="importAnomalyCodex(this.files[0])" accept=".json" style="margin-top:4px;">
+</label>
+</div>
 </div>
 
 <div id="neuralCommandBridge" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
@@ -320,7 +339,7 @@
   // --- Agent Lifeline Monitor logic ---
   // The Hollow Warden anomaly handler
   const agentStatusMap = {};
-  const anomalyLog = [];
+  const anomalyLog = JSON.parse(localStorage.getItem("anomalyLog") || "[]");
 
   function refreshAgentLifeline() {
     renderAgentLifeline();
@@ -392,7 +411,14 @@
       const age = now - timestamp;
       if (age > 120000) {
         purged.push(key);
-        anomalyLog.unshift({ key, timestamp });
+        anomalyLog.unshift({
+          key,
+          timestamp,
+          reason: "No ping in over 2 minutes",
+          memoryId: `${key}-${Date.now()}`,
+          echoKey: generateEchoKey(key)
+        });
+        localStorage.setItem("anomalyLog", JSON.stringify(anomalyLog.slice(0, 50)));
         delete agentStatusMap[key];
       }
     });
@@ -403,6 +429,32 @@
       renderAnomalySanctum();
       logToFeedbackConsole(`☠️ Hollow Warden purged ${purged.length} ghost agent(s): ${purged.join(", ")}`);
     }
+  }
+
+  function generateEchoKey(base) {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let key = "";
+    for (let i = 0; i < 6; i++) {
+      key += charset[Math.floor(Math.random() * charset.length)];
+    }
+    return `${base.toUpperCase()}-${key}`;
+  }
+
+  // 🔄 Resurrect anomaly by Echo Key utility
+  function resurrectAnomalyByEchoKey(echoKey) {
+    const entry = anomalyLog.find(a => a.echoKey === echoKey);
+    if (!entry) {
+      alert("❌ No matching memory found.");
+      return;
+    }
+
+    // Simulate restoration logic
+    agentStatusMap[entry.key] = Date.now();
+    sweepGhostAgents();
+    renderAgentLifeline();
+    renderAnomalySanctum();
+
+    alert(`🔄 ${entry.key} resurrected from memory (${echoKey})`);
   }
 
   function pulseWardenGlyph(active) {
@@ -445,7 +497,7 @@ function renderAnomalySanctum() {
     anomalyLog.slice(0, 10).forEach((entry) => {
       const li = document.createElement("li");
       const time = new Date(entry.timestamp).toLocaleTimeString();
-      li.textContent = `${entry.key} — ${time}`;
+      li.innerHTML = `<strong>${entry.key}</strong> — <em>${time}</em><br/><small style="color:#999;">${entry.reason}</small>`;
       list.appendChild(li);
     });
 
@@ -461,6 +513,42 @@ function renderAnomalySanctum() {
     renderAnomalySanctum();
     storeAgentMemory();
     logToFeedbackConsole(`⚡ Restored forgotten agent: ${entry.key}`);
+  }
+
+  // 📦 Export anomaly codex as JSON file
+  function exportAnomalyCodex() {
+    const blob = new Blob([JSON.stringify(anomalyLog, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "sovereign_lore_codex.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // 📥 Import anomaly codex from JSON file
+  function importAnomalyCodex(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const importedLog = JSON.parse(e.target.result);
+        if (Array.isArray(importedLog)) {
+          importedLog.forEach(entry => {
+            if (entry.key && entry.timestamp) {
+              anomalyLog.unshift(entry);
+            }
+          });
+          localStorage.setItem("anomalyLog", JSON.stringify(anomalyLog.slice(0, 50)));
+          renderAnomalySanctum();
+          alert("📖 Lore Codex synchronized successfully.");
+        } else {
+          alert("❌ Invalid format.");
+        }
+      } catch {
+        alert("❌ Failed to parse JSON.");
+      }
+    };
+    reader.readAsText(file);
   }
 
   setInterval(sweepGhostAgents, 90000);
