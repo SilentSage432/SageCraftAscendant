@@ -1043,6 +1043,13 @@ function toggleAnomalySanctum() {
         </div>
       </div>
     </section>
+    <!-- 🔮 Sigil Render Console -->
+    <div id="sigilRenderConsole" class="holo-console" style="display:none;">
+      <h2>Sigil Render Console</h2>
+      <input type="text" id="sigilNameInput" placeholder="Enter Sigil Name" style="width: 80%; padding: 5px;">
+      <button onclick="renderSigilPreview()">Render Sigil</button>
+      <div id="sigilRenderOutput" style="margin-top: 15px;"></div>
+    </div>
     <!-- 🛠 Utility Hub Console Panel (injected after sessionManagerConsole) -->
     <div id="utilityHubConsole" class="holo-console dock-panel hidden">
       <h2>🛠️ Utility Hub</h2>
