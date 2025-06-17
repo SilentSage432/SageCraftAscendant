@@ -121,6 +121,15 @@ const SovereignAgent = (function () {
     console.warn("🧼 Sovereign Agent memory has been reset.");
   }
 
+  function registerAgent(name, config) {
+    window.SovereignAgents = window.SovereignAgents || {};
+    window.SovereignAgents[name] = {
+      ...config,
+      lastPing: Date.now()
+    };
+    console.log(`✅ Agent registered: ${name}`);
+  }
+
   return {
     initializeAgent,
     receiveDirective,
@@ -131,3 +140,5 @@ const SovereignAgent = (function () {
 
 // Optional: Auto-initialize agent on script load
 SovereignAgent.initializeAgent();
+
+window.registerAgent = registerAgent;

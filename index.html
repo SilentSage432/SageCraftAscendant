@@ -122,10 +122,27 @@
   <script src="core/sovereignEventBus.js"></script>
 </div>
 </div>
+<!-- 🧠 Neural Command Bridge Toggle Button -->
+<div id="neuralBridgeToggle" onclick="toggleNeuralCommandBridge()" style="
+  position: fixed;
+  bottom: 120px;
+  left: 20px;
+  z-index: 10000;
+  background: #111;
+  color: #0ff;
+  padding: 6px 10px;
+  font-family: monospace;
+  border: 1px solid #0ff;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #0ff;
+">
+  ⚙ Command Bridge
+</div>
 <!-- 🛠 Dev Console Toggle -->
 <div id="devConsoleToggle" onclick="toggleDevConsole()" style="
   position: fixed;
-  bottom: 115px;
+  bottom: 80px;
   left: 20px;
   z-index: 9999;
   background: #222;
@@ -139,6 +156,18 @@
 ">
   🛠 Dev Console
 </div>
+
+<!-- 🧬 Agent Lifecycle Toggle -->
+<div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; bottom: 160px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
+  🧬
+</div>
+<script>
+  function toggleLifecyclePanel() {
+    const panel = document.getElementById("agentLifecyclePanel");
+    if (!panel) return;
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+  }
+</script>
 
 <!-- 🧪 Dev Console Panel -->
   <div id="devConsolePanel" style="
@@ -192,6 +221,7 @@
     border: 1px solid #0f0;
   "></pre>
 </pre>
+</div>
   <!-- 🫀 Agent Lifeline Monitor Panel -->
   <div id="agentLifelinePanel" style="
     margin-top: 10px;
@@ -217,6 +247,11 @@
     ">
       🔁 Refresh Lifeline
     </button>
+  </div>
+  <!-- 🧬 Agent Lifecycle Registry Panel -->
+  <div id="agentLifecyclePanel" style="display:none; position: fixed; bottom: 100px; right: 20px; width: 260px; background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+    <h3 style="margin-top: 0;">📋 Agent Lifecycle</h3>
+    <ul id="lifecycleList" style="list-style: none; padding-left: 0; margin: 0;"></ul>
   </div>
 </div>
 <!-- 📖 Sanctum Lore Archive Panel -->
@@ -376,6 +411,14 @@ function toggleGlyphLegend() {
 <script>
   function toggleDevConsole() {
     const panel = document.getElementById("devConsolePanel");
+    if (panel) {
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+  }
+
+  // Neural Command Bridge toggle helper
+  function toggleNeuralCommandBridge() {
+    const panel = document.getElementById("neuralCommandBridge");
     if (panel) {
       panel.style.display = panel.style.display === "none" ? "block" : "none";
     }
@@ -759,6 +802,31 @@ function toggleAnomalySanctum() {
     };
     reader.readAsText(file);
   }
+
+  // === 🧬 Agent Lifecycle Registry Panel Logic ===
+  function renderAgentLifecyclePanel() {
+    const list = document.getElementById("lifecycleList");
+    if (!list || !window.SovereignAgents) return;
+
+    list.innerHTML = "";
+    const now = Date.now();
+
+    Object.entries(SovereignAgents).forEach(([name, agent]) => {
+      const lastPing = agent.lastPing || 0;
+      const secondsAgo = Math.floor((now - lastPing) / 1000);
+
+      let status = "✅ ONLINE";
+      if (secondsAgo > 30) status = "❌ MISSING";
+      else if (secondsAgo > 10) status = "⚠️ IDLE";
+
+      const li = document.createElement("li");
+      li.textContent = `${name}: ${status} — ${secondsAgo}s ago`;
+      list.appendChild(li);
+    });
+  }
+
+  // ♻️ Refresh panel every 5 seconds
+  setInterval(renderAgentLifecyclePanel, 5000);
 </script>
 </html>
   <script>
@@ -2430,7 +2498,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-  <div id="commandBridgeToggle" class="command-bridge-toggle" onclick="toggleCommandBridge()" style="bottom: 65px;">⚙️</div>
   <script>
     function toggleCommandBridge() {
       const bridge = document.getElementById('neuralCommandBridge');
