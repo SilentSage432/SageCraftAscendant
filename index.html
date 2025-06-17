@@ -18,6 +18,25 @@
   <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/ph.css">
+  <style>
+    .lore-entry {
+      opacity: 0;
+      transform: rotateX(-90deg);
+      animation: pageReveal 0.6s ease-out forwards;
+      margin-bottom: 6px;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #7744dd;
+      border-radius: 3px;
+    }
+
+    @keyframes pageReveal {
+      to {
+        opacity: 1;
+        transform: rotateX(0);
+      }
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
@@ -202,39 +221,142 @@
 </div>
 <!-- 📖 Sanctum Lore Archive Panel -->
 </div>
-<div id="anomalySanctumPanel" style="
+</ul>
+  <div id="anomalySanctumPanel" style="
   position: fixed;
   top: 90px;
   left: 10px;
-  width: 320px;
-  max-height: 400px;
+  width: 340px;
+  max-height: 420px;
   overflow-y: auto;
-  background: #111;
-  color: #eee;
-  border: 1px solid #555;
-  padding: 12px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85em;
+  background: radial-gradient(ellipse at center, #1a1a1a 0%, #000000 100%);
+  color: #e2e2e2;
+  border: 2px solid #552288;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 0.9em;
   display: none;
   z-index: 9999;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(136, 85, 255, 0.3);
+  backdrop-filter: blur(2px);
+  transition: transform 0.4s ease;
+  transform-origin: left center;
 ">
   <h3 style="margin-top: 0; color: #9ff;">🕯️ Anomaly Sanctum</h3>
-</ul>
-<button onclick="exportAnomalyCodex()" style="
-  margin-top: 12px;
-  padding: 6px 10px;
-  font-size: 0.75em;
-  background: #222;
-  color: #9ff;
-  border: 1px solid #444;
-  cursor: pointer;
-">📦 Export Memory Codex</button>
-<label style="display:block; margin-top:10px; font-size:0.75em; color:#aaa;">
-  📥 Import Lore Codex:
-  <input type="file" onchange="importAnomalyCodex(this.files[0])" accept=".json" style="margin-top:4px;">
-</label>
+  <!-- Glyph Legend Toggle Block -->
+  <div id="glyphLegendToggle" style="margin-bottom: 8px;">
+    <button onclick="toggleGlyphLegend()" style="
+      font-size: 0.75em;
+      background: #111;
+      color: #ccf;
+      border: 1px solid #444;
+      padding: 4px 6px;
+      cursor: pointer;
+    ">📖 Show Glyph Legend</button>
+    <div id="glyphLegend" style="display: none; font-size: 0.8em; margin-top: 6px; color: #aaa; line-height: 1.5;">
+      ⚙️ <b>System</b> — Sovereign subsystems and internal signals<br>
+      👁️ <b>Ghost</b> — Phantom agents or anomalies<br>
+      💾 <b>Echo</b> — Archived drift agents or memory entries<br>
+      🧿 <b>Unknown</b> — Unclassified or flagged disturbances
+    </div>
+    <div style="margin-top: 10px;">
+      <label style="font-size: 0.75em; color: #ccc;">🔍 Filter by Type:</label>
+      <select id="anomalyFilterSelect" onchange="renderAnomalySanctum()" style="font-size: 0.8em; margin-left: 6px;">
+        <option value="">All</option>
+        <option value="⚙️">System</option>
+        <option value="👁️">Ghost</option>
+        <option value="💾">Echo</option>
+        <option value="🧿">Unknown</option>
+      </select>
+    </div>
+  </div>
+  <!-- End Glyph Legend Toggle Block -->
+  <ul id="anomalyList"></ul>
+  <hr />
+  <h4>🛡️ Warden Audit Log</h4>
+  <pre id="wardenLog" style="font-size: 0.85em; background: #111; padding: 8px; border-radius: 6px; max-height: 150px; overflow-y: auto;"></pre>
+  <div style="margin-top: 10px;">
+    <input id="anomalyInjectInput" placeholder="Enter anomaly key (e.g., GHOST-DELTA01)" style="
+      font-size: 0.8em;
+      width: 220px;
+      padding: 4px;
+      background: #111;
+      color: #9cf;
+      border: 1px solid #444;
+    ">
+    <button onclick="injectAnomaly()" style="
+      font-size: 0.8em;
+      background: #221144;
+      color: #cff;
+      border: 1px solid #446;
+      padding: 4px 10px;
+      margin-left: 4px;
+      cursor: pointer;
+    ">🧪 Inject</button>
+  </div>
+  <div style="margin-top: 12px;">
+    <button onclick="exportAnomalyLog()" style="
+      font-size: 0.8em;
+      background: #112;
+      color: #9cf;
+      border: 1px solid #335;
+      padding: 4px 10px;
+      cursor: pointer;
+    ">📤 Export Anomaly Log (.json)</button>
+  </div>
+  <div style="margin-top: 8px;">
+    <input type="file" id="anomalyImportFile" accept=".json" style="font-size: 0.75em; margin-right: 6px;" />
+    <button onclick="importAnomalyLog()" style="
+      font-size: 0.8em;
+      background: #112;
+      color: #9cf;
+      border: 1px solid #335;
+      padding: 4px 10px;
+      cursor: pointer;
+    ">📥 Import Anomaly Archive</button>
+  </div>
+  <button onclick="exportAnomalyCodex()" style="
+    margin-top: 12px;
+    padding: 6px 10px;
+    font-size: 0.75em;
+    background: #222;
+    color: #9ff;
+    border: 1px solid #444;
+    cursor: pointer;
+  ">📦 Export Memory Codex</button>
+  <label style="display:block; margin-top:10px; font-size:0.75em; color:#aaa;">
+    📥 Import Lore Codex:
+    <input type="file" onchange="importAnomalyCodex(this.files[0])" accept=".json" style="margin-top:4px;">
+  </label>
 </div>
+<script>
+  // Inject Anomaly utility for Anomaly Sanctum
+  function injectAnomaly() {
+    const input = document.getElementById("anomalyInjectInput");
+    const key = input?.value?.trim();
+    if (!key) return alert("⚠️ Enter an anomaly key first.");
+
+    anomalyLog.unshift({
+      key,
+      timestamp: Date.now()
+    });
+
+    renderAnomalySanctum();
+    alert(`🧬 Injected anomaly: ${key}`);
+    input.value = "";
+  }
+</script>
+<script>
+// Glyph Legend Toggle for Anomaly Sanctum
+function toggleGlyphLegend() {
+  const legend = document.getElementById("glyphLegend");
+  const toggleBtn = document.querySelector("#glyphLegendToggle button");
+  const isVisible = legend.style.display === "block";
+  legend.style.display = isVisible ? "none" : "block";
+  toggleBtn.textContent = isVisible ? "📖 Show Glyph Legend" : "📕 Hide Glyph Legend";
+}
+</script>
 </div>
 
 <div id="neuralCommandBridge" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
@@ -470,39 +592,47 @@ function toggleAnomalySanctum() {
   panel.style.display = panel.style.display === "none" ? "block" : "none";
 }
 
-function renderAnomalySanctum() {
-  const list = document.getElementById("anomalyList");
-  if (!list) return;
-  list.innerHTML = "";
-
-  anomalyLog.slice(0, 10).forEach((entry) => {
-    const li = document.createElement("li");
-    const time = new Date(entry.timestamp).toLocaleTimeString();
-    li.textContent = `${entry.key} — ${time}`;
-    list.appendChild(li);
-  });
-
-  const panel = document.getElementById("anomalySanctumPanel");
-  const hasAnomalies = anomalyLog.length > 0;
-
-  if (panel) panel.style.display = hasAnomalies ? "block" : "none";
-  pulseWardenGlyph(hasAnomalies);
-}
+  // Helper: Get sigil for anomaly key
+  function getSigilForAnomaly(key = "") {
+    if (key.startsWith("GHOST") || key.includes("phantom")) return "👁️";
+    if (key.startsWith("SYS") || key.includes("core")) return "⚙️";
+    if (key.startsWith("DRIFTER") || key.includes("echo")) return "💾";
+    return "🧿";
+  }
 
   function renderAnomalySanctum() {
     const list = document.getElementById("anomalyList");
     if (!list) return;
     list.innerHTML = "";
 
+    const selectedFilter = document.getElementById("anomalyFilterSelect")?.value || "";
+
     anomalyLog.slice(0, 10).forEach((entry) => {
+      const sigil = getSigilForAnomaly(entry.key);
+      if (selectedFilter && sigil !== selectedFilter) return;
       const li = document.createElement("li");
       const time = new Date(entry.timestamp).toLocaleTimeString();
-      li.innerHTML = `<strong>${entry.key}</strong> — <em>${time}</em><br/><small style="color:#999;">${entry.reason}</small>`;
+      // --- Begin: Render anomaly key as link to grimoire.html#<key>
+      const link = document.createElement("a");
+      link.href = `/grimoire.html#${entry.key}`;
+      link.textContent = `${entry.key}`;
+      link.style.color = "#9cf";
+      link.style.textDecoration = "underline";
+      link.target = "_blank";
+
+      li.textContent = `${sigil} `;
+      li.appendChild(link);
+      li.append(` — ${time}`);
+      // --- End: Render anomaly key as link
+      li.classList.add("lore-entry");
       list.appendChild(li);
     });
 
     // Reveal the panel if it has content
-    document.getElementById("anomalySanctumPanel").style.display = anomalyLog.length > 0 ? "block" : "none";
+    const panel = document.getElementById("anomalySanctumPanel");
+    const hasAnomalies = anomalyLog.length > 0;
+    if (panel) panel.style.display = hasAnomalies ? "block" : "none";
+    pulseWardenGlyph(hasAnomalies);
   }
 
   function restoreLastAnomaly() {
@@ -597,6 +727,38 @@ function renderAnomalySanctum() {
     const existing = logEl.textContent.trim();
     logEl.textContent = line + "\n" + existing;
   }
+
+  // 📤 Export Anomaly Log as JSON file
+  function exportAnomalyLog() {
+    if (!anomalyLog?.length) return alert("📭 No anomalies to export.");
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(anomalyLog, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "anomaly_log_export.json");
+    downloadAnchor.click();
+  }
+
+  // 📥 Import Anomaly Log from JSON file
+  function importAnomalyLog() {
+    const fileInput = document.getElementById("anomalyImportFile");
+    const file = fileInput?.files?.[0];
+    if (!file) return alert("📂 No file selected.");
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error("Invalid format.");
+        anomalyLog = [...imported, ...anomalyLog];
+        renderAnomalySanctum();
+        alert("✅ Anomalies imported.");
+      } catch (err) {
+        alert("❌ Failed to import. Invalid JSON format.");
+      }
+    };
+    reader.readAsText(file);
+  }
 </script>
 </html>
   <script>
@@ -616,6 +778,13 @@ function renderAnomalySanctum() {
         if (shouldRestore) {
           originalRestore();
         }
+      }
+
+      // 🛡️ Activate Warden lifecycle
+      if (typeof renderAnomalySanctum === "function") renderAnomalySanctum();
+      if (typeof renderAgentLifeline === "function") renderAgentLifeline();
+      if (window.Warden && typeof Warden.init === "function") {
+        Warden.init(); // 🛡️ Activate Warden lifecycle
       }
     });
   </script>
