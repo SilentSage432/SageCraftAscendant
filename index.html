@@ -125,6 +125,7 @@
 
 <!-- 2. Core Sovereign Agent System -->
 <script src="scripts/core/sovereignAgent.js"></script>
+<script src="scripts/engine/sigil.engine.js"></script>
 
 <!-- 3. Agent Modules (now that agent map exists) -->
 <script src="scripts/agents/dropAgent.js"></script>
@@ -169,12 +170,39 @@
   🛠 Dev Console
 </div>
 
-<!-- 🧬 Agent Lifecycle Toggle -->
+  <!-- 🧬 Agent Lifecycle Toggle -->
 <div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; bottom: 100px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
   🧬
 </div>
-  🧬
+
+  <!-- 🔮 Sigil Forge Toggle Button -->
+  <div id="sigilToggle" onclick="toggleSigilForge()" style="position: fixed; top: 160px; right: 20px; font-size: 22px; cursor: pointer; z-index: 10000;" title="Open Sigil Forge Panel">
+    🔮
+  </div>
+
+  <!-- 🧬 Sigil Forge Panel -->
+  <div id="sigilForgePanel" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+    <h3 style="margin-top: 0;">🧬 Sigil Forge</h3>
+    <div id="sigilContent">
+      <p>Select an archetype and forge a glyph.</p>
+      <!-- Placeholder UI controls -->
+      <button onclick="forgeSigil()">Forge New Sigil</button>
+    </div>
+  </div>
 </div>
+<script>
+  // Sigil Forge Toggle
+  function toggleSigilForge() {
+    const panel = document.getElementById("sigilForgePanel");
+    if (panel) {
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+  }
+  // Placeholder forgeSigil function
+  function forgeSigil() {
+    alert("🔮 Sigil forging is not yet implemented.");
+  }
+</script>
 <script>
   function toggleLifecyclePanel() {
     const panel = document.getElementById("agentLifecyclePanel");
