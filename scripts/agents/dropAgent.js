@@ -1,6 +1,3 @@
-
-
-
 // 🌐 dropAgent Instancing Protocol — Phase 18002
 if (window.SovereignBus?.emit) {
   window.SovereignBus.emit("agentPresence", {
@@ -12,7 +9,8 @@ if (window.SovereignBus?.emit) {
 
 registerAgent("dropAgent", {
   receiveDirective(directive) {
-    switch (directive.action) {
+    const action = directive.action || directive.command;
+    switch (action) {
       case "checkInventory":
         console.log("📦 dropAgent: Checking inventory...");
         // Future inventory logic here
@@ -20,10 +18,26 @@ registerAgent("dropAgent", {
       case "placeOrder":
         const order = directive.payload?.orderId || "unknown";
         console.log(`🧾 dropAgent: Placing mock order #${order}`);
-        alert(`🛒 Mock order placed: #${order}`);
+        console.log(`🛒 Mock order placed: #${order}`);
+        break;
+      case "testCommand":
+        console.log("🧪 dropAgent: Test command received.");
+        // Trigger dynamic UI pulse effect on the dropAgent entry in the lifecycle panel
+        const lifecycleEntry = document.querySelector('#lifecycleList li:nth-child(1)');
+        if (lifecycleEntry) {
+          lifecycleEntry.classList.add("agent-pulse");
+          setTimeout(() => lifecycleEntry.classList.remove("agent-pulse"), 2000);
+        }
         break;
       default:
-        console.warn(`⚠️ dropAgent received unknown action: ${directive.action}`);
+        console.warn(`⚠️ dropAgent received unknown action: ${action}`);
+    }
+    if (window.SovereignBus?.emit) {
+      window.SovereignBus.emit("agentResponse", {
+        source: "dropAgent",
+        status: "received",
+        directive
+      });
     }
   },
   init() {

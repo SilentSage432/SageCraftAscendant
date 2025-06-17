@@ -167,6 +167,12 @@ function trackDirectiveEcho({ target, payload }) {
     time: new Date().toLocaleTimeString(),
     summary: JSON.stringify(payload).slice(0, 60)
   });
+  logFeedbackTrace({
+    agent: target,
+    time: new Date().toISOString(),
+    action: payload?.action || 'unknown',
+    echo: payload
+  });
   if (directiveHistory[target].length > 5) directiveHistory[target].pop();
   updateDirectiveEchoDOM(target);
 }
@@ -275,3 +281,26 @@ function updateDirectiveEchoDOM(agent) {
     }
   });
 }
+
+function logFeedbackTrace(data) {
+  const consolePanel = document.getElementById("devConsolePanel");
+  if (!consolePanel) return;
+
+  let container = document.getElementById("feedbackRelayLogs");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "feedbackRelayLogs";
+    container.innerHTML = "<h4>🛰️ Feedback Relay</h4>";
+    consolePanel.appendChild(container);
+  }
+
+  const line = document.createElement("div");
+  line.style.fontSize = "0.85em";
+  line.style.marginBottom = "6px";
+  line.textContent = `[${new Date(data.time).toLocaleTimeString()}] → ${data.agent} (${data.action})`;
+
+  container.appendChild(line);
+}
+
+// Make SovereignBus globally accessible as SovereignEventBus
+window.SovereignEventBus = window.SovereignBus;
