@@ -57,6 +57,35 @@ window.SovereignBus.emit = window.SovereignBus.emit.bind(window.SovereignBus);
 
 console.log("🧠 SovereignBus initialized: Listening for system-wide pulse events.");
 
+// Delayed SovereignBus Bootstrap to ensure agents are fully registered
+setTimeout(() => {
+  if (!window.SovereignAgents) {
+    console.warn("⚠ SovereignAgents registry not initialized.");
+    return;
+  }
+
+  const directiveHandler = (event) => {
+    const directive = event?.detail;
+    if (!directive) {
+      console.warn("⚠ Received empty directive payload.");
+      return;
+    }
+
+    const target = directive.target;
+    const agent = window.SovereignAgents?.[target];
+
+    if (agent && typeof agent.receiveDirective === 'function') {
+      console.log(`📥 Directive dispatched to agent '${target}':`, directive);
+      agent.receiveDirective(directive);
+    } else {
+      console.warn(`❌ Agent '${target}' is not defined or not yet loaded.`);
+    }
+  };
+
+  SovereignBus.on('agentDirective', directiveHandler);
+  console.log("🤖 SovereignBus (Delayed): Ready to relay directives to SovereignAgents.");
+}, 500);
+
 // === Phase 17000 — Sovereign Agent Listener Integration ===
 // === Phase 17002 — Sovereign Agent Directive Listener ===
 SovereignBus.on('agentDirective', (event) => {
@@ -66,11 +95,15 @@ SovereignBus.on('agentDirective', (event) => {
     return;
   }
 
-  if (window.SovereignAgent && typeof SovereignAgent.receiveDirective === 'function') {
+  const agent = window.SovereignAgent;
+  const handler = agent?.receiveDirective;
+
+  if (typeof handler === 'function') {
     console.log("📥 Sovereign Directive dispatched to Agent:", directive);
-    SovereignAgent.receiveDirective(directive);
+    handler.call(agent, directive);
   } else {
     console.warn('⚠ SovereignAgent or receiveDirective method not found.');
+    console.debug('🛠 Available SovereignAgent:', agent);
   }
 });
 console.log("🤖 SovereignBus: Ready to relay directives to SovereignAgent.");

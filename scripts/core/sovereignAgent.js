@@ -18,6 +18,14 @@ const SovereignAgent = (function () {
     if (directive && typeof directive === 'object' && directive.target && directive.action) {
       console.log(`🧭 SovereignAgent Routing — Target: ${directive.target}, Action: ${directive.action}`);
 
+      // 🔁 Dynamic Routing Check — Generic Method Fallback
+      const agent = window[directive.target];
+      if (agent && typeof agent[directive.action] === "function") {
+        agent[directive.action](directive.payload);
+        SovereignBus?.emit?.('agentResponse', { status: 'success', directive });
+        return;
+      }
+
       try {
         switch (directive.target) {
           case 'dockManager':
@@ -39,8 +47,28 @@ const SovereignAgent = (function () {
             break;
 
           default:
-            console.warn(`⚠️ No routing defined for target: ${directive.target}`);
-            SovereignBus?.emit?.('agentResponse', { status: 'unhandled', directive });
+            // Attempt dynamic routing to DropAgent, TaskAgent, or WardenAgent
+            const targetAgentMap = {
+              dropAgent: window.DropAgent,
+              taskAgent: window.TaskAgent,
+              wardenAgent: window.WardenAgent
+            };
+
+            const targetAgent = targetAgentMap[directive.target];
+            if (!targetAgent) {
+              console.warn(`❌ Agent '${directive.target}' is not defined or not yet loaded.`);
+              SovereignBus?.emit?.('agentResponse', { status: 'unhandled', directive, error: "Agent not found" });
+              return;
+            }
+
+            if (typeof targetAgent[directive.action] !== 'function') {
+              console.warn(`⚠️ Agent '${directive.target}' does not implement action '${directive.action}'.`);
+              SovereignBus?.emit?.('agentResponse', { status: 'unhandled', directive, error: "Action not implemented" });
+              return;
+            }
+
+            targetAgent[directive.action](directive.payload);
+            SovereignBus?.emit?.('agentResponse', { status: 'success', directive });
             break;
         }
         return; // Exit early after routing logic
@@ -121,15 +149,6 @@ const SovereignAgent = (function () {
     console.warn("🧼 Sovereign Agent memory has been reset.");
   }
 
-  function registerAgent(name, config) {
-    window.SovereignAgents = window.SovereignAgents || {};
-    window.SovereignAgents[name] = {
-      ...config,
-      lastPing: Date.now()
-    };
-    console.log(`✅ Agent registered: ${name}`);
-  }
-
   return {
     initializeAgent,
     receiveDirective,
@@ -138,7 +157,20 @@ const SovereignAgent = (function () {
   };
 })();
 
+function registerAgent(name, config) {
+  window.SovereignAgents = window.SovereignAgents || {};
+  window.SovereignAgents[name] = {
+    ...config,
+    lastPing: Date.now()
+  };
+  console.log(`✅ Agent registered: ${name}`);
+  console.log(`🛰️ Agent '${name}' fully registered and ready for directives.`);
+  SovereignBus?.emit?.('agentReady', { agent: name });
+}
+
 // Optional: Auto-initialize agent on script load
 SovereignAgent.initializeAgent();
 
+window.SovereignAgent = SovereignAgent;
+window.receiveDirective = SovereignAgent.receiveDirective;
 window.registerAgent = registerAgent;

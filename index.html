@@ -120,9 +120,19 @@
   -->
 </script>
 </script>
-  <script src="core/sovereignEventBus.js"></script>
-  <script src="scripts/console/console.directives.js"></script>
-</div>
+ <!-- 1. Sovereign Event Bus should be FIRST -->
+<script src="core/sovereignEventBus.js"></script>
+
+<!-- 2. Core Sovereign Agent System -->
+<script src="scripts/core/sovereignAgent.js"></script>
+
+<!-- 3. Agent Modules (now that agent map exists) -->
+<script src="scripts/agents/dropAgent.js"></script>
+<script src="scripts/agents/taskAgent.js"></script>
+<script src="scripts/agents/wardenAgent.js"></script>
+
+<!-- 4. UI & Console -->
+<script src="scripts/console/console.directives.js"></script>
 </div>
 <!-- 🧠 Neural Command Bridge Toggle Button -->
 <div id="neuralBridgeToggle" onclick="toggleNeuralCommandBridge()" style="
@@ -160,7 +170,7 @@
 </div>
 
 <!-- 🧬 Agent Lifecycle Toggle -->
-<div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; bottom: 160px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
+<div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; top: 88px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
   🧬
 </div>
 <script>
@@ -251,7 +261,7 @@
     </button>
   </div>
   <!-- 🧬 Agent Lifecycle Registry Panel -->
-  <div id="agentLifecyclePanel" style="display:none; position: fixed; bottom: 100px; right: 20px; width: 260px; background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+  <div id="agentLifecyclePanel" style="display:none; position: fixed; bottom: 160px; right: 20px; width: 260px; background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
     <h3 style="margin-top: 0;">📋 Agent Lifecycle</h3>
     <ul id="lifecycleList" style="list-style: none; padding-left: 0; margin: 0;"></ul>
   </div>

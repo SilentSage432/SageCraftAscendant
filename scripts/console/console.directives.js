@@ -1,7 +1,14 @@
 // 🧠 Console Directives Logic
 
 function toggleCortexLoop() {
-  alert("🧬 toggleCortexLoop not yet implemented.");
+  setTimeout(() => {
+    console.log("📡 Dispatching test directive to dropAgent...");
+    SovereignEventBus.dispatchDirective({
+      target: "dropAgent",
+      command: "testCommand",
+      payload: { message: "Hello from toggleCortexLoop" }
+    });
+  }, 500); // slight delay to ensure agent is ready
 }
 
 function injectOrbit() {
