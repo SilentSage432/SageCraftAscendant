@@ -1,4 +1,10 @@
 // === Phase 27.2 — Neural Macro Console Panel Injection ===
+// Safeguard for renderMacroConsolePanel on window
+if (typeof window.renderMacroConsolePanel === "undefined") {
+  window.renderMacroConsolePanel = function () {
+    console.warn("⚠️ renderMacroConsolePanel not implemented yet.");
+  };
+}
 SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container) {
   if (!container) return;
 
