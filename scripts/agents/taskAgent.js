@@ -1,6 +1,16 @@
 
 
 
+
+// 🌐 taskAgent Instancing Protocol — Phase 18002
+if (window.SovereignBus?.emit) {
+  window.SovereignBus.emit("agentPresence", {
+    agentId: "taskAgent",
+    status: "online",
+    timestamp: Date.now()
+  });
+}
+
 registerAgent("taskAgent", {
   receiveDirective(directive) {
     if (directive.action === "remind") {

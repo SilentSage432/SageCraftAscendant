@@ -1,5 +1,15 @@
 
 
+
+// 🌐 dropAgent Instancing Protocol — Phase 18002
+if (window.SovereignBus?.emit) {
+  window.SovereignBus.emit("agentPresence", {
+    agentId: "dropAgent",
+    status: "online",
+    timestamp: Date.now()
+  });
+}
+
 registerAgent("dropAgent", {
   receiveDirective(directive) {
     switch (directive.action) {

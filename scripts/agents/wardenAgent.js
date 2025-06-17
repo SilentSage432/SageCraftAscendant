@@ -1,6 +1,16 @@
 
 
 
+
+// 🌐 wardenAgent Instancing Protocol — Phase 18002
+if (window.SovereignBus?.emit) {
+  window.SovereignBus.emit("agentPresence", {
+    agentId: "wardenAgent",
+    status: "online",
+    timestamp: Date.now()
+  });
+}
+
 registerAgent("wardenAgent", {
   receiveDirective(directive) {
     switch (directive.action) {
