@@ -203,6 +203,10 @@
     <h3 style="margin-top: 0;">🧬 Sigil Forge</h3>
     <div id="sigilContent">
       <p>Select an archetype and forge a glyph.</p>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+        <button onclick="promptExportByType()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">📤 Export by Type</button>
+        <button onclick="promptExportByElement()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">🌌 Export by Element</button>
+      </div>
       <button onclick="forgeSigil()">Forge New Sigil</button>
     </div>
     <!-- 🗃️ Sigil Archive Search & Scroll Container -->
@@ -221,17 +225,17 @@
     <!-- 🔧 Sigil Edit Panel -->
     <div id="sigilEditPanel" style="margin-top: 20px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; display: none;">
       <h3>Edit Sigil</h3>
-      <label for="editSigilName">Name:</label><br>
-      <input type="text" id="editSigilName" style="width: 100%; margin-bottom: 10px;"><br>
+      <label for="editSigilName-2">Name:</label><br>
+      <input type="text" id="editSigilName-2" style="width: 100%; margin-bottom: 10px;"><br>
 
-      <label for="editSigilType">Type:</label><br>
-      <input type="text" id="editSigilType" style="width: 100%; margin-bottom: 10px;"><br>
+      <label for="editSigilType-2">Type:</label><br>
+      <input type="text" id="editSigilType-2" style="width: 100%; margin-bottom: 10px;"><br>
 
-      <label for="editSigilElement">Element:</label><br>
-      <input type="text" id="editSigilElement" style="width: 100%; margin-bottom: 10px;"><br>
+      <label for="editSigilElement-2">Element:</label><br>
+      <input type="text" id="editSigilElement-2" style="width: 100%; margin-bottom: 10px;"><br>
 
-      <label for="editSigilGlyph">Glyph Code:</label><br>
-      <input type="text" id="editSigilGlyph" style="width: 100%; margin-bottom: 12px;"><br>
+      <label for="editSigilGlyph-2">Glyph Code:</label><br>
+      <input type="text" id="editSigilGlyph-2" style="width: 100%; margin-bottom: 12px;"><br>
 
       <button onclick="submitSigilEdit()" style="padding: 8px 16px; background: #4af; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Submit Edit</button>
     </div>
@@ -913,6 +917,42 @@ function toggleAnomalySanctum() {
   // ♻️ Refresh panel every 5 seconds
   setInterval(renderAgentLifecyclePanel, 5000);
 </script>
+<script>
+function promptExportByType() {
+  const type = prompt("Enter sigil type to export (or leave blank for all):", "all");
+  if (type !== null) {
+    exportSigilsByTypeToJSON(type.trim() || "all");
+    showToast(`📤 Exporting sigils by type: "${type}"`);
+  }
+}
+
+function promptExportByElement() {
+  const element = prompt("Enter sigil element to export (or leave blank for all):", "all");
+  if (element !== null) {
+    exportSigilsByElementToJSON(element.trim() || "all");
+    showToast(`🌌 Exporting sigils by element: "${element}"`);
+  }
+}
+
+function showToast(message = "✅ Done") {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.style.position = "fixed";
+  toast.style.bottom = "30px";
+  toast.style.right = "30px";
+  toast.style.background = "rgba(0,0,0,0.8)";
+  toast.style.color = "#fff";
+  toast.style.padding = "10px 14px";
+  toast.style.borderRadius = "6px";
+  toast.style.fontFamily = "monospace";
+  toast.style.zIndex = 10000;
+  toast.style.boxShadow = "0 0 6px #8844ff";
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+</script>
 </html>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -1051,16 +1091,16 @@ function toggleAnomalySanctum() {
     <div id="dockGrid" style="display: none;"></div>
 
     <!-- 🔧 Sigil Editor Panel -->
-    <div id="sigilEditPanel" class="holo-console" style="display: none;">
+    <div id="sigilEditPanel-2" class="holo-console" style="display: none;">
       <h2>🔧 Edit Sigil</h2>
       <label>Name:</label>
-      <input id="editSigilName" type="text" placeholder="Enter new name..." /><br>
+      <input id="editSigilName-3" type="text" placeholder="Enter new name..." /><br>
 
       <label>Glyph Code:</label>
-      <input id="editSigilGlyph" type="text" placeholder="e.g., ∇⟁⌖" /><br>
+      <input id="editSigilGlyph-3" type="text" placeholder="e.g., ∇⟁⌖" /><br>
 
       <label>Element:</label>
-      <select id="editSigilElement">
+      <select id="editSigilElement-3">
         <option value="fire">🔥 Fire</option>
         <option value="water">💧 Water</option>
         <option value="earth">🌱 Earth</option>

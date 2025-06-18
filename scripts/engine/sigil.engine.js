@@ -479,6 +479,58 @@ function populateSigilEditFields(name) {
 }
 window.populateSigilEditFields = populateSigilEditFields;
 
+// 🌌 Phase 19.8 — Sigil Archive Export by Type
+function exportSigilsByTypeToJSON(type = "all") {
+  let exportData;
+  if (type === "all") {
+    exportData = SigilEngine.listDetailedSigils();
+  } else {
+    exportData = SigilEngine.listDetailedSigils().filter(
+      sigil => sigil.type.toLowerCase() === type.toLowerCase()
+    );
+  }
+
+  const data = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `sigil_export_${type}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  console.log(`📤 Sigils of type '${type}' exported.`);
+}
+
+window.exportSigilsByTypeToJSON = exportSigilsByTypeToJSON;
+
+// 🌌 Phase 19.9 — Sigil Archive Export by Element
+function exportSigilsByElementToJSON(element = "all") {
+  let exportData;
+  if (element === "all") {
+    exportData = SigilEngine.listDetailedSigils();
+  } else {
+    exportData = SigilEngine.listDetailedSigils().filter(
+      sigil => sigil.element.toLowerCase() === element.toLowerCase()
+    );
+  }
+
+  const data = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `sigil_export_${element}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  console.log(`📤 Sigils of element '${element}' exported.`);
+}
+
+window.exportSigilsByElementToJSON = exportSigilsByElementToJSON;
+
 // ✅ Sigil Edit Panel Initialization Log
 console.log("🧪 Sigil Engine edit panel fully operational.");
 

@@ -108,12 +108,12 @@ function renderFeedbackDiagnosticsPanel() {
 
 // Listen for SovereignEventBus logs
 if (typeof SovereignEventBus !== "undefined") {
-  SovereignEventBus.listen("agentDirective", (msg) => {
+  SovereignEventBus.on("agentDirective", (msg) => {
     const log = document.getElementById("feedbackLog");
     if (log) log.innerText += `📤 To ${msg.target}: ${JSON.stringify(msg)}\n`;
   });
 
-  SovereignEventBus.listen("agentResponse", (msg) => {
+  SovereignEventBus.on("agentResponse", (msg) => {
     const log = document.getElementById("feedbackLog");
     if (log) log.innerText += `📥 From ${msg.source || "Unknown"}: ${JSON.stringify(msg)}\n`;
   });

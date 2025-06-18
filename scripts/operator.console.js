@@ -5,127 +5,137 @@ if (typeof window.renderMacroConsolePanel === "undefined") {
     console.warn("⚠️ renderMacroConsolePanel not implemented yet.");
   };
 }
-SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container) {
-  if (!container) return;
+if (typeof SageCraftAscendant.OperatorConsole === "object") {
+  SageCraftAscendant.OperatorConsole.renderMacroConsolePanel = function (container) {
+    if (!container) return;
 
-  const section = document.createElement("div");
-  section.classList.add("console-section");
+    const section = document.createElement("div");
+    section.classList.add("console-section");
 
-  const header = document.createElement("h3");
-  header.textContent = "🎯 Neural Macro Console";
-  section.appendChild(header);
+    const header = document.createElement("h3");
+    header.textContent = "🎯 Neural Macro Console";
+    section.appendChild(header);
 
-  const macroList = document.createElement("div");
-  macroList.style.border = "1px solid #555";
-  macroList.style.background = "#111";
-  macroList.style.padding = "10px";
-  macroList.style.height = "250px";
-  macroList.style.overflowY = "scroll";
-  section.appendChild(macroList);
+    const macroList = document.createElement("div");
+    macroList.style.border = "1px solid #555";
+    macroList.style.background = "#111";
+    macroList.style.padding = "10px";
+    macroList.style.height = "250px";
+    macroList.style.overflowY = "scroll";
+    section.appendChild(macroList);
 
-  function refreshMacroList() {
-    macroList.innerHTML = '';
-    for (let i = 1; i <= 9; i++) {
-      const slot = document.createElement("div");
-      slot.style.marginBottom = "8px";
-      slot.textContent = `Slot ${i}: `;
-      const assigned = SageCraftAscendant.NeuralMacroCodex?.isSlotAssigned?.(i) ? '🟢 Assigned' : '⚪ Empty';
-      slot.innerHTML += assigned;
-      macroList.appendChild(slot);
-    }
-  }
-
-  // Expose macroRegistry for panel (for display only)
-  if (!SageCraftAscendant.NeuralMacroCodex.macroRegistry) {
-    // Provide a reference to macroRegistry for display
-    Object.defineProperty(SageCraftAscendant.NeuralMacroCodex, "macroRegistry", {
-      get: function () { return this._macroRegistry || {}; },
-      set: function (val) { this._macroRegistry = val; }
-    });
-    SageCraftAscendant.NeuralMacroCodex.macroRegistry = {};
-  }
-  // Sync reference for display (in case already defined in closure)
-  if (typeof SageCraftAscendant.NeuralMacroCodex._macroRegistry === "undefined" && typeof SageCraftAscendant.NeuralMacroCodex.registerMacro === "function") {
-    // Try to find the macroRegistry in the closure (hacky, but for panel display)
-    // We can't access closure directly, so fallback to empty object if not available
-  }
-
-  refreshMacroList();
-
-  const slotInput = document.createElement("input");
-  slotInput.type = "number";
-  slotInput.min = 1;
-  slotInput.max = 9;
-  slotInput.placeholder = "Slot #";
-  slotInput.style.width = "50px";
-  slotInput.style.marginRight = "10px";
-  section.appendChild(slotInput);
-
-  const registerBtn = document.createElement("button");
-  registerBtn.textContent = "➕ Bind Mock Macro";
-  registerBtn.onclick = () => {
-    const slotNum = parseInt(slotInput.value);
-    if (slotNum >= 1 && slotNum <= 9) {
-      SageCraftAscendant.NeuralMacroCodex?.registerMacro(slotNum, () => {
-        alert(`🎯 Mock Macro Executed → Slot ${slotNum}`);
-      });
-      // Also update macroRegistry for display
-      if (SageCraftAscendant.NeuralMacroCodex.macroRegistry) {
-        SageCraftAscendant.NeuralMacroCodex.macroRegistry[slotNum] = true;
+    function refreshMacroList() {
+      macroList.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        const slot = document.createElement("div");
+        slot.style.marginBottom = "8px";
+        slot.textContent = `Slot ${i}: `;
+        const assigned = SageCraftAscendant.NeuralMacroCodex?.isSlotAssigned?.(i) ? '🟢 Assigned' : '⚪ Empty';
+        slot.innerHTML += assigned;
+        macroList.appendChild(slot);
       }
-      refreshMacroList();
-    } else {
-      alert("⚠ Enter valid slot 1-9");
     }
-  };
-  section.appendChild(registerBtn);
 
-  // === Phase 27.6 — Export/Import UI Controls ===
+    // Expose macroRegistry for panel (for display only)
+    if (!SageCraftAscendant.NeuralMacroCodex.macroRegistry) {
+      // Provide a reference to macroRegistry for display
+      Object.defineProperty(SageCraftAscendant.NeuralMacroCodex, "macroRegistry", {
+        get: function () { return this._macroRegistry || {}; },
+        set: function (val) { this._macroRegistry = val; }
+      });
+      SageCraftAscendant.NeuralMacroCodex.macroRegistry = {};
+    }
+    // Sync reference for display (in case already defined in closure)
+    if (typeof SageCraftAscendant.NeuralMacroCodex._macroRegistry === "undefined" && typeof SageCraftAscendant.NeuralMacroCodex.registerMacro === "function") {
+      // Try to find the macroRegistry in the closure (hacky, but for panel display)
+      // We can't access closure directly, so fallback to empty object if not available
+    }
 
-  const exportBtn = document.createElement("button");
-  exportBtn.textContent = "📤 Export Macros";
-  exportBtn.style.marginLeft = "10px";
-  exportBtn.onclick = () => {
-    SageCraftAscendant.NeuralMacroCodex?.exportMacros();
-  };
-  section.appendChild(exportBtn);
+    refreshMacroList();
 
-  const importLabel = document.createElement("label");
-  importLabel.style.marginTop = "10px";
-  importLabel.style.display = "block";
-  importLabel.textContent = "📥 Import Macros:";
+    const slotInput = document.createElement("input");
+    slotInput.type = "number";
+    slotInput.min = 1;
+    slotInput.max = 9;
+    slotInput.placeholder = "Slot #";
+    slotInput.style.width = "50px";
+    slotInput.style.marginRight = "10px";
+    section.appendChild(slotInput);
 
-  const importInput = document.createElement("input");
-  importInput.type = "file";
-  importInput.accept = ".json";
-  importInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        SageCraftAscendant.NeuralMacroCodex?.importMacros(evt.target.result);
+    const registerBtn = document.createElement("button");
+    registerBtn.textContent = "➕ Bind Mock Macro";
+    registerBtn.onclick = () => {
+      const slotNum = parseInt(slotInput.value);
+      if (slotNum >= 1 && slotNum <= 9) {
+        SageCraftAscendant.NeuralMacroCodex?.registerMacro(slotNum, () => {
+          alert(`🎯 Mock Macro Executed → Slot ${slotNum}`);
+        });
+        // Also update macroRegistry for display
+        if (SageCraftAscendant.NeuralMacroCodex.macroRegistry) {
+          SageCraftAscendant.NeuralMacroCodex.macroRegistry[slotNum] = true;
+        }
         refreshMacroList();
-        alert("✅ Macro Registry imported.");
-      } catch (err) {
-        alert("⚠ Failed to import macros.");
+      } else {
+        alert("⚠ Enter valid slot 1-9");
       }
     };
-    reader.readAsText(file);
+    section.appendChild(registerBtn);
+
+    // === Phase 27.6 — Export/Import UI Controls ===
+
+    const exportBtn = document.createElement("button");
+    exportBtn.textContent = "📤 Export Macros";
+    exportBtn.style.marginLeft = "10px";
+    exportBtn.onclick = () => {
+      SageCraftAscendant.NeuralMacroCodex?.exportMacros();
+    };
+    section.appendChild(exportBtn);
+
+    const importLabel = document.createElement("label");
+    importLabel.style.marginTop = "10px";
+    importLabel.style.display = "block";
+    importLabel.textContent = "📥 Import Macros:";
+
+    const importInput = document.createElement("input");
+    importInput.type = "file";
+    importInput.accept = ".json";
+    importInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          SageCraftAscendant.NeuralMacroCodex?.importMacros(evt.target.result);
+          refreshMacroList();
+          alert("✅ Macro Registry imported.");
+        } catch (err) {
+          alert("⚠ Failed to import macros.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    section.appendChild(importLabel);
+    section.appendChild(importInput);
+
+    container.appendChild(section);
   };
-
-  section.appendChild(importLabel);
-  section.appendChild(importInput);
-
-  container.appendChild(section);
-};
+} else {
+  console.warn("⚠️ OperatorDockConsole not initialized yet. Skipping panel binding.");
+}
 
 // Macro Console Panel Registration — Phase 27.2
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'macroConsole',
-  label: 'Macro Console',
-  render: SageCraftAscendant.OperatorConsole.renderMacroConsolePanel
-});
+if (typeof OperatorDockConsole !== "undefined" && typeof OperatorDockConsole.registerPanel === "function") {
+  OperatorDockConsole.registerPanel({
+    id: 'yourPanelId',
+    name: 'Your Panel Name',
+    render: function () {
+      // Your render logic here
+    }
+  });
+} else {
+  console.warn("⚠️ OperatorDockConsole.registerPanel not available at this stage.");
+}
 // === Phase 27.1 — Neural Hotkey Macro Channel Bootstrap ===
 SageCraftAscendant.NeuralMacroCodex = (function() {
   const macroRegistry = loadMacroRegistry();

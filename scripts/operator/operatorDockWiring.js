@@ -1564,11 +1564,14 @@ setTimeout(() => {
 setTimeout(() => {
     console.log("🚀 Executing Phase 300.13: Dynamic Dock Panel Population...");
 
-    const dockGrid = document.getElementById("operatorDockGrid");
+    // Inserted DOM safety check for dock grid
+    const dockGrid = document.getElementById("dockGrid");
     if (!dockGrid) {
-        console.warn("❌ Dock Grid not found.");
-        return;
+      console.warn("❌ Dock Grid not found. Skipping dynamic dock population.");
+      return;
     }
+
+    // (If "operatorDockGrid" is correct, you may want to adjust the ID above accordingly)
 
     const dockDefinitions = [
         { id: "count", label: "📊 Live Counts", description: "Live inventory counting subsystem online." },
@@ -1707,6 +1710,32 @@ OperatorDockWiring.registerSubsystemDock({
 
 // === Register subsystem alias "whisperer" for "whispererConsole" ===
 // Register the Whisperer subsystem dock for orbit button support
+
+// --- Ensure registerSubsystemDock is available globally ---
+function registerSubsystemDock(dockId, dockConfig) {
+    if (!dockId || typeof dockId !== 'string') {
+        console.warn(`registerSubsystemDock: Invalid dock ID →`, dockId);
+        return;
+    }
+
+    // Find or create the panel container
+    let panel = document.getElementById(dockId);
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = dockId;
+        panel.className = 'sovereign-dock-panel';
+        document.body.appendChild(panel);
+    }
+
+    // Apply dockConfig if provided
+    if (dockConfig && typeof dockConfig === 'object') {
+        Object.assign(panel.style, dockConfig.style || {});
+        panel.innerHTML = dockConfig.content || '';
+    }
+
+    console.log(`✅ Subsystem Dock '${dockId}' successfully registered.`);
+}
+
 registerSubsystemDock({
   orbit: 'whisperer',
   panelId: 'whispererConsole',
@@ -1962,134 +1991,3 @@ setTimeout(() => {
       }
     }, 1800);
 }, 1200);
-
-// === Delta Analyzer Console Runtime Activation ===
-setTimeout(() => {
-    const deltaConsole = document.getElementById("deltaAnalyzerConsole");
-    if (!deltaConsole) return;
-
-    const scanTime = deltaConsole.querySelector(".delta-scan-time");
-    const driftSpan = deltaConsole.querySelector(".drift-events");
-    const spikeSpan = deltaConsole.querySelector(".critical-spikes");
-    const logList = deltaConsole.querySelector(".delta-log-entries");
-
-    // DOM-ready check before HUD element access
-    const mockScan = () => {
-        if (!document.readyState || document.readyState !== 'complete') {
-            console.warn("⏳ DOM not fully ready — deferring HUD binding.");
-            setTimeout(() => mockScan(), 100);
-            return;
-        }
-        const now = new Date().toLocaleTimeString();
-        const driftCount = Math.floor(Math.random() * 5);
-        const spikeCount = Math.floor(Math.random() * 3);
-
-        if (scanTime) {
-          scanTime.textContent = now;
-        } else {
-          console.warn("⚠️ Element not found for text assignment: scanTime");
-        }
-        if (driftSpan) {
-          driftSpan.textContent = driftCount;
-        } else {
-          console.warn("⚠️ Element not found for text assignment: driftSpan");
-        }
-        if (spikeSpan) {
-          spikeSpan.textContent = spikeCount;
-        } else {
-          console.warn("⚠️ Element not found for text assignment: spikeSpan");
-        }
-
-        const logs = [
-            "Δ minor offset detected in HVAC",
-            "Δ product sync drift in Bay 6",
-            "⚠ unexpected delta in ESL map",
-            "🚨 spike in UPC mapping",
-            "✅ correction algorithm stabilized drift"
-        ];
-
-        if (logList) {
-          logList.innerHTML = "";
-          for (let i = 0; i < driftCount + spikeCount; i++) {
-              const entry = logs[Math.floor(Math.random() * logs.length)];
-              const li = document.createElement("li");
-              li.textContent = `[${now}] ${entry}`;
-              logList.appendChild(li);
-          }
-        } else {
-          console.warn("⚠️ Element not found for log list assignment: logList");
-        }
-
-        console.log("📡 Delta Analyzer scan completed.");
-    };
-
-    const deltaScanBtn = deltaConsole?.querySelector(".run-delta-scan");
-    if (deltaScanBtn) {
-      deltaScanBtn.addEventListener("click", mockScan);
-      console.log("✅ Delta scan button wired.");
-    } else {
-      console.warn("⚠️ Delta scan button not found — skipping listener attachment.");
-    }
-
-// Example of replacing direct addEventListener calls with SafeBind for robust error handling
-// Replace the following lines (if they exist elsewhere in the file or are added in the future):
-// document.getElementById("scanTime").addEventListener("click", handleScanTime);
-// document.getElementById("driftSpan").addEventListener("click", handleDriftSpan);
-// document.getElementById("spikeSpan").addEventListener("click", handleSpikeSpan);
-// document.getElementById("logList").addEventListener("click", handleLogList);
-// document.getElementById("sessionManagerBtn").addEventListener("click", openSessionManager);
-// document.getElementById("someOtherBtn").addEventListener("click", handleOtherAction);
-// With:
-// SafeBind("scanTime", "click", handleScanTime);
-// SafeBind("driftSpan", "click", handleDriftSpan);
-// SafeBind("spikeSpan", "click", handleSpikeSpan);
-// SafeBind("logList", "click", handleLogList);
-// SafeBind("sessionManagerBtn", "click", openSessionManager);
-// SafeBind("someOtherBtn", "click", handleOtherAction);
-
-    mockScan();
-}, 1300);
-
-// === Whisperer Orbit Button Toggle Logic (Refactored for DOMContentLoaded) ===
-
-// --- Begin: Dock Bindings and initializeDockBindings ---
-// Central dockBindings registry for orbit<->panel mapping.
-const dockBindings = [
-  // Example: { orbit: "count", panelId: "countConsole" },
-  // Add more as needed.
-];
-
-// Add whisperer mapping if not already present
-if (!dockBindings.some(b => b.orbit === "whisperer" && b.panelId === "whispererConsole")) {
-  dockBindings.push({
-    orbit: "whisperer",
-    panelId: "whispererConsole",
-  });
-}
-
-// === Trace: Log the dockBindings registry for verification ===
-console.log("🧩 Dock Subsystem Registry:");
-dockBindings.forEach(sub => {
-  console.log(`🔹 Orbit: ${sub.orbit}, Panel: ${sub.panelId}`);
-});
-
-// === Orbit Button to Dock Panel Toggle Logic ===
-// This block ensures any [data-orbit] button opens its corresponding dock panel reliably.
-document.querySelectorAll('[data-orbit]').forEach(button => {
-  button.addEventListener('click', (e) => {
-    const orbitTarget = button.getAttribute('data-orbit');
-    console.log(`🌀 Orbit clicked: ${orbitTarget}`);
-
-    // Check if a matching dock panel exists
-    const dockPanel = document.getElementById(`${orbitTarget}Console`);
-    if (dockPanel) {
-      console.log(`🚪 Opening dock panel: ${orbitTarget}Console`);
-      // Hide all other panels first
-      document.querySelectorAll('.dock-panel').forEach(panel => panel.classList.add('hidden'));
-      // Show the target panel
-      dockPanel.classList.remove('hidden');
-    } else {
-      console.warn(`❌ No matching dock panel found for: ${orbitTarget}Console`);
-    }
-  });
-});

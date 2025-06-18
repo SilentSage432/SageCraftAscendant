@@ -709,8 +709,13 @@ window.NeuralMeshIntegritySentinel = (function () {
       return;
     }
 
-    // Force full mesh refresh
-    NeuralOrbitalDockMesh.renderOrbitalDock();
+    // Force full mesh refresh, but only if the dock container exists
+    const dockContainer = document.getElementById("orbitalDockContainer");
+    if (dockContainer) {
+      NeuralOrbitalDockMesh.renderOrbitalDock();
+    } else {
+      console.warn("❌ Orbital Dock Container not found. Skipping renderOrbitalDock().");
+    }
     console.log("✅ Mesh synchronized with latest registry state.");
   }
 
