@@ -26,7 +26,8 @@ function renderSovereignToolbar() {
     { id: "tools", label: "Tools" },
     { id: "audit", label: "Audit" },
     { id: "configPanel", label: "Config" },
-    { id: "forecastConsole", label: "Forecast Console" }
+    { id: "forecastConsole", label: "Forecast Console" },
+    { id: "loreEngine", label: "Lore Engine" }
   ];
 
   const toolbarWrapper = document.createElement("div");

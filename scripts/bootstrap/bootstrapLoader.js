@@ -1,8 +1,23 @@
 // SageCraft Ascendant — Sovereign Bootstrap Loader
 // Phase 500.6 Unified Sovereign Dock Loader
 
+// Helper to load scripts with callback and error logging
+function loadScript(src, callback) {
+  const script = document.createElement('script');
+  script.src = src;
+  script.onload = callback || function () {
+    console.log(`✅ Script loaded: ${src}`);
+  };
+  script.onerror = function () {
+    console.error(`❌ Failed to load script: ${src}`);
+  };
+  document.head.appendChild(script);
+}
+
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 console.log("✅ Sovereign Namespace Activated");
+
+let bootstrapInitialized = false;
 
 // Load Core Modules
 console.log("✅ Loaded core.namespace.js");
@@ -63,9 +78,12 @@ console.log("✅ Loaded dock.persistence.js");
 console.log("✅ Loaded autonomous.js");
 console.log("✅ Loaded registry.orbits.js");
 console.log("✅ Loaded registry.editor.js");
+console.log("✅ Loaded panel.registry.js");
 
 // Load Operator Console
 console.log("✅ Loaded operator.console.js");
+loadScript("scripts/registry/panel.registry.js");
+loadScript("scripts/panels/forecastConsole.panel.js");
 
 // Unified Sovereign API Bridge + Mount Controller
 import('/scripts/operator/operatorDockWiring.js').then(module => {
@@ -93,6 +111,9 @@ import('/scripts/operator/operatorDockWiring.js').then(module => {
     { id: "toolsSection", content: api.getToolsContent },
     { id: "auditSection", content: api.getAuditContent },
     { id: "configPanelSection", content: api.getConfigPanelContent }
+    ,
+    { id: "forecastConsoleSection", content: api.getForecastConsoleContent },
+    { id: "loreEngineSection", content: api.getLoreEngineConsoleContent }
   ];
 
   dockPanels.forEach(panel => {
@@ -109,11 +130,26 @@ import('/scripts/operator/operatorDockWiring.js').then(module => {
 
 // Neural Unified Bootstrap Loader
 import('/scripts/bootstrap/bootstrapNeural.js').then(module => {
-  if (typeof window.NeuralUnifiedBootstrap !== 'function') {
-    console.warn("⚠️ NeuralUnifiedBootstrap is not properly defined in bootstrapNeural.js.");
-  } else {
-    console.log("✅ NeuralUnifiedBootstrap registered successfully.");
+  function waitForNeuralBootstrap(attempt = 0) {
+    if (typeof window.NeuralUnifiedBootstrap === 'function' && !bootstrapInitialized) {
+      console.log("🧠 NeuralUnifiedBootstrap: Invoked successfully.");
+      try {
+        window.NeuralUnifiedBootstrap();
+        bootstrapInitialized = true;
+        console.log("🚀 NeuralUnifiedBootstrap execution initiated.");
+      } catch (err) {
+        console.error("❌ NeuralUnifiedBootstrap execution failed:", err);
+      }
+    } else if (typeof window.NeuralUnifiedBootstrap !== 'function' && attempt < 50) {
+      console.warn(`⏳ Waiting for NeuralUnifiedBootstrap... attempt ${attempt + 1}`);
+      setTimeout(() => waitForNeuralBootstrap(attempt + 1), 100);
+    } else if (!bootstrapInitialized) {
+      console.error("❌ NeuralUnifiedBootstrap failed to register after multiple attempts.");
+    }
   }
+
+  waitForNeuralBootstrap();
+  console.log("✅ NeuralUnifiedBootstrap is defined and ready.");
 }).catch(err => {
   console.error("❌ Failed to load bootstrapNeural.js:", err);
 });

@@ -1513,56 +1513,66 @@ function injectLiveOrbit() {
 // (Locate this section in your file; add the following after sessionManagerConsole wiring)
 
 // --- Sage Feed Console Initialization and Wiring ---
-document.addEventListener("DOMContentLoaded", () => {
-    const sageFeedConsole = document.getElementById("sageFeedConsole");
+function initializeSageFeedConsole() {
+  const input = document.getElementById("sageFeedInput");
+  const submitBtn = document.getElementById("sageFeedSubmit");
 
-    if (sageFeedConsole) {
-        const feedInput = sageFeedConsole.querySelector(".feed-input");
-        const submitBtn = sageFeedConsole.querySelector(".submit-feed");
+  if (!input || !submitBtn) {
+    console.warn("⚠️ Feed input or submit button missing in Sage Feed Console.");
+    return;
+  }
 
-        if (submitBtn && feedInput) {
-            submitBtn.addEventListener("click", () => {
-                const message = feedInput.value.trim();
-                if (message) {
-                    console.log(`📡 Sage Feed received: "${message}"`);
-                    alert(`Sage Feed received: "${message}"`);
-                    feedInput.value = "";
-                } else {
-                    console.warn("⚠️ No input detected in Sage Feed.");
-                }
-            });
-        } else {
-            console.warn("⚠️ Feed input or submit button missing in Sage Feed Console.");
-        }
-
-        console.log("✅ Sage Feed Console wired successfully.");
-    } else {
-        console.warn("⚠️ Sage Feed Console not found in DOM.");
+  submitBtn.addEventListener("click", () => {
+    const directive = input.value.trim();
+    if (!directive) {
+      console.warn("⚠️ No directive entered.");
+      return;
     }
 
-    // --- Unified Orbit Button Wiring for All .orbit-btn ---
-    document.querySelectorAll('.orbit-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        const targetId = button.getAttribute('data-target');
-        const panel = document.getElementById(targetId);
-        
-        // Debugging log
-        console.log("🌀 Orbit clicked — Target ID:", targetId);
-
-        // Hide all panels
-        document.querySelectorAll('.holo-console').forEach(p => {
-          p.style.display = 'none';
-        });
-
-        // Show target panel
-        if (panel) {
-          panel.style.display = 'block';
-          console.log("✅ Activated panel:", targetId);
-        } else {
-          console.warn("⚠️ Panel not found:", targetId);
-        }
-      });
+    // Dispatch directive via SovereignBus
+    SovereignBus.emit("agentDirective", {
+      agent: "dropAgent",
+      payload: { type: "directive", content: directive },
     });
+
+    console.log(`📡 Directive sent to dropAgent: ${directive}`);
+    input.value = "";
+  });
+
+  console.log("✅ Sage Feed Console wired successfully.");
+}
+
+// Invoke during panel bootstrap
+document.addEventListener("DOMContentLoaded", () => {
+  initializeSageFeedConsole();
+
+  // --- Unified Orbit Button Wiring for All .orbit-btn ---
+  document.querySelectorAll('.orbit-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetId = button.getAttribute('data-target');
+      // Debugging log
+      console.log("🌀 Orbit clicked — Target ID:", targetId);
+
+      switch (targetId) {
+        case "forecastConsole":
+          activatePanel("forecastConsole");
+          break;
+        default:
+          const panel = document.getElementById(targetId);
+          // Hide all panels
+          document.querySelectorAll('.holo-console').forEach(p => {
+            p.style.display = 'none';
+          });
+          // Show target panel
+          if (panel) {
+            panel.style.display = 'block';
+            console.log("✅ Activated panel:", targetId);
+          } else {
+            console.warn("⚠️ Panel not found:", targetId);
+          }
+      }
+    });
+  });
 });
 
 // === Phase 43: Orbital Router Activation Mesh ===
@@ -3058,10 +3068,13 @@ const NeuralOrbitalRouterMesh = (function () {
 })();
 // === Phase 13000.1: Neural Anchor Mesh Synchronization ===
 
+let orbitalDockRendered = false;
 function renderOrbitalDock() {
+  if (orbitalDockRendered) return;
   const orbitalDock = document.getElementById("orbitalDockContainer");
   if (!orbitalDock) {
-    console.warn("⚠ Orbital Dock Container not found.");
+    console.warn("⚠ Orbital Dock Container not found. Retrying in 750ms...");
+    setTimeout(renderOrbitalDock, 750);
     return;
   }
 
@@ -3095,6 +3108,7 @@ function renderOrbitalDock() {
     orbitalDock.appendChild(button);
   });
 
+  orbitalDockRendered = true;
   console.log("✅ Orbital Dock fully synchronized.");
 }
 // === Phase 13000.3: Neural Dock Health Scan & Verification Layer ===
@@ -3190,6 +3204,7 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     if (window.NeuralOrbitalDockMesh?.renderOrbitalDock) {
       NeuralOrbitalDockMesh.renderOrbitalDock();
+      orbitalDockRendered = true;
       console.log("✅ Orbital Dock Rendered Successfully.");
     } else {
       console.error("❌ NeuralOrbitalDockMesh.renderOrbitalDock() unavailable.");

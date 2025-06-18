@@ -22,6 +22,30 @@ SageCraftAscendant.OrbitRegistry = (function() {
     console.log(`🪐 Orbit Registered: ${name}`);
   }
 
+  // Register Lore Engine Orbit
+  registerOrbit(
+    "loreEngineConsole",
+    "Lore Engine",
+    [],
+    "assets/icons/icon-lorebook.png"
+  );
+
+  // Register Forecast Console Orbit
+  registerOrbit(
+    "forecastConsole",
+    "Forecast Console",
+    [],
+    "assets/icons/icon-forecast.png"
+  );
+
+  // Register Whisperer Console Orbit
+  registerOrbit(
+    "whispererConsole",
+    "Whisperer Console",
+    [],
+    "assets/icons/icon-whisperer.png"
+  );
+
   function listOrbits() {
     console.table(orbits);
     return orbits;

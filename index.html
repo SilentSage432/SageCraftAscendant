@@ -496,6 +496,18 @@ function toggleGlyphLegend() {
 
   <div id="commandBridgeOutput" style="margin-top:10px; color:#ccc; font-size:0.9em;"></div>
 </div>
+  <!-- 🌌 Forecast Intelligence Console -->
+  <div id="forecastConsole" class="dock-panel hidden">
+    <!-- Content dynamically injected by renderForecastConsole() -->
+  </div>
+  <div id="orbitalDockContainer"></div>
+  <div id="dockGrid"></div>
+
+  <!-- Forecast Console Section -->
+  <div id="forecastConsoleSection"></div>
+
+  <!-- Lore Engine Section -->
+  <div id="loreEngineSection"></div>
 </body>
 <script>
   function toggleDevConsole() {
@@ -1087,6 +1099,31 @@ function showToast(message = "✅ Done") {
         </div>
       </div>
     </section>
+
+    <!-- 🧪 Sage Feed Console Elements -->
+    <div id="sageFeedConsole" class="dock-panel hidden">
+      <h3>🌿 Sage Feed Console</h3>
+      <input
+        type="text"
+        id="sageFeedInput"
+        placeholder="Enter directive..."
+        autocomplete="off"
+      />
+      <button id="sageFeedSubmit">Send</button>
+      <ul id="sageFeedLog"></ul>
+    </div>
+    <!-- 📊 Forecast Console Panel -->
+    <div id="forecastConsole" class="dock-panel hidden">
+      <h2>📊 Forecast Console</h2>
+      <p>Initializing predictive modules...</p>
+      <!-- Panel content dynamically inserted here -->
+    </div>
+    <!-- 📖 Lore Engine Panel -->
+    <div id="loreEngineConsole" class="dock-panel hidden">
+      <h2>📖 Lore Engine</h2>
+      <p>Initializing Lore Engine Interface...</p>
+      <!-- Future lore content and controls will be injected here -->
+    </div>
     <!-- 3. Dock Grid Stub -->
     <div id="dockGrid" style="display: none;"></div>
 

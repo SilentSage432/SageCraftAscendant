@@ -1,4 +1,27 @@
+// === Panel Manual Recovery Helper ===
+window.OperatorDockConsole = window.OperatorDockConsole || {};
+OperatorDockConsole.forceRegister = function(panelId) {
+  if (typeof registerPanel === "function") {
+    registerPanel(panelId);
+    console.log(`✅ Manual registerPanel triggered for: ${panelId}`);
+  } else {
+    console.error("❌ registerPanel function not available in current scope.");
+  }
+};
 // === Phase 27.2 — Neural Macro Console Panel Injection ===
+
+// Ensure OperatorDockConsole global exists for early references
+// Phase 1: OperatorConsole Initialization
+if (!window.OperatorDockConsole) {
+  window.OperatorDockConsole = {
+    diagnostics: () => {
+      console.log("🧪 OperatorDockConsole Diagnostics: Running checks...");
+      // Future diagnostics logic can be implemented here
+      return "Diagnostics complete.";
+    }
+  };
+  console.log("✅ OperatorDockConsole initialized globally.");
+}
 // Safeguard for renderMacroConsolePanel on window
 if (typeof window.renderMacroConsolePanel === "undefined") {
   window.renderMacroConsolePanel = function () {
@@ -119,23 +142,13 @@ if (typeof SageCraftAscendant.OperatorConsole === "object") {
     section.appendChild(importInput);
 
     container.appendChild(section);
-  };
+};
 } else {
   console.warn("⚠️ OperatorDockConsole not initialized yet. Skipping panel binding.");
 }
 
 // Macro Console Panel Registration — Phase 27.2
-if (typeof OperatorDockConsole !== "undefined" && typeof OperatorDockConsole.registerPanel === "function") {
-  OperatorDockConsole.registerPanel({
-    id: 'yourPanelId',
-    name: 'Your Panel Name',
-    render: function () {
-      // Your render logic here
-    }
-  });
-} else {
-  console.warn("⚠️ OperatorDockConsole.registerPanel not available at this stage.");
-}
+// (Old OperatorDockConsole.registerPanel logic removed)
 // === Phase 27.1 — Neural Hotkey Macro Channel Bootstrap ===
 SageCraftAscendant.NeuralMacroCodex = (function() {
   const macroRegistry = loadMacroRegistry();
@@ -324,13 +337,17 @@ SageCraftAscendant.DockMeshSyncBridge = (function() {
 
   const OperatorSessionID = "Operator001";
 
-  // Hook into DockPersistenceHub save operation
-  const originalSave = SageCraftAscendant.DockPersistenceHub.save;
-
-  SageCraftAscendant.DockPersistenceHub.save = function(stateArray) {
-    originalSave.call(SageCraftAscendant.DockPersistenceHub, stateArray);
-    broadcastDockLayout(stateArray);
-  };
+  // Hook into DockPersistenceHub save operation (intercept and wrap)
+  if (typeof SageCraftAscendant.DockPersistenceHub !== "undefined") {
+    const originalSave = SageCraftAscendant.DockPersistenceHub.save;
+    const wrappedSave = function () {
+      console.log("💾 Intercepted dock save event");
+      return originalSave.apply(this, arguments);
+    };
+    SageCraftAscendant.DockPersistenceHub.save = wrappedSave;
+  } else {
+    console.warn("⚠️ DockPersistenceHub not yet defined — skipping override.");
+  }
 
   function broadcastDockLayout(stateArray) {
     console.log("📡 DockMeshSyncBridge: Broadcasting dock state...");
@@ -699,9 +716,97 @@ SageCraftAscendant.DockPersistence = (function() {
     clearDockLayout
   };
 })();
-  // Phase 22.5 — Forecast Model Performance Console Panel
-  SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel = function (container) {
-    if (!container) return;
+
+// === Phase 22.5 — Forecast Model Performance Console Panel
+// Ensure OperatorDockConsole is initialized before any dependent assignments
+if (!window.OperatorDockConsole) {
+  window.OperatorDockConsole = {
+    diagnostics: () => {
+      console.log("🧪 OperatorDockConsole Diagnostics: Running checks...");
+      return "Diagnostics complete.";
+    }
+  };
+  console.log("✅ OperatorDockConsole initialized globally.");
+}
+
+// --- Forecast Performance Console Panel: Safe registration block ---
+function forecastRenderFunc(container) {
+  if (!container) return;
+
+  const section = document.createElement("div");
+  section.classList.add("console-section");
+
+  const header = document.createElement("h3");
+  header.textContent = "📈 Forecast Performance Console";
+  section.appendChild(header);
+
+  const evaluateBtn = document.createElement("button");
+  evaluateBtn.textContent = "🔬 Evaluate Forecast Accuracy";
+  evaluateBtn.onclick = () => {
+    const liveData = SageCraftAscendant.NeuralMemoryExpansion?.loadLiveTableMemory?.();
+    if (!liveData || liveData.length === 0) {
+      alert("⚠ No live table data available to evaluate.");
+      return;
+    }
+    const evaluation = SageCraftAscendant.ForecastCortex?.evaluateForecastAccuracy(liveData);
+    if (!evaluation) {
+      alert("⚠ No forecast available to evaluate.");
+      return;
+    }
+    renderEvaluation(evaluation);
+  };
+  section.appendChild(evaluateBtn);
+
+  const evaluationContainer = document.createElement("div");
+  evaluationContainer.style.border = "1px solid #555";
+  evaluationContainer.style.background = "#111";
+  evaluationContainer.style.padding = "10px";
+  evaluationContainer.style.height = "250px";
+  evaluationContainer.style.overflowY = "scroll";
+  evaluationContainer.style.marginTop = "10px";
+  section.appendChild(evaluationContainer);
+
+  function renderEvaluation(evaluation) {
+    evaluationContainer.innerHTML = '';
+    evaluation.forEach(result => {
+      const entryDiv = document.createElement("div");
+      entryDiv.style.marginBottom = "8px";
+      if (result.actualQty !== null) {
+        entryDiv.innerHTML = `
+          <b>${result.item} — ${result.desc}</b><br>
+          Projected: ${result.projectedQty} | Actual: ${result.actualQty} | 
+          Error: ${result.error} | Accuracy: ${result.accuracy}%
+        `;
+      } else {
+        entryDiv.innerHTML = `
+          <b>${result.item} — ${result.desc}</b><br>
+          Projected: ${result.projectedQty} | Actual: Unknown
+        `;
+      }
+      evaluationContainer.appendChild(entryDiv);
+    });
+  }
+
+  container.appendChild(section);
+}
+
+// Assign or defer registration depending on registerPanel readiness
+if (
+  typeof SageCraftAscendant.OperatorConsole === "object" &&
+  typeof SageCraftAscendant.OperatorConsole.registerPanel !== "function"
+) {
+  console.warn("⚠️ registerPanel method is not yet available. Deferring forecast console registration...");
+  const intervalId = setInterval(() => {
+    if (typeof SageCraftAscendant.OperatorConsole.registerPanel === "function") {
+      console.log("✅ Delayed forecast panel registration proceeding...");
+      SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel = forecastRenderFunc;
+      clearInterval(intervalId);
+    }
+  }, 500);
+  // Do not assign yet, will assign when ready
+} else if (typeof SageCraftAscendant.OperatorConsole === "object") {
+  SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel = forecastRenderFunc;
+}
 
     const section = document.createElement("div");
     section.classList.add("console-section");
@@ -736,29 +841,147 @@ SageCraftAscendant.DockPersistence = (function() {
     evaluationContainer.style.marginTop = "10px";
     section.appendChild(evaluationContainer);
 
-    function renderEvaluation(evaluation) {
-      evaluationContainer.innerHTML = '';
-      evaluation.forEach(result => {
-        const entryDiv = document.createElement("div");
-        entryDiv.style.marginBottom = "8px";
-        if (result.actualQty !== null) {
-          entryDiv.innerHTML = `
-            <b>${result.item} — ${result.desc}</b><br>
-            Projected: ${result.projectedQty} | Actual: ${result.actualQty} | 
-            Error: ${result.error} | Accuracy: ${result.accuracy}%
-          `;
-        } else {
-          entryDiv.innerHTML = `
-            <b>${result.item} — ${result.desc}</b><br>
-            Projected: ${result.projectedQty} | Actual: Unknown
-          `;
+    // Forecast Console Panel Registration for OperatorDockConsole (modernized)
+    // --- Begin new forecastConsole.panel.js code injection ---
+    if (typeof OperatorDockConsole !== "undefined" && typeof OperatorDockConsole.registerPanel === "function") {
+      OperatorDockConsole.registerPanel({
+        id: 'forecastConsole',
+        name: 'Forecast Console',
+        render: function(container) {
+          const section = document.createElement("section");
+          section.classList.add("console-section");
+
+          const title = document.createElement("h3");
+          title.textContent = "Forecast Performance Evaluation";
+          section.appendChild(title);
+
+          const evaluationContainer = document.createElement("div");
+          evaluationContainer.id = "forecastEvaluationResults";
+          section.appendChild(evaluationContainer);
+
+          function renderEvaluation(evaluation) {
+            evaluationContainer.innerHTML = '';
+            evaluation.forEach(result => {
+              const entryDiv = document.createElement("div");
+              entryDiv.style.marginBottom = "8px";
+              if (result.actualQty !== null) {
+                entryDiv.innerHTML = `
+                  <b>${result.item} — ${result.desc}</b><br>
+                  Projected: ${result.projectedQty} | Actual: ${result.actualQty} | 
+                  Error: ${result.error} | Accuracy: ${result.accuracy}%
+                `;
+              } else {
+                entryDiv.innerHTML = `
+                  <b>${result.item} — ${result.desc}</b><br>
+                  Projected: ${result.projectedQty} | Actual: Unknown
+                `;
+              }
+              evaluationContainer.appendChild(entryDiv);
+            });
+          }
+
+          // Expose the renderer globally for mesh or other consumers
+          SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel = renderEvaluation;
+
+          container.appendChild(section);
         }
-        evaluationContainer.appendChild(entryDiv);
       });
     }
+    // --- End forecastConsole.panel.js code injection ---
 
-    container.appendChild(section);
-  };
+  // === Forecast Intelligence Console Panel ===
+  function renderForecastConsole() {
+    const container = document.getElementById("forecastConsole");
+    if (!container) {
+      console.warn("⚠️ Forecast Console container not found.");
+      return;
+    }
+
+    container.innerHTML = `
+      <h2>📈 Forecast Intelligence Console</h2>
+      <div class="forecast-metrics">
+        <p><strong>Trend Stability:</strong> <span id="trendStability">-</span></p>
+        <p><strong>Drift Trajectory:</strong> <span id="driftTrajectory">-</span></p>
+        <p><strong>Signal Clarity:</strong> <span id="signalClarity">-</span></p>
+      </div>
+      <ul id="forecastLogs" class="console-log-list"></ul>
+    `;
+
+    // Populate with mock values
+    document.getElementById("trendStability").textContent = `${Math.floor(Math.random() * 100)}%`;
+    document.getElementById("driftTrajectory").textContent = `${(Math.random() * 10).toFixed(2)} units`;
+    document.getElementById("signalClarity").textContent = `${(Math.random() * 100).toFixed(1)} dB`;
+
+    const logs = [
+      "📡 Synchronizing horizon predictors...",
+      "🧪 Analyzing pattern volatility...",
+      "🌀 Drift containment systems holding...",
+      "🌐 Confidence index recalibrated...",
+      "🛡 Threat vector foresight stabilized..."
+    ];
+
+    const logContainer = document.getElementById("forecastLogs");
+    if (logContainer) {
+      logContainer.innerHTML = "";
+      logs.forEach(log => {
+        const li = document.createElement("li");
+        li.textContent = `[${new Date().toLocaleTimeString()}] ${log}`;
+        logContainer.appendChild(li);
+      });
+    }
+  }
+
+  // === Forecast Console Panel Registration (Event-based, resilient) ===
+  function waitForRegisterPanel() {
+    // Early exit if registerPanel is not yet defined at all (not even as a function)
+  if (typeof window.registerPanel !== "function") {
+    console.warn("⚠️ registerPanel is not yet defined. Deferring panel registration.");
+    document.addEventListener("SageReady", waitForRegisterPanel, { once: true });
+    return;
+  }
+    // If defined, proceed to register the panel
+    window.registerPanel("forecastConsole", {
+      title: "Forecast Console",
+      render: container => {
+        if (SageCraftAscendant?.OperatorConsole?.renderForecastPerformancePanel) {
+          SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel(container);
+        } else {
+          console.warn("⚠️ Forecast render function not ready.");
+        }
+      }
+    });
+    console.log("✅ Forecast Console panel successfully registered via event-based handler.");
+    // Signal that SageReady is now available (in case others are waiting)
+    document.dispatchEvent(new Event("SageReady"));
+  }
+
+window.addEventListener("load", () => {
+  console.log("🌐 Window fully loaded — beginning forecastConsole registration...");
+  waitForRegisterPanel();
+  // Extended fallback: after 10 seconds, if still not registered, inform user of manual recovery
+  setTimeout(() => {
+    if (typeof window.registerPanel !== "function") {
+      console.warn("registerPanel still unavailable after extended wait. Silent fallback engaged.");
+      console.info("🛠️ Manual recovery option: Use OperatorDockConsole.forceRegister('forecastConsole') to retry panel binding.");
+    }
+  }, 10000);
+
+  // === Phase 300.19 — Panel Activation Binding ===
+  // Wait until registerPanel is available, then register forecastConsole and loreEngineConsole panels
+  function waitForRegisterPanel(callback) {
+    const interval = setInterval(() => {
+      if (typeof registerPanel === "function") {
+        clearInterval(interval);
+        callback();
+      }
+    }, 100);
+  }
+
+  waitForRegisterPanel(() => {
+    registerPanel("forecastConsole", "Forecast Console", "forecastConsole.panel.html");
+    registerPanel("loreEngineConsole", "Lore Engine", "loreEngine.panel.html");
+  });
+});
   // Phase 22.2 — Live Data Fusion Integration
   SageCraftAscendant.OperatorConsole.renderForecastCortexPanel = function (container) {
   // === Phase 28.1 — Operator Script Console Panel Injection ===
@@ -1212,6 +1435,21 @@ SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
   label: 'Neural Macro Console',
   render: SageCraftAscendant.OperatorConsole.renderMacroConsolePanel
 });
+
+// === Register Lore Engine Console Panel ===
+if (typeof registerPanel === "function" && typeof loreEngineConsole !== "undefined") {
+  registerPanel("loreEngineConsole", loreEngineConsole);
+}
+
+// === Forecast Console Panel Registration for OperatorDockConsole (legacy system) ===
+if (typeof OperatorDockConsole !== "undefined" && typeof OperatorDockConsole.registerPanel === "function") {
+  OperatorDockConsole.registerPanel({
+    id: 'forecastConsole',
+    name: 'Forecast Console',
+    icon: '📊',
+    render: renderForecastConsole,
+  });
+}
 
 // === Phase 29.3 — Dock Resurrection Finalization ===
 

@@ -302,5 +302,26 @@ function logFeedbackTrace(data) {
   container.appendChild(line);
 }
 
+// === Phase 300.21 — Companion Protocol Initialization ===
+SovereignBus.on('companionDirective', (event) => {
+  const directive = event?.detail;
+  if (!directive) {
+    console.warn("⚠ Received empty companion directive.");
+    return;
+  }
+
+  const { target, action, payload } = directive;
+  const companion = window.CompanionRegistry?.[target];
+
+  if (companion && typeof companion.receiveDirective === 'function') {
+    console.log(`🤝 Companion '${target}' received directive:`, directive);
+    companion.receiveDirective({ action, payload });
+  } else {
+    console.warn(`❌ Companion '${target}' not found or does not support receiveDirective.`);
+  }
+});
+
+console.log("🤝 SovereignBus: Companion Protocol Initialized.");
+
 // Make SovereignBus globally accessible as SovereignEventBus
 window.SovereignEventBus = window.SovereignBus;

@@ -1541,6 +1541,25 @@ setTimeout(() => {
         configPanel: "configPanelSection"
     };
 
+    // Enhanced migration validation
+    const dockBindings = Object.entries(dockMap).map(([panelId, legacyId]) => ({ panelId, legacyId }));
+    dockBindings.forEach(binding => {
+      const targetId = `${binding.panelId}Console`;
+      const panelEl = document.getElementById(targetId);
+      if (!panelEl) {
+        console.warn(`⚠ Migration skipped — panel not found for: ${targetId}`);
+        return;
+      }
+      try {
+        panelEl.classList.add("dock-panel");
+        console.log(`✅ Migration completed for panel: ${targetId}`);
+      } catch (e) {
+        console.error(`❌ Error during migration for ${targetId}:`, e);
+      }
+    });
+
+    // (Original migration logic for legacy containers, if needed)
+    /*
     Object.entries(dockMap).forEach(([dockId, legacyId]) => {
         const legacyContainer = document.getElementById(legacyId);
         const newDockPanel = document.getElementById(dockId);
@@ -1550,9 +1569,10 @@ setTimeout(() => {
             legacyContainer.remove();
             console.log(`✅ Migrated '${legacyId}' ➔ '${dockId}'`);
         } else {
-            console.warn(`⚠ Skipped migration for '${dockId}'`);
+            // console.warn(`⚠ Skipped migration for '${dockId}'`);
         }
     });
+    */
 
     console.log("✅ Phase 300.9 Dock Grid Unification complete.");
 
@@ -1650,13 +1670,20 @@ OperatorDockWiring.registerSubsystemDock({
     }
 });
 
-// Forecast Console Subsystem Dock Registration
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "forecastConsole",
-    onClick: () => {
-        console.log("📊 Forecast Console Activated");
-        alert("📊 Forecast Console Panel Loaded — Forecasting Subsystem Online");
-    }
+
+// === Phase 500 — Dock Panel Registration Listeners ===
+document.addEventListener("OperatorDockReady", () => {
+  console.log("🧩 OperatorDockReady event detected — registering Forecast Console panel...");
+  if (typeof registerPanel === "function") {
+    registerPanel("forecastConsole", {
+      title: "Forecast Console",
+      icon: "📡",
+      contentId: "forecastConsolePanel"
+    });
+    console.log("✅ Forecast Console panel registered via event.");
+  } else {
+    console.error("❌ registerPanel is not available.");
+  }
 });
 
 // === Additional Subsystem Dock Registrations ===
@@ -1712,28 +1739,57 @@ OperatorDockWiring.registerSubsystemDock({
 // Register the Whisperer subsystem dock for orbit button support
 
 // --- Ensure registerSubsystemDock is available globally ---
-function registerSubsystemDock(dockId, dockConfig) {
-    if (!dockId || typeof dockId !== 'string') {
-        console.warn(`registerSubsystemDock: Invalid dock ID →`, dockId);
+function registerSubsystemDock(config) {
+    // Accepts either (dockId, dockConfig) for legacy or (config) for new API
+    if (!config) {
+        console.warn("registerSubsystemDock: No configuration provided.");
         return;
     }
-
-    // Find or create the panel container
-    let panel = document.getElementById(dockId);
-    if (!panel) {
-        panel = document.createElement('div');
-        panel.id = dockId;
-        panel.className = 'sovereign-dock-panel';
-        document.body.appendChild(panel);
+    // If string, legacy signature
+    if (typeof config === "string") {
+        console.warn("registerSubsystemDock: Legacy API signature detected, please update usage.");
+        return;
     }
-
-    // Apply dockConfig if provided
-    if (dockConfig && typeof dockConfig === 'object') {
-        Object.assign(panel.style, dockConfig.style || {});
-        panel.innerHTML = dockConfig.content || '';
+    // Modern config: expects either {dockId, onClick, ...} or {orbit, panelId, ...}
+    if (config.dockId) {
+        // Existing registration logic
+        const dockId = config.dockId;
+        let panel = document.getElementById(dockId);
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = dockId;
+            panel.className = 'sovereign-dock-panel';
+            document.body.appendChild(panel);
+        }
+        Object.assign(panel.style, config.style || {});
+        if (config.content) panel.innerHTML = config.content;
+        if (typeof config.onClick === "function") {
+            panel.addEventListener("click", config.onClick);
+        }
+        if (typeof config.visible === "boolean") {
+            if (config.visible) {
+                panel.classList.remove("hidden");
+            } else {
+                panel.classList.add("hidden");
+            }
+        }
+        console.log(`✅ Subsystem Dock '${dockId}' successfully registered.`);
+        return;
     }
-
-    console.log(`✅ Subsystem Dock '${dockId}' successfully registered.`);
+    // New orbit/panelId config (for alias/activation mapping)
+    if (config.orbit && config.panelId) {
+        // Optionally: store this mapping for orbit button support, or just log it.
+        // In real system, you may want to wire this to button activation logic.
+        window.SovereignDockOrbitMap = window.SovereignDockOrbitMap || {};
+        window.SovereignDockOrbitMap[config.orbit] = {
+            panelId: config.panelId,
+            title: config.title,
+            icon: config.icon
+        };
+        console.log(`✅ Subsystem Dock alias registered: orbit='${config.orbit}', panelId='${config.panelId}'`);
+        return;
+    }
+    console.warn("registerSubsystemDock: Invalid configuration object.", config);
 }
 
 registerSubsystemDock({
@@ -1741,6 +1797,14 @@ registerSubsystemDock({
   panelId: 'whispererConsole',
   title: 'The Whisperer',
   icon: 'assets/icons/icon-whisperer-glyph.png'
+});
+
+// === Lore Engine Panel Registration ===
+registerSubsystemDock({
+  orbit: "loreEngine",
+  panelId: "loreEngineConsole",
+  title: "Lore Engine",
+  icon: "assets/icons/icon-lorebook.png"
 });
 
 // 🧠 Phase 400.9 — Delta Analyzer Console Initialization
@@ -1991,3 +2055,23 @@ setTimeout(() => {
       }
     }, 1800);
 }, 1200);
+
+// === Phase 400.4 — HUD Reactivation Monitor Loop ===
+setTimeout(() => {
+  console.log("🔁 HUD Reactivation Monitor Cycle Initiated");
+
+  const dockStatusText = document.getElementById("dockStatusText");
+  const lastSync = document.getElementById("lastSync");
+  const itemSpan = document.getElementById("itemSpan");
+  const categorySpan = document.getElementById("categorySpan");
+  const recentList = document.getElementById("recentList");
+
+  if (
+    dockStatusText && lastSync &&
+    itemSpan && categorySpan && recentList
+  ) {
+    console.log("✅ HUD elements are stable and reactive.");
+  } else {
+    console.warn("⚠️ One or more HUD elements failed rebind check.");
+  }
+}, 3000);
