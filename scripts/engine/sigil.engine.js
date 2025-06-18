@@ -6,6 +6,12 @@ const SigilEngine = {
   sigils: {},
 
   createSigil(name, properties = {}) {
+    if (this.sigils[name]) {
+      alert(`⚠️ A sigil named '${name}' already exists.`);
+      console.warn(`❌ Duplicate sigil creation prevented: '${name}' already exists.`);
+      return null;
+    }
+
     const sigil = {
       id: `sigil-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       name,
@@ -87,10 +93,28 @@ const SigilEngine = {
         <strong>${sigil.name}</strong> (${sigil.type} • ${sigil.element})<br/>
         ${sigil.visual ? `<img src="${sigil.visual}" alt="${sigil.name}" style="max-width: 100px;">` : ""}
         <small>ID: ${sigil.id}</small><br/>
-        <em>Forged on: ${new Date(sigil.createdAt).toLocaleString()}</em>
+        <em>Forged on: ${new Date(sigil.createdAt).toLocaleString()}</em><br/>
+        <button onclick="populateSigilEditFields('${sigil.name}')" style="margin-top: 5px;">✏️ Edit</button>
+        <button onclick="deleteSigilAndRefresh('${sigil.name}')" style="margin-top: 5px; margin-left: 5px;">🗑️ Delete</button>
       </div>
     `;
   },
+
+// 🌌 Utility — Sigil Archive Renderer
+
+  updateSigilArchive() {
+    const archiveTarget = document.getElementById("sigilArchiveScroll");
+    if (!archiveTarget) return;
+
+    const allSigils = this.listDetailedSigils().reverse();
+    archiveTarget.innerHTML = allSigils
+      .map(sigil => this.renderSigilSummary(sigil.name))
+      .join("");
+
+    console.log("📚 Sigil archive updated.");
+  }
+
+  ,
 
   saveSigilsToStorage() {
     try {
@@ -100,7 +124,9 @@ const SigilEngine = {
     } catch (e) {
       console.error("❌ Failed to save sigils:", e);
     }
-  },
+  }
+
+  ,
 
   loadSigilsFromStorage() {
     try {
@@ -112,11 +138,11 @@ const SigilEngine = {
     } catch (e) {
       console.error("❌ Failed to load sigils:", e);
     }
-  },
+  }
 };
 
 SigilEngine.loadSigilsFromStorage();
-updateSigilArchive();
+SigilEngine.updateSigilArchive();
 
 // 🌈 Phase 18.4 — Sigil Selection + Reactive Highlighting
 function highlightSelectedSigil(name) {
@@ -163,7 +189,7 @@ function forgeSigil() {
   }
 
   // Update the full archive display
-  updateSigilArchive();
+  SigilEngine.updateSigilArchive();
   const archive = document.getElementById("sigilArchiveScroll");
   if (archive) {
     archive.style.opacity = "0";
@@ -259,7 +285,14 @@ function enableSigilArchiveInteractivity() {
 
     if (sigilName && SigilEngine.getSigil(sigilName)) {
       highlightSelectedSigil(sigilName);
+
+      populateSigilEditFields(sigilName);
+
       SigilEngine.pulse(sigilName);
+      const nameInput = document.getElementById("editSigilName");
+      if (nameInput) {
+        nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       console.log(`🎯 Sigil '${sigilName}' selected from archive.`);
     }
   });
@@ -293,6 +326,18 @@ function renderGlyphEcho(sigil) {
   }, 1200);
 }
 
+// 🗑️ Helper: Delete sigil and refresh archive
+function deleteSigilAndRefresh(name) {
+  if (confirm(`Are you sure you want to delete the sigil '${name}'?`)) {
+    if (SigilEngine.deleteSigil(name)) {
+      SigilEngine.saveSigilsToStorage();
+      SigilEngine.updateSigilArchive();
+    }
+  }
+}
+
+window.deleteSigilAndRefresh = deleteSigilAndRefresh;
+
 window.addEventListener("DOMContentLoaded", enableSigilArchiveInteractivity);
 
 
@@ -322,7 +367,7 @@ function importSigilsFromJSON(file) {
         }
       });
       SigilEngine.saveSigilsToStorage();
-      updateSigilArchive();
+      SigilEngine.updateSigilArchive();
       const archive = document.getElementById("sigilArchiveScroll");
       if (archive) {
         archive.style.opacity = "0";
@@ -353,7 +398,7 @@ function resetSigilArchive(confirmReset = true) {
 
   SigilEngine.sigils = {};
   localStorage.removeItem("SAGE_SIGILS");
-  updateSigilArchive();
+  SigilEngine.updateSigilArchive();
   const archive = document.getElementById("sigilArchiveScroll");
   if (archive) {
     archive.style.opacity = "0";
@@ -368,3 +413,113 @@ function resetSigilArchive(confirmReset = true) {
 }
 
 window.resetSigilArchive = resetSigilArchive;
+
+
+// 🛠️ Phase 19.2 — Sigil Editing Interface (Scaffold)
+function editSigil(name, updates = {}) {
+  const sigil = SigilEngine.getSigil(name);
+  if (!sigil) {
+    console.warn(`⚠️ Cannot edit non-existent sigil '${name}'`);
+    return;
+  }
+
+  Object.assign(sigil, updates, { updatedAt: new Date().toISOString() });
+  SigilEngine.saveSigilsToStorage();
+  SigilEngine.updateSigilArchive();
+  highlightSelectedSigil(name);
+  console.log(`✏️ Sigil '${name}' updated with:`, updates);
+  animateSigilArchivePulse(name);
+}
+
+window.editSigil = editSigil;
+
+// 🛠️ Sigil Edit Panel Submission Helper
+function submitSigilEdit() {
+  const name = document.getElementById("editSigilName")?.value;
+  const type = document.getElementById("editSigilType")?.value;
+  const element = document.getElementById("editSigilElement")?.value;
+  const glyphCode = document.getElementById("editSigilGlyphCode")?.value;
+
+  if (!name) {
+    alert("Sigil name is required.");
+    return;
+  }
+
+  const updates = {};
+  if (type) updates.type = type;
+  if (element) updates.element = element;
+  if (glyphCode) updates.glyphCode = glyphCode;
+
+  editSigil(name, updates);
+
+  if (document.getElementById("editSigilName")) document.getElementById("editSigilName").value = "";
+  if (document.getElementById("editSigilType")) document.getElementById("editSigilType").value = "";
+  if (document.getElementById("editSigilElement")) document.getElementById("editSigilElement").value = "";
+  if (document.getElementById("editSigilGlyphCode")) document.getElementById("editSigilGlyphCode").value = "";
+}
+
+window.submitSigilEdit = submitSigilEdit;
+
+// 🧠 Phase 21.2 — Real-Time Sigil Edit Field Reflection
+function populateSigilEditFields(name) {
+  const sigil = SigilEngine.getSigil(name);
+  if (!sigil) return;
+
+  const nameField = document.getElementById("editSigilName");
+  const typeField = document.getElementById("editSigilType");
+  const elementField = document.getElementById("editSigilElement");
+  const glyphField = document.getElementById("editSigilGlyphCode");
+
+  if (nameField) nameField.value = sigil.name;
+  if (typeField) typeField.value = sigil.type;
+  if (elementField) elementField.value = sigil.element;
+  if (glyphField) glyphField.value = sigil.glyphCode || "";
+
+  console.log(`🧬 Populated sigil editor with '${name}'`);
+}
+window.populateSigilEditFields = populateSigilEditFields;
+
+// ✅ Sigil Edit Panel Initialization Log
+console.log("🧪 Sigil Engine edit panel fully operational.");
+
+// 🌌 Phase 21.3 — Sigil Archive Search Filter
+function filterSigilArchive(query = "") {
+  const archiveTarget = document.getElementById("sigilArchiveScroll");
+  if (!archiveTarget) return;
+
+  const allSigils = SigilEngine.listDetailedSigils().reverse();
+  const filtered = allSigils.filter(sigil =>
+    sigil.name.toLowerCase().includes(query.toLowerCase())
+  );
+  if (filtered.length === 0) {
+    showEmptySigilMessage();
+    console.log("📭 No sigils matched the search.");
+    return;
+  }
+
+  archiveTarget.innerHTML = filtered
+    .map(sigil => SigilEngine.renderSigilSummary(sigil.name))
+    .join("");
+
+  console.log(`🔍 Sigil archive filtered by query: '${query}'`);
+}
+
+window.filterSigilArchive = filterSigilArchive;
+
+function showEmptySigilMessage() {
+  const archiveTarget = document.getElementById("sigilArchiveScroll");
+  if (!archiveTarget) return;
+
+  const message = document.createElement("div");
+  message.className = "empty-archive-message";
+  message.innerHTML = `
+    <div style="padding: 20px; text-align: center; color: #0ff;">
+      <strong>✨ No sigils found ✨</strong><br/>
+      Try forging a new sigil or adjusting your filters.
+    </div>
+  `;
+
+  archiveTarget.innerHTML = "";
+  archiveTarget.appendChild(message);
+}
+window.showEmptySigilMessage = showEmptySigilMessage;

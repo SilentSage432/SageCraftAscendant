@@ -182,11 +182,58 @@
 
   <!-- 🧬 Sigil Forge Panel -->
   <div id="sigilForgePanel" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+    <div id="sigilEditorContainer" style="margin-top: 20px; padding: 10px; border-top: 1px solid #555;">
+      <h3>Edit Sigil</h3>
+      <form id="sigilEditForm" onsubmit="event.preventDefault(); submitSigilEdit();">
+        <label for="editSigilName">Name:</label><br>
+        <input type="text" id="editSigilName" name="editSigilName" style="width: 100%; margin-bottom: 8px;"><br>
+
+        <label for="editSigilType">Type:</label><br>
+        <input type="text" id="editSigilType" name="editSigilType" style="width: 100%; margin-bottom: 8px;"><br>
+
+        <label for="editSigilElement">Element:</label><br>
+        <input type="text" id="editSigilElement" name="editSigilElement" style="width: 100%; margin-bottom: 8px;"><br>
+
+        <label for="editSigilGlyph">Glyph Code:</label><br>
+        <input type="text" id="editSigilGlyph" name="editSigilGlyph" style="width: 100%; margin-bottom: 8px;"><br>
+
+        <button type="submit" style="margin-top: 10px;">Save Changes</button>
+      </form>
+    </div>
     <h3 style="margin-top: 0;">🧬 Sigil Forge</h3>
     <div id="sigilContent">
       <p>Select an archetype and forge a glyph.</p>
-      <!-- Placeholder UI controls -->
       <button onclick="forgeSigil()">Forge New Sigil</button>
+    </div>
+    <!-- 🗃️ Sigil Archive Search & Scroll Container -->
+    <div style="margin-bottom: 10px;">
+      <input
+        id="sigilSearchInput"
+        type="text"
+        placeholder="🔍 Search Sigils..."
+        oninput="filterSigilArchive()"
+        style="width: 100%; padding: 6px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc;"
+      />
+    </div>
+    <div id="sigilArchiveScroll" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #888; background: rgba(255, 255, 255, 0.05); margin-top: 10px; border-radius: 5px; font-size: 14px;">
+      <!-- Sigil Archive will render here -->
+    </div>
+    <!-- 🔧 Sigil Edit Panel -->
+    <div id="sigilEditPanel" style="margin-top: 20px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; display: none;">
+      <h3>Edit Sigil</h3>
+      <label for="editSigilName">Name:</label><br>
+      <input type="text" id="editSigilName" style="width: 100%; margin-bottom: 10px;"><br>
+
+      <label for="editSigilType">Type:</label><br>
+      <input type="text" id="editSigilType" style="width: 100%; margin-bottom: 10px;"><br>
+
+      <label for="editSigilElement">Element:</label><br>
+      <input type="text" id="editSigilElement" style="width: 100%; margin-bottom: 10px;"><br>
+
+      <label for="editSigilGlyph">Glyph Code:</label><br>
+      <input type="text" id="editSigilGlyph" style="width: 100%; margin-bottom: 12px;"><br>
+
+      <button onclick="submitSigilEdit()" style="padding: 8px 16px; background: #4af; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Submit Edit</button>
     </div>
   </div>
 </div>
@@ -197,10 +244,6 @@
     if (panel) {
       panel.style.display = panel.style.display === "none" ? "block" : "none";
     }
-  }
-  // Placeholder forgeSigil function
-  function forgeSigil() {
-    alert("🔮 Sigil forging is not yet implemented.");
   }
 </script>
 <script>
@@ -1006,6 +1049,28 @@ function toggleAnomalySanctum() {
     </section>
     <!-- 3. Dock Grid Stub -->
     <div id="dockGrid" style="display: none;"></div>
+
+    <!-- 🔧 Sigil Editor Panel -->
+    <div id="sigilEditPanel" class="holo-console" style="display: none;">
+      <h2>🔧 Edit Sigil</h2>
+      <label>Name:</label>
+      <input id="editSigilName" type="text" placeholder="Enter new name..." /><br>
+
+      <label>Glyph Code:</label>
+      <input id="editSigilGlyph" type="text" placeholder="e.g., ∇⟁⌖" /><br>
+
+      <label>Element:</label>
+      <select id="editSigilElement">
+        <option value="fire">🔥 Fire</option>
+        <option value="water">💧 Water</option>
+        <option value="earth">🌱 Earth</option>
+        <option value="air">🌪️ Air</option>
+        <option value="ether">✨ Ether</option>
+      </select><br>
+
+      <button onclick="submitSigilEdit()">💾 Save Changes</button>
+      <button onclick="closeSigilEditor()">❌ Cancel</button>
+    </div>
 
     <!-- Injected missing orbital panels -->
     <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true">
