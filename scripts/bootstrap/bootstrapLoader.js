@@ -131,10 +131,14 @@ import('/scripts/operator/operatorDockWiring.js').then(module => {
 // Neural Unified Bootstrap Loader
 import('/scripts/bootstrap/bootstrapNeural.js').then(module => {
   function waitForNeuralBootstrap(attempt = 0) {
-    if (typeof window.NeuralUnifiedBootstrap === 'function' && !bootstrapInitialized) {
+    if (
+      typeof window.NeuralUnifiedBootstrap === 'object' &&
+      typeof window.NeuralUnifiedBootstrap.initialize === 'function' &&
+      !bootstrapInitialized
+    ) {
       console.log("🧠 NeuralUnifiedBootstrap: Invoked successfully.");
       try {
-        window.NeuralUnifiedBootstrap();
+        window.NeuralUnifiedBootstrap.initialize();
         bootstrapInitialized = true;
         console.log("🚀 NeuralUnifiedBootstrap execution initiated.");
       } catch (err) {

@@ -1,5 +1,3 @@
-
-
 // 🧠 Companion Protocol Framework | SageCraft Ascendant
 // -----------------------------------------------------
 
@@ -39,15 +37,29 @@ const CompanionProtocol = (() => {
     return true;
   }
 
-  function getAllCompanions() {
-    return Object.values(companions);
-  }
-
   return {
     registerCompanion,
     getCompanion,
     updateState,
     injectMemory,
+    updateTraits(id, traits) {
+      if (!companions[id]) return false;
+      companions[id].traits = { ...companions[id].traits, ...traits };
+      console.log(`✨ Traits updated for ${id}:`, companions[id].traits);
+      return true;
+    },
+    overwriteMemory(id, memoryArray) {
+      if (!companions[id]) return false;
+      companions[id].memory = memoryArray;
+      console.log(`♻️ Memory overwritten for ${id}.`);
+      return true;
+    },
+    removeCompanion(id) {
+      if (!companions[id]) return false;
+      delete companions[id];
+      console.log(`🗑️ Companion removed: ${id}`);
+      return true;
+    },
     getAllCompanions,
   };
 })();
