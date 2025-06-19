@@ -1546,32 +1546,35 @@ function initializeSageFeedConsole() {
 document.addEventListener("DOMContentLoaded", () => {
   initializeSageFeedConsole();
 
-  // --- Unified Orbit Button Wiring for All .orbit-btn ---
-  document.querySelectorAll('.orbit-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const targetId = button.getAttribute('data-target');
-      // Debugging log
-      console.log("🌀 Orbit clicked — Target ID:", targetId);
+// --- Unified Orbit Button Wiring for All .orbit-btn ---
+// Handles orbit button clicks: toggles the corresponding dock panel.
+document.querySelectorAll('.orbit-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.getAttribute('data-target');
+    const panel = document.getElementById(targetId);
 
-      switch (targetId) {
-        case "forecastConsole":
-          activatePanel("forecastConsole");
-          break;
-        default:
-          const panel = document.getElementById(targetId);
-          // Hide all panels
-          document.querySelectorAll('.holo-console').forEach(p => {
-            p.style.display = 'none';
-          });
-          // Show target panel
-          if (panel) {
-            panel.style.display = 'block';
-            console.log("✅ Activated panel:", targetId);
-          } else {
-            console.warn("⚠️ Panel not found:", targetId);
-          }
-      }
-    });
+    if (!panel) {
+      console.warn(`⚠️ Panel not found for ID: ${targetId}`);
+      return;
+    }
+
+    const isActive = panel.classList.contains('console-active');
+
+    if (isActive) {
+      panel.classList.remove('console-active');
+      panel.classList.add('hidden');
+      console.log(`🔻 Panel ${targetId} closed.`);
+    } else {
+      // Optional: close all others for single-panel mode
+      document.querySelectorAll('.dock-panel.console-active').forEach(p => {
+        p.classList.remove('console-active');
+        p.classList.add('hidden');
+      });
+
+      panel.classList.add('console-active');
+      panel.classList.remove('hidden');
+      console.log(`✅ Panel ${targetId} activated.`);
+    }
   });
 });
 

@@ -1454,18 +1454,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // === Orbit Button Registration (data-target based) ===
-  document.querySelectorAll('[data-target]').forEach(button => {
-    const targetId = button.getAttribute("data-target");
-    button.addEventListener("click", () => {
+// === Orbit Button Registration (data-target based, improved toggle logic) ===
+  document.querySelectorAll('.orbit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
       const panel = document.getElementById(targetId);
-      if (panel) {
-        panel.classList.remove("hidden");
-        console.log(`🚀 Dock Panel "${targetId}" activated.`);
+
+      if (!panel) {
+        console.warn(`⚠️ Panel not found for ID: ${targetId}`);
+        return;
+      }
+
+      const isVisible = !panel.classList.contains('hidden');
+
+      // Hide all other panels
+      document.querySelectorAll('.dock-panel').forEach(p => p.classList.add('hidden'));
+
+      // Toggle visibility
+      if (!isVisible) {
+        panel.classList.remove('hidden');
+        console.log(`✅ Panel ${targetId} activated.`);
       } else {
-        console.warn(`❌ Dock Panel "${targetId}" not found in DOM.`);
+        panel.classList.add('hidden');
+        console.log(`❌ Panel ${targetId} hidden.`);
       }
     });
+  });
+
+  // === SageFeed Orbit Button Toggle Logic ===
+  const orbitBtn = document.querySelector('.sagefeed-orbit');
+  orbitBtn?.addEventListener('click', () => {
+    const targetId = orbitBtn.getAttribute('data-target');
+    const panel = document.getElementById(targetId);
+
+    if (!panel) return;
+
+    if (panel.classList.contains('console-active')) {
+      panel.classList.remove('console-active');
+      panel.classList.add('hidden');
+      console.log(`🔻 Panel ${targetId} closed.`);
+    } else {
+      panel.classList.remove('hidden');
+      panel.classList.add('console-active');
+      console.log(`✅ Panel ${targetId} opened.`);
+    }
   });
 });
 

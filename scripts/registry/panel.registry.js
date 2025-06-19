@@ -1,6 +1,3 @@
-
-
-
 // 🧠 panel.registry.js — Central Registry for Sovereign Dock Panels
 import '../panels/scriptConsole.panel.js';
 
@@ -38,5 +35,14 @@ PanelRegistry.register("loreEngineConsole", {
   inject: true,
   domElementId: "loreEngineConsole"
 });
+
+PanelRegistry.register("sageFeedConsole", {
+  title: "Sage Feed",
+  id: "sageFeedConsole",
+  class: "panel sage-feed-console",
+  inject: true,
+  domElementId: "sageFeedConsoleWrapper"
+});
+
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 window.SageCraftAscendant.PanelRegistry = PanelRegistry;

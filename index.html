@@ -508,6 +508,31 @@ function toggleGlyphLegend() {
 
   <!-- Lore Engine Section -->
   <div id="loreEngineSection"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const orbitButtons = document.querySelectorAll('.orbit-btn');
+
+      orbitButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const targetId = button.getAttribute('data-target');
+          console.log(`🌀 Orbit clicked — Target ID: ${targetId}`);
+
+          if (!targetId) {
+            console.warn("⚠️ No data-target defined on clicked orbit.");
+            return;
+          }
+
+          const panel = document.getElementById(targetId);
+          if (panel) {
+            panel.classList.remove('hidden');
+            console.log(`✅ Panel ${targetId} activated.`);
+          } else {
+            console.warn(`⚠️ Panel not found: ${targetId}`);
+          }
+        });
+      });
+    });
+  </script>
 </body>
 <script>
   function toggleDevConsole() {
@@ -1401,6 +1426,8 @@ function showToast(message = "✅ Done") {
 
   <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
     <div id="sovereignOrbitDock" class="orbit-cluster">
+      <!-- 🧠 Orbit Memory Echo Layer -->
+      <div id="orbitMemoryGhosts" class="orbit-memory-ghosts"></div>
       <button class="orbit-btn" data-target="countConsole">
         <img src="assets/icons/icon-count.png" alt="Count Console" />
       </button>
@@ -1424,7 +1451,7 @@ function showToast(message = "✅ Done") {
           <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
         </button>
       </div>
-      <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
+    <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" data-panel="sageFeedConsole" title="Sage Feed Console">
         <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console">
       </button>
       <!-- 🪐 Grimoire Orbit Button -->
@@ -1530,7 +1557,7 @@ function showToast(message = "✅ Done") {
        Only dynamic Control Deck injection point remains below. -->
   <div id="operatorConsole" class="tabcontent"></div>
   <!-- 🧠 Sage Feed Console Interface -->
-  <div id="sageFeedConsoleWrapper" class="holo-console dock-panel hidden">
+  <div id="sageFeedConsole" class="holo-console dock-panel hidden">
     <h2>🧠 Sage Feed Console</h2>
     <p class="console-desc">Direct injection to Sage Memory Engine. Enter encoded lore, trigger phrases, or neural directives.</p>
     <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>

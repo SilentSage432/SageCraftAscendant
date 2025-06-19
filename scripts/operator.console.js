@@ -1,3 +1,118 @@
+// === Phase X+ — Orbit Button Interaction Memory (Orbit Memory Ghosts) ===
+// This section visually echoes orbit button clicks with a ghost effect.
+(function orbitMemoryGhostsEcho() {
+  // Helper: create the ghost overlay layer if not present
+  function ensureGhostLayer() {
+    let ghostLayer = document.getElementById("orbitMemoryGhosts");
+    if (!ghostLayer) {
+      ghostLayer = document.createElement("div");
+      ghostLayer.id = "orbitMemoryGhosts";
+      ghostLayer.style.position = "fixed";
+      ghostLayer.style.pointerEvents = "none";
+      ghostLayer.style.top = "0";
+      ghostLayer.style.left = "0";
+      ghostLayer.style.width = "100vw";
+      ghostLayer.style.height = "100vh";
+      ghostLayer.style.zIndex = "9999";
+      ghostLayer.style.display = "block";
+      document.body.appendChild(ghostLayer);
+    }
+    return ghostLayer;
+  }
+
+  // Add basic CSS for orbit-ghosts if not present
+  function injectGhostStyles() {
+    if (document.getElementById("orbitMemoryGhostsStyles")) return;
+    const style = document.createElement("style");
+    style.id = "orbitMemoryGhostsStyles";
+    style.textContent = `
+      #orbitMemoryGhosts .orbit-ghost {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%, #cc99ffbb 0%, #33114477 80%, transparent 100%);
+        box-shadow: 0 0 32px 8px #cc99ff55, 0 0 8px 2px #fff5;
+        opacity: 0.7;
+        animation: orbitGhostPulse 1.2s cubic-bezier(.4,0,.2,1) 1, orbitGhostFade 6s linear 1;
+        pointer-events: none;
+        transition: opacity 0.6s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #fff;
+        font-size: 1.1em;
+        text-shadow: 0 0 6px #331144, 0 0 2px #fff;
+      }
+      @keyframes orbitGhostPulse {
+        0% { transform: scale(0.2); opacity: 0.1; }
+        30% { transform: scale(1.1); opacity: 0.85; }
+        60% { transform: scale(0.98); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 0.7; }
+      }
+      @keyframes orbitGhostFade {
+        0% { opacity: 0.7; }
+        80% { opacity: 0.7; }
+        100% { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function markOrbitMemory(orbitId, btn) {
+    const ghostLayer = ensureGhostLayer();
+    injectGhostStyles();
+
+    // Try to position the ghost over the button
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    if (btn && typeof btn.getBoundingClientRect === "function") {
+      const rect = btn.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+
+    const ghost = document.createElement("div");
+    ghost.classList.add("orbit-ghost");
+    ghost.dataset.orbit = orbitId;
+    ghost.style.left = (x - 30) + "px";
+    ghost.style.top = (y - 30) + "px";
+    ghost.textContent = orbitId || "";
+
+    // Remove after delay
+    setTimeout(() => ghost.remove(), 6000);
+
+    ghostLayer.appendChild(ghost);
+  }
+
+  // Hook into existing orbit button interaction
+  function hookOrbitButtons() {
+    const orbitBtns = document.querySelectorAll("#sovereignOrbitDock .orbit-button");
+    if (!orbitBtns.length) return;
+    orbitBtns.forEach(btn => {
+      if (btn.dataset.orbitMemoryHooked) return;
+      btn.addEventListener("click", () => {
+        const orbitId = btn.getAttribute("data-orbit-id") || btn.textContent.trim();
+        markOrbitMemory(orbitId, btn);
+      });
+      btn.dataset.orbitMemoryHooked = "1";
+    });
+  }
+
+  // Try to hook immediately, then on DOMContentLoaded, then on mutations
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    hookOrbitButtons();
+  } else {
+    document.addEventListener("DOMContentLoaded", hookOrbitButtons);
+  }
+  // Also try again after a short delay in case of late-rendered buttons
+  setTimeout(hookOrbitButtons, 1000);
+  // Observe DOM for new orbit buttons
+  if (window.MutationObserver) {
+    const obs = new MutationObserver(hookOrbitButtons);
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+})();
 // Early OperatorConsole Exposure Layer
 if (typeof window.SageCraftAscendant === 'undefined') {
   window.SageCraftAscendant = {};
