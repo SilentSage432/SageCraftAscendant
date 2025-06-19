@@ -24,17 +24,27 @@
 }
 
 .orbit-btn {
-  transition: all 0.3s ease-in-out;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(79, 255, 212, 0.15), rgba(26, 28, 32, 0.85));
-  box-shadow: 0 0 6px var(--glow-color);
-  border: 1px solid rgba(153, 236, 255, 0.4);
-  backdrop-filter: blur(4px);
+  position: relative;
   width: 64px;
   height: 64px;
-  display: inline-flex;
-  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(79, 255, 212, 0.1), rgba(26, 28, 32, 0.85));
+  border: 1px solid rgba(153, 236, 255, 0.4);
+  backdrop-filter: blur(6px) brightness(1.05);
+  box-shadow:
+    inset 0 0 4px rgba(90, 245, 233, 0.3),
+    0 0 12px var(--glow-color),
+    0 0 24px rgba(79, 255, 212, 0.2);
+  color: var(--text-color);
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-shadow: 0 0 8px var(--accent-color);
+  font-weight: bold;
+  flex: 0 0 auto;
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .orbit-btn:hover {
@@ -318,37 +328,37 @@ html {
   visibility: hidden !important;
 }
 
-.orbit-cluster {
-  position: relative !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 28px !important;
-  flex-wrap: wrap;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  z-index: 1000;
-}
+  .orbit-cluster {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    padding: 40px 20px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
 
-.orbit-btn {
-  position: relative !important;
-  width: 64px !important;
-  height: 64px !important;
-  border-radius: 50% !important;
-  background: radial-gradient(circle at center, rgba(79, 255, 212, 0.1), rgba(26, 28, 32, 0.85)) !important;
-  border: 1px solid rgba(153, 236, 255, 0.4) !important;
-  backdrop-filter: blur(6px) brightness(1.05) !important;
-  box-shadow:
-    inset 0 0 4px rgba(90, 245, 233, 0.3),
-    0 0 12px var(--glow-color),
-    0 0 24px rgba(79, 255, 212, 0.2) !important;
-  color: var(--text-color) !important;
-  font-size: 1.6rem;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  text-shadow: 0 0 8px var(--accent-color);
-  font-weight: bold;
+
+
+@media (max-width: 600px) {
+  .orbit-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .orbit-btn {
+    margin: 4px;
+    width: 64px;
+    height: 64px;
+  }
 }
 
 .orbit-btn:hover {
@@ -845,15 +855,25 @@ html {
   transform: translateY(0);
 }
 
-/* .dock-panel.console-active.hidden {
+.dock-panel.console-active.hidden {
   display: none !important;
   opacity: 0 !important;
   transform: translateY(10px) !important;
-} */
+}
 
 .dock-panel.hidden {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   transform: scale(0.95) !important;
+}
+/* === Sovereign Toolbar Mount Centered Layout === */
+#sovereignToolbarMount {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 20px;
+  max-width: 960px;
 }
