@@ -82,7 +82,6 @@ console.log("✅ Loaded panel.registry.js");
 
 // Load Operator Console
 console.log("✅ Loaded operator.console.js");
-loadScript("scripts/registry/panel.registry.js");
 loadScript("scripts/panels/forecastConsole.panel.js");
 
 // Unified Sovereign API Bridge + Mount Controller

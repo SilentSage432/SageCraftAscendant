@@ -20,61 +20,63 @@ function registerScriptConsolePanel() {
       const runBtn = document.querySelector('#runScript');
       const input = document.querySelector('#scriptInput');
 
-      // Add after the #scriptSelector inside your setTimeout
-      const output = document.createElement('div');
-      output.id = 'scriptOutput';
-      output.className = 'outputMirror';
-      output.style.cssText = 'margin-top: 12px; background: #111; color: #0f0; padding: 8px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px;';
-      input.parentElement.appendChild(output);
+      if (input && input.parentElement) {
+        const output = document.createElement('div');
+        output.id = 'scriptOutput';
+        output.className = 'outputMirror';
+        output.style.cssText = 'margin-top: 12px; background: #111; color: #0f0; padding: 8px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px;';
+        input.parentElement.appendChild(output);
 
-      // Patch console.log to mirror into output panel
-      const originalLog = console.log;
-      console.log = function (...args) {
-        const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
-        const line = document.createElement('div');
-        line.textContent = '🟢 ' + msg;
-        output.appendChild(line);
-        output.scrollTop = output.scrollHeight;
-        originalLog.apply(console, args);
-      };
-
-      // Also mirror console.error
-      const originalError = console.error;
-      console.error = function (...args) {
-        const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
-        const line = document.createElement('div');
-        line.textContent = '🔴 ' + msg;
-        output.appendChild(line);
-        output.scrollTop = output.scrollHeight;
-        originalError.apply(console, args);
-      };
-
-      if (runBtn && input) {
-        runBtn.onclick = () => {
-          const script = input.value.trim();
-
-          if (script.startsWith('#emit:')) {
-            const [_, channelLine, ...rest] = script.split('\n');
-            const channel = script.match(/#emit:(\w+)/)?.[1];
-            try {
-              const payload = JSON.parse(rest.join('\n'));
-              if (window.SovereignBus && typeof SovereignBus.emit === 'function') {
-                SovereignBus.emit(channel, payload);
-                console.log(`📡 Emitted via SovereignBus → ${channel}`, payload);
-              } else {
-                console.warn("⚠️ SovereignBus not available.");
-              }
-            } catch (e) {
-              console.error("❌ Failed to parse payload:", e);
-            }
-          } else {
-            try {
-              eval(script);
-            } catch (err) {
-              console.error("❌ Script error:", err);
-            }
-          }
+        const originalLog = console.log;
+        console.log = function (...args) {
+          const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+          const line = document.createElement('div');
+          line.textContent = '🟢 ' + msg;
+          output.appendChild(line);
+          output.scrollTop = output.scrollHeight;
+          originalLog.apply(console, args);
         };
+
+        const originalError = console.error;
+        console.error = function (...args) {
+          const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+          const line = document.createElement('div');
+          line.textContent = '🔴 ' + msg;
+          output.appendChild(line);
+          output.scrollTop = output.scrollHeight;
+          originalError.apply(console, args);
+        };
+
+        if (runBtn && input) {
+          runBtn.onclick = () => {
+            const script = input.value.trim();
+
+            if (script.startsWith('#emit:')) {
+              const [_, channelLine, ...rest] = script.split('\n');
+              const channel = script.match(/#emit:(\w+)/)?.[1];
+              try {
+                const payload = JSON.parse(rest.join('\n'));
+                if (window.SovereignBus && typeof SovereignBus.emit === 'function') {
+                  SovereignBus.emit(channel, payload);
+                  console.log(`📡 Emitted via SovereignBus → ${channel}`, payload);
+                } else {
+                  console.warn("⚠️ SovereignBus not available.");
+                }
+              } catch (e) {
+                console.error("❌ Failed to parse payload:", e);
+              }
+            } else {
+              try {
+                eval(script);
+              } catch (err) {
+                console.error("❌ Script error:", err);
+              }
+            }
+          };
+        }
+      } else {
+        console.warn("⚠️ scriptInput or its parent element not found. Output mirror not attached.");
+        return;
       }
     }, 500);
   } else {

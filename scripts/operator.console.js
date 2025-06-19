@@ -1572,7 +1572,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Diagnostics Panel Registration — Phase 17.2.0
-  registerWhenReady('diagnostics', 'Diagnostics Console', 'renderDiagnosticsPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('diagnostics', 'Diagnostics Console', 'renderDiagnosticsPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
   // Phase 17.2.1 — Mesh Integrity Overlay Migration
   SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel = function (container) {
@@ -1609,7 +1613,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Mesh Integrity Panel Registration — Phase 17.2.1
-  registerWhenReady('meshIntegrity', 'Mesh Integrity Overlay', 'renderMeshIntegrityPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('meshIntegrity', 'Mesh Integrity Overlay', 'renderMeshIntegrityPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 19.2 — NeuralBus → Event Log Wiring
@@ -1683,7 +1691,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Event Log Panel Registration — Phase 17.2.2
-  registerWhenReady('eventLog', 'Event Log Console', 'renderEventLogPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('eventLog', 'Event Log Console', 'renderEventLogPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 19.3.1 — NeuralBus Wiring for Forecast Anomaly Sentinel
@@ -1721,7 +1733,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Forecast Anomaly Panel Registration — Phase 17.2.3
-  registerWhenReady('forecastAnomaly', 'Forecast Anomaly Sentinel', 'renderForecastAnomalyPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('forecastAnomaly', 'Forecast Anomaly Sentinel', 'renderForecastAnomalyPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 17.2.4 — Control Lattice Migration
@@ -1758,7 +1774,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Control Lattice Panel Registration — Phase 17.2.4
-  registerWhenReady('controlLattice', 'Control Lattice Console', 'renderControlLatticePanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('controlLattice', 'Control Lattice Console', 'renderControlLatticePanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Memory Console
@@ -1803,7 +1823,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Memory Panel Registration — Phase 17.2.5
-  registerWhenReady('memoryControl', 'Memory Control Console', 'renderMemoryPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('memoryControl', 'Memory Control Console', 'renderMemoryPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Recovery Console
@@ -1829,7 +1853,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Recovery Panel Registration — Phase 17.2.6
-  registerWhenReady('recoveryConsole', 'Recovery Console', 'renderRecoveryPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('recoveryConsole', 'Recovery Console', 'renderRecoveryPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Forecast Mutation Simulator
@@ -1905,7 +1933,11 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Forecast Mutation Panel Registration — Phase 17.2.7
-  registerWhenReady('forecastMutation', 'Forecast Mutation Simulator', 'renderForecastMutationPanel');
+  if (typeof registerWhenReady === "function") {
+    registerWhenReady('forecastMutation', 'Forecast Mutation Simulator', 'renderForecastMutationPanel');
+  } else {
+    console.warn("⚠️ registerWhenReady is not defined — skipping forecast console registration.");
+  }
 
 
 
@@ -2153,23 +2185,24 @@ SageCraftAscendant.OperatorConsole = (function() {
     updateScriptSelector();
   }
 
-  return {
-    renderOperatorConsole,
-    registerOrbitInjectionControls,
-    registerOrbitRemovalControls,
-    registerOrbitRegistryControls,
-    renderDiagnosticsPanel,
-    renderMeshIntegrityPanel,
-    renderEventLogPanel,
-    renderForecastAnomalyPanel,
-    renderControlLatticePanel,
-    renderMemoryPanel,
-    renderRecoveryPanel,
-    renderForecastMutationPanel,
-    renderOperatorControlDeck,
-    renderSubsystemNavigation,
-    renderScriptConsolePanel
-  };
+  return Object.assign(
+    {},
+    typeof renderOperatorConsole === "function" ? { renderOperatorConsole } : {},
+    typeof renderDiagnosticsPanel === "function" ? { renderDiagnosticsPanel } : {},
+    typeof renderMeshIntegrityPanel === "function" ? { renderMeshIntegrityPanel } : {},
+    typeof renderEventLogPanel === "function" ? { renderEventLogPanel } : {},
+    typeof renderForecastAnomalyPanel === "function" ? { renderForecastAnomalyPanel } : {},
+    typeof renderControlLatticePanel === "function" ? { renderControlLatticePanel } : {},
+    typeof renderMemoryPanel === "function" ? { renderMemoryPanel } : {},
+    typeof renderRecoveryPanel === "function" ? { renderRecoveryPanel } : {},
+    typeof renderForecastMutationPanel === "function" ? { renderForecastMutationPanel } : {},
+    typeof renderOperatorControlDeck === "function" ? { renderOperatorControlDeck } : {},
+    typeof renderSubsystemNavigation === "function" ? { renderSubsystemNavigation } : {},
+    typeof renderScriptConsolePanel === "function" ? { renderScriptConsolePanel } : {},
+    typeof registerOrbitInjectionControls === "function" ? { registerOrbitInjectionControls } : {},
+    typeof registerOrbitRemovalControls === "function" ? { registerOrbitRemovalControls } : {},
+    typeof registerOrbitRegistryControls === "function" ? { registerOrbitRegistryControls } : {}
+  );
 })();
 
   // === Phase 28.0 — Neural Operator Scripting Layer Bootstrap ===

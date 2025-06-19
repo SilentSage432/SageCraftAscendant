@@ -308,12 +308,39 @@ document.addEventListener("DOMContentLoaded", () => {
     pulseState = !pulseState;
   }, 1000);
   const summonBtn = document.getElementById("whispererSummonBtn");
-  if (!summonBtn) console.warn("🔕 summonBtn not found");
-  const output = document.getElementById("whispererOutput");
-  if (!output) console.warn("🔕 whispererOutput not found");
+  if (summonBtn) {
+    summonBtn.addEventListener("click", () => {
+      const output = document.getElementById("whispererOutput");
+      const logList = document.getElementById("echoLogEntries");
 
+      if (!output) console.warn("🔕 whispererOutput not found");
+      if (!logList) console.warn("🔕 echoLogEntries not found");
+
+      const whispers = [
+        "The wind carries truths unspoken.",
+        "Even shadows have memories.",
+        "Echoes remember what minds forget.",
+        "The truth hides in silence.",
+        "What is forgotten is not gone.",
+        "There are stories etched in dust."
+      ];
+
+      const randomWhisper = whispers[Math.floor(Math.random() * whispers.length)];
+      if (output) output.textContent = randomWhisper;
+
+      if (logList) {
+        const li = document.createElement("li");
+        li.textContent = `${randomWhisper}`;
+        li.classList.add("whisperer-log-entry");
+        logList.prepend(li);
+      }
+
+      WhispererMemory.record(randomWhisper);
+    });
+  } else {
+    console.warn("🔕 summonBtn not found when attempting to assign click listener.");
+  }
   const logList = document.getElementById("echoLogEntries");
-  if (!logList) console.warn("🔕 echoLogEntries not found");
   const recoveredEntries = WhispererMemory.getAll();
 
   if (logList && recoveredEntries.length > 0) {
@@ -414,6 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
     log.id = "sovereignLog";
     log.classList.add("log-console", "sovereign");
     document.body.appendChild(log);
+    // Define log before applying styles
     log.style.maxHeight = "200px";
     log.style.overflowY = "auto";
     log.style.padding = "0.5rem";
@@ -426,49 +454,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const sentinelLog = document.getElementById("sentinelLog");
   if (!sentinelLog) {
     console.warn("🔕 sentinelLog not found. Injecting placeholder.");
-    const log = document.createElement("ul");
-    log.id = "sentinelLog";
-    log.classList.add("log-console", "sentinel");
-    document.body.appendChild(log);
+    const newLog = document.createElement("ul");
+    newLog.id = "sentinelLog";
+    newLog.classList.add("log-console", "sentinel");
+    document.body.appendChild(newLog);
+
+    // Define styles after element creation
+    newLog.style.maxHeight = "200px";
+    newLog.style.overflowY = "auto";
+    newLog.style.padding = "0.5rem";
+    newLog.style.margin = "1rem";
+    newLog.style.border = "1px solid #444";
+    newLog.style.backgroundColor = "rgba(0,0,0,0.5)";
+    newLog.style.fontFamily = "monospace";
+    newLog.style.fontSize = "0.85rem";
   }
-  log.style.maxHeight = "200px";
-  log.style.overflowY = "auto";
-  log.style.padding = "0.5rem";
-  log.style.margin = "1rem";
-  log.style.border = "1px solid #444";
-  log.style.backgroundColor = "rgba(0,0,0,0.5)";
-  log.style.fontFamily = "monospace";
-  log.style.fontSize = "0.85rem";
 
   updateVitals();
 
-  const whispers = [
-    "The wind carries truths unspoken.",
-    "Even shadows have memories.",
-    "Echoes remember what minds forget.",
-    "The truth hides in silence.",
-    "What is forgotten is not gone.",
-    "There are stories etched in dust."
-  ];
-
-  summonBtn.addEventListener("click", () => {
-    const randomWhisper = whispers[Math.floor(Math.random() * whispers.length)];
-    if (output) output.textContent = randomWhisper;
-
-    const logList = document.getElementById("echoLogEntries");
-    if (logList) {
-      const li = document.createElement("li");
-      li.textContent = `${randomWhisper}`;
-      li.classList.add("whisperer-log-entry");
-      logList.prepend(li);
-    }
-
-    WhispererMemory.record(randomWhisper);
-  });
+  // (summonBtn click listener is now guarded above)
 
   // === Sovereign Event Bus Listener ===
-  if (window.SovereignBus) {
-    window.SovereignBus.listen("*", (channel, payload) => {
+  if (window.SovereignBus?.on) {
+    window.SovereignBus.on("*", (channel, payload) => {
       const echo = `🔊 [${channel}] ${typeof payload === "object" ? JSON.stringify(payload) : payload}`;
       WhispererMemory.record(echo);
       if (sovereignLog) {
