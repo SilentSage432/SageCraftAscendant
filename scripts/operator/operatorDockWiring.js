@@ -31,6 +31,13 @@ const SovereignDockPanelMap = {
 var OperatorDockWiring = {
     // === Phase 1000.0: Sovereign Dock Population Matrix Injection ===
     populateDockMatrix: function () {
+        // 🔒 Phase 500.36 — Dock Grid DOM Safety Check
+        const dockGridContainer = document.getElementById("sovereignDockGrid");
+        if (!dockGridContainer) {
+          console.warn("⚠️ Dock Grid container not found. Deferring matrix injection...");
+          // Optional: Retry injection later or trigger fallback
+          return;
+        }
         console.log("🚀 Sovereign Dock Population Matrix Injection Activated");
 
         const dockDefinitions = [
@@ -1605,7 +1612,9 @@ setTimeout(() => {
         { id: "mappings", label: "🗺 Mappings Interface", description: "Mapping configuration subsystem loaded." },
         { id: "tools", label: "🔧 Tools Panel", description: "Developer and diagnostic tools online." },
         { id: "audit", label: "📋 Audit Manager", description: "System audit controls engaged." },
-        { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." }
+        { id: "configPanel", label: "⚙ Configuration Panel", description: "Codex configuration settings loaded." },
+        // Add Lore Engine panel
+        { id: "loreEngine", label: "📖 Lore Engine", description: "Lore Engine subsystem online." }
     ];
 
     dockDefinitions.forEach(def => {
@@ -1619,6 +1628,40 @@ setTimeout(() => {
         }
         panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
     });
+
+    // Inject Lore Engine Console panel if not present
+    if (!document.getElementById("loreEngineConsole")) {
+        const lorePanel = document.createElement("div");
+        lorePanel.id = "loreEngineConsole";
+        lorePanel.classList.add("holo-console");
+        lorePanel.innerHTML = `
+          <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            📖 Lore Engine Console
+          </div>
+          <div class="console-body">
+            <p><strong>Status:</strong> <span class="lore-status">🟢 Online</span></p>
+            <p><strong>Engine Message:</strong> <span class="lore-message">Awaiting...</span></p>
+            <div class="lore-log">
+              <p>📚 <em>Recent Lore Entries:</em></p>
+              <ul class="lore-entries">
+                <li class="faint">No lore entries yet.</li>
+              </ul>
+            </div>
+            <button class="trigger-lore-sync">🔄 Sync Lore Engine</button>
+          </div>
+        `;
+        document.body.appendChild(lorePanel);
+        console.log("✅ Lore Engine Console initialized and wired to DOM");
+        // 🧠 Contextual Lore Injection Trigger
+        if (typeof SovereignBus !== "undefined" && typeof SovereignBus.emit === "function") {
+          SovereignBus.emit("loreEvent", {
+            title: "Mesh Initialization Complete",
+            summary: "The Sovereign Mesh System reached full operational capacity. All agents and subsystems are stabilized.",
+            timestamp: Date.now(),
+            tags: ["bootstrap", "mesh", "agents", "lore"]
+          });
+        }
+    }
 
     // === Phase 400.1: Sovereign Toolbar DOM Injection ===
     console.log("🚀 Executing Phase 400.1 — Sovereign Toolbar DOM Injection...");
@@ -1670,6 +1713,9 @@ OperatorDockWiring.registerSubsystemDock({
     }
 });
 
+// === Register Lore Engine subsystem dock ===
+registerSubsystemDock("loreEngine", "loreEngineConsole");
+
 
 // === Phase 500 — Dock Panel Registration Listeners ===
 document.addEventListener("OperatorDockReady", () => {
@@ -1685,6 +1731,17 @@ document.addEventListener("OperatorDockReady", () => {
     console.error("❌ registerPanel is not available.");
   }
 });
+
+// SovereignBus loreEvent listener registration (after all listeners are added)
+if (typeof SovereignBus !== "undefined" && typeof SovereignBus.listen === "function") {
+  SovereignBus.listen("loreEvent", (entry) => {
+    if (typeof window.SAGE !== "undefined" && typeof window.SAGE.registerLore === "function") {
+      window.SAGE.registerLore(entry);
+    } else {
+      console.warn("Lore registration skipped — SAGE.registerLore not yet available.");
+    }
+  });
+}
 
 // === Additional Subsystem Dock Registrations ===
 OperatorDockWiring.registerSubsystemDock({
@@ -1806,6 +1863,11 @@ registerSubsystemDock({
   title: "Lore Engine",
   icon: "assets/icons/icon-lorebook.png"
 });
+
+// === Register dock alias for loreEngine ===
+if (typeof registerDockAlias === "function") {
+  registerDockAlias("loreEngine", "loreEngineConsole");
+}
 
 // 🧠 Phase 400.9 — Delta Analyzer Console Initialization
 const deltaAnalyzerConsole = document.createElement('div');
@@ -1943,135 +2005,27 @@ Object.entries(dockConsoles).forEach(([id, content]) => {
     console.log(`✅ ${id} initialized and wired to DOM`);
 });
 
-// Ensure Whisperer Console is appended
-if (!document.getElementById("whispererConsole")) {
-  const whispererConsoleEl = document.createElement("div");
-  whispererConsoleEl.classList.add("holo-console");
-  whispererConsoleEl.id = "whispererConsole";
-  whispererConsoleEl.innerHTML = `
-    <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
-      🧠 Whisperer Console
-    </div>
-    <div class="console-body">
-      <p><strong>Status:</strong> <span class="whisperer-status">🟢 Listening</span></p>
-      <p><strong>Time Origin Message:</strong> <span class="origin-message">Awaiting...</span></p>
-      <div class="whisperer-log">
-        <p>📡 <em>Captured Signals:</em></p>
-        <ul class="whisperer-entries">
-          <li class="faint">No transmissions received.</li>
-        </ul>
-      </div>
-      <button class="trigger-whisper-sync">🔁 Sync Whisperer</button>
-    </div>
-  `;
-  document.body.appendChild(whispererConsoleEl);
-  console.log("✅ Whisperer Console initialized and wired to DOM");
+// Ensure Whisperer Console is ap<truncated__content/>
+
+// === Phase: HUD Element Safe-Binding for Key UI Elements ===
+// Wrap direct getElementById bindings with safe-check for HUD elements
+const dockStatusText = document.getElementById("dockStatusText");
+if (!dockStatusText) {
+  console.warn("⚠️ [HUD Warning] dockStatusText not found. Will revalidate on next HUD cycle.");
 }
-
-// === Live Counts Console Runtime Activation ===
-setTimeout(() => {
-    const countConsole = document.getElementById("countConsole");
-    if (!countConsole) return;
-
-    const lastSync = countConsole.querySelector(".last-sync");
-    const itemSpan = countConsole.querySelector(".count-items");
-    const categorySpan = countConsole.querySelector(".count-categories");
-    const recentList = countConsole.querySelector(".recent-items");
-    const dockStatusText = document.querySelector(".dock-status-text");
-
-    const fakeData = {
-        lastSync: new Date().toLocaleString(),
-        items: 127,
-        categories: 9,
-        recent: ["Dishwashers", "Tool Chests", "Air Conditioners"]
-    };
-
-    if (lastSync) lastSync.textContent = fakeData.lastSync;
-    if (itemSpan) itemSpan.textContent = fakeData.items;
-    if (categorySpan) categorySpan.textContent = fakeData.categories;
-    if (recentList) {
-      recentList.innerHTML = fakeData.recent.map(item => `<li>${item}</li>`).join("");
-    } else {
-      console.warn("⚠️ recentList element not found.");
-    }
-
-    // 🧪 Phase 11.7B — Predictive HUD Display Validation Hook
-    console.group("🧠 Predictive HUD Display Validation");
-
-    const dockStatusTextEl = document.querySelector(".dock-status-text");
-    const lastSyncEl = document.querySelector(".hud-last-sync");
-    const itemSpanEl = document.querySelector(".hud-item-count");
-    const categorySpanEl = document.querySelector(".hud-category-count");
-    const recentListEl = document.querySelector(".hud-recent-list");
-
-    const hudElements = {
-      dockStatusText: dockStatusTextEl,
-      lastSync: lastSyncEl,
-      itemSpan: itemSpanEl,
-      categorySpan: categorySpanEl,
-      recentList: recentListEl
-    };
-    Object.entries(hudElements).forEach(([key, el]) => {
-      if (!el) {
-        console.warn(`⚠️ HUD element "${key}" is missing or null.`);
-      } else {
-        console.log(`✅ HUD element "${key}" is present.`);
-      }
-    });
-    console.groupEnd();
-
-    countConsole.querySelector(".refresh-counts").addEventListener("click", () => {
-        console.log("🔄 Manual data refresh triggered.");
-        alert("Live Counts refreshed from Cortex.");
-    });
-
-    console.log("✅ Live Counts Console Bootstrapped.");
-    console.log("🧪 Revalidating HUD element bindings...");
-    ["dockStatusText", "lastSync", "itemSpan", "categorySpan", "recentList"].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) {
-        console.warn(`⚠️ Revalidation: Element "${id}" still missing from DOM.`);
-      } else {
-        console.log(`✅ Revalidation: Element "${id}" successfully located.`);
-      }
-    });
-
-    // === Replace mockScan invocation with HUD readiness check ===
-    setTimeout(() => {
-      if (
-        dockStatusText &&
-        lastSync &&
-        itemSpan &&
-        categorySpan &&
-        recentList
-      ) {
-        console.log("✅ All HUD elements confirmed. Proceeding with mockScan.");
-        // If mockScan is defined in this scope, call it; else, define a no-op.
-        if (typeof mockScan === "function") {
-          mockScan();
-        }
-      } else {
-        console.warn("⚠️ Skipping mockScan — HUD elements still not ready.");
-      }
-    }, 1800);
-}, 1200);
-
-// === Phase 400.4 — HUD Reactivation Monitor Loop ===
-setTimeout(() => {
-  console.log("🔁 HUD Reactivation Monitor Cycle Initiated");
-
-  const dockStatusText = document.getElementById("dockStatusText");
-  const lastSync = document.getElementById("lastSync");
-  const itemSpan = document.getElementById("itemSpan");
-  const categorySpan = document.getElementById("categorySpan");
-  const recentList = document.getElementById("recentList");
-
-  if (
-    dockStatusText && lastSync &&
-    itemSpan && categorySpan && recentList
-  ) {
-    console.log("✅ HUD elements are stable and reactive.");
-  } else {
-    console.warn("⚠️ One or more HUD elements failed rebind check.");
-  }
-}, 3000);
+const lastSync = document.getElementById("lastSync");
+if (!lastSync) {
+  console.warn("⚠️ [HUD Warning] lastSync not found. Will revalidate on next HUD cycle.");
+}
+const itemSpan = document.getElementById("itemSpan");
+if (!itemSpan) {
+  console.warn("⚠️ [HUD Warning] itemSpan not found. Will revalidate on next HUD cycle.");
+}
+const categorySpan = document.getElementById("categorySpan");
+if (!categorySpan) {
+  console.warn("⚠️ [HUD Warning] categorySpan not found. Will revalidate on next HUD cycle.");
+}
+const recentList = document.getElementById("recentList");
+if (!recentList) {
+  console.warn("⚠️ [HUD Warning] recentList not found. Will revalidate on next HUD cycle.");
+}

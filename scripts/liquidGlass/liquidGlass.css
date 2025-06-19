@@ -697,3 +697,122 @@ html {
   color: #ff8080;
   font-size: 0.9rem;
 }
+
+/* === Whisperer Console Visual Enhancements — Phase 31.9 === */
+
+@keyframes fadeInDrift {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.log-entry {
+  animation: fadeInDrift 0.6s ease-out;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* === Echo Archive Enhanced Layout === */
+
+.echo-log-archive {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(10, 12, 14, 0.5);
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  box-shadow: 0 0 8px var(--glow-color);
+}
+
+.echo-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--accent-color);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px 4px 0 0;
+}
+
+.echo-log-header span {
+  flex: 1;
+}
+
+.echo-log-header .time-col {
+  max-width: 120px;
+  text-align: left;
+}
+
+.echo-log-header .message-col {
+  text-align: left;
+  padding-left: 6px;
+}
+
+.echo-log-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 4px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transition: background 0.3s ease;
+}
+
+.echo-log-entry:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.echo-log-time {
+  color: var(--accent-color);
+  font-size: 0.8rem;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.echo-log-message {
+  flex-grow: 1;
+  color: var(--text-color);
+  padding-left: 6px;
+}
+
+@keyframes pulseUrgent {
+  0% { box-shadow: 0 0 0px red; }
+  50% { box-shadow: 0 0 12px red; }
+  100% { box-shadow: 0 0 0px red; }
+}
+
+.log-entry.urgent {
+  animation: pulseUrgent 1.5s ease-in-out;
+}
+
+.log-entry:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.log-entry[data-log-type="vitals"]:hover {
+  box-shadow: 0 0 4px #00ffcc;
+}
+
+.log-entry[data-log-type="diagnostic"]:hover {
+  box-shadow: 0 0 4px #ffa500;
+}
+
+.log-entry[data-log-type="warning"]:hover {
+  box-shadow: 0 0 6px #ff4d4f;
+}

@@ -1657,6 +1657,15 @@ function showToast(message = "✅ Done") {
       </section>
     </section>
     <!-- 🌫️ WHISPERER CONSOLE PANEL -->
+    <!-- Whisperer Controls (injected above console output) -->
+    <div id="whispererControls" class="whisperer-controls">
+      <button data-filter="all">🌐 All</button>
+      <button data-filter="vitals">🩺 Vitals</button>
+      <button data-filter="warning">⚠️ Warnings</button>
+      <button data-filter="diagnostic">🧪 Diagnostics</button>
+      <button data-filter="echo">🌀 Echoes</button>
+      <button id="memoryDiveToggle">🧠 Memory Dive</button>
+    </div>
     <section id="whispererConsole" class="holo-console panel">
       <h2 class="console-title">🌀 Whisperer Console</h2>
 
@@ -1681,6 +1690,13 @@ function showToast(message = "✅ Done") {
         <div id="commandResponse" class="command-feedback"></div>
       </section>
     </section>
+    <!-- 📈 Signal Forecast Panel -->
+    <div id="forecastPanel" class="forecast-panel">
+      <h3>📈 Signal Forecast</h3>
+      <div id="forecastEntries" class="forecast-entries">
+        <!-- Forecast signals will populate here -->
+      </div>
+    </div>
 <!-- Grimoire Lore Table Render Trigger -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -2570,6 +2586,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- Operator Command Console (module) -->
   <script type="module" src="scripts/operator.console.js"></script>
+
+  <script type="module" src="scripts/bootstrap/operatorConsoleReady.js"></script>
 
   <!-- Wiring logic loader -->
   <script src="scripts/bootstrap/wiring.js"></script>

@@ -1,6 +1,8 @@
 
 
+
 // 🧠 panel.registry.js — Central Registry for Sovereign Dock Panels
+import '../panels/scriptConsole.panel.js';
 
 const PanelRegistry = (function () {
   const _registry = {};
@@ -29,5 +31,12 @@ const PanelRegistry = (function () {
   };
 })();
 
+PanelRegistry.register("loreEngineConsole", {
+  title: "Lore Engine",
+  id: "loreEngine",
+  class: "panel lore-engine-console",
+  inject: true,
+  domElementId: "loreEngineConsole"
+});
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 window.SageCraftAscendant.PanelRegistry = PanelRegistry;

@@ -1,3 +1,13 @@
+// Early OperatorConsole Exposure Layer
+if (typeof window.SageCraftAscendant === 'undefined') {
+  window.SageCraftAscendant = {};
+}
+
+if (typeof window.SageCraftAscendant.OperatorConsole === 'undefined') {
+  window.SageCraftAscendant.OperatorConsole = {};
+  console.log("🧠 OperatorConsole exposed early under SageCraftAscendant.");
+}
+import { whenReady } from './core/utils/readyTools.js';
 // === Panel Manual Recovery Helper ===
 window.OperatorDockConsole = window.OperatorDockConsole || {};
 OperatorDockConsole.forceRegister = function(panelId) {
@@ -338,13 +348,8 @@ SageCraftAscendant.DockMeshSyncBridge = (function() {
   const OperatorSessionID = "Operator001";
 
   // Hook into DockPersistenceHub save operation (intercept and wrap)
-  if (typeof SageCraftAscendant.DockPersistenceHub !== "undefined") {
-    const originalSave = SageCraftAscendant.DockPersistenceHub.save;
-    const wrappedSave = function () {
-      console.log("💾 Intercepted dock save event");
-      return originalSave.apply(this, arguments);
-    };
-    SageCraftAscendant.DockPersistenceHub.save = wrappedSave;
+  if (typeof DockPersistenceHub !== 'undefined') {
+    DockPersistenceHub.overrideDefaultPersistence();
   } else {
     console.warn("⚠️ DockPersistenceHub not yet defined — skipping override.");
   }
@@ -931,617 +936,158 @@ if (
     }
   }
 
-  // === Forecast Console Panel Registration (Event-based, resilient) ===
-  function waitForRegisterPanel() {
-    // Early exit if registerPanel is not yet defined at all (not even as a function)
-  if (typeof window.registerPanel !== "function") {
-    console.warn("⚠️ registerPanel is not yet defined. Deferring panel registration.");
-    document.addEventListener("SageReady", waitForRegisterPanel, { once: true });
-    return;
-  }
-    // If defined, proceed to register the panel
-    window.registerPanel("forecastConsole", {
-      title: "Forecast Console",
-      render: container => {
-        if (SageCraftAscendant?.OperatorConsole?.renderForecastPerformancePanel) {
-          SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel(container);
-        } else {
-          console.warn("⚠️ Forecast render function not ready.");
-        }
-      }
-    });
-    console.log("✅ Forecast Console panel successfully registered via event-based handler.");
-    // Signal that SageReady is now available (in case others are waiting)
-    document.dispatchEvent(new Event("SageReady"));
-  }
+  // === Lore Engine Console Initialization ===
+  if (document.getElementById("loreEngineConsole")) {
+    console.log("🧠 Lore Engine Console Initialized");
+    document.getElementById("loreEngineConsole").innerHTML = `
+      <div class="lore-engine-header">📜 Welcome to the Lore Engine</div>
+      <div class="lore-engine-body">Awaiting memory stream...</div>
+    `;
 
-window.addEventListener("load", () => {
-  console.log("🌐 Window fully loaded — beginning forecastConsole registration...");
-  waitForRegisterPanel();
-  // Extended fallback: after 10 seconds, if still not registered, inform user of manual recovery
-  setTimeout(() => {
-    if (typeof window.registerPanel !== "function") {
-      console.warn("registerPanel still unavailable after extended wait. Silent fallback engaged.");
-      console.info("🛠️ Manual recovery option: Use OperatorDockConsole.forceRegister('forecastConsole') to retry panel binding.");
-    }
-  }, 10000);
+    // === Grimoire Archive Skeleton Injection ===
+    document.getElementById("loreEngineConsole").innerHTML += `
+      <div class="grimoire-section">
+        <h3 class="grimoire-header">📖 Grimoire Archive</h3>
+        <div id="grimoireLog" class="grimoire-log" style="border: 1px solid #555; background: #111; color: #eee; padding: 10px; height: 150px; overflow-y: scroll; margin-bottom: 10px;">
+          <p><i>🧭 Awaiting unlocked lore entries...</i></p>
+        </div>
 
-  // === Phase 300.19 — Panel Activation Binding ===
-  // Wait until registerPanel is available, then register forecastConsole and loreEngineConsole panels
-  function waitForRegisterPanel(callback) {
-    const interval = setInterval(() => {
-      if (typeof registerPanel === "function") {
-        clearInterval(interval);
-        callback();
-      }
-    }, 100);
-  }
+        <div class="grimoire-entry-form" style="margin-top: 10px;">
+          <input id="grimoireEntryId" type="text" placeholder="Lore ID" style="margin-bottom: 5px; display: block;" />
+          <input id="grimoireEntryTitle" type="text" placeholder="Lore Title" style="margin-bottom: 5px; display: block;" />
+          <textarea id="grimoireEntryContent" placeholder="Lore Content" rows="4" style="width: 100%; margin-bottom: 5px;"></textarea>
+          <button id="addGrimoireEntryBtn">💾 Add Lore Entry</button>
+        </div>
+      </div>
+    `;
 
-  waitForRegisterPanel(() => {
-    registerPanel("forecastConsole", "Forecast Console", "forecastConsole.panel.html");
-    registerPanel("loreEngineConsole", "Lore Engine", "loreEngine.panel.html");
-  });
-});
-  // Phase 22.2 — Live Data Fusion Integration
-  SageCraftAscendant.OperatorConsole.renderForecastCortexPanel = function (container) {
-  // === Phase 28.1 — Operator Script Console Panel Injection ===
-  SageCraftAscendant.OperatorConsole.renderScriptConsolePanel = function (container) {
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🧮 Operator Script Console";
-    section.appendChild(header);
-
-    const scriptList = document.createElement("div");
-    scriptList.style.border = "1px solid #555";
-    scriptList.style.background = "#111";
-    scriptList.style.padding = "10px";
-    scriptList.style.height = "250px";
-    scriptList.style.overflowY = "scroll";
-    section.appendChild(scriptList);
-
-    function refreshScriptList() {
-      scriptList.innerHTML = '';
-      const scripts = SageCraftAscendant.OperatorScripts.listScripts();
-      const ids = Object.keys(scripts);
-      if (ids.length === 0) {
-        scriptList.textContent = "⚠ No Operator Scripts registered.";
-        return;
-      }
-      ids.forEach(id => {
-        const entry = document.createElement("div");
-        entry.style.marginBottom = "8px";
-        entry.innerHTML = `<b>${id}</b>: ${scripts[id].label} 
-          <button style="margin-left:10px;" onclick="SageCraftAscendant.OperatorScripts.executeScript('${id}')">▶ Run</button>`;
-        scriptList.appendChild(entry);
-      });
-    }
-
-    refreshScriptList();
-
-    const idInput = document.createElement("input");
-    idInput.placeholder = "Script ID";
-    idInput.style.marginRight = "10px";
-    section.appendChild(idInput);
-
-    const labelInput = document.createElement("input");
-    labelInput.placeholder = "Script Label";
-    labelInput.style.marginRight = "10px";
-    section.appendChild(labelInput);
-
-    const registerBtn = document.createElement("button");
-    registerBtn.textContent = "➕ Register Test Script";
-    registerBtn.onclick = () => {
-      const id = idInput.value.trim();
-      const label = labelInput.value.trim();
-      if (!id || !label) {
-        alert("⚠ Both ID and Label required.");
-        return;
-      }
-      SageCraftAscendant.OperatorScripts.registerScript(id, label, () => {
-        alert(`🚀 Executing Test Operator Script → ${label}`);
-      });
-      refreshScriptList();
-      idInput.value = '';
-      labelInput.value = '';
-    };
-    section.appendChild(registerBtn);
-
-    container.appendChild(section);
-  };
-
-  // === Phase 28.3 — Conditional Chain Editor Panel Injection ===
-  SageCraftAscendant.OperatorConsole.renderConditionalChainPanel = function (container) {
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🧮 Conditional Chain Editor";
-    section.appendChild(header);
-
-    const chainList = document.createElement("div");
-    chainList.style.border = "1px solid #555";
-    chainList.style.background = "#111";
-    chainList.style.padding = "10px";
-    chainList.style.height = "250px";
-    chainList.style.overflowY = "scroll";
-    section.appendChild(chainList);
-
-    let chainSteps = [];
-
-    function refreshChainList() {
-      chainList.innerHTML = '';
-      if (chainSteps.length === 0) {
-        chainList.textContent = "⚠ No chain steps configured.";
-        return;
-      }
-      chainSteps.forEach((step, index) => {
-        const entry = document.createElement("div");
-        entry.style.marginBottom = "8px";
-        entry.innerHTML = `<b>Step ${index + 1}</b> — Condition: ${step.hasCondition ? 'Yes' : 'Always'} ${step.breakOnSuccess ? '(Break)' : ''}`;
-        chainList.appendChild(entry);
-      });
-    }
-
-    refreshChainList();
-
-    const addStepBtn = document.createElement("button");
-    addStepBtn.textContent = "➕ Add Chain Step";
-    addStepBtn.onclick = () => {
-      const hasCondition = confirm("Does this step have a condition?");
-      const breakOnSuccess = confirm("Break chain if this step succeeds?");
-      chainSteps.push({
-        hasCondition,
-        breakOnSuccess,
-        condition: hasCondition ? () => confirm("✅ Condition evaluated TRUE?") : null,
-        action: () => alert("🚀 Action executed."),
-        elseAction: () => alert("⚠ Else Action executed.")
-      });
-      refreshChainList();
-    };
-    section.appendChild(addStepBtn);
-
-    const runChainBtn = document.createElement("button");
-    runChainBtn.textContent = "▶ Execute Chain";
-    runChainBtn.style.marginLeft = "10px";
-    runChainBtn.onclick = () => {
-      SageCraftAscendant.OperatorScripts.ConditionalChain.runConditionalChain(chainSteps);
-    };
-    section.appendChild(runChainBtn);
-
-    container.appendChild(section);
-  };
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🔮 Forecast Cortex Console";
-    section.appendChild(header);
-
-    const simulateLiveBtn = document.createElement("button");
-    simulateLiveBtn.textContent = "📊 Simulate Forecast (Live Data)";
-    simulateLiveBtn.onclick = () => {
-      const liveData = SageCraftAscendant.NeuralMemoryExpansion?.loadLiveTableMemory?.();
-      if (!liveData || liveData.length === 0) {
-        alert("⚠ No live table data available to simulate.");
-        return;
-      }
-
-      // Transform to Forecast Cortex input format
-      const forecastInput = liveData.map(entry => ({
-        item: entry.item,
-        desc: entry.desc,
-        qty: entry.qty,
-        cat: entry.cat
-      }));
-
-      SageCraftAscendant.ForecastCortex?.simulateForecast(forecastInput);
-      refreshForecasts();
-    };
-    section.appendChild(simulateLiveBtn);
-
-    const clearBtn = document.createElement("button");
-    clearBtn.textContent = "🧹 Clear Forecast History";
-    clearBtn.style.marginLeft = "10px";
-    clearBtn.onclick = () => {
-      SageCraftAscendant.ForecastCortex?.clearForecasts();
-      refreshForecasts();
-    };
-    section.appendChild(clearBtn);
-
-    const forecastContainer = document.createElement("div");
-    forecastContainer.style.border = "1px solid #555";
-    forecastContainer.style.background = "#111";
-    forecastContainer.style.padding = "10px";
-    forecastContainer.style.height = "250px";
-    forecastContainer.style.overflowY = "scroll";
-    forecastContainer.style.marginTop = "10px";
-    section.appendChild(forecastContainer);
-
-    function refreshForecasts() {
-      forecastContainer.innerHTML = '';
-      const history = SageCraftAscendant.ForecastCortex?.getForecastHistory() || [];
-      if (history.length === 0) {
-        forecastContainer.textContent = "⚠ No forecasts available.";
-        return;
-      }
-
-      history.forEach(snapshot => {
-        const snapDiv = document.createElement("div");
-        snapDiv.style.marginBottom = "10px";
-        snapDiv.innerHTML = `<b>${snapshot.timestamp}</b><br>`;
-        snapshot.forecast.forEach(entry => {
-          snapDiv.innerHTML += `- ${entry.item}: ${entry.desc} → Projected Qty: ${entry.projectedQty}<br>`;
-        });
-        forecastContainer.appendChild(snapDiv);
-      });
-    }
-
-    refreshForecasts();
-    container.appendChild(section);
-  };
-  // Phase 20.6 — Oracle Grimoire Intelligence Console Injection
-  SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel = function (container) {
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🧠 Oracle Intelligence Console";
-    section.appendChild(header);
-
-    const analysisContainer = document.createElement("div");
-    analysisContainer.style.border = "1px solid #555";
-    analysisContainer.style.background = "#111";
-    analysisContainer.style.padding = "10px";
-    analysisContainer.style.height = "200px";
-    analysisContainer.style.overflowY = "scroll";
-    section.appendChild(analysisContainer);
-
-    const analyzeBtn = document.createElement("button");
-    analyzeBtn.textContent = "🔎 Run Lore Intelligence Scan";
-    analyzeBtn.onclick = () => {
-      const analysis = SageCraftAscendant.SilentSageOracle?.analyzeLore();
-      analysisContainer.innerHTML = `
-        <b>Total Entries:</b> ${analysis.totalEntries}<br>
-        <b>Topics:</b> ${analysis.topics.join(", ")}<br>
-        <b>Summary:</b> ${analysis.summary}
-      `;
-    };
-    section.appendChild(analyzeBtn);
-
-    container.appendChild(section);
-  };
-  // Phase 20.4 — Dynamic Lore Expansion Interface
-  SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel = function (container) {
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "📖 Silent Sage Oracle Grimoire";
-    section.appendChild(header);
-
-    // Oracle Log Viewer
-    const logHeader = document.createElement("h4");
-    logHeader.textContent = "🔎 Oracle Insight Log";
-    section.appendChild(logHeader);
-
-    const logContainer = document.createElement("div");
-    logContainer.style.border = "1px solid #555";
-    logContainer.style.background = "#111";
-    logContainer.style.padding = "10px";
-    logContainer.style.height = "200px";
-    logContainer.style.overflowY = "scroll";
-    section.appendChild(logContainer);
-
-    const refreshLogBtn = document.createElement("button");
-    refreshLogBtn.textContent = "🔄 Refresh Oracle Log";
-    refreshLogBtn.onclick = () => {
-      logContainer.innerHTML = '';
-      const logs = SageCraftAscendant.SilentSageOracle?.getOracleLog() || [];
-      logs.reverse().forEach(entry => {
-        const logEntry = document.createElement("div");
-        logEntry.textContent = entry;
-        logContainer.appendChild(logEntry);
-      });
-    };
-    section.appendChild(refreshLogBtn);
-    refreshLogBtn.click();
-
-    // Lore Archive Viewer
-    const loreHeader = document.createElement("h4");
-    loreHeader.style.marginTop = "20px";
-    loreHeader.textContent = "📜 Lore Memory Archive";
-    section.appendChild(loreHeader);
-
-    const loreContainer = document.createElement("div");
-    loreContainer.style.border = "1px solid #555";
-    loreContainer.style.background = "#111";
-    loreContainer.style.padding = "10px";
-    loreContainer.style.height = "200px";
-    loreContainer.style.overflowY = "scroll";
-    section.appendChild(loreContainer);
-
-    const refreshLoreBtn = document.createElement("button");
-    refreshLoreBtn.textContent = "🔄 Refresh Lore Archive";
-    refreshLoreBtn.onclick = () => {
-      loreContainer.innerHTML = '';
-      const lore = SageCraftAscendant.SilentSageOracle?.getLore() || [];
-      lore.forEach(entry => {
-        const loreEntry = document.createElement("div");
-        loreEntry.style.marginBottom = "8px";
-        loreEntry.innerHTML = `<b>${entry.title}</b><br><i>${entry.content}</i><br><span style="color:#888">${entry.timestamp}</span>`;
-        loreContainer.appendChild(loreEntry);
-      });
-    };
-    section.appendChild(refreshLoreBtn);
-    refreshLoreBtn.click();
-
-    // Lore Expansion Input
-    const expansionHeader = document.createElement("h4");
-    expansionHeader.style.marginTop = "20px";
-    expansionHeader.textContent = "➕ Add New Lore Entry";
-    section.appendChild(expansionHeader);
-
-    const idInput = document.createElement("input");
-    idInput.placeholder = "Lore ID (e.g. lore004)";
-    idInput.style.display = "block";
-    idInput.style.marginBottom = "5px";
-    section.appendChild(idInput);
-
-    const titleInput = document.createElement("input");
-    titleInput.placeholder = "Lore Title";
-    titleInput.style.display = "block";
-    titleInput.style.marginBottom = "5px";
-    section.appendChild(titleInput);
-
-    const contentInput = document.createElement("textarea");
-    contentInput.placeholder = "Lore Content";
-    contentInput.style.display = "block";
-    contentInput.style.width = "100%";
-    contentInput.style.height = "60px";
-    section.appendChild(contentInput);
-
-    const addLoreBtn = document.createElement("button");
-    addLoreBtn.textContent = "💾 Add Lore Entry";
-    addLoreBtn.onclick = () => {
-      const id = idInput.value.trim();
-      const title = titleInput.value.trim();
-      const content = contentInput.value.trim();
+    document.getElementById("addGrimoireEntryBtn").onclick = () => {
+      const id = document.getElementById("grimoireEntryId").value.trim();
+      const title = document.getElementById("grimoireEntryTitle").value.trim();
+      const content = document.getElementById("grimoireEntryContent").value.trim();
       if (!id || !title || !content) {
-        alert("⚠ All fields are required to add lore.");
+        alert("⚠ Please complete all fields to add a lore entry.");
         return;
       }
-      SageCraftAscendant.SilentSageOracle?.addLoreEntry(id, title, content);
-      refreshLoreBtn.click();
-      idInput.value = '';
-      titleInput.value = '';
-      contentInput.value = '';
-    };
-    section.appendChild(addLoreBtn);
 
-    container.appendChild(section);
-  };
-  // Phase 18.1 — Neural Live Table Core Rendering
-  SageCraftAscendant.OperatorConsole.renderLiveTablePanel = function (container) {
+      const timestamp = new Date().toLocaleString();
+      const entryHtml = `<div style="margin-bottom: 10px;">
+        <b>${title}</b><br>
+        <i>${content}</i><br>
+        <span style="color: #888;">${timestamp}</span>
+      </div>`;
+
+      document.getElementById("grimoireLog").innerHTML += entryHtml;
+
+      document.getElementById("grimoireEntryId").value = '';
+      document.getElementById("grimoireEntryTitle").value = '';
+      document.getElementById("grimoireEntryContent").value = '';
+    };
+  }
+
+  // === Forecast Console Panel Registration (Stabilized Retry Mechanism) ===
+  // (Removed duplicate retry logic for forecastConsole panel registration, now handled in forecastConsole.panel.js)
+  // Phase 22.2 — Live Data Fusion Integration
+  // Wrap renderForecastCortexPanel assignment in whenReady to ensure OperatorDockConsole is defined
+  // --- PATCH: Safe invocation of renderForecastCortexPanel ---
+  const forecastRenderFn = window?.SageSystem?.renderForecastCortexPanel;
+  if (typeof forecastRenderFn === 'function') {
+    whenReady(forecastRenderFn);
+  } else {
+    console.warn('⚠️ renderForecastCortexPanel is not a function or not available yet.');
+  }
+// === Phase 28.1 — Operator Script Console Panel Injection ===
+// === Phase 28.1 — Operator Script Console Panel Injection (Conditional-Safe Assignment) ===
+// (whenReady definition moved below)
 // === Phase 29.0 — Dock Panel Resurrection Bootstrap ===
 
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'forecastPerformance',
-  label: 'Forecast Performance',
-  render: SageCraftAscendant.OperatorConsole.renderForecastPerformancePanel
-});
 
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'forecastCortex',
-  label: 'Forecast Cortex',
-  render: SageCraftAscendant.OperatorConsole.renderForecastCortexPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'oracleIntelligence',
-  label: 'Oracle Intelligence',
-  render: SageCraftAscendant.OperatorConsole.renderOracleIntelligencePanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'oracleGrimoire',
-  label: 'Oracle Grimoire',
-  render: SageCraftAscendant.OperatorConsole.renderOracleGrimoirePanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'liveTable',
-  label: 'Live Table',
-  render: SageCraftAscendant.OperatorConsole.renderLiveTablePanel
-});
-
-// === Phase 29.1 — Dock Resurrection Continuation Pass ===
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'diagnostics',
-  label: 'Diagnostics Console',
-  render: SageCraftAscendant.OperatorConsole.renderDiagnosticsPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'meshIntegrity',
-  label: 'Mesh Integrity Overlay',
-  render: SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'eventLog',
-  label: 'Event Log Console',
-  render: SageCraftAscendant.OperatorConsole.renderEventLogPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'forecastAnomaly',
-  label: 'Forecast Anomaly Sentinel',
-  render: SageCraftAscendant.OperatorConsole.renderForecastAnomalyPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'controlLattice',
-  label: 'Control Lattice Console',
-  render: SageCraftAscendant.OperatorConsole.renderControlLatticePanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'memoryControl',
-  label: 'Memory Control Console',
-  render: SageCraftAscendant.OperatorConsole.renderMemoryPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'recoveryConsole',
-  label: 'Recovery Console',
-  render: SageCraftAscendant.OperatorConsole.renderRecoveryPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'forecastMutation',
-  label: 'Forecast Mutation Simulator',
-  render: SageCraftAscendant.OperatorConsole.renderForecastMutationPanel
-});
-
-// === Phase 29.2 — Dock Resurrection: Codex Systems Expansion ===
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'scriptConsole',
-  label: 'Operator Script Console',
-  render: SageCraftAscendant.OperatorConsole.renderScriptConsolePanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'conditionalChain',
-  label: 'Conditional Chain Editor',
-  render: SageCraftAscendant.OperatorConsole.renderConditionalChainPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'macroConsole',
-  label: 'Neural Macro Console',
-  render: SageCraftAscendant.OperatorConsole.renderMacroConsolePanel
-});
+// 🧠 Lore Engine Console Initialization
+const loreEngineConsole = document.getElementById("loreEngineConsole");
+if (loreEngineConsole) {
+  console.log("✅ loreEngineConsole initialized and wired to DOM");
+} else {
+  console.warn("⚠️ loreEngineConsole not found in DOM");
+}
 
 // === Register Lore Engine Console Panel ===
 if (typeof registerPanel === "function" && typeof loreEngineConsole !== "undefined") {
   registerPanel("loreEngineConsole", loreEngineConsole);
 }
 
-// === Forecast Console Panel Registration for OperatorDockConsole (legacy system) ===
-if (typeof OperatorDockConsole !== "undefined" && typeof OperatorDockConsole.registerPanel === "function") {
-  OperatorDockConsole.registerPanel({
-    id: 'forecastConsole',
-    name: 'Forecast Console',
-    icon: '📊',
-    render: renderForecastConsole,
+
+// === Phase 18.1 — Neural Live Table Panel Renderer ===
+function renderLiveTablePanel(container) {
+  if (!container) return;
+
+  const section = document.createElement("div");
+  section.classList.add("console-section");
+
+  const header = document.createElement("h3");
+  header.textContent = "📊 Neural Live Table";
+  section.appendChild(header);
+
+  // Build Table Container
+  const tableContainer = document.createElement("div");
+  tableContainer.style.overflowX = "auto";
+  tableContainer.style.border = "1px solid #555";
+  tableContainer.style.background = "#111";
+  tableContainer.style.padding = "10px";
+
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  table.style.color = "#eee";
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+
+  const headers = ["Item #", "Description", "Location", "Quantity", "Category"];
+  headers.forEach(text => {
+    const th = document.createElement("th");
+    th.textContent = text;
+    th.style.border = "1px solid #666";
+    th.style.padding = "8px";
+    th.style.background = "#222";
+    headerRow.appendChild(th);
   });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  tbody.id = "neuralLiveTableBody";
+  table.appendChild(tbody);
+
+  tableContainer.appendChild(table);
+  if (SageCraftAscendant.NeuralLiveTable?.loadPersistentState) {
+    SageCraftAscendant.NeuralLiveTable.loadPersistentState();
+  }
+  section.appendChild(tableContainer);
+
+  const message = document.createElement("p");
+  message.style.marginTop = "10px";
+  message.style.fontStyle = "italic";
+  message.style.color = "#aaa";
+  message.textContent = "⚙ Neural Live Table core initialized. Data population coming in Phase 18.2+.";
+  section.appendChild(message);
+
+  const injectBtn = document.createElement("button");
+  injectBtn.textContent = "➕ Inject Mock Data";
+  injectBtn.style.marginTop = "10px";
+  injectBtn.onclick = () => {
+    SageCraftAscendant.NeuralLiveTable.injectMockData();
+  };
+  section.appendChild(injectBtn);
+
+  container.appendChild(section);
 }
 
-// === Phase 29.3 — Dock Resurrection Finalization ===
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'recoveryCodex',
-  label: 'Neural Recovery Codex',
-  render: SageCraftAscendant.OperatorConsole.renderRecoveryCodexPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'forecastArchive',
-  label: 'Forecast Data Archive',
-  render: SageCraftAscendant.OperatorConsole.renderForecastArchivePanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'selfHealing',
-  label: 'Operator Self-Healing Console',
-  render: SageCraftAscendant.OperatorConsole.renderSelfHealingPanel
-});
-
-SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-  id: 'neuralBusMonitor',
-  label: 'NeuralBus Channel Monitor',
-  render: SageCraftAscendant.OperatorConsole.renderNeuralBusMonitorPanel
-});
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "📊 Neural Live Table";
-    section.appendChild(header);
-
-    // Build Table Container
-    const tableContainer = document.createElement("div");
-    tableContainer.style.overflowX = "auto";
-    tableContainer.style.border = "1px solid #555";
-    tableContainer.style.background = "#111";
-    tableContainer.style.padding = "10px";
-
-    const table = document.createElement("table");
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-    table.style.color = "#eee";
-
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-
-    const headers = ["Item #", "Description", "Location", "Quantity", "Category"];
-    headers.forEach(text => {
-      const th = document.createElement("th");
-      th.textContent = text;
-      th.style.border = "1px solid #666";
-      th.style.padding = "8px";
-      th.style.background = "#222";
-      headerRow.appendChild(th);
-    });
-
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    tbody.id = "neuralLiveTableBody";
-    table.appendChild(tbody);
-
-    tableContainer.appendChild(table);
-    // Attempt to auto-load persisted table state
-    if (SageCraftAscendant.NeuralLiveTable?.loadPersistentState) {
-      SageCraftAscendant.NeuralLiveTable.loadPersistentState();
-    }
-    section.appendChild(tableContainer);
-
-    const message = document.createElement("p");
-    message.style.marginTop = "10px";
-    message.style.fontStyle = "italic";
-    message.style.color = "#aaa";
-    message.textContent = "⚙ Neural Live Table core initialized. Data population coming in Phase 18.2+.";
-    section.appendChild(message);
-
-    // === Phase 18.2: Inject Mock Data Button for Verification ===
-    const injectBtn = document.createElement("button");
-    injectBtn.textContent = "➕ Inject Mock Data";
-    injectBtn.style.marginTop = "10px";
-    injectBtn.onclick = () => {
-      SageCraftAscendant.NeuralLiveTable.injectMockData();
-    };
-    section.appendChild(injectBtn);
-
-    container.appendChild(section);
-  };
+// Assign renderLiveTablePanel to SageCraftAscendant.consolePanels for compatibility
+SageCraftAscendant.consolePanels = SageCraftAscendant.consolePanels || {};
+SageCraftAscendant.consolePanels.renderLiveTablePanel = renderLiveTablePanel;
+  
+  // End of DOMContentLoaded listener
   // Phase 18.2 — Neural Live Table Data Injection Engine
   SageCraftAscendant.NeuralLiveTable = (function() {
     const _tableBodyId = "neuralLiveTableBody";
@@ -1675,6 +1221,39 @@ SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
 
 window.SageCraftAscendant = window.SageCraftAscendant || {};
 
+// === HUD Element Validation (Phase X) ===
+function validateHUDElements() {
+  const requiredElements = [
+    'dockStatusText',
+    'lastSync',
+    'itemSpan',
+    'categorySpan',
+    'recentList'
+  ];
+
+  let allFound = true;
+
+  for (const id of requiredElements) {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`⚠️ HUD element "${id}" is missing or null.`);
+      allFound = false;
+    } else {
+      console.log(`✅ Revalidation: Element "${id}" successfully located.`);
+    }
+  }
+
+  return allFound;
+}
+
+// Call before any HUD operations
+if (validateHUDElements()) {
+  // Proceed with HUD binding logic...
+  // (Keep existing HUD population code here)
+} else {
+  console.warn("⚠️ Skipping HUD operations — one or more required elements missing.");
+}
+
 // === Phase 30.0 — Operator Telemetry Pulse Channels ===
 setInterval(() => {
   const pulseChannels = [
@@ -1705,74 +1284,6 @@ setInterval(() => {
   };
 
 SageCraftAscendant.OperatorConsole = (function() {
-  // === Phase 28.1 — Operator Script Console Panel Injection ===
-  SageCraftAscendant.OperatorConsole.renderScriptConsolePanel = function (container) {
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🧮 Operator Script Console";
-    section.appendChild(header);
-
-    const scriptList = document.createElement("div");
-    scriptList.style.border = "1px solid #555";
-    scriptList.style.background = "#111";
-    scriptList.style.padding = "10px";
-    scriptList.style.height = "250px";
-    scriptList.style.overflowY = "scroll";
-    section.appendChild(scriptList);
-
-    function refreshScriptList() {
-      scriptList.innerHTML = '';
-      const scripts = SageCraftAscendant.OperatorScripts.listScripts();
-      const ids = Object.keys(scripts);
-      if (ids.length === 0) {
-        scriptList.textContent = "⚠ No Operator Scripts registered.";
-        return;
-      }
-      ids.forEach(id => {
-        const entry = document.createElement("div");
-        entry.style.marginBottom = "8px";
-        entry.innerHTML = `<b>${id}</b>: ${scripts[id].label} 
-          <button style="margin-left:10px;" onclick="SageCraftAscendant.OperatorScripts.executeScript('${id}')">▶ Run</button>`;
-        scriptList.appendChild(entry);
-      });
-    }
-
-    refreshScriptList();
-
-    const idInput = document.createElement("input");
-    idInput.placeholder = "Script ID";
-    idInput.style.marginRight = "10px";
-    section.appendChild(idInput);
-
-    const labelInput = document.createElement("input");
-    labelInput.placeholder = "Script Label";
-    labelInput.style.marginRight = "10px";
-    section.appendChild(labelInput);
-
-    const registerBtn = document.createElement("button");
-    registerBtn.textContent = "➕ Register Test Script";
-    registerBtn.onclick = () => {
-      const id = idInput.value.trim();
-      const label = labelInput.value.trim();
-      if (!id || !label) {
-        alert("⚠ Both ID and Label required.");
-        return;
-      }
-      SageCraftAscendant.OperatorScripts.registerScript(id, label, () => {
-        alert(`🚀 Executing Test Operator Script → ${label}`);
-      });
-      refreshScriptList();
-      idInput.value = '';
-      labelInput.value = '';
-    };
-    section.appendChild(registerBtn);
-
-    container.appendChild(section);
-  };
 
   function renderOperatorConsole() {
     const operatorTools = document.getElementById("operatorTools");
@@ -1833,54 +1344,6 @@ SageCraftAscendant.OperatorConsole = (function() {
     console.log("✅ Operator Console fully rendered.");
   }
 
-  // Phase 9.3 — Live Orbit Injection Console
-  SageCraftAscendant.OperatorConsole.registerOrbitInjectionControls = function () {
-    const container = document.getElementById("operatorConsole");
-    if (!container) return;
-
-    const section = document.createElement("div");
-    section.classList.add("console-section");
-
-    const header = document.createElement("h3");
-    header.textContent = "🛰 Live Orbit Injection";
-    section.appendChild(header);
-
-    const labelInput = document.createElement("input");
-    labelInput.placeholder = "Orbit Label";
-    section.appendChild(labelInput);
-
-    const panelInput = document.createElement("input");
-    panelInput.placeholder = "Panel ID";
-    section.appendChild(panelInput);
-
-    const iconInput = document.createElement("input");
-    iconInput.placeholder = "Icon Filename";
-    section.appendChild(iconInput);
-
-    const injectBtn = document.createElement("button");
-    injectBtn.textContent = "➕ Inject Orbit";
-    injectBtn.onclick = () => {
-      const label = labelInput.value.trim();
-      const panelId = panelInput.value.trim();
-      const icon = iconInput.value.trim() || "icon-default.png";
-      if (!label || !panelId) {
-        alert("⚠ Both Label and Panel ID are required.");
-        return;
-      }
-      SageCraftAscendant.OrbitRegistry.registerOrbit(panelId, label, [], icon);
-      SageCraftAscendant.NeuralOrbitalDockMesh.renderDock();
-      SageCraftAscendant.PersistenceRegistry.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
-      // === Dock Persistence Sync Hook ===
-      if (SageCraftAscendant.DockPersistence?.saveRegistry) {
-        SageCraftAscendant.DockPersistence.saveRegistry(SageCraftAscendant.OrbitRegistry.listOrbits());
-        console.log("💾 DockPersistence updated.");
-      }
-      alert(`✅ Orbit '${label}' injected and saved.`);
-    };
-
-    section.appendChild(injectBtn);
-    container.appendChild(section);
-  };
 
   // Phase 9.5 — Orbit Removal Console Enhancer
   SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls = function () {
@@ -1994,11 +1457,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Diagnostics Panel Registration — Phase 17.2.0
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'diagnostics',
-    label: 'Diagnostics Console',
-    render: SageCraftAscendant.OperatorConsole.renderDiagnosticsPanel
-  });
+  registerWhenReady('diagnostics', 'Diagnostics Console', 'renderDiagnosticsPanel');
 
   // Phase 17.2.1 — Mesh Integrity Overlay Migration
   SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel = function (container) {
@@ -2035,11 +1494,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Mesh Integrity Panel Registration — Phase 17.2.1
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'meshIntegrity',
-    label: 'Mesh Integrity Overlay',
-    render: SageCraftAscendant.OperatorConsole.renderMeshIntegrityPanel
-  });
+  registerWhenReady('meshIntegrity', 'Mesh Integrity Overlay', 'renderMeshIntegrityPanel');
 
 
   // Phase 19.2 — NeuralBus → Event Log Wiring
@@ -2113,11 +1568,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Event Log Panel Registration — Phase 17.2.2
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'eventLog',
-    label: 'Event Log Console',
-    render: SageCraftAscendant.OperatorConsole.renderEventLogPanel
-  });
+  registerWhenReady('eventLog', 'Event Log Console', 'renderEventLogPanel');
 
 
   // Phase 19.3.1 — NeuralBus Wiring for Forecast Anomaly Sentinel
@@ -2155,11 +1606,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Forecast Anomaly Panel Registration — Phase 17.2.3
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'forecastAnomaly',
-    label: 'Forecast Anomaly Sentinel',
-    render: SageCraftAscendant.OperatorConsole.renderForecastAnomalyPanel
-  });
+  registerWhenReady('forecastAnomaly', 'Forecast Anomaly Sentinel', 'renderForecastAnomalyPanel');
 
 
   // Phase 17.2.4 — Control Lattice Migration
@@ -2196,11 +1643,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Control Lattice Panel Registration — Phase 17.2.4
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'controlLattice',
-    label: 'Control Lattice Console',
-    render: SageCraftAscendant.OperatorConsole.renderControlLatticePanel
-  });
+  registerWhenReady('controlLattice', 'Control Lattice Console', 'renderControlLatticePanel');
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Memory Console
@@ -2245,11 +1688,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Memory Panel Registration — Phase 17.2.5
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'memoryControl',
-    label: 'Memory Control Console',
-    render: SageCraftAscendant.OperatorConsole.renderMemoryPanel
-  });
+  registerWhenReady('memoryControl', 'Memory Control Console', 'renderMemoryPanel');
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Recovery Console
@@ -2275,11 +1714,7 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Recovery Panel Registration — Phase 17.2.6
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'recoveryConsole',
-    label: 'Recovery Console',
-    render: SageCraftAscendant.OperatorConsole.renderRecoveryPanel
-  });
+  registerWhenReady('recoveryConsole', 'Recovery Console', 'renderRecoveryPanel');
 
 
   // Phase 19.3.2 — NeuralBus Wiring for Forecast Mutation Simulator
@@ -2355,11 +1790,8 @@ SageCraftAscendant.OperatorConsole = (function() {
   };
 
   // Forecast Mutation Panel Registration — Phase 17.2.7
-  SageCraftAscendant.OperatorConsoleRegistry.registerPanel({
-    id: 'forecastMutation',
-    label: 'Forecast Mutation Simulator',
-    render: SageCraftAscendant.OperatorConsole.renderForecastMutationPanel
-  });
+  registerWhenReady('forecastMutation', 'Forecast Mutation Simulator', 'renderForecastMutationPanel');
+
 
 
   // Phase 23.2 — Control Deck Responsive Fluidity Layer
@@ -2556,6 +1988,56 @@ SageCraftAscendant.OperatorConsole = (function() {
 
     restoreDockState();
   };
+  // === Phase 28.1 — Operator Script Console Panel Injection ===
+  function renderScriptConsolePanel(container) {
+    container.innerHTML = `
+      <div class="script-console">
+        <textarea id="scriptInput" placeholder="Write your Operator Script here..."></textarea>
+        <div class="controls">
+          <button id="runScript">▶️ Run</button>
+          <button id="saveScript">💾 Save</button>
+          <button id="clearScript">🧹 Clear</button>
+          <select id="scriptSelector"></select>
+        </div>
+      </div>
+    `;
+
+    const scriptInput = container.querySelector('#scriptInput');
+    const runBtn = container.querySelector('#runScript');
+    const saveBtn = container.querySelector('#saveScript');
+    const clearBtn = container.querySelector('#clearScript');
+    const scriptSelector = container.querySelector('#scriptSelector');
+
+    runBtn.onclick = () => eval(scriptInput.value);
+    saveBtn.onclick = () => {
+      const name = prompt("Save as:");
+      if (name) {
+        localStorage.setItem(`script-${name}`, scriptInput.value);
+        updateScriptSelector();
+      }
+    };
+    clearBtn.onclick = () => scriptInput.value = '';
+
+    function updateScriptSelector() {
+      scriptSelector.innerHTML = '';
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('script-')) {
+          const option = document.createElement('option');
+          option.value = key.replace('script-', '');
+          option.textContent = key.replace('script-', '');
+          scriptSelector.appendChild(option);
+        }
+      });
+    }
+
+    scriptSelector.onchange = () => {
+      const script = localStorage.getItem(`script-${scriptSelector.value}`);
+      if (script) scriptInput.value = script;
+    };
+
+    updateScriptSelector();
+  }
+
   return {
     renderOperatorConsole,
     registerOrbitInjectionControls,
@@ -2652,24 +2134,8 @@ SageCraftAscendant.OperatorScripts = (function () {
     saveScriptRegistry,
     loadScriptRegistry
   };
-  // Properly expose the OperatorConsole module
-  return {
-    renderOperatorConsole,
-    registerOrbitInjectionControls,
-    registerOrbitRemovalControls,
-    registerOrbitRegistryControls,
-    renderDiagnosticsPanel,
-    renderMeshIntegrityPanel,
-    renderEventLogPanel,
-    renderForecastAnomalyPanel,
-    renderControlLatticePanel,
-    renderMemoryPanel,
-    renderRecoveryPanel,
-    renderForecastMutationPanel,
-    renderOperatorControlDeck,
-    renderSubsystemNavigation
-};
 })();
+
 // === Telemetry Broadcast: Sovereign Pulse Vitals ===
 setInterval(() => {
   const channel = "vitals";
@@ -2678,3 +2144,41 @@ setInterval(() => {
     detail: { channel, detail }
   }));
 }, 3000);
+
+// === Phase X — Orbit Controls Registration (Safe Guarded) ===
+// Replace direct calls to registerOrbitInjectionControls and registerOrbitRemovalControls with guarded block
+if (
+  typeof SageCraftAscendant !== 'undefined' &&
+  typeof SageCraftAscendant.OperatorConsole !== 'undefined'
+) {
+  if (typeof SageCraftAscendant.OperatorConsole.registerOrbitInjectionControls === 'function') {
+    SageCraftAscendant.OperatorConsole.registerOrbitInjectionControls();
+  }
+  if (typeof SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls === 'function') {
+    SageCraftAscendant.OperatorConsole.registerOrbitRemovalControls();
+  }
+} else {
+  console.warn("⚠️ Orbit control methods skipped — OperatorConsole not available.");
+}
+
+// === Forecast Cortex Panel Render assignment helper ===
+function waitForOperatorDockConsole(attempts = 20) {
+  if (window.OperatorDockConsole) {
+    window.OperatorDockConsole.renderForecastCortexPanel = function () {
+      // 🚀 Custom rendering logic here
+      console.log("🌀 Forecast Cortex Panel Rendered");
+    };
+    console.log("✅ renderForecastCortexPanel successfully assigned.");
+  } else if (attempts > 0) {
+    console.warn("⏳ Waiting for OperatorDockConsole to initialize...");
+    setTimeout(() => waitForOperatorDockConsole(attempts - 1), 200);
+  } else {
+    console.error("❌ OperatorDockConsole not available after multiple attempts.");
+  }
+}
+
+// Trigger delayed check
+waitForOperatorDockConsole();
+// ✅ Declare whenReady utility if not already defined
+
+// --- PATCH: Robust whenReady implementation with type check ---

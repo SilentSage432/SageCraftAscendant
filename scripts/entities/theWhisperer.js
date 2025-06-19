@@ -89,6 +89,16 @@ function hasAccess(requiredTier = OPERATOR_TIERS.INITIATE) {
 // ✅ Canonical SovereignBus listener for Whisperer Vitals (now globally available)
 function renderWhispererVitals(data) {
   data.type = classifyLogEntry(data); // Classify log type based on content
+  // === Signal Class Inference Injection — Phase 31.6 ===
+  if (typeof data?.signalStrength === "number") {
+    if (data.signalStrength >= 90) {
+      data.signalClass = "prime";
+    } else if (data.signalStrength >= 70) {
+      data.signalClass = "stable";
+    } else {
+      data.signalClass = "critical";
+    }
+  }
   // --- Classification logic and access gate ---
   const type = data?.type || "vitals";
   const tierRequired = data?.tierRequired || OPERATOR_TIERS.INITIATE;
@@ -107,9 +117,12 @@ function renderWhispererVitals(data) {
 
   const div = document.createElement("div");
   div.className = `log-entry vitals log-${type}`;
-  div.style.color = "#00ffcc";
+  div.style.color = "#b9fbc0";
   div.style.fontFamily = "monospace";
-  div.style.padding = "4px";
+  div.style.padding = "6px 10px";
+  div.style.borderRadius = "6px";
+  div.style.marginBottom = "4px";
+  div.style.boxShadow = "0 0 4px rgba(0,255,204,0.2)";
   // Add data-log-type attribute
   div.setAttribute("data-log-type", type);
 
@@ -176,16 +189,29 @@ function renderWhispererVitals(data) {
   tierBadge.style.marginLeft = "1em";
   tierBadge.style.opacity = "0.5";
   div.appendChild(tierBadge);
+  // === Signal Class Display Injection — Phase 31.6 ===
+  if (data.signalClass) {
+    const classSpan = document.createElement("span");
+    classSpan.textContent = ` Signal: ${data.signalClass.toUpperCase()}`;
+    classSpan.style.fontSize = "0.75em";
+    classSpan.style.marginLeft = "1em";
+    classSpan.style.opacity = "0.5";
+    div.appendChild(classSpan);
+  }
 
   // --- Urgency-based visual cue handling ---
   if (urgency === "high") {
     div.style.border = "2px solid #ff4d4f";
-    div.style.animation = "flashBorder 1s infinite alternate";
+    div.classList.add("urgent");
   } else if (urgency === "low") {
     div.style.opacity = "0.6";
   }
 
   // div.textContent = `[${timestamp}] ${module}: ${status}`; // original line removed/commented out
+  const maxLogs = 250;
+  if (container.children.length > maxLogs) {
+    container.removeChild(container.firstChild);
+  }
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
@@ -200,10 +226,22 @@ const WhispererMemory = {
   record(entry) {
     // Optional filtering logic placeholder:
     if (entry?.tierRequired && currentOperatorTier < entry.tierRequired) return;
-    const timestamp = new Date().toISOString();
-    const memory = { entry, timestamp, type: entry?.type || "echo", tierRequired: entry?.tierRequired || 0 };
+    // Timestamp normalization
+    const now = new Date();
+    const timestamp = entry?.timestamp
+      ? new Date(entry.timestamp).toLocaleTimeString()
+      : now.toLocaleTimeString();
+    const isoTimestamp = now.toISOString();
+    const memory = {
+      entry,
+      timestamp: isoTimestamp,
+      displayTime: timestamp,
+      type: entry?.type || "echo",
+      tierRequired: entry?.tierRequired || 0
+    };
     this._log.push(memory);
-    console.log(`🪬 [Whisperer Log Entry] ${entry} @ ${timestamp}`);
+    if (this._log.length > 250) this._log.shift();
+    console.log(`🪬 [Whisperer Log Entry] ${entry} @ ${isoTimestamp}`);
     const echoEvent = new CustomEvent("whispererEcho", { detail: memory });
     document.dispatchEvent(echoEvent);
     this.save();
@@ -270,28 +308,75 @@ document.addEventListener("DOMContentLoaded", () => {
     pulseState = !pulseState;
   }, 1000);
   const summonBtn = document.getElementById("whispererSummonBtn");
+  if (!summonBtn) console.warn("🔕 summonBtn not found");
   const output = document.getElementById("whispererOutput");
+  if (!output) console.warn("🔕 whispererOutput not found");
 
-  if (!summonBtn || !output) {
-    console.warn("🔕 Whisperer DOM elements not found.");
-    return;
-  }
-
-  const logList = document.getElementById("echoLogEntries"); // corrected ID
+  const logList = document.getElementById("echoLogEntries");
+  if (!logList) console.warn("🔕 echoLogEntries not found");
   const recoveredEntries = WhispererMemory.getAll();
 
   if (logList && recoveredEntries.length > 0) {
-    recoveredEntries.slice().reverse().forEach(({ entry }) => {
+    logList.innerHTML = ""; // Clear old logs
+    recoveredEntries.slice(-100).reverse().forEach(({ entry, displayTime, type, tierRequired }) => {
+      if (!entry && !entry?.status) return;
+
       const li = document.createElement("li");
-      li.textContent = entry;
       li.classList.add("whisperer-log-entry");
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.justifyContent = "space-between";
+      li.style.fontFamily = "monospace";
+      li.style.padding = "4px 0";
+      li.style.borderBottom = "1px solid #333";
+
+      const leftGroup = document.createElement("div");
+      leftGroup.style.display = "flex";
+      leftGroup.style.alignItems = "center";
+
+      const time = document.createElement("span");
+      time.textContent = `[${displayTime || "Echo"}]`;
+      time.style.color = "#aaa";
+      time.style.marginRight = "0.75em";
+      time.style.fontSize = "0.85em";
+
+      const icon = document.createElement("span");
+      icon.textContent =
+        entry?.type === "warning" ? "⚠️" :
+        entry?.type === "vitals" ? "🩺" :
+        entry?.type === "diagnostic" ? "🧪" :
+        "🌀";
+      icon.style.marginRight = "0.5em";
+
+      const msg = document.createElement("span");
+      msg.textContent = typeof entry === "string" ? entry : entry.status || JSON.stringify(entry);
+      msg.style.color = (entry?.type === "warning") ? "#ffcc00" : "#cccccc";
+
+      leftGroup.appendChild(time);
+      leftGroup.appendChild(icon);
+      leftGroup.appendChild(msg);
+
+      const rightGroup = document.createElement("div");
+      rightGroup.style.marginLeft = "auto";
+      rightGroup.style.fontSize = "0.75em";
+      rightGroup.style.opacity = "0.5";
+
+      if (tierRequired !== undefined) {
+        const tier = document.createElement("span");
+        tier.textContent = ` [Tier: ${Object.keys(OPERATOR_TIERS).find(k => OPERATOR_TIERS[k] === tierRequired)}]`;
+        rightGroup.appendChild(tier);
+      }
+
+      li.appendChild(leftGroup);
+      li.appendChild(rightGroup);
       logList.appendChild(li);
     });
-    console.log(`🔁 Restored ${recoveredEntries.length} entries to Echo Archive`);
+    console.log(`🔁 Restored ${Math.min(100, recoveredEntries.length)} entries to Echo Archive`);
   }
 
   // Additional elements for panel updates
   const whispererPanel = document.getElementById("whisperer");
+  if (!whispererPanel) console.warn("🔕 whisperer panel not found");
   if (whispererPanel) whispererPanel.style.display = "block";
 
   // Ensure whispererConsoleOutput is present
@@ -301,10 +386,14 @@ document.addEventListener("DOMContentLoaded", () => {
     whispererConsoleOutput.id = "whispererConsoleOutput";
     whispererConsoleOutput.style.padding = "1rem";
     whispererConsoleOutput.style.fontFamily = "monospace";
-    whispererConsoleOutput.style.color = "#00ffcc";
-    whispererConsoleOutput.style.backgroundColor = "rgba(0,0,0,0.75)";
+    whispererConsoleOutput.style.color = "#b9fbc0";
+    whispererConsoleOutput.style.backgroundColor = "rgba(10, 10, 10, 0.85)";
     whispererConsoleOutput.style.overflowY = "auto";
     whispererConsoleOutput.style.maxHeight = "200px";
+    whispererConsoleOutput.style.scrollBehavior = "smooth";
+    whispererConsoleOutput.style.border = "1px solid #333";
+    whispererConsoleOutput.style.borderRadius = "6px";
+    whispererConsoleOutput.style.boxShadow = "inset 0 0 6px rgba(0,255,204,0.2)";
     whispererPanel.appendChild(whispererConsoleOutput);
     console.log("✅ whispererConsoleOutput dynamically injected into DOM.");
   }
@@ -319,7 +408,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const kernelDrift = document.getElementById("kernelDrift");
   const sovereignStatus = document.getElementById("sovereignStatus");
   const sovereignLog = document.getElementById("sovereignLog");
+  if (!sovereignLog) {
+    console.log("🔕 sovereignLog not found. Injecting placeholder.");
+    const log = document.createElement("ul");
+    log.id = "sovereignLog";
+    log.classList.add("log-console", "sovereign");
+    document.body.appendChild(log);
+    log.style.maxHeight = "200px";
+    log.style.overflowY = "auto";
+    log.style.padding = "0.5rem";
+    log.style.margin = "1rem";
+    log.style.border = "1px solid #444";
+    log.style.backgroundColor = "rgba(0,0,0,0.5)";
+    log.style.fontFamily = "monospace";
+    log.style.fontSize = "0.85rem";
+  }
   const sentinelLog = document.getElementById("sentinelLog");
+  if (!sentinelLog) {
+    console.warn("🔕 sentinelLog not found. Injecting placeholder.");
+    const log = document.createElement("ul");
+    log.id = "sentinelLog";
+    log.classList.add("log-console", "sentinel");
+    document.body.appendChild(log);
+  }
+  log.style.maxHeight = "200px";
+  log.style.overflowY = "auto";
+  log.style.padding = "0.5rem";
+  log.style.margin = "1rem";
+  log.style.border = "1px solid #444";
+  log.style.backgroundColor = "rgba(0,0,0,0.5)";
+  log.style.fontFamily = "monospace";
+  log.style.fontSize = "0.85rem";
 
   updateVitals();
 
@@ -355,6 +474,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sovereignLog) {
         const li = document.createElement("li");
         li.textContent = `[${new Date().toLocaleTimeString()}] ${echo}`;
+        if (sovereignLog.children.length > 250) {
+          sovereignLog.removeChild(sovereignLog.lastChild);
+        }
         sovereignLog.prepend(li);
       }
     });
@@ -444,7 +566,16 @@ document.addEventListener("DOMContentLoaded", () => {
         li.classList.add("sentinel-warning");
         sentinelLog.prepend(li);
       }
-      WhispererMemory.record(warning);
+      const warningObject = {
+        module: "Sentinel",
+        status: warning,
+        type: "warning",
+        urgency: "high",
+        signalStrength: integrityValue,
+        tierRequired: OPERATOR_TIERS.APPRENTICE,
+        timestamp: new Date().toISOString()
+      };
+      WhispererMemory.record(warningObject);
     }
 
     if (driftValue > 1.2) {
@@ -455,7 +586,16 @@ document.addEventListener("DOMContentLoaded", () => {
         li.classList.add("sentinel-warning");
         sentinelLog.prepend(li);
       }
-      WhispererMemory.record(warning);
+      const warningObject = {
+        module: "Sentinel",
+        status: warning,
+        type: "warning",
+        urgency: "high",
+        signalStrength: driftValue,
+        tierRequired: OPERATOR_TIERS.APPRENTICE,
+        timestamp: new Date().toISOString()
+      };
+      WhispererMemory.record(warningObject);
     }
   }
 
@@ -482,6 +622,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Additional UI target: whispererConsoleOutput (if present)
     const liveOutput = document.getElementById("whispererConsoleOutput");
     if (liveOutput && channel && detail) {
+      if (liveOutput.children.length > 250) {
+        liveOutput.removeChild(liveOutput.firstChild);
+      }
       const div = document.createElement("div");
       div.textContent = formatted;
       liveOutput.appendChild(div);
@@ -499,6 +642,9 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("🔍 [diagnosticSignalTest] Signal received:", data);
     const liveOutput = document.getElementById("whispererConsoleOutput");
     if (liveOutput) {
+      if (liveOutput.children.length > 250) {
+        liveOutput.removeChild(liveOutput.firstChild);
+      }
       const div = document.createElement("div");
       div.textContent = `[${new Date().toLocaleTimeString()}] [DIAGNOSTIC] ${JSON.stringify(data)}`;
       div.classList.add("log-entry", "diagnostic");
@@ -509,27 +655,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // === Failsafe Injection for whispererConsoleOutput ===
-  setTimeout(() => {
-    const liveOutput = document.getElementById("whispererConsoleOutput");
-    if (!liveOutput) {
-      console.warn("🚫 whispererConsoleOutput still not found — forcing injection.");
-      const whispererPanel = document.getElementById("whisperer");
-      if (whispererPanel) {
-        const fallback = document.createElement("div");
-        fallback.id = "whispererConsoleOutput";
-        fallback.style.padding = "1rem";
-        fallback.style.fontFamily = "monospace";
-        fallback.style.color = "#00ffcc";
-        fallback.style.backgroundColor = "rgba(0,0,0,0.75)";
-        fallback.style.overflowY = "auto";
-        fallback.style.maxHeight = "200px";
-        whispererPanel.appendChild(fallback);
-        console.log("✅ whispererConsoleOutput Fallback Injected.");
-      }
-    } else {
-      console.log("✅ whispererConsoleOutput already present.");
-    }
-  }, 2000);
+  // (Removed duplicate fallback block)
 
 // === Failsafe SovereignBus whispererVitals Listener ===
 // (Removed: canonical listener will be registered at the end)

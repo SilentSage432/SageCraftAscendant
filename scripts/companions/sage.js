@@ -1,5 +1,24 @@
 // === Companion: The Silent Sage ===
-// Role: Oracle, lorekeeper, and conversational AI interface
+
+// Prevent Lore Engine from opening on load
+document.addEventListener("DOMContentLoaded", () => {
+  const lorePanel = document.getElementById("loreEngineConsole");
+  if (lorePanel) {
+    lorePanel.classList.add("hidden");
+  }
+
+  // 🧪 Test lore entry injection (only if not already present)
+  const existingLore = JSON.parse(localStorage.getItem("sageLoreMemory") || "{}");
+  if (!existingLore["welcome_lore"]) {
+    if (window.SovereignCompanions?.Sage?.addLoreEntry) {
+      window.SovereignCompanions.Sage.addLoreEntry(
+        "welcome_lore",
+        "Welcome to the Lore Engine",
+        "This engine stores knowledge fragments gathered through interaction with the system. As you progress, more lore will be revealed."
+      );
+    }
+  }
+});
 
 window.SovereignCompanions = window.SovereignCompanions || {};
 
@@ -123,7 +142,67 @@ window.SovereignCompanions.Sage = (function () {
 
   return {
     ask,
-    memory: CodexMemory
+    memory: CodexMemory,
+
+    addLoreEntry(id, title, content) {
+      this.loreMemory = this.loreMemory || JSON.parse(localStorage.getItem("sageLoreMemory") || "{}");
+      this.loreMemory[id] = { title, content, timestamp: Date.now() };
+      localStorage.setItem("sageLoreMemory", JSON.stringify(this.loreMemory));
+      console.log(`📘 Lore added: ${title}`);
+      if (window.SovereignBus) {
+        window.SovereignBus.emit("loreUpdate", {
+          id,
+          title,
+          content,
+          timestamp: Date.now()
+        });
+      }
+    },
+
+    getLoreEntry(id) {
+      this.loreMemory = this.loreMemory || JSON.parse(localStorage.getItem("sageLoreMemory") || "{}");
+      if (!this.loreMemory[id]) {
+        console.warn(`❌ Lore entry "${id}" not found.`);
+        return null;
+      }
+      console.log(`📖 Retrieved lore entry: ${this.loreMemory[id].title}`);
+      return this.loreMemory[id];
+    },
+
+    speakLore(id) {
+      const lore = this.getLoreEntry(id);
+      if (!lore) return;
+
+      const utterance = new SpeechSynthesisUtterance(`${lore.title}. ${lore.content}`);
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    },
+
+    registerLoreAccess() {
+      if (window.SovereignBus) {
+        window.SovereignBus.listen("lore.query", (msg) => {
+          const { type, id } = msg || {};
+          if (!type || !id) return;
+
+          if (type === "get") {
+            const lore = this.getLoreEntry(id);
+            window.SovereignBus.emit("lore.response", {
+              id,
+              found: !!lore,
+              data: lore
+            });
+          }
+
+          if (type === "speak") {
+            this.speakLore(id);
+          }
+        });
+
+        console.log("📡 Lore Engine: SovereignBus listener activated.");
+      }
+    }
   };
 
   // CompanionCognitionCore for Sage
@@ -159,6 +238,19 @@ window.SovereignCompanions.Sage = (function () {
     });
   }
 })();
+
+
+// 🕓 Delay Lore Engine binding until SovereignBus is stable
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    if (window.SovereignCompanions?.Sage?.registerLoreAccess && typeof window.SovereignBus?.listen === "function") {
+      window.SovereignCompanions.Sage.registerLoreAccess();
+      console.log("✅ Delayed Lore Access registration executed.");
+    } else {
+      console.warn("⚠️ SovereignBus or listener not ready — Lore Access not registered.");
+    }
+  }, 500);
+});
 
 // === Companion Manifest Router ===
 // Central event dispatcher for all companions
