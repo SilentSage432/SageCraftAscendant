@@ -420,12 +420,14 @@ html {
 
 /* 🧬 Phase 18005 — Panel Display Fix */
 
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   The following rules forcibly override display, position, and sizing for .holo-console.
+   These may interfere with grid alignment/snap logic!
+   Consider reviewing or removing !important flags and absolute sizing for grid harmonization.
+*/
 .holo-console {
-  display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  position: relative !important;
-  z-index: 1000 !important;
   min-width: 400px;
   min-height: 300px;
   border: 2px solid lime;
@@ -436,13 +438,16 @@ html {
   overflow: auto;
 }
 
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .holo-console.active also forces display/position and may override grid snap logic.
+*/
 .holo-console.active {
   /* Retain enhancements for active state, but keep debug visibility overrides */
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0px);
-  position: relative;
+  position: relative; /* <-- May conflict with grid alignment */
   border: 2px dashed lime;
   box-shadow:
     0 0 12px rgba(90, 245, 233, 0.3),
@@ -856,12 +861,17 @@ html {
 }
 /* 🧬 Phase 18012 — Dock Panel Visibility & Styling */
 
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .dock-panel uses display: none/block and opacity transforms for visibility.
+   Watch for !important flags below that may override grid display/snap logic.
+*/
 .dock-panel {
   margin: 10px;
-  display: none;
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  min-width: auto;
+  min-height: auto;
   padding: 16px;
   margin-top: 20px;
   background: linear-gradient(145deg, rgba(26, 28, 32, 0.85), rgba(26, 28, 32, 0.95));
@@ -896,23 +906,20 @@ html {
   transform: scale(0.98);
 }
 
-.dock-panel.console-active {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.dock-panel.console-active.hidden {
-  display: none !important;
-  opacity: 0 !important;
-  transform: translateY(10px) !important;
-}
-
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .dock-panel.console-active and .dock-panel.hidden use display: block/none !important;
+   This can break grid/cascade if used in grid layouts.
+*/
+.dock-panel.console-active,
 .dock-panel.hidden {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  transform: scale(0.95) !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.dock-panel[data-grid-active="true"] {
+  opacity: 1;
+  pointer-events: auto;
 }
 /* === Sovereign Toolbar Mount Centered Layout === */
 #sovereignToolbarMount {
@@ -1152,6 +1159,11 @@ html {
 
 /* === Phase 310.5: Sovereign Dock Style Resolver === */
 
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .dock-panel and .dock-grid use display: block/grid !important;
+   .dock-panel-group and #dockGrid force display: block !important;
+   These may override intended grid/flex layouts in the cascade.
+*/
 .dock-panel {
   display: block !important;
   opacity: 1 !important;
@@ -1168,7 +1180,7 @@ html {
 }
 
 .dock-grid {
-  display: grid !important;
+  display: grid !important; /* <-- Forces grid, may break parent grid/flex snap */
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
 }
@@ -1188,7 +1200,9 @@ html {
 /* Prevent parent container suppression for dock grid and panel groups */
 #dockGrid,
 .dock-panel-group {
-  display: block !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
   visibility: visible !important;
   opacity: 1 !important;
 }
@@ -1238,6 +1252,10 @@ html {
   z-index: 9999 !important;
   font-size: 1rem !important;
 }
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .holo-console is forced to display: block and z-index: 999 !important here.
+   Also sets min-width/min-height and box-shadow, which may affect grid snap/size.
+*/
 .holo-console {
   display: block !important;
   opacity: 1 !important;
@@ -1252,6 +1270,10 @@ html {
 }
 
 /* === Phase 313.0: Console Soul Manifestation Layer === */
+/* 🚨 LAYOUT OVERRIDE WARNING:
+   .holo-console, .console-panel: display: block !important, min-size, z-index: 9999 !important.
+   These will override grid/flex display and sizing.
+*/
 .holo-console,
 .console-panel {
   display: block !important;
@@ -1317,4 +1339,69 @@ html {
 .snap-confirm {
   animation: pulseSnapGrid 0.6s ease-out;
   z-index: 9999 !important;
+}
+/* === GRID ASCENSION: PHASE ONE — Grid Structure Harmonization === */
+#sovereignGridSystem {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-auto-rows: minmax(240px, auto);
+  gap: 16px;
+  padding: 32px;
+  align-items: stretch;
+  justify-items: stretch;
+  box-sizing: border-box;
+}
+
+/* 🚨 LAYOUT NOTE:
+   .holo-console, .grid-panel: border-radius, box-shadow, background, transition.
+   These are visual only, but .holo-console display/position rules above may override grid logic.
+*/
+.holo-console, .grid-panel {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 6px rgba(0, 255, 255, 0.15);
+  background-color: rgba(10, 10, 20, 0.95);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.holo-console:hover, .grid-panel:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* === Sovereign Grid Anchor Styles === */
+#sovereignGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+  padding: 20px;
+  align-items: start;
+  justify-items: center;
+  position: relative;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+  transition: all 0.5s ease-in-out;
+}
+
+/* 🚨 LAYOUT NOTE:
+   #sovereignGrid .holo-console: border-radius/overflow/transition only—OK.
+   But .holo-console display/position rules above may still override grid logic!
+*/
+#sovereignGrid .holo-console {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+.dock-panel {
+  box-sizing: border-box;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.65);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }

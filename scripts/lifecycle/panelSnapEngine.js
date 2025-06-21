@@ -1,3 +1,198 @@
+// === Phase Zero: Grid Alignment Cascade ===
+document.addEventListener("DOMContentLoaded", () => {
+  // Phase 426: Persistent Grid Memory Binding
+  const persistGridState = () => {
+    const gridMemory = [];
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      const id = panel.id || panel.dataset.role;
+      const area = panel.dataset.gridArea;
+      if (id && area) {
+        gridMemory.push({ id, area });
+      }
+    });
+    localStorage.setItem("sovereignGridMemory", JSON.stringify(gridMemory));
+  };
+
+  const restoreGridState = () => {
+    const memory = JSON.parse(localStorage.getItem("sovereignGridMemory") || "[]");
+    memory.forEach(({ id, area }) => {
+      const panel = document.getElementById(id) || document.querySelector(`[data-role="${id}"]`);
+      if (panel) {
+        panel.dataset.gridArea = area;
+        panel.style.gridArea = area;
+      }
+    });
+  };
+
+  restoreGridState();
+  window.addEventListener("beforeunload", persistGridState);
+  // === PanelSnap Patch: Assign roles to panels based on ID if missing ===
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    if (!panel.dataset.role || panel.dataset.role.trim() === '') {
+      const id = panel.id?.toLowerCase() || '';
+      if (id.includes('terminal')) {
+        panel.dataset.role = 'terminal';
+      } else if (id.includes('oracle')) {
+        panel.dataset.role = 'oracle';
+      } else if (id.includes('pulse')) {
+        panel.dataset.role = 'pulseMonitor';
+      } else if (id.includes('dock')) {
+        panel.dataset.role = 'dockHub';
+      } else {
+        panel.dataset.role = 'unassigned';
+      }
+      console.log(`📌 Assigned role "${panel.dataset.role}" to #${panel.id}`);
+    }
+  });
+
+  const grid = document.getElementById("sovereignGrid");
+  if (!grid) return console.warn("⚠️ sovereignGrid not found.");
+
+  const panels = document.querySelectorAll(".holo-console");
+
+  panels.forEach(panel => {
+    if (!grid.contains(panel)) {
+      grid.appendChild(panel);
+    }
+  });
+
+  console.log(`✅ ${panels.length} panels injected into sovereignGrid.`);
+});
+// 🔒 Phase 404.6: Symphonic Grid Seal Activation
+function activateSymphonicGridSeal() {
+  console.log("🔒 Activating Symphonic Grid Seal...");
+
+  const seal = document.createElement('div');
+  seal.id = 'symphonicGridSeal';
+  seal.innerText = '⚙️ SYMPHONIC GRID SEALED';
+  seal.style.position = 'fixed';
+  seal.style.bottom = '20px';
+  seal.style.right = '20px';
+  seal.style.padding = '12px 20px';
+  seal.style.background = 'rgba(0, 255, 170, 0.85)';
+  seal.style.color = '#000';
+  seal.style.fontWeight = 'bold';
+  seal.style.fontFamily = 'monospace';
+  seal.style.borderRadius = '8px';
+  seal.style.boxShadow = '0 0 12px rgba(0, 255, 170, 0.9)';
+  seal.style.zIndex = 9999;
+  document.body.appendChild(seal);
+
+  setTimeout(() => {
+    seal.style.transition = 'opacity 1.5s ease';
+    seal.style.opacity = 0;
+    setTimeout(() => seal.remove(), 1600);
+  }, 3500);
+
+  console.log("✅ Symphonic Grid Seal engaged.");
+}
+
+// Seal grid after harmonic snap cascade
+window.addEventListener('load', () => {
+  setTimeout(activateSymphonicGridSeal, 3400);
+});
+// 🎼 Phase 404.5: Harmonic Snap Cascade
+function triggerHarmonicSnapCascade() {
+  console.log("🎼 Initiating Harmonic Snap Cascade...");
+
+  const panels = Array.from(document.querySelectorAll('.holo-console')).filter(Boolean);
+  panels.forEach((panel, index) => {
+    setTimeout(() => {
+      panel.classList.add('harmonic-snap');
+      console.log(`🎯 Panel ${index + 1} harmonically snapped.`);
+    }, index * 100);
+  });
+
+  console.log("✅ Harmonic Snap Cascade initiated.");
+}
+
+// Trigger after anchors and oscillation
+window.addEventListener('load', () => {
+  setTimeout(triggerHarmonicSnapCascade, 2600);
+});
+// 🧲 Phase 404: Ascendant Grid Anchor Deployment
+function deployAscendantGridAnchors() {
+  console.log("🧲 Deploying Ascendant Grid Anchors...");
+
+  const anchors = [
+    { id: 'anchor-top-left', x: 0, y: 0 },
+    { id: 'anchor-top-right', x: window.innerWidth, y: 0 },
+    { id: 'anchor-bottom-left', x: 0, y: window.innerHeight },
+    { id: 'anchor-bottom-right', x: window.innerWidth, y: window.innerHeight }
+  ];
+
+  anchors.forEach(anchor => {
+    const div = document.createElement('div');
+    div.id = anchor.id;
+    div.className = 'grid-anchor';
+    div.style.position = 'absolute';
+    div.style.left = `${anchor.x}px`;
+    div.style.top = `${anchor.y}px`;
+    div.style.width = '8px';
+    div.style.height = '8px';
+    div.style.backgroundColor = 'lime';
+    div.style.borderRadius = '50%';
+    div.style.zIndex = 999;
+    div.title = anchor.id;
+    document.body.appendChild(div);
+    console.log(`📍 Grid anchor added: ${anchor.id}`);
+  });
+
+  console.log("✅ Ascendant Grid Anchors deployed.");
+}
+
+// Call after dock oscillation
+window.addEventListener('load', () => {
+  setTimeout(deployAscendantGridAnchors, 2200);
+});
+// 🌊 Phase 403: Role-Synced Dock Oscillation
+function beginRoleSyncedDockOscillation() {
+  console.log("🌊 Syncing Dock Oscillations by Role...");
+
+  const roles = ['companion', 'command', 'observer'];
+  let phaseShift = 0;
+
+  roles.forEach(role => {
+    const panels = document.querySelectorAll(`.holo-console[data-role="${role}"]`);
+    panels.forEach((panel, index) => {
+      panel.style.animation = `dockOscillation 2.5s ease-in-out ${phaseShift}s infinite alternate`;
+      console.log(`🔁 Oscillation initialized for ${role} panel ${index + 1}`);
+    });
+    phaseShift += 0.3;
+  });
+
+  console.log("✅ Role-Synced Oscillation complete.");
+}
+
+// Begin after portal initialization
+window.addEventListener('load', () => {
+  setTimeout(beginRoleSyncedDockOscillation, 1800);
+});
+// === PHASE ZERO: GRID ASCENSION ===
+console.log("🌐 Grid Ascension Phase Zero Activated");
+
+const gridSystem = document.getElementById("sovereignGridSystem");
+if (!gridSystem) {
+  console.warn("❌ sovereignGridSystem not found.");
+} else {
+  const orderedPanels = [
+    "countConsolePanel",
+    "deltaAnalyzerPanel",
+    "reportingHubPanel",
+    "sessionManagerPanel",
+    "utilityHubPanel",
+    "sovereignTerminalPanel"
+  ];
+
+  orderedPanels.forEach(panelId => {
+    const panel = document.getElementById(panelId);
+    if (panel) {
+      gridSystem.appendChild(panel); // Moves panel to the end, maintaining order
+    } else {
+      console.warn(`⚠️ Panel not found: ${panelId}`);
+    }
+  });
+}
 // DEBUG: Logs and outlines enabled for Snap Diagnostics. Remove before production.
 import panelGridMatrix from '../grid/gridMatrix.js';
 import { snapToNearestGrid } from '../ascendancy/consoleGridBinder.js';
@@ -58,6 +253,50 @@ renderOrbitGroup(GRID_ORBITS.auxiliary, 10);
 
 // Master Snap Engine for aligning all console panels to the grid
 document.addEventListener("DOMContentLoaded", () => {
+  // --- PanelSnap Patch: Enforce Consistent Panel Alignment + Mutation Observer ---
+  // === Grid Sentinel Recalibration Utility ===
+  function recalibrateGridSentinels() {
+    console.log("🛰️ Recalibrating Grid Sentinels...");
+    document.querySelectorAll(".holo-console").forEach(panel => {
+      if (!panel.classList.contains("locked")) {
+        panel.style.position = "absolute";
+        panel.style.margin = "0";
+        panel.style.padding = "0";
+        panel.style.left = panel.dataset.snapLeft || "0px";
+        panel.style.top = panel.dataset.snapTop || "0px";
+        panel.style.width = panel.dataset.snapWidth || "400px";
+        panel.style.height = panel.dataset.snapHeight || "300px";
+        panel.style.zIndex = panel.dataset.z || "10";
+      }
+    });
+    console.log("✅ Grid Sentinels recalibrated.");
+  }
+
+  // Auto-trigger recalibration after initial grid setup
+  window.addEventListener("load", () => {
+    setTimeout(recalibrateGridSentinels, 300);
+  });
+  function enforceGridAlignment() {
+    const panels = document.querySelectorAll('.holo-console');
+    panels.forEach(panel => {
+      panel.style.margin = '10px';
+      panel.style.minHeight = '300px';
+      panel.style.boxSizing = 'border-box';
+    });
+  }
+
+  // Initial enforcement
+  enforceGridAlignment();
+
+  // Mutation Observer for changes in layout
+  const observer = new MutationObserver(() => {
+    enforceGridAlignment();
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
   console.log('%c🌐 Panel Snap Engine Initialized', 'color: lime; font-weight: bold; font-size: 14px;');
   // --- Phase 0: Panel DOM Order Injection by Role Priority ---
   // This block injects the panel role DOM order logic before any grid/snap logic.
@@ -563,6 +802,118 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 🧩 Layout Harmony Matrix: Role-based panel positioning
+  function initializeRoleLayoutMatrix() {
+    console.log("🧩 Initializing Layout Harmony Matrix...");
+
+    const roleMatrix = {
+      core: { top: 40, left: 40 },
+      system: { top: 40, left: 600 },
+      utility: { top: 300, left: 40 },
+      forecast: { top: 300, left: 600 },
+      agent: { top: 560, left: 40 },
+      terminal: { top: 560, left: 600 }
+    };
+
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      const role = panel.getAttribute('data-role');
+      if (role && roleMatrix[role]) {
+        const { top, left } = roleMatrix[role];
+        panel.style.position = 'absolute';
+        panel.style.top = `${top}px`;
+        panel.style.left = `${left}px`;
+        console.log(`📦 Positioned ${role} panel at (${top}, ${left})`);
+      }
+    });
+
+    console.log("✅ Layout Harmony Matrix Applied");
+  }
+
+  // --- Responsive Flow Matrix ---
+  function applyResponsiveFlowMatrix() {
+    console.log("📐 Applying Responsive Flow Matrix...");
+
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      const role = panel.getAttribute('data-role');
+      if (!role) return;
+
+      // Adjust layout based on screen width
+      const scaleFactor = screenWidth < 1200 ? 0.7 : 1;
+      panel.style.transform = `scale(${scaleFactor})`;
+
+      // Optional: stack vertically on smaller screens
+      if (screenWidth < 800) {
+        panel.style.position = 'relative';
+        panel.style.top = 'unset';
+        panel.style.left = 'unset';
+        panel.style.marginBottom = '20px';
+      }
+
+      console.log(`🔄 Responsive flow applied to ${role}`);
+    });
+
+    console.log("✅ Responsive Flow Matrix Complete");
+  }
+
+  // Execute layout positioning on load
+  window.addEventListener('load', initializeRoleLayoutMatrix);
+  // Trigger responsive flow on resize and on load
+  window.addEventListener('resize', applyResponsiveFlowMatrix);
+  window.addEventListener('load', applyResponsiveFlowMatrix);
+
+  // 🎞️ Role-based Panel Animations
+  function bindRoleBasedPanelAnimations() {
+    console.log("🎞️ Binding role-based panel animations...");
+
+    const roleAnimationMap = {
+      core: 'fadeInScale',
+      system: 'slideLeft',
+      utility: 'bounceIn',
+      forecast: 'fadeInRight',
+      agent: 'zoomIn',
+      terminal: 'pulseGlow'
+    };
+
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      const role = panel.getAttribute('data-role');
+      if (role && roleAnimationMap[role]) {
+        panel.classList.add('animated', roleAnimationMap[role]);
+        console.log(`🎬 ${role} panel animation: ${roleAnimationMap[role]}`);
+      }
+    });
+
+    console.log("✅ Panel animations bound.");
+  }
+
+  // Execute on load
+  window.addEventListener('load', bindRoleBasedPanelAnimations);
+
+  // 🎼 Panel Symphony Flow: Cascading panel row animation
+  function enforcePanelSymphonyFlow() {
+    console.log("🎼 Orchestrating panel symphony flow...");
+
+    const rows = document.querySelectorAll('.grid-row');
+    let delay = 0;
+
+    rows.forEach((row, index) => {
+      const panels = row.querySelectorAll('.holo-console');
+      panels.forEach((panel, i) => {
+        panel.style.transitionDelay = `${delay}s`;
+        panel.classList.add('symphonyFlow');
+        delay += 0.1;
+        console.log(`🎶 Panel in row ${index + 1}, position ${i + 1} timed at ${delay}s`);
+      });
+    });
+
+    console.log("✅ Panel symphony flow enforced.");
+  }
+
+  // Trigger after animations and layout are bound
+  window.addEventListener('load', enforcePanelSymphonyFlow);
+
   // Save panel positions before unload
   window.addEventListener('beforeunload', () => {
     const state = {};
@@ -812,6 +1163,45 @@ style.textContent = `
     50% { opacity: 0.6; transform: scale(1.03); }
     100% { opacity: 0.3; transform: scale(0.98); }
   }
+
+  /* 🎞️ Panel Animation Placeholders */
+  .animated { transition: all 0.8s ease-in-out; }
+  .fadeInScale { transform: scale(1.05); opacity: 1; }
+  .slideLeft { transform: translateX(-10px); opacity: 1; }
+  .bounceIn { animation: bounceIn 0.9s; }
+  .fadeInRight { transform: translateX(10px); opacity: 1; }
+  .zoomIn { transform: scale(1.1); }
+  .pulseGlow { box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
+
+  /* 🎼 Symphony Flow: Cascading panel row animation */
+  .symphonyFlow {
+    transition: transform 0.8s ease-in-out, opacity 0.6s ease-in-out;
+    opacity: 1;
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0.2; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  @keyframes dockOscillation {
+    0% {
+      transform: translateY(0px);
+    }
+    100% {
+      transform: translateY(5px);
+    }
+  }
+  .grid-anchor {
+    box-shadow: 0 0 6px 2px lime;
+    pointer-events: none;
+  }
+  /* 🎼 Harmonic Snap Cascade */
+  .harmonic-snap {
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 10px 3px rgba(0, 255, 255, 0.6);
+    transform: translateY(0px);
+  }
 `;
 document.head.appendChild(style);
 
@@ -1039,3 +1429,258 @@ function visuallyConfirmSnap(panel) {
   console.log('%c📡 Grid Sentinel Standing By', 'color: gold;');
   console.log('%c🫧 Heartbeat Stable', 'color: pink;');
   console.groupEnd();
+// 🪐 Phase 401: Orbital Grid Balance Calibration
+function calibrateOrbitalGridBalance() {
+  console.log("🪐 Calibrating Orbital Grid Balance...");
+
+  const panels = document.querySelectorAll('.holo-console');
+  const total = panels.length;
+  const midpoint = Math.floor(total / 2);
+
+  panels.forEach((panel, index) => {
+    const offset = (index - midpoint) * 10;
+    // If no transform is set, default to empty string
+    panel.style.transform = (panel.style.transform || "") + ` translateY(${offset}px)`;
+    panel.style.opacity = 1;
+    console.log(`⚖️ Panel ${index + 1}/${total} adjusted by ${offset}px`);
+  });
+
+  console.log("✅ Orbital balance complete.");
+}
+
+// Trigger after symphony flow completes
+window.addEventListener('load', () => {
+  setTimeout(calibrateOrbitalGridBalance, 600); // Wait briefly after symphony
+});
+
+// 🚪 Companion Dock Portals: Phase 402
+function initializeCompanionDockPortals() {
+  console.log("🚪 Initializing Companion Dock Portals...");
+
+  const companionPanels = document.querySelectorAll('.holo-console[data-role="companion"]');
+  companionPanels.forEach((panel, i) => {
+    const portal = document.createElement('div');
+    portal.className = 'companion-dock-portal';
+    portal.innerText = `🧿 Portal ${i + 1}`;
+    portal.onclick = () => {
+      panel.classList.toggle('portal-active');
+      console.log(`🌀 Companion Portal ${i + 1} toggled`);
+    };
+    panel.appendChild(portal);
+  });
+
+  console.log("✅ Companion Dock Portals ready.");
+}
+
+// Trigger after orbital balance
+window.addEventListener('load', () => {
+  setTimeout(initializeCompanionDockPortals, 1200);
+});
+
+// Inject CSS for companion-dock-portal and portal-active
+(function() {
+  const companionDockStyle = document.createElement('style');
+  companionDockStyle.textContent = `
+    .companion-dock-portal {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      background: rgba(0, 0, 50, 0.6);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .portal-active {
+      border: 2px solid cyan;
+      box-shadow: 0 0 10px cyan;
+    }
+  `;
+  document.head.appendChild(companionDockStyle);
+})();
+// Phase 425: Realignment Pulse Broadcast
+window.triggerRealignmentPulse = function () {
+  // Assign grid areas before snapping logic
+  assignGridAreasByRole();
+
+  const panels = document.querySelectorAll('.holo-console');
+  const grid = document.querySelector('#sovereignGrid');
+
+  if (!grid) {
+    console.warn("⚠️ Sovereign Grid not found.");
+    return;
+  }
+
+  panels.forEach(panel => {
+    if (!panel.dataset.role) {
+      console.warn("⚠️ Panel missing role:", panel);
+      return;
+    }
+
+    // Reset layout position
+    panel.style.position = 'absolute';
+    panel.style.left = '';
+    panel.style.top = '';
+    panel.classList.remove('snapped');
+
+    // Reapply layout alignment
+    const snapTarget = document.querySelector(`#gridAnchor-${panel.dataset.role}`);
+    if (snapTarget && grid.contains(snapTarget)) {
+      const { top, left } = snapTarget.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+      panel.style.left = `${left - gridRect.left}px`;
+      panel.style.top = `${top - gridRect.top}px`;
+      panel.classList.add('snapped');
+    }
+  });
+
+  console.log("📡 Realignment Pulse Broadcast Complete.");
+};
+
+// === Grid Role Validator ===
+function validatePanelGridRoles() {
+  const panels = document.querySelectorAll('.holo-console');
+
+  panels.forEach(panel => {
+    const role = panel.dataset.role;
+    const gridArea = panel.dataset.gridArea;
+
+    if (!role || role === 'unassigned') {
+      panel.dataset.role = 'observer';
+      console.warn(`🔍 Auto-assigned role "observer" to panel`, panel);
+    }
+
+    if (!gridArea || gridArea === 'unassigned-zone') {
+      panel.dataset.gridArea = 'staging-zone';
+      console.warn(`📍 Auto-assigned grid area "staging-zone" to panel`, panel);
+    }
+  });
+
+  console.log("✅ Grid Role Validator completed.");
+}
+
+// Invoke validator immediately after grid pulse
+validatePanelGridRoles();
+
+// Assign grid-area to panels based on their role
+function assignGridAreasByRole() {
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    const role = panel.dataset.role;
+
+    let targetArea = 'float-zone'; // default fallback
+
+    switch (role) {
+      case 'terminal':
+        targetArea = 'bottom-left';
+        break;
+      case 'oracle':
+        targetArea = 'top-center';
+        break;
+      case 'pulseMonitor':
+        targetArea = 'center-right';
+        break;
+      case 'support':
+        targetArea = 'bottom-right';
+        break;
+      case 'relay':
+        targetArea = 'center-left';
+        break;
+      case 'archive':
+        targetArea = 'top-left';
+        break;
+      case 'conductor':
+        targetArea = 'center';
+        break;
+      case 'pulse-node':
+        targetArea = 'top-right';
+        break;
+      case 'unassigned':
+        targetArea = 'float-zone';
+        break;
+    }
+
+    panel.dataset.gridArea = targetArea;
+  });
+
+  console.log('📌 Grid areas assigned based on role.');
+}
+
+window.assignGridAreasByRole = assignGridAreasByRole;
+// === Grid Conflict Diagnostic Scan ===
+console.groupCollapsed("🔍 GRID CONFLICT SCAN");
+
+document.querySelectorAll('.holo-console').forEach(panel => {
+  const id = panel.id || '[no-id]';
+  const role = panel.dataset.role || '[no-role]';
+  const area = panel.dataset.gridArea || '[no-grid-area]';
+  
+  if (!panel.dataset.role) {
+    console.warn(`⚠️ Panel ${id} missing 'data-role'`);
+  }
+  if (!panel.dataset.gridArea) {
+    console.warn(`⚠️ Panel ${id} missing 'data-grid-area'`);
+  }
+
+  const computed = window.getComputedStyle(panel);
+  const display = computed.getPropertyValue('display');
+  const position = computed.getPropertyValue('position');
+
+  console.log(`🧩 ${id} → role: ${role}, gridArea: ${area}, display: ${display}, position: ${position}`);
+});
+
+console.groupEnd();
+
+// === Panel Role & Zone Assignment Layer (Phase 426) ===
+const panelZoneMap = {
+  terminal: { role: 'interface', gridArea: 'core-zone' },
+  pulseMonitor: { role: 'monitor', gridArea: 'core-zone' },
+  oracle: { role: 'oracle', gridArea: 'wisdom-zone' },
+  conductor: { role: 'command', gridArea: 'core-zone' },
+  'pulse-node': { role: 'relay', gridArea: 'signal-zone' },
+  relay: { role: 'relay', gridArea: 'signal-zone' },
+  archive: { role: 'storage', gridArea: 'data-zone' },
+  support: { role: 'support', gridArea: 'aux-zone' },
+  countConsole: { role: 'analytics', gridArea: 'dashboard-zone' },
+  deltaAnalyzerConsole: { role: 'analytics', gridArea: 'dashboard-zone' },
+  reportingHubConsole: { role: 'dashboard', gridArea: 'dashboard-zone' },
+  sessionManagerConsole: { role: 'session', gridArea: 'core-zone' },
+  utilityHubConsole: { role: 'utility', gridArea: 'aux-zone' },
+  oracleConsole: { role: 'oracle', gridArea: 'wisdom-zone' },
+  grimoireConsole: { role: 'lore', gridArea: 'wisdom-zone' },
+  whispererConsole: { role: 'messenger', gridArea: 'signal-zone' },
+  sigilRenderConsole: { role: 'forge', gridArea: 'ritual-zone' },
+  sigilEditPanel2: { role: 'edit', gridArea: 'ritual-zone' },
+  exceptionManagerConsole: { role: 'debug', gridArea: 'system-zone' },
+  progressDashboardConsole: { role: 'status', gridArea: 'dashboard-zone' },
+  masterExportHubConsole: { role: 'exporter', gridArea: 'data-zone' },
+  mappingsConsole: { role: 'mapping', gridArea: 'system-zone' },
+  toolsConsole: { role: 'tools', gridArea: 'system-zone' },
+  configPanelConsole: { role: 'config', gridArea: 'system-zone' },
+  sageFeedConsole: { role: 'input', gridArea: 'wisdom-zone' },
+  auditConsole: { role: 'auditor', gridArea: 'system-zone' },
+  sageTerminal: { role: 'interface', gridArea: 'core-zone' },
+  forecastConsole: { role: 'forecast', gridArea: 'signal-zone' }
+};
+
+document.querySelectorAll('.holo-console').forEach(panel => {
+  const id = panel.id || '';
+  // Remove common suffixes for baseId matching (e.g., Console, Panel, Hub, Edit)
+  const baseId = id.replace(/Console|Panel|Hub|Edit/g, '').replace(/[-_]\d+$/, '');
+  const zone = panelZoneMap[baseId];
+
+  if (zone) {
+    panel.dataset.role = zone.role;
+    panel.dataset.gridArea = zone.gridArea;
+    panel.style.display = 'grid';
+    panel.style.position = 'relative';
+  } else {
+    panel.dataset.role = 'unassigned';
+    panel.dataset.gridArea = 'holding-zone';
+    panel.style.display = 'none';
+  }
+});
+console.log('✅ Phase 426: Panel roles and zones assigned.');

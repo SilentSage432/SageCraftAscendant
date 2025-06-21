@@ -69,74 +69,102 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <body class="liquid-glass-ui">
-  <div style="position: fixed; top: 10px; right: 20px; z-index: 10000;">
-    <label style="font-family: monospace; color: #fff;">
-      <input type="checkbox" id="restoreToggle" checked />
-      🔁 Restore Last Panel
-    </label>
-  </div>
-  <!-- 🔧 Phase 11.9 — Injected Dock Panel Anchors -->
-
-  <!-- 🔌 Dock Panel Scaffolding Injected — Phase 12.0 -->
-  <div class="dock-wrapper">
-    <div id="exceptionManager" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="deltaAnalyzer" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="reportingHub" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="sessionManager" class="holo-console dock-panel holo-console-panel">
-      <div class="last-backup-time"></div>
-      <ul class="session-entries"></ul>
-      <button class="trigger-backup">Backup</button>
-      <button class="trigger-restore">Restore</button>
+    <div style="position: fixed; top: 10px; right: 20px; z-index: 10000;">
+      <label style="font-family: monospace; color: #fff;">
+        <input type="checkbox" id="restoreToggle" checked />
+        🔁 Restore Last Panel
+      </label>
     </div>
-    <div id="utilityHub" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="progressDashboard" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="masterExportHub" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="mappings" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="tools" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="audit" class="holo-console dock-panel holo-console-panel"></div>
-    <div id="configPanel" class="holo-console dock-panel holo-console-panel"></div>
-  </div>
-
-  <!--
-  <div id="countConsole" class="holo-console" data-panel="count">
-    ... (legacy, replaced by unified consolePanelGroup below)
-  </div>
-  -->
-
-  <!-- 🧠 Predictive HUD Anchors -->
-  <div id="predictiveHUD">
-    <div id="dockStatusText" class="hud-label"></div>
-    <div id="lastSync" class="hud-label"></div>
-    <div>
-      Items: <span id="itemSpan" class="hud-value"></span>
-      Categories: <span id="categorySpan" class="hud-value"></span>
+    <!-- === SOVEREIGN GRID SYSTEM LAYOUT (REPLACES ALL PANELS/CONSOLES) === -->
+    <div id="sovereignGrid" class="grid-container">
+      <!-- Sovereign panels will anchor here -->
     </div>
-    <ul id="recentList" class="hud-log"></ul>
-  </div>
+    <div id="sovereignGridSystem">
+      <div id="orbitBarZone"></div>
 
-  <!--
-  <div id="deltaAnalyzerConsole" class="holo-console" data-panel="deltaAnalyzer">
-    ... (legacy, replaced by unified consolePanelGroup below)
-  </div>
-  -->
+      <div class="grid-row" id="primaryConsoleRow">
+        <div class="grid-panel" id="countConsolePanel"></div>
+        <div class="grid-panel" id="deltaAnalyzerPanel"></div>
+        <div class="grid-panel" id="reportingHubPanel"></div>
+      </div>
 
-  <!--
-  <div id="reportingHubConsole" class="holo-console" data-panel="reportingHub">
-    ... (legacy, replaced by unified consolePanelGroup below)
-  </div>
-  -->
+      <div class="grid-row" id="secondaryConsoleRow">
+        <div class="grid-panel" id="sessionManagerPanel"></div>
+        <div class="grid-panel" id="utilityHubPanel"></div>
+        <div class="grid-panel" id="sovereignTerminalPanel"></div>
+      </div>
 
-  <!--
-  <div id="sessionManagerConsole" class="holo-console" data-panel="sessionManager">
-    ... (legacy, replaced by unified consolePanelGroup below)
-  </div>
-  -->
+      <div id="footerStatusZone"></div>
 
-  <!--
-  <div id="utilityHubConsole" class="holo-console" data-panel="utilityHub">
-    ... (legacy, replaced by unified consolePanelGroup below)
-  </div>
-  -->
+      <!-- 🌌 Forecast Intelligence Console -->
+      <div id="forecastConsole" class="dock-panel holo-console-panel hidden" data-role="observer" data-grid-area="staging-zone">
+        <!-- Content dynamically injected by renderForecastConsole() -->
+      </div>
+      <div id="orbitalDockContainer" class="holo-console-panel"></div>
+      <div id="dockGrid" class="dock-grid hidden holo-console-panel">
+        <div class="dock-panel-group">
+          <div id="countConsole" class="holo-console dock-panel holo-console-panel hidden" data-permalock>
+            <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+              📊 Count Console
+            </div>
+            <div class="console-body">
+              <div class="console-section">
+                <p><strong>Metrics:</strong> System count initialized.</p>
+                <ul class="log-list">
+                  <li class="faint">🧮 Awaiting data stream...</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="deltaAnalyzerConsole" class="dock-panel holo-console-panel">
+            <!-- Panel content for Delta Analyzer Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="reportingHubConsole" class="dock-panel holo-console-panel">
+            <!-- Panel content for Reporting Hub Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="sessionManagerConsole" class="dock-panel holo-console-panel">
+            <!-- Panel content for Session Manager Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="utilityHubConsole" class="dock-panel holo-console-panel">
+            <!-- Panel content for Utility Hub Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="oracleConsole" class="dock-panel holo-console-panel" data-role="oracle" data-grid-area="staging-zone">
+            <!-- Panel content for Oracle Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="whispererConsole" class="dock-panel holo-console-panel" data-role="whisperer" data-grid-area="staging-zone">
+            <!-- Panel content for Whisperer Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="sageFeedConsole" class="dock-panel holo-console-panel">
+            <!-- Panel content for Sage Feed Console goes here -->
+          </div>
+        </div>
+        <div class="dock-panel-group">
+          <div id="grimoireConsole" class="dock-panel holo-console-panel" data-role="grimoire" data-grid-area="staging-zone">
+            <!-- Panel content for Grimoire Console goes here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Forecast Console Section -->
+      <div id="forecastConsoleSection"></div>
+
+      <!-- Lore Engine Section -->
+      <div id="loreEngineSection"></div>
+    </div>
 </script>
 </script>
  <!-- 1. Sovereign Event Bus should be FIRST -->
@@ -225,7 +253,7 @@
   </div>
 
   <!-- 🧬 Sigil Forge Panel -->
-  <div id="sigilForgePanel" class="holo-console-panel" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+  <div id="sigilForgePanel" class="holo-console-panel" data-role="sigil-forge" data-grid-area="staging-zone" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
     <div id="sigilEditorContainer" style="margin-top: 20px; padding: 10px; border-top: 1px solid #555;">
       <h3>Edit Sigil</h3>
       <form id="sigilEditForm" onsubmit="event.preventDefault(); submitSigilEdit();">
@@ -390,7 +418,7 @@
 <!-- 📖 Sanctum Lore Archive Panel -->
 </div>
 </ul>
-  <div id="anomalySanctumPanel" class="holo-console-panel" style="
+  <div id="anomalySanctumPanel" class="holo-console-panel" data-role="anomaly-sanctum" data-grid-area="staging-zone" style="
   position: fixed;
   top: 90px;
   left: 10px;
@@ -527,7 +555,7 @@ function toggleGlyphLegend() {
 </script>
 </div>
 
-<div id="neuralCommandBridge" class="holo-console-panel" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
+<div id="neuralCommandBridge" class="holo-console-panel" data-role="neural-bridge" data-grid-area="staging-zone" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
   <h3 style="margin-top:0;">🧠 Neural Command Bridge Online</h3>
   
   <div style="display:flex; flex-wrap:wrap; gap:12px;">
@@ -669,6 +697,7 @@ function toggleGlyphLegend() {
 <!-- === CLEANUP & SANITATION === -->
 <script type="module" src="scripts/wiring/uiSanitizer.js"></script>
 <script type="module" src="scripts/cleanup/panelSanitizer.js"></script>
+<script type="module" src="scripts/lifecycle/panelSnapValidationSweep.js"></script>
 
 <!-- === CONSOLE CORE LIFECYCLE === -->
 <script type="module" src="scripts/ascendancy/consoleAtlas.js"></script>
@@ -763,6 +792,9 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ui/panelInteractionLinker.js"></script>
 <script type="module" src="scripts/lifecycle/layoutPresetsDropdown.js"></script>
 
+<!-- === Companion Systems & Lifecycle Modules === -->
+<script type="module" src="scripts/lifecycle/companionKernel.js"></script>
+
 <!-- === FORECAST & SIGNAL SYSTEMS === -->
 <script type="module" src="scripts/forecasting/forecastMatrixSync.js"></script>
 <script type="module" src="scripts/ascendancy/resurrectionQueue.js"></script>
@@ -774,6 +806,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/gridRelayLinker.js"></script>
 <script type="module" src="scripts/ascendancy/consoleAnomalyRebinder.js"></script>
 <script type="module" src="scripts/grid/gridSnapCoordinator.js"></script>
+<script type="module" src="scripts/lifecycle/panelGridAnchor.js"></script>
 </body>
 <script>
   function toggleDevConsole() {
@@ -1596,7 +1629,7 @@ function showToast(message = "✅ Done") {
       <!-- Panel content dynamically inserted here -->
     </div>
     <!-- 📖 Lore Engine Panel -->
-    <div id="loreEngineConsole" class="dock-panel holo-console-panel hidden">
+    <div id="loreEngineConsole" class="dock-panel holo-console-panel hidden" data-role="lore-engine" data-grid-area="staging-zone">
       <h2>📖 Lore Engine</h2>
       <p>Initializing Lore Engine Interface...</p>
       <!-- Future lore content and controls will be injected here -->

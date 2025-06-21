@@ -142,6 +142,31 @@ function rehomeOrphanPanels() {
 
 document.addEventListener("DOMContentLoaded", rehomeOrphanPanels);
 
+// 🧬 Phase 427 — Panel Identity & Role Codex Enforcement
+function enforcePanelCodex() {
+  const panelGroup = document.getElementById("consolePanelGroup");
+  if (!panelGroup) return;
+
+  const defaultRole = "observer";
+  const defaultZone = "staging-zone";
+
+  panelGroup.querySelectorAll(".console-panel").forEach(panel => {
+    if (!panel.dataset.role) {
+      panel.dataset.role = defaultRole;
+      console.warn(`🧬 Role Assigned: ${panel.id} → ${defaultRole}`);
+    }
+
+    if (!panel.dataset.gridArea) {
+      panel.dataset.gridArea = defaultZone;
+      console.warn(`🧬 Grid Area Assigned: ${panel.id} → ${defaultZone}`);
+    }
+  });
+
+  console.log("🧬 Panel Codex Enforcement Complete.");
+}
+
+document.addEventListener("DOMContentLoaded", enforcePanelCodex);
+
 // 🧬 Phase 344.6 — Console Panel State Normalizer
 function normalizePanelStates() {
   const panelGroup = document.getElementById("consolePanelGroup");

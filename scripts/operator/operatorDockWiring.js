@@ -1,3 +1,12 @@
+// === Sovereign Panel Override Lock: Prevents post-load forced repositioning if panels are already aligned ===
+document.body.dataset.gridLock = "true";
+
+// === Temporary Auto-Snap Disablement for Manual Panel Placement ===
+window.disableAutoSnap = true;
+document.querySelectorAll('.holo-console').forEach(panel => {
+  panel.dataset.snap = "manual";
+  panel.style.transition = "none";
+});
 // === Phase 31.0 — Sovereign Dock Resurrection Sweep ===
 setTimeout(() => {
   console.log("🧬 Phase 31.0 — Sovereign Dock Resurrection Sweep Initiated");
@@ -22,6 +31,12 @@ setTimeout(() => {
   };
 
   allPanels.forEach(panel => {
+    // === Panel Override Lock: Prevent forced repositioning if gridLock is active ===
+    const panelOverrideLock = document.body.dataset.gridLock === "true";
+    if (panelOverrideLock) {
+      console.warn("🛑 Panel Override Lock Active — Skipping Forced Repositioning.");
+      return;
+    }
     panel.style.display = "block";
     panel.style.visibility = "visible";
     panel.style.opacity = "1";
@@ -1337,18 +1352,26 @@ var OperatorDockWiring = {
             if (!panel) return;
             const dockInfo = panels[id];
 
-            // Apply visibility
-            if (dockInfo.visible) {
-                panel.classList.remove("hidden");
-            } else {
-                panel.classList.add("hidden");
-            }
+        // Panel Override Lock: skip visibility/position update if gridLock is active
+        const panelOverrideLock = document.body.dataset.gridLock === "true";
+        if (panelOverrideLock) {
+            console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
+            return;
+        }
+        // Optionally log subsystem trying to mutate layout
+        console.warn(`⚠️ Layout mutation attempted by: ${id}`);
+        // Apply visibility
+        if (dockInfo.visible) {
+            panel.classList.remove("hidden");
+        } else {
+            panel.classList.add("hidden");
+        }
 
-            // Apply position
-            if (dockInfo.position) {
-                if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
-                if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
-            }
+        // Apply position
+        if (dockInfo.position) {
+            if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
+            if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
+        }
         });
         console.log("✅ Dock state restored.");
         this.triggerEvent("restore", state);
@@ -1501,18 +1524,26 @@ var OperatorDockWiring = {
             if (!panel) return;
             const dockInfo = panels[id];
 
-            // Apply visibility
-            if (dockInfo.visible) {
-                panel.classList.remove("hidden");
-            } else {
-                panel.classList.add("hidden");
-            }
+        // Panel Override Lock: skip visibility/position update if gridLock is active
+        const panelOverrideLock = document.body.dataset.gridLock === "true";
+        if (panelOverrideLock) {
+            console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
+            return;
+        }
+        // Optionally log subsystem trying to mutate layout
+        console.warn(`⚠️ Layout mutation attempted by: ${id}`);
+        // Apply visibility
+        if (dockInfo.visible) {
+            panel.classList.remove("hidden");
+        } else {
+            panel.classList.add("hidden");
+        }
 
-            // Apply position
-            if (dockInfo.position) {
-                if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
-                if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
-            }
+        // Apply position
+        if (dockInfo.position) {
+            if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
+            if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
+        }
         });
 
         // Save the imported state into localStorage
@@ -3437,3 +3468,16 @@ setTimeout(() => {
   });
   console.log("✅ Final Resurrection Scan Complete.");
 }, 1500);
+// === Audit Block: Interference Sweep for Post-Load Panel Mutations ===
+window.addEventListener("load", () => {
+  console.log("🚨 Interference Sweep Initiated...");
+  const panels = document.querySelectorAll('.holo-console');
+  panels.forEach(panel => {
+    const id = panel.id || 'unnamed';
+    const role = panel.dataset.role || 'undefined';
+    const zone = panel.dataset.gridArea || 'unset';
+    const style = getComputedStyle(panel);
+    console.log(`🧪 Panel: ${id} | Role: ${role} | Zone: ${zone} | Display: ${style.display} | Position: ${style.position}`);
+  });
+  console.log("✅ Sweep Complete — Check for reflow triggers, style overrides, or missing role commitments.");
+});
