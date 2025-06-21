@@ -36,6 +36,25 @@
         transform: rotateX(0);
       }
     }
+    /* === Phase 1 Orbit Cluster Optimization: Orbit Panel Styles === */
+    .holo-console,
+    .dock-panel,
+    .panel-content {
+      /* Remove any forced white backgrounds set during Phase 1 */
+      /* background-color: #fff; */
+      /* background: #fff; */
+      /* background-color: white; */
+      background-color: transparent !important;
+      /* Preserve original dark, ethereal theme */
+      color: #e2e2e2;
+      border: 1px solid #552288;
+    }
+    /* Optional: For better contrast in dark theme, adjust console-header if needed */
+    .console-header {
+      background: rgba(34,0,51,0.7);
+      color: #ccbbff;
+      border-bottom: 1px solid #552288;
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,22 +79,22 @@
 
   <!-- 🔌 Dock Panel Scaffolding Injected — Phase 12.0 -->
   <div class="dock-wrapper">
-    <div id="exceptionManager" class="holo-console dock-panel"></div>
-    <div id="deltaAnalyzer" class="holo-console dock-panel"></div>
-    <div id="reportingHub" class="holo-console dock-panel"></div>
-    <div id="sessionManager" class="holo-console dock-panel">
+    <div id="exceptionManager" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="deltaAnalyzer" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="reportingHub" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="sessionManager" class="holo-console dock-panel holo-console-panel">
       <div class="last-backup-time"></div>
       <ul class="session-entries"></ul>
       <button class="trigger-backup">Backup</button>
       <button class="trigger-restore">Restore</button>
     </div>
-    <div id="utilityHub" class="holo-console dock-panel"></div>
-    <div id="progressDashboard" class="holo-console dock-panel"></div>
-    <div id="masterExportHub" class="holo-console dock-panel"></div>
-    <div id="mappings" class="holo-console dock-panel"></div>
-    <div id="tools" class="holo-console dock-panel"></div>
-    <div id="audit" class="holo-console dock-panel"></div>
-    <div id="configPanel" class="holo-console dock-panel"></div>
+    <div id="utilityHub" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="progressDashboard" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="masterExportHub" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="mappings" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="tools" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="audit" class="holo-console dock-panel holo-console-panel"></div>
+    <div id="configPanel" class="holo-console dock-panel holo-console-panel"></div>
   </div>
 
   <!--
@@ -122,6 +141,8 @@
 </script>
  <!-- 1. Sovereign Event Bus should be FIRST -->
 <script src="core/sovereignEventBus.js"></script>
+<!-- Sovereign Event Hub (must come before scripts that dispatch sovereign events) -->
+<script type="module" src="scripts/sovereign/sovereignEventHub.js"></script>
 
 <!-- 2. Core Sovereign Agent System -->
 <script src="scripts/core/sovereignAgent.js"></script>
@@ -132,9 +153,32 @@
 <script src="scripts/agents/taskAgent.js"></script>
 <script src="scripts/agents/wardenAgent.js"></script>
 
+</script>
 <!-- 4. UI & Console -->
+</script>
+</script>
 <script src="scripts/console/console.directives.js"></script>
-</div>
+<script type="module" src="scripts/wiring/buttonHooks.js"></script>
+<script type="module" src="scripts/wiring/panelVerification.js"></script>
+<script type="module" src="scripts/wiring/uiSanitizer.js"></script>
+<script type="module" src="scripts/wiring/consoleLifecycle.js"></script>
+<script type="module" src="scripts/wiring/inputObserver.js"></script>
+</script>
+</script>
+<script type="module" src="scripts/wiring/commandDispatcher.js"></script>
+<script type="module" src="scripts/wiring/commandFeedback.js"></script>
+<script type="module" src="scripts/cleanup/panelSanitizer.js"></script>
+</script>
+  <script type="module" src="scripts/wiring/uiGridHarmonizer.js"></script>
+  <script type="module" src="scripts/ascendancy/consolePanelMemory.js"></script>
+  <script type="module" src="scripts/ascendancy/consoleArrayNormalizer.js"></script>
+  <script type="module" src="scripts/ascendancy/uiHarmonyEngine.js"></script>
+  <script type="module" src="scripts/ascendancy/memorySocketLinker.js"></script>
+  <script type="module" src="scripts/ascendancy/legacyEchoRecovery.js"></script>
+  <script type="module" src="scripts/ascendancy/legacyEchoRehousing.js"></script>
+  <script type="module" src="scripts/ascendancy/consoleAtlas.js"></script>
+  <script type="module" src="scripts/ascendancy/consoleRelayBinder.js"></script>
+  <script type="module" src="scripts/ascendancy/consoleRecovery.js"></script>
 <!-- 🧠 Neural Command Bridge Toggle Button -->
 <div id="neuralBridgeToggle" onclick="toggleNeuralCommandBridge()" style="
   position: fixed;
@@ -181,7 +225,7 @@
   </div>
 
   <!-- 🧬 Sigil Forge Panel -->
-  <div id="sigilForgePanel" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+  <div id="sigilForgePanel" class="holo-console-panel" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
     <div id="sigilEditorContainer" style="margin-top: 20px; padding: 10px; border-top: 1px solid #555;">
       <h3>Edit Sigil</h3>
       <form id="sigilEditForm" onsubmit="event.preventDefault(); submitSigilEdit();">
@@ -346,7 +390,7 @@
 <!-- 📖 Sanctum Lore Archive Panel -->
 </div>
 </ul>
-  <div id="anomalySanctumPanel" style="
+  <div id="anomalySanctumPanel" class="holo-console-panel" style="
   position: fixed;
   top: 90px;
   left: 10px;
@@ -483,7 +527,7 @@ function toggleGlyphLegend() {
 </script>
 </div>
 
-<div id="neuralCommandBridge" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
+<div id="neuralCommandBridge" class="holo-console-panel" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
   <h3 style="margin-top:0;">🧠 Neural Command Bridge Online</h3>
   
   <div style="display:flex; flex-wrap:wrap; gap:12px;">
@@ -497,11 +541,67 @@ function toggleGlyphLegend() {
   <div id="commandBridgeOutput" style="margin-top:10px; color:#ccc; font-size:0.9em;"></div>
 </div>
   <!-- 🌌 Forecast Intelligence Console -->
-  <div id="forecastConsole" class="dock-panel hidden">
+  <div id="forecastConsole" class="dock-panel holo-console-panel hidden">
     <!-- Content dynamically injected by renderForecastConsole() -->
   </div>
-  <div id="orbitalDockContainer"></div>
-  <div id="dockGrid"></div>
+  <div id="orbitalDockContainer" class="holo-console-panel"></div>
+  <div id="dockGrid" class="dock-grid hidden holo-console-panel">
+    <div class="dock-panel-group">
+      <div id="countConsole" class="holo-console dock-panel holo-console-panel hidden" data-permalock>
+        <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
+          📊 Count Console
+        </div>
+        <div class="console-body">
+          <div class="console-section">
+            <p><strong>Metrics:</strong> System count initialized.</p>
+            <ul class="log-list">
+              <li class="faint">🧮 Awaiting data stream...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="deltaAnalyzerConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Delta Analyzer Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="reportingHubConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Reporting Hub Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="sessionManagerConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Session Manager Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="utilityHubConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Utility Hub Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="oracleConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Oracle Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="whispererConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Whisperer Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="sageFeedConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Sage Feed Console goes here -->
+      </div>
+    </div>
+    <div class="dock-panel-group">
+      <div id="grimoireConsole" class="dock-panel holo-console-panel">
+        <!-- Panel content for Grimoire Console goes here -->
+      </div>
+    </div>
+  </div>
 
   <!-- Forecast Console Section -->
   <div id="forecastConsoleSection"></div>
@@ -511,28 +611,169 @@ function toggleGlyphLegend() {
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const orbitButtons = document.querySelectorAll('.orbit-btn');
+      const allPanels = document.querySelectorAll('.holo-console');
 
       orbitButtons.forEach(button => {
         button.addEventListener('click', () => {
           const targetId = button.getAttribute('data-target');
-          console.log(`🌀 Orbit clicked — Target ID: ${targetId}`);
-
-          if (!targetId) {
-            console.warn("⚠️ No data-target defined on clicked orbit.");
-            return;
-          }
-
           const panel = document.getElementById(targetId);
+
+          // Hide all panels
+          allPanels.forEach(p => {
+            p.classList.add('hidden');
+            p.setAttribute('aria-hidden', 'true');
+          });
+
           if (panel) {
             panel.classList.remove('hidden');
-            console.log(`✅ Panel ${targetId} activated.`);
+            panel.setAttribute('aria-hidden', 'false');
+            panel.style.display = 'block';
+            panel.style.visibility = 'visible';
+            panel.style.opacity = '1';
+            panel.style.zIndex = '10';
+            console.log(`✅ Activated panel: ${targetId}`);
           } else {
-            console.warn(`⚠️ Panel not found: ${targetId}`);
+            console.warn(`⚠️ Could not find panel with ID: ${targetId}`);
           }
         });
       });
+
+      console.log(`🧠 Orbit Panel System initialized with ${orbitButtons.length} buttons.`);
     });
   </script>
+  <script>
+    const panelIDs = [
+      "countConsole", "deltaAnalyzerConsole", "reportingHubConsole", "sessionManagerConsole",
+      "utilityHubConsole", "sovereignTerminal", "sageFeedConsole", "whispererConsole"
+    ];
+
+    panelIDs.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.warn(`⚠️ Panel with ID "${id}" not found in DOM.`);
+      } else {
+        console.log(`✅ Panel "${id}" is present.`);
+      }
+    });
+  </script>
+<!-- === UI FOUNDATION & WIRING === -->
+<script type="module" src="scripts/wiring/buttonHooks.js"></script>
+<script type="module" src="scripts/wiring/panelVerification.js"></script>
+<script type="module" src="scripts/wiring/consoleGroupSanitizer.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridAllocator.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridActivation.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridVisualizer.js"></script>
+<script type="module" src="scripts/ascendancy/panelCoordinateAtlas.js"></script>
+<script type="module" src="scripts/ascendancy/consoleDockRelinker.js"></script>
+
+<!-- === CLEANUP & SANITATION === -->
+<script type="module" src="scripts/wiring/uiSanitizer.js"></script>
+<script type="module" src="scripts/cleanup/panelSanitizer.js"></script>
+
+<!-- === CONSOLE CORE LIFECYCLE === -->
+<script type="module" src="scripts/ascendancy/consoleAtlas.js"></script>
+<script type="module" src="scripts/ascendancy/consolePanelMemory.js"></script>
+<script type="module" src="scripts/ascendancy/consoleRecovery.js"></script>
+<script type="module" src="scripts/ascendancy/panelDockBinder.js"></script>
+<script type="module" src="scripts/ascendancy/consoleHarmonySync.js"></script>
+<script type="module" src="scripts/ascendancy/consoleClarityMatrix.js"></script>
+<script type="module" src="scripts/ascendancy/consoleIdentityStabilizer.js"></script>
+<script type="module" src="scripts/ascendancy/consoleVisibilitySweep.js"></script>
+<script type="module" src="scripts/ascendancy/consoleClarityScanner.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridBinder.js"></script>
+<script type="module" src="scripts/ascendancy/panelGridMemoryLinker.js"></script>
+<script type="module" src="scripts/ascendancy/consoleHomePositionResolver.js"></script>
+
+<!-- === COMMAND SYSTEM & FEEDBACK === -->
+<script type="module" src="scripts/wiring/commandDispatcher.js"></script>
+<script type="module" src="scripts/ascendancy/commandFeedback.js"></script>
+
+<!-- === VALIDATION LAYERS === -->
+<script type="module" src="scripts/ascendancy/buttonValidator.js"></script>
+<script type="module" src="scripts/ascendancy/inputFieldValidator.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridValidator.js"></script>
+
+<!-- === UI STABILITY MODULES === -->
+<script type="module" src="scripts/ascendancy/consoleLayoutResolver.js"></script>
+<script type="module" src="scripts/ascendancy/consoleHomeBinder.js"></script>
+<script type="module" src="scripts/ascendancy/consoleContainmentField.js"></script>
+<script type="module" src="scripts/ascendancy/uiHarmonyEngine.js"></script>
+<script type="module" src="scripts/ascendancy/terminalVisibilityController.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridLayoutResolver.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridEnforcer.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridConsistency.js"></script>
+<script type="module" src="scripts/ascendancy/panelAutoAligner.js"></script>
+<script type="module" src="scripts/ascendancy/gridNodeRestorer.js"></script>
+<script type="module" src="scripts/ascendancy/consoleDockInjectionFinalizer.js"></script>
+<script type="module" src="scripts/ascendancy/gridConstraintStabilizer.js"></script>
+<script type="module" src="scripts/ascendancy/gridSentinel.js"></script>
+<script type="module" src="scripts/ascendancy/consoleWarpStabilizer.js"></script>
+<script type="module" src="scripts/ascendancy/terminalContainmentShield.js"></script>
+<script type="module" src="scripts/ascendancy/terminalVisibilityGuard.js"></script>
+<script type="module" src="scripts/ascendancy/driftCompensator.js"></script>
+<script type="module" src="scripts/ascendancy/gridAnchorRegistry.js"></script>
+<script type="module" src="scripts/ascendancy/gridAnchorRestoration.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGroupAnomalyDetector.js"></script>
+<script type="module" src="scripts/ascendancy/terminalGridLinkSynchronizer.js"></script>
+<script type="module" src="scripts/ascendancy/consoleGridEngine.js"></script>
+<script type="module" src="scripts/ascendancy/gridSnapResolver.js"></script>
+<script type="module" src="scripts/ascendancy/panelSnapRehydrator.js"></script>
+<script type="module" src="scripts/grid/consoleSyncPulse.js"></script>
+<script type="module" src="scripts/grid/panelOrbitSync.js"></script>
+<script type="module" src="scripts/grid/consoleAnchorMatrix.js"></script>
+<script type="module" src="scripts/grid/consoleSyncPulse.js"></script>
+<script type="module" src="scripts/grid/gridIntegrityScanner.js"></script>
+<script type="module" src="scripts/grid/spatialReconciliationEngine.js"></script>
+<script type="module" src="scripts/ascendancy/consoleContourBinder.js"></script>
+<script type="module" src="scripts/grid/gridMagnetMatrix.js"></script>
+<script type="module" src="scripts/grid/gridResyncEmitter.js"></script>
+<script type="module" src="scripts/grid/gridSnapMagnetism.js"></script>
+<script type="module" src="scripts/grid/gridCoordinateResolver.js"></script>
+<script type="module" src="scripts/grid/consoleGridMagnetizer.js"></script>
+<script type="module" src="scripts/grid/gridNodeRestorer.js"></script>
+<script type="module" src="scripts/ascendancy/panelSnapSerializer.js"></script>
+<script type="module" src="scripts/ascendancy/panelMagneticFeedback.js"></script>
+<script type="module" src="scripts/grid/panelQuadrantRegistry.js"></script>
+<script type="module" src="scripts/grid/sectorAnchorBinder.js"></script>
+<script type="module" src="scripts/grid/magneticGridSeeker.js"></script>
+<script type="module" src="scripts/grid/gridCoordinateRegistry.js"></script>
+<script type="module" src="scripts/stability/consoleUIMender.js"></script>
+<script type="module" src="scripts/stability/consoleStyleBalancer.js"></script>
+<script type="module" src="scripts/stability/consoleAnchorField.js"></script>
+<script type="module" src="scripts/stability/uiRecoveryPulse.js"></script>
+<script type="module" src="scripts/stability/adaptiveGridSentinel.js"></script>
+<script type="module" src="scripts/stability/signalDriftDetector.js"></script>
+<script type="module" src="scripts/stability/terminalSnapDiagnostics.js"></script>
+<script type="module" src="scripts/stability/dockReconciliationMatrix.js"></script>
+<script type="module" src="scripts/stability/consoleRootCalibrator.js"></script>
+<script type="module" src="scripts/stability/consoleMatrixRealigner.js"></script>
+<script type="module" src="scripts/stability/consoleStabilityDriftMonitor.js"></script>
+<script type="module" src="scripts/stability/consolePanelFluxBinder.js"></script>
+<script type="module" src="scripts/stability/consolePanelSyncGuardian.js"></script>
+<script type="module" src="scripts/stability/terminalAnchorBinder.js"></script>
+<script type="module" src="scripts/stability/consoleViewAligner.js"></script>
+<script type="module" src="scripts/stability/interfaceLayoutMatrix.js"></script>
+<script type="module" src="scripts/stability/interfaceKinetics.js"></script>
+<script type="module" src="scripts/grid/gridSnapTrigger.js"></script>
+<script type="module" src="scripts/devtools/gridSnapTestKit.js"></script>
+<script type="module" src="scripts/lifecycle/panelDriftSignal.js"></script>
+<script type="module" src="scripts/lifecycle/panelSnapEngine.js"></script>
+<script type="module" src="scripts/lifecycle/panelGridAnchor.js"></script>
+<script type="module" src="scripts/lifecycle/panelSnapEngine.js"></script>
+<script type="module" src="scripts/ui/panelInteractionLinker.js"></script>
+<script type="module" src="scripts/lifecycle/layoutPresetsDropdown.js"></script>
+
+<!-- === FORECAST & SIGNAL SYSTEMS === -->
+<script type="module" src="scripts/forecasting/forecastMatrixSync.js"></script>
+<script type="module" src="scripts/ascendancy/resurrectionQueue.js"></script>
+
+<!-- === ADVANCED MODULAR HOOKS === -->
+<script type="module" src="scripts/ascendancy/consoleAnomalyScanner.js"></script>
+<script type="module" src="scripts/ascendancy/panelActivityScanner.js"></script>
+<script type="module" src="scripts/ascendancy/panelMemoryRehydrator.js"></script>
+<script type="module" src="scripts/ascendancy/gridRelayLinker.js"></script>
+<script type="module" src="scripts/ascendancy/consoleAnomalyRebinder.js"></script>
+<script type="module" src="scripts/grid/gridSnapCoordinator.js"></script>
 </body>
 <script>
   function toggleDevConsole() {
@@ -1027,7 +1268,50 @@ function showToast(message = "✅ Done") {
       <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" style="max-width: 220px; height: auto;" />
       <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
     </div>
-    <div id="sovereignToolbarMount" class="sovereign-toolbar-container"></div>
+    <div id="sovereignToolbarMount" class="sovereign-toolbar-container" style="margin-bottom: 20px;">
+      <details class="dropdown">
+        <summary>📊 Forecast Systems</summary>
+        <ul class="dropdown-menu active">
+          <li onclick="toggleDockPanel('forecastConsole')">Forecast Console</li>
+          <li onclick="toggleDockPanel('forecastAnomalyConsole')">Forecast Anomaly Console</li>
+        </ul>
+      </details>
+
+      <details class="dropdown">
+        <summary>🧬 Agent Management</summary>
+        <ul class="dropdown-menu">
+          <li onclick="toggleDockPanel('agentLifecycleConsole')">Agent Lifecycle</li>
+          <li onclick="toggleDockPanel('sessionManagerConsole')">Session Manager</li>
+        </ul>
+      </details>
+
+      <details class="dropdown">
+        <summary>🛠️ Diagnostic Tools</summary>
+        <ul class="dropdown-menu">
+          <li onclick="toggleDockPanel('countConsole')">Count Console</li>
+          <li onclick="toggleDockPanel('deltaAnalyzerConsole')">Delta Analyzer</li>
+          <li onclick="toggleDockPanel('reportingHubConsole')">Reporting Hub</li>
+          <li onclick="toggleDockPanel('utilityHubConsole')">Utility Hub</li>
+          <li onclick="toggleDockPanel('operatorConsole')">Operator Console</li>
+        </ul>
+      </details>
+
+      <details class="dropdown">
+        <summary>📚 Lore & Archive</summary>
+        <ul class="dropdown-menu">
+          <li onclick="toggleDockPanel('grimoireConsole')">Grimoire Console</li>
+          <li onclick="toggleDockPanel('sageFeedConsole')">Sage Feed Console</li>
+        </ul>
+      </details>
+
+      <details class="dropdown">
+        <summary>🔊 Communication & Echo</summary>
+        <ul class="dropdown-menu">
+          <li onclick="toggleDockPanel('oracleConsole')">Oracle Console</li>
+          <li onclick="toggleDockPanel('whispererConsole')">Whisperer Console</li>
+        </ul>
+      </details>
+    </div>
     <!-- Additional HoloConsole Sovereign Panels -->
     <!-- Sovereign Orbit Dock Console Panels -->
     <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
@@ -1046,38 +1330,205 @@ function showToast(message = "✅ Done") {
     </div>
   </section>
     <!-- 2. Full Panel Definitions for count and deltaAnalyzer -->
-    <section class="holo-console hidden" id="countConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">🧮 Count Console</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>🧮 Count Console</h2>
-          <p>Track any metric or inventory manually.</p>
+    <div id="dockGrid">
+      <div class="dock-panel-group">
+    <section class="holo-console hidden holo-console-panel" id="countConsole" aria-hidden="true" data-permalock>
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">🧮 Count Console</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>🧮 Count Console</h2>
+              <p class="panel-desc">Track, manage, and audit all current item counts in real time.</p>
+              <p>Track any metric or inventory manually.</p>
 
-          <div class="counter-display" id="countDisplay">0</div>
+              <div class="counter-display" id="countDisplay">0</div>
 
-          <div class="counter-controls">
-            <button onclick="updateCounter(1)">➕ Increment</button>
-            <button onclick="updateCounter(-1)">➖ Decrement</button>
-            <button onclick="resetCounter()">🔁 Reset</button>
-          </div>
+              <div class="counter-controls">
+                <button onclick="updateCounter(1)">➕ Increment</button>
+                <button onclick="updateCounter(-1)">➖ Decrement</button>
+                <button onclick="resetCounter()">🔁 Reset</button>
+              </div>
 
-          <!-- Predictive HUD and count refresh markup -->
-          <div class="status-bar">
-            <span class="dock-status" id="dockStatusText">Status: Operational</span>
-            <span class="last-sync">Last Sync: <span class="last-sync-time" id="lastSync">--:--</span></span>
+              <!-- Predictive HUD and count refresh markup -->
+              <div class="status-bar">
+                <span class="dock-status" id="dockStatusText">Status: Operational</span>
+                <span class="last-sync">Last Sync: <span class="last-sync-time" id="lastSync">--:--</span></span>
+              </div>
+              <div class="hud-data">
+                <span>Items: <span class="item-count" id="itemSpan">0</span></span>
+                <span>Categories: <span class="category-count" id="categorySpan">0</span></span>
+              </div>
+              <ul class="recent-activity" id="recentList">
+                <li>No recent activity</li>
+              </ul>
+              <button class="refresh-counts">🔄 Refresh Counts</button>
+            </div>
           </div>
-          <div class="hud-data">
-            <span>Items: <span class="item-count" id="itemSpan">0</span></span>
-            <span>Categories: <span class="category-count" id="categorySpan">0</span></span>
-          </div>
-          <ul class="recent-activity" id="recentList">
-            <li>No recent activity</li>
-          </ul>
-          <button class="refresh-counts">🔄 Refresh Counts</button>
-        </div>
+        </section>
       </div>
-    </section>
+      <div class="dock-panel-group">
+    <section class="holo-console dock-panel holo-console-panel hidden" id="deltaAnalyzerConsole" aria-hidden="true">
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">📊 Delta Analyzer</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>📊 Delta Analyzer</h2>
+              <p class="panel-desc">Analyze change over time with delta visualizations and predictive shifts.</p>
+              <p>Compare two values and calculate the delta (A - B).</p>
+
+              <label>
+                Value A:
+                <input type="number" id="deltaValueA" placeholder="Enter Value A">
+              </label>
+              <label>
+                Value B:
+                <input type="number" id="deltaValueB" placeholder="Enter Value B">
+              </label>
+
+              <div class="delta-controls">
+                <button onclick="calculateDelta()">🔍 Analyze</button>
+                <button onclick="clearDeltaInputs()">🧼 Clear</button>
+              </div>
+
+              <div id="deltaResult" class="delta-result">Δ = 0</div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section class="holo-console dock-panel holo-console-panel hidden" id="reportingHubConsole" aria-hidden="true">
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">🗂 Reporting Hub</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>📝 Reporting Hub</h2>
+              <p class="panel-desc">Generate dynamic reports and visualize system metrics.</p>
+              <p>Submit observations, reports, or logs below.</p>
+              <div class="button-group">
+                <button class="run-diagnostics">Run Diagnostics</button>
+                <button class="export-report">Export Report</button>
+                <button class="clear-logs">Clear Logs</button>
+              </div>
+              <div class="log-output"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section class="holo-console dock-panel holo-console-panel hidden" id="sessionManagerConsole" aria-hidden="true">
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">📋 Session Manager</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>🧠 Session Manager</h2>
+              <p class="panel-desc">Control active user sessions, memory states, and save points.</p>
+              <p>Name and initiate your active session.</p>
+
+              <label>
+                Session Name:
+                <input type="text" id="sessionNameInput" placeholder="e.g., Forecast Sync 7">
+              </label>
+              <button onclick="startSession()">🚀 Start Session</button>
+
+              <div id="activeSessionDisplay" class="session-display"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section class="holo-console dock-panel holo-console-panel hidden" id="utilityHubConsole" aria-hidden="true">
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">🧰 Utility Hub</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>🛠 Utility Hub</h2>
+              <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
+              <p>Run quick diagnostics or utility functions.</p>
+
+              <div class="utility-controls">
+                <button onclick="triggerTestAlert()">🔔 Test Alert</button>
+                <button onclick="runDiagnosticLog()">📋 Log Diagnostic</button>
+                <button onclick="pingPanels()">📡 Ping Panels</button>
+              </div>
+
+              <pre id="utilityOutput" class="utility-output">Awaiting commands...</pre>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section class="holo-console dock-panel holo-console-panel hidden" id="oracleConsole" aria-hidden="true">
+          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+          <header class="console-header">🔮 Oracle Interface</header>
+          <div class="console-body">
+            <div class="panel-content">
+              <h2>🔮 Oracle Console</h2>
+              <p class="panel-desc">Consult the Oracle for wisdom, lore alignment, and sigil resonance.</p>
+              <p>Consult the Silent Sage. Enter your query below:</p>
+
+              <label>
+                Your Inquiry:
+                <input type="text" id="oracleInput" placeholder="e.g., What is the state of the mesh?">
+              </label>
+              <button onclick="consultOracle()">🧙 Ask the Sage</button>
+
+              <div id="oracleResponse" class="oracle-output">Awaiting your question...</div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section id="sageFeedConsole" class="holo-console dock-panel holo-console-panel hidden" aria-hidden="true">
+          <h2>🧠 Sage Feed Console</h2>
+          <p class="panel-desc">Inject lore, commands, or neural memory directly into the Sage Engine.</p>
+          <p>Enter memory tokens, commands, or lore injections:</p>
+          <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
+          <button class="inject-feed">Inject Memory</button>
+          <div id="feedLog"></div>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section id="grimoireConsole" class="holo-console dock-panel holo-console-panel hidden" aria-hidden="true">
+          <h2 class="console-title">📖 Grimoire Console</h2>
+          <p class="panel-desc">Access the magical Lore Archive and decode hidden secrets.</p>
+          <div id="grimoirePanelContent">
+            <p>Select a memory node to review its imprint...</p>
+          </div>
+          <!-- Lore Archive Table Panel: injected below main lore log panel -->
+          <section id="grimoireTablePanel" class="grimoire-table-panel">
+            <h2>📚 Lore Archive Table</h2>
+            <!-- Table will be rendered here by JS -->
+          </section>
+        </section>
+      </div>
+      <div class="dock-panel-group">
+    <section id="whispererConsole" class="holo-console dock-panel holo-console-panel" data-permalock>
+          <h2 class="console-title">🌀 Whisperer Console</h2>
+          <p class="panel-desc">Receive live feedback, debug insights, and system messages.</p>
+
+          <!-- Whisperer Console Output (ensure this exists and is first in the panel) -->
+          <div id="whispererConsoleOutput" class="console-output"></div>
+
+          <section id="neuralPulseMonitor" class="console-section">
+            <h3>Neural Pulse</h3>
+            <div class="pulse-visual"></div>
+            <p id="pulseStatus">Initializing...</p>
+          </section>
+
+          <section id="echoArchivePanel" class="console-section">
+            <h3>Echo Archive</h3>
+            <ul id="echoLogEntries"></ul>
+          </section>
+
+          <section id="coreCommandInput" class="console-section">
+            <h3>Inject Command</h3>
+            <input type="text" id="sovereignCommand" placeholder="Enter core directive...">
+            <button id="injectCommandBtn">Inject</button>
+            <div id="commandResponse" class="command-feedback"></div>
+          </section>
+        </section>
+      </div>
+    </div>
   <style>
     .counter-display {
       font-size: 3rem;
@@ -1104,6 +1555,7 @@ function showToast(message = "✅ Done") {
       <div class="console-body">
         <div class="panel-content">
           <h2>📊 Delta Analyzer</h2>
+          <p class="panel-desc">Analyze change over time with delta visualizations and predictive shifts.</p>
           <p>Compare two values and calculate the delta (A - B).</p>
 
           <label>
@@ -1126,7 +1578,7 @@ function showToast(message = "✅ Done") {
     </section>
 
     <!-- 🧪 Sage Feed Console Elements -->
-    <div id="sageFeedConsole" class="dock-panel hidden">
+    <div id="sageFeedConsole" class="dock-panel holo-console-panel hidden">
       <h3>🌿 Sage Feed Console</h3>
       <input
         type="text"
@@ -1138,22 +1590,21 @@ function showToast(message = "✅ Done") {
       <ul id="sageFeedLog"></ul>
     </div>
     <!-- 📊 Forecast Console Panel -->
-    <div id="forecastConsole" class="dock-panel hidden">
+    <div id="forecastConsole" class="dock-panel holo-console-panel hidden">
       <h2>📊 Forecast Console</h2>
       <p>Initializing predictive modules...</p>
       <!-- Panel content dynamically inserted here -->
     </div>
     <!-- 📖 Lore Engine Panel -->
-    <div id="loreEngineConsole" class="dock-panel hidden">
+    <div id="loreEngineConsole" class="dock-panel holo-console-panel hidden">
       <h2>📖 Lore Engine</h2>
       <p>Initializing Lore Engine Interface...</p>
       <!-- Future lore content and controls will be injected here -->
     </div>
     <!-- 3. Dock Grid Stub -->
-    <div id="dockGrid" style="display: none;"></div>
 
     <!-- 🔧 Sigil Editor Panel -->
-    <div id="sigilEditPanel-2" class="holo-console" style="display: none;">
+    <div id="sigilEditPanel-2" class="holo-console holo-console-panel" style="display: none;">
       <h2>🔧 Edit Sigil</h2>
       <label>Name:</label>
       <input id="editSigilName-3" type="text" placeholder="Enter new name..." /><br>
@@ -1181,6 +1632,7 @@ function showToast(message = "✅ Done") {
       <div class="console-body">
         <div class="panel-content">
           <h2>📝 Reporting Hub</h2>
+          <p class="panel-desc">Generate dynamic reports and visualize system metrics.</p>
           <p>Submit observations, reports, or logs below.</p>
           <div class="button-group">
             <button class="run-diagnostics">Run Diagnostics</button>
@@ -1198,6 +1650,7 @@ function showToast(message = "✅ Done") {
       <div class="console-body">
         <div class="panel-content">
           <h2>🧠 Session Manager</h2>
+          <p class="panel-desc">Control active user sessions, memory states, and save points.</p>
           <p>Name and initiate your active session.</p>
 
           <label>
@@ -1211,15 +1664,16 @@ function showToast(message = "✅ Done") {
       </div>
     </section>
     <!-- 🔮 Sigil Render Console -->
-    <div id="sigilRenderConsole" class="holo-console" style="display:none;">
+    <div id="sigilRenderConsole" class="holo-console holo-console-panel" style="display:none;">
       <h2>Sigil Render Console</h2>
       <input type="text" id="sigilNameInput" placeholder="Enter Sigil Name" style="width: 80%; padding: 5px;">
       <button onclick="renderSigilPreview()">Render Sigil</button>
       <div id="sigilRenderOutput" style="margin-top: 15px;"></div>
     </div>
     <!-- 🛠 Utility Hub Console Panel (injected after sessionManagerConsole) -->
-    <div id="utilityHubConsole" class="holo-console dock-panel hidden">
+    <div id="utilityHubConsole" class="holo-console dock-panel holo-console-panel hidden">
       <h2>🛠️ Utility Hub</h2>
+      <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
       <button class="clean-cache">🧹 Clean Cache</button>
       <button class="resync">🔄 Re-Sync</button>
       <div class="utility-log"></div>
@@ -1232,6 +1686,7 @@ function showToast(message = "✅ Done") {
       <div class="console-body">
         <div class="panel-content">
           <h2>🛠 Utility Hub</h2>
+          <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
           <p>Run quick diagnostics or utility functions.</p>
 
           <div class="utility-controls">
@@ -1343,6 +1798,7 @@ function showToast(message = "✅ Done") {
       <div class="console-body">
         <div class="panel-content">
           <h2>🔮 Oracle Console</h2>
+          <p class="panel-desc">Consult the Oracle for wisdom, lore alignment, and sigil resonance.</p>
           <p>Consult the Silent Sage. Enter your query below:</p>
 
           <label>
@@ -1356,7 +1812,7 @@ function showToast(message = "✅ Done") {
       </div>
     </section>
     <!-- Micro-injected missing panels for Sovereign Console -->
-    <div id="exceptionManagerConsole" class="holo-console">
+    <div id="exceptionManagerConsole" class="holo-console holo-console-panel" data-permalock>
       <h2>🧨 Exception Manager</h2>
       <p>Monitoring real-time exceptions in the system.</p>
       <ul id="exceptionList">
@@ -1364,12 +1820,12 @@ function showToast(message = "✅ Done") {
       </ul>
       <button id="clearExceptionsBtn">Clear Exceptions</button>
     </div>
-    <div id="progressDashboardConsole" class="holo-console"></div>
-    <div id="masterExportHubConsole" class="holo-console"></div>
-    <div id="mappingsConsole" class="holo-console"></div>
-    <div id="toolsConsole" class="holo-console"></div>
-    <div id="auditConsole" class="holo-console"></div>
-    <div id="configPanelConsole" class="holo-console"></div>
+    <div id="progressDashboardConsole" class="holo-console holo-console-panel"></div>
+    <div id="masterExportHubConsole" class="holo-console holo-console-panel"></div>
+    <div id="mappingsConsole" class="holo-console holo-console-panel"></div>
+    <div id="toolsConsole" class="holo-console holo-console-panel"></div>
+    <div id="auditConsole" class="holo-console holo-console-panel"></div>
+    <div id="configPanelConsole" class="holo-console holo-console-panel"></div>
   <script>
     function consultOracle() {
       const input = document.getElementById("oracleInput");
@@ -1427,40 +1883,77 @@ function showToast(message = "✅ Done") {
   <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
     <div id="sovereignOrbitDock" class="orbit-cluster">
       <!-- 🧠 Orbit Memory Echo Layer -->
-      <button class="orbit-btn" data-target="countConsole">
-        <img src="assets/icons/icon-count.png" alt="Count Console" />
-      </button>
-      <button class="orbit-btn" data-target="deltaAnalyzerConsole">
-        <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
-      </button>
-      <button class="orbit-btn" data-target="reportingHubConsole">
-        <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
-      </button>
-      <button class="orbit-btn" data-target="sessionManagerConsole">
-        <img src="assets/icons/icon-session.png" alt="Session Manager" />
-      </button>
-      <button class="orbit-btn" data-target="utilityHubConsole">
-        <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
-      </button>
-      <button class="orbit-btn" data-target="oracleConsole">
-        <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
-      </button>
-      <button class="orbit-btn" data-target="whispererConsole" title="The Whisperer Console">
-        <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
-      </button>
-      <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" data-panel="sageFeedConsole" title="Sage Feed Console">
-        <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console">
-      </button>
-      <!-- 🪐 Grimoire Orbit Button -->
-      <button class="orbit-btn" data-target="grimoireConsole" title="Grimoire Console">
-        <img src="assets/icons/icon-grimoire-glyph.png" alt="Grimoire Console" />
-      </button>
+      <!-- Orbit buttons moved to dropdown menu for unified access -->
     </div>
   </div>
-  <!-- Fallback Dock Grid Container -->
-  <div id="dockGrid" class="dock-grid hidden">
-    <!-- Panels will populate here dynamically -->
-  </div>
+      <!-- Orbit Buttons Dropdown Cluster -->
+      <div class="dropdown" style="display:inline-block; margin-left:20px;">
+        <button id="sovereignOrbitToggle" class="dropdown-toggle" style="padding: 10px 18px; border-radius: 5px; border: 1px solid #8844ff; background: #1e1e2f; color: #fff; font-family: monospace; font-size: 1.1em; cursor: pointer;">
+          🛰️ Sovereign Orbits
+        </button>
+        <div class="dropdown-content" style="display:none; position:absolute; background:#2a003f; min-width: 250px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3); z-index: 2000; padding: 18px 18px 10px 18px; border-radius: 8px; border: 1px solid #8844ff;">
+          <!-- Core Systems -->
+          <button class="orbit-btn" data-target="countConsole" title="Count Console">
+            <img src="assets/icons/icon-count.png" alt="Count Console" />
+          </button>
+          <button class="orbit-btn" data-target="deltaAnalyzerConsole" title="Delta Analyzer">
+            <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
+          </button>
+          <button class="orbit-btn" data-target="reportingHubConsole" title="Reporting Hub">
+            <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
+          </button>
+          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
+          <!-- Session & Utility -->
+          <button class="orbit-btn" data-target="sessionManagerConsole" title="Session Manager">
+            <img src="assets/icons/icon-session.png" alt="Session Manager" />
+          </button>
+          <button class="orbit-btn" data-target="utilityHubConsole" title="Utility Hub">
+            <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
+          </button>
+          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
+          <!-- Advanced Interfaces -->
+          <button class="orbit-btn" data-target="oracleConsole" title="Oracle Console">
+            <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
+          </button>
+          <button class="orbit-btn" data-target="whispererConsole" title="The Whisperer Console">
+            <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
+          </button>
+          <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
+            <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console" />
+          </button>
+          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
+          <!-- Lore System -->
+          <button class="orbit-btn" data-target="grimoireConsole" title="Grimoire Console">
+            <img src="assets/icons/icon-grimoire-glyph.png" alt="Grimoire Console" />
+          </button>
+        </div>
+      </div>
+      <!-- Dropdown show/hide logic now handled by global script below -->
+</body>
+<script>
+  // Sovereign Orbit Dropdown Toggle Logic
+  document.addEventListener("DOMContentLoaded", function () {
+    const orbitToggle = document.getElementById("sovereignOrbitToggle");
+    const orbitContent = orbitToggle?.nextElementSibling;
+
+    if (orbitToggle && orbitContent) {
+      orbitToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        orbitContent.style.display = orbitContent.style.display === "block" ? "none" : "block";
+      });
+
+      // Optional: click outside to close dropdown
+      document.addEventListener("click", function () {
+        orbitContent.style.display = "none";
+      });
+
+      // Prevent closing when clicking inside
+      orbitContent.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+    }
+  });
+</script>
 
   <!-- Whisperer Orbit external navigation logic removed; now handled via data-target like other orbits -->
   <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
@@ -1643,13 +2136,14 @@ function showToast(message = "✅ Done") {
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
       <div id="sessionManagerConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="sageFeedConsole" class="holo-console dock-panel hidden" aria-hidden="true">
-        <h2>🧠 Sage Feed Console</h2>
-        <p>Enter memory tokens, commands, or lore injections:</p>
-        <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
-        <button class="inject-feed">Inject Memory</button>
-        <div id="feedLog"></div>
-      </div>
+    <div id="sageFeedConsole" class="holo-console dock-panel hidden" aria-hidden="true">
+      <h2>🧠 Sage Feed Console</h2>
+      <p class="panel-desc">Inject lore, commands, or neural memory directly into the Sage Engine.</p>
+      <p>Enter memory tokens, commands, or lore injections:</p>
+      <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
+      <button class="inject-feed">Inject Memory</button>
+      <div id="feedLog"></div>
+    </div>
       <div id="utilityHubConsole" class="holo-console hidden"
         style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
       <div id="exceptionManagerConsole" class="holo-console hidden"
@@ -1671,6 +2165,7 @@ function showToast(message = "✅ Done") {
     <!-- 📖 Grimoire Console Panel -->
     <section id="grimoireConsole" class="holo-console hidden" aria-hidden="true">
       <h2 class="console-title">📖 Grimoire Console</h2>
+      <p class="panel-desc">Access the magical Lore Archive and decode hidden secrets.</p>
       <div id="grimoirePanelContent">
         <p>Select a memory node to review its imprint...</p>
       </div>
@@ -1692,6 +2187,7 @@ function showToast(message = "✅ Done") {
     </div>
     <section id="whispererConsole" class="holo-console panel">
       <h2 class="console-title">🌀 Whisperer Console</h2>
+      <p class="panel-desc">Receive live feedback, debug insights, and system messages.</p>
 
       <!-- Whisperer Console Output (ensure this exists and is first in the panel) -->
       <div id="whispererConsoleOutput" class="console-output"></div>
@@ -1729,7 +2225,35 @@ function showToast(message = "✅ Done") {
     }
   });
 </script>
-  </main>
+    </main>
+
+    <!-- === Debug Style Injection for #dock-panel-group === -->
+    <script>
+      const style = document.createElement('style');
+      style.innerHTML = `
+        #dock-panel-group *,
+        #dock-panel-group *::before,
+        #dock-panel-group *::after {
+          all: unset !important;
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          position: relative !important;
+          z-index: 9999 !important;
+          background-color: rgba(255, 0, 255, 0.2) !important;
+          color: magenta !important;
+          outline: 2px dashed magenta !important;
+        }
+
+        #dock-panel-group {
+          display: flex !important;
+          flex-direction: column;
+          background-color: rgba(0,0,0,0.8);
+          padding: 20px;
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
 
 <!-- Phase 201.2 — Neural Intake Uploader binding -->
 <script>
@@ -1750,6 +2274,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+</script>
+
+<!-- Orbit Button Active State Handler -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const allOrbitButtons = document.querySelectorAll('.orbit-btn');
+    allOrbitButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const allOrbits = document.querySelectorAll('.orbit-btn');
+        allOrbits.forEach(o => o.classList.remove('active-orbit'));
+        btn.classList.add('active-orbit');
+      });
+    });
+  });
 </script>
 
 

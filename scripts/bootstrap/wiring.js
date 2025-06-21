@@ -1549,6 +1549,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- Unified Orbit Button Wiring for All .orbit-btn ---
 // Handles orbit button clicks: toggles the corresponding dock panel.
+
+// === Orbital Trigger Visibility & Linkage Audit ===
+console.log("🔍 Initiating Orbital Trigger Visibility & Linkage Audit...");
+const orbitButtons = document.querySelectorAll(".orbit-button");
+
+orbitButtons.forEach(btn => {
+  const targetId = btn.getAttribute("data-target");
+  const targetPanel = document.getElementById(targetId);
+  const isVisible = window.getComputedStyle(btn).display !== "none" && window.getComputedStyle(btn).visibility !== "hidden";
+
+  console.log(`🚀 Orbit Button: ${btn.id || "(unnamed)"}`);
+  console.log(`   → Target Panel ID: ${targetId}`);
+  console.log(`   → Panel Exists? ${!!targetPanel}`);
+  console.log(`   → Visible? ${isVisible}`);
+  if (!targetPanel) {
+    console.warn(`❌ Panel "${targetId}" does not exist in DOM.`);
+  }
+});
+
 document.querySelectorAll('.orbit-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     const targetId = btn.getAttribute('data-target');

@@ -1,3 +1,11 @@
+:root {
+  /* Ensures universal box-sizing for all elements and pseudo-elements */
+}
+*, 
+*::before, 
+*::after {
+  box-sizing: border-box !important;
+}
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
 :root {
   --glow-color: rgba(122, 255, 252, 0.4);     /* spectral teal */
@@ -413,32 +421,48 @@ html {
 /* 🧬 Phase 18005 — Panel Display Fix */
 
 .holo-console {
-  display: none;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  padding: 20px;
-  margin-top: 20px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  min-width: 400px;
+  min-height: 300px;
+  border: 2px solid lime;
+  background-color: #111;
+  color: #0f0;
+  margin-bottom: 20px;
+  padding: 10px;
+  overflow: auto;
 }
 
 .holo-console.active {
-  display: block;
-  opacity: 1;
+  /* Retain enhancements for active state, but keep debug visibility overrides */
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   transform: translateY(0px);
-  /* --- Neon Tech Enhancement --- */
   position: relative;
-  border: 1px solid var(--accent-color);
+  border: 2px dashed lime;
   box-shadow:
     0 0 12px rgba(90, 245, 233, 0.3),
     0 0 24px rgba(90, 245, 233, 0.2),
     inset 0 0 12px rgba(122, 255, 252, 0.3);
-  background: linear-gradient(
-    145deg,
-    rgba(26, 28, 32, 0.85) 0%,
-    rgba(26, 28, 32, 0.95) 100%
-  );
+  background-color: rgba(17, 17, 17, 0.9);
+  color: #0f0;
   animation: scanPulse 6s linear infinite;
-  z-index: 500;
+  z-index: 1000;
+}
+
+.console-body {
+  display: block !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.console-section {
+  padding: 10px;
+  color: #fff;
 }
 
 .orbit-icon {
@@ -833,20 +857,43 @@ html {
 /* 🧬 Phase 18012 — Dock Panel Visibility & Styling */
 
 .dock-panel {
+  margin: 10px;
   display: none;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
-  padding: 20px;
+  padding: 16px;
   margin-top: 20px;
   background: linear-gradient(145deg, rgba(26, 28, 32, 0.85), rgba(26, 28, 32, 0.95));
   border: 1px solid var(--accent-color);
   box-shadow:
-    0 0 12px rgba(90, 245, 233, 0.3),
-    0 0 24px rgba(90, 245, 233, 0.2),
-    inset 0 0 12px rgba(122, 255, 252, 0.3);
-  border-radius: 12px;
+    0 0 10px rgba(90, 245, 233, 0.25),
+    0 0 20px rgba(90, 245, 233, 0.15),
+    inset 0 0 8px rgba(122, 255, 252, 0.25);
+  border-radius: 10px;
   z-index: 450;
+}
+
+.dock-panel h2 {
+  font-size: 1.4rem;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  text-shadow: 0 0 6px rgba(90, 245, 233, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.dock-panel small {
+  display: block;
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.dock-panel.collapsed {
+  opacity: 0.3;
+  pointer-events: none;
+  transform: scale(0.98);
 }
 
 .dock-panel.console-active {
@@ -876,4 +923,398 @@ html {
   gap: 10px;
   margin: 0 auto 20px;
   max-width: 960px;
+}
+
+
+/* 🧬 Phase 3 — Adaptive Styling for Dock Panel Group Layout */
+
+.dock-group {
+  margin-bottom: 40px;
+  padding: 24px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(26, 28, 32, 0.8), rgba(26, 28, 32, 0.95));
+  box-shadow:
+    0 0 12px rgba(90, 245, 233, 0.15),
+    0 0 24px rgba(90, 245, 233, 0.1),
+    inset 0 0 12px rgba(122, 255, 252, 0.2);
+  border: 1px solid rgba(90, 245, 233, 0.4);
+  transition: all 0.3s ease-in-out;
+}
+
+.dock-group.collapsed .dock-panel {
+  display: none !important;
+  opacity: 0 !important;
+  transform: scale(0.95) !important;
+}
+
+.dock-group-header {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  text-shadow: 0 0 6px var(--accent-color);
+}
+
+.dock-group-header:hover {
+  color: var(--accent-color);
+  text-shadow: 0 0 8px var(--glow-color);
+}
+
+.dock-group-header::after {
+  content: '▼';
+  font-size: 1.2rem;
+  margin-left: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.dock-group.collapsed .dock-group-header::after {
+  transform: rotate(-90deg);
+}
+/* 🧬 Phase 4 — Dropdown and Filter Strip Styling */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  padding: 10px 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  border: 1px solid var(--glow-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 12px var(--accent-color);
+}
+
+.dropdown-toggle:hover {
+  background: var(--glow-color);
+  color: var(--text-color);
+  box-shadow: 0 0 16px var(--glow-color);
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: rgba(26, 28, 32, 0.95);
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 0 10px var(--glow-color);
+  border-radius: 10px;
+  margin-top: 10px;
+  min-width: 160px;
+  z-index: 9999;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.dropdown-menu.active {
+  display: block;
+}
+
+.dropdown-menu li {
+  padding: 10px 14px;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.dropdown-menu li:hover {
+  background: rgba(90, 245, 233, 0.1);
+  color: var(--accent-color);
+}
+
+.filter-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(10, 12, 14, 0.6);
+  border: 1px solid var(--glow-color);
+  border-radius: 10px;
+  box-shadow: 0 0 8px var(--glow-color);
+  margin-bottom: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.filter-input {
+  padding: 8px 12px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.95rem;
+  background: rgba(26, 28, 32, 0.8);
+  color: var(--text-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  box-shadow: inset 0 0 6px var(--accent-color);
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.filter-input:focus {
+  outline: none;
+  box-shadow: 0 0 10px var(--accent-color);
+  background: rgba(26, 28, 32, 1);
+}
+/* === Collapsible Dock Group Styles === */
+.dock-group {
+  border: 1px solid #333;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(20, 20, 30, 0.75);
+}
+
+.dock-group-header {
+  background: linear-gradient(90deg, #1e1e2f, #2c2c44);
+  padding: 10px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #e0e0ff;
+  font-size: 1rem;
+  border-bottom: 1px solid #444;
+}
+
+.dock-group-content {
+  padding: 10px;
+  transition: max-height 0.3s ease;
+}
+
+.dock-group-content.collapsed {
+  display: none;
+}
+.dock-group-content.collapsed {
+  display: none;
+}
+
+/* === Dock Grid Mobile Responsiveness === */
+@media screen and (max-width: 768px) {
+  .dock-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    padding: 20px !important;
+  }
+
+  .dock-group {
+    margin: 0 !important;
+  }
+
+  .dock-group h3 {
+    font-size: 1rem !important;
+    padding: 8px 10px !important;
+  }
+
+  .dock-group-content {
+    padding: 10px !important;
+  }
+
+  .dock-grid-panel {
+    padding: 10px !important;
+    font-size: 0.9rem !important;
+  }
+}
+/* === Phase 7 — Minimalist Symbol Overlay Update === */
+.orbit-btn img {
+  max-width: 48px;
+  height: auto;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.orbit-btn:hover img {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+/* Optional: if you want orbit icons to shift tint depending on context */
+.orbit-btn[data-target="grimoireConsole"] img {
+  filter: hue-rotate(240deg) brightness(1.1);
+}
+
+.orbit-btn[data-target="sageFeedConsole"] img {
+  filter: hue-rotate(60deg) brightness(1.1);
+}
+
+/* Debug override */
+#countConsole.force-visible {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 450 !important;
+}
+
+
+/* === Phase 310.5: Sovereign Dock Style Resolver === */
+
+.dock-panel {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 5 !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.dock-panel.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  z-index: -1 !important;
+}
+
+.dock-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.dock-panel-group {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px; /* Ensures visibility and layout integrity */
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 200px !important;
+  max-height: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 1 !important;
+}
+
+/* Prevent parent container suppression for dock grid and panel groups */
+#dockGrid,
+.dock-panel-group {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+/* 🔓 Phase 311.5 — Sovereign Panel Visibility Restoration */
+
+.holo-console {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: auto !important;
+  min-height: 150px !important;
+  max-height: none !important;
+  border: 2px dashed magenta !important;
+  background-color: rgba(20, 20, 20, 0.95) !important;
+  color: #f0f !important;
+}
+
+.holo-console,
+.sovereign-panel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+  min-width: 300px;
+  min-height: 150px;
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  border: 1px solid lime !important;
+  color: #0f0 !important;
+}
+
+.dock-panel-group > * {
+  margin: 4px !important;
+  padding: 10px !important;
+}
+.holo-console,
+.dock-panel-group .dock-panel,
+#dockGrid > div {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  min-height: 240px;
+  min-width: 400px;
+  outline: 3px solid magenta;
+  background-color: rgba(25, 25, 25, 0.9) !important;
+  color: #f0f0f0 !important;
+  z-index: 9999 !important;
+  font-size: 1rem !important;
+}
+.holo-console {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 999 !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+  border: 1px solid magenta !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px magenta !important;
+  min-height: 200px;
+  min-width: 300px;
+}
+
+/* === Phase 313.0: Console Soul Manifestation Layer === */
+.holo-console,
+.console-panel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 200px !important;
+  min-width: 300px !important;
+  padding: 12px !important;
+  border: 1px solid #cc00ff88 !important; /* slight purple highlight */
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+  z-index: 9999 !important;
+}
+/* 🌐 Phase 346.5 — Synced vs Unsynced Panel Styling */
+.synced-panel {
+  outline: 2px solid rgba(0, 255, 128, 0.4);
+  box-shadow: 0 0 10px rgba(0, 255, 128, 0.25);
+  transition: outline 0.3s ease, box-shadow 0.3s ease;
+}
+
+.unsynced-panel {
+  outline: 2px dashed rgba(255, 64, 64, 0.6);
+  background: rgba(255, 0, 0, 0.02);
+  animation: pulse-unsynced 1.5s infinite alternate;
+}
+
+@keyframes pulse-unsynced {
+  from {
+    box-shadow: 0 0 5px rgba(255, 64, 64, 0.3);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(255, 64, 64, 0.5);
+  }
+}
+
+/* === Grid Integrity Visual Feedback === */
+.pulse-effect {
+  animation: pulse 0.8s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(0, 255, 255, 0);
+  }
+}
+/* 🧬 Phase 346.7B — Snap Engine Visual Feedback */
+
+@keyframes pulseSnapGrid {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 12px 6px rgba(0, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+  }
+}
+
+.snap-confirm {
+  animation: pulseSnapGrid 0.6s ease-out;
+  z-index: 9999 !important;
 }

@@ -1,6 +1,1139 @@
+// === Phase 31.0 — Sovereign Dock Resurrection Sweep ===
+setTimeout(() => {
+  console.log("🧬 Phase 31.0 — Sovereign Dock Resurrection Sweep Initiated");
+
+  const allPanels = document.querySelectorAll(".dock-panel, .holo-console");
+  // Utility to reveal nested elements for .holo-console panels
+  const revealNestedElements = (root) => {
+    if (!root) return;
+    const nestedElements = root.querySelectorAll('*');
+    nestedElements.forEach((el) => {
+      el.style.display = 'block';
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+      el.style.zIndex = '9999';
+      el.style.position = 'relative';
+      if (!el.style.minHeight) el.style.minHeight = '40px';
+      if (!el.style.minWidth) el.style.minWidth = '100px';
+      if (!el.textContent.trim()) {
+        el.innerHTML = '<span style="color: magenta; font-style: italic;">🔍 Empty Element</span>';
+      }
+    });
+  };
+
+  allPanels.forEach(panel => {
+    panel.style.display = "block";
+    panel.style.visibility = "visible";
+    panel.style.opacity = "1";
+    // === Additional force overrides ===
+    panel.style.height = "auto";
+    panel.style.position = "relative";
+    panel.style.transform = "translateY(0)";
+    // ===
+    panel.style.zIndex = "1000";
+    panel.classList.remove("hidden", "collapsed");
+
+    const group = panel.closest(".dock-panel-group");
+    if (group) {
+      group.classList.remove("hidden", "collapsed");
+      group.style.display = "flex";
+      // === Additional group force overrides ===
+      group.style.opacity = "1";
+      group.style.height = "auto";
+      // ===
+    }
+
+    const grid = panel.closest("#dockGrid");
+    if (grid) {
+      grid.classList.remove("hidden");
+      grid.style.display = "grid";
+      // === Additional grid force overrides ===
+      grid.style.opacity = "1";
+      grid.style.height = "auto";
+      // ===
+    }
+
+    // If this is a .holo-console panel, reveal nested elements and log SoulLink
+    if (panel.classList.contains("holo-console")) {
+      revealNestedElements(panel);
+      console.log(`🧠 SoulLink awakened for: #${panel.id}`);
+    }
+
+    console.log(`✅ Resurrected Panel: ${panel.id}`);
+  });
+
+  // 🧬 Phase 311.2 — Persistent Visibility Lock-In
+  if (typeof SovereignPanels !== "undefined" && SovereignPanels) {
+    Object.keys(SovereignPanels || {}).forEach(panelId => {
+      const el = document.getElementById(panelId);
+      if (el) {
+        Object.assign(el.style, {
+          display: "block",
+          visibility: "visible",
+          opacity: "1",
+          position: "relative",
+          zIndex: "9999",
+          minWidth: "400px",
+          minHeight: "300px",
+          backgroundColor: "#111",
+          color: "#0f0",
+          border: "1px solid lime",
+          margin: "10px",
+          overflow: "auto"
+        });
+        console.log(`🔓 Persistent Visibility Lock-In applied to: #${panelId}`);
+      }
+    });
+  }
+
+  console.log("✅ Phase 31.0 — All known panels forcibly revealed.");
+}, 1500);
+
+// === Phase 310.9 — Panel Content Injector Audit ===
+setTimeout(() => {
+  console.log("🔍 Phase 310.9 — Panel Content Injector Audit Initiated");
+
+  const dockPanels = document.querySelectorAll(".dock-panel, .holo-console");
+  dockPanels.forEach(panel => {
+    const hasContent = panel.innerHTML.trim().length > 0;
+    if (!hasContent) {
+      console.warn(`⚠️ Empty Panel Detected: #${panel.id}`);
+      panel.innerHTML = `<h2>🧪 Placeholder for ${panel.id}</h2><p>No content detected. This panel may require population or rehydration.</p>`;
+      panel.style.minHeight = "120px";
+      panel.style.backgroundColor = "rgba(20,20,20,0.5)";
+      panel.style.border = "1px dashed red";
+      console.log(`🩹 Injected placeholder into: #${panel.id}`);
+    } else {
+      console.log(`✅ Panel #${panel.id} contains content.`);
+    }
+  });
+
+  // 🌐 Phase 311.3 — Sovereign Panel Anchor Mapping Injection
+  // SOVEREIGN_PANEL_REGISTRY should be defined, fallback to a set of known IDs if not present
+  const SOVEREIGN_PANEL_REGISTRY = window.SOVEREIGN_PANEL_REGISTRY || {
+    sageTerminal: true,
+    oracleConsole: true,
+    grimoireConsole: true,
+    whispererConsole: true
+  };
+  const sovereignAnchors = {
+    sageTerminal: { top: "20px", left: "20px" },
+    oracleConsole: { top: "20px", right: "20px" },
+    grimoireConsole: { bottom: "20px", left: "20px" },
+    whispererConsole: { bottom: "20px", right: "20px" },
+  };
+
+  Object.keys(SOVEREIGN_PANEL_REGISTRY).forEach((panelId, index) => {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+
+    panel.style.position = sovereignAnchors[panelId] ? "fixed" : "absolute";
+    panel.style.display = "block";
+    panel.style.opacity = "1";
+    panel.style.visibility = "visible";
+    panel.style.zIndex = 1000 + index;
+    panel.style.width = panel.style.width || "400px";
+    panel.style.height = panel.style.height || "300px";
+    panel.style.backgroundColor = panel.style.backgroundColor || "#111";
+    panel.style.color = panel.style.color || "#0f0";
+
+    // Anchor positioning
+    const anchor = sovereignAnchors[panelId];
+    if (anchor) {
+      if (anchor.top) panel.style.top = anchor.top;
+      if (anchor.bottom) panel.style.bottom = anchor.bottom;
+      if (anchor.left) panel.style.left = anchor.left;
+      if (anchor.right) panel.style.right = anchor.right;
+    } else {
+      panel.style.top = `${(index * 50) % 500}px`;
+      panel.style.left = `${(index * 60) % 700}px`;
+    }
+
+    console.log(`📌 Anchored Panel: #${panelId}`);
+  });
+
+  console.log("✅ Phase 310.9 — Panel content audit complete.");
+
+  // 🧩 Dark Revealer Placeholder Injection
+  document.querySelectorAll('.console-body').forEach(body => {
+    if (!body.innerHTML.trim()) {
+      const placeholder = document.createElement('div');
+      placeholder.textContent = '🧩 Diagnostic placeholder active';
+      placeholder.style.padding = '10px';
+      placeholder.style.background = 'rgba(255,255,255,0.05)';
+      placeholder.style.color = 'lime';
+      placeholder.style.border = '1px solid lime';
+      placeholder.style.marginTop = '5px';
+      body.appendChild(placeholder);
+    }
+  });
+
+  // === Phase 312.0 — Console Soul Imprint Audit Initiated ===
+  console.log("🔎 Phase 312.0 — Console Soul Imprint Audit Initiated");
+
+  const resurrectedPanels = document.querySelectorAll('.holo-console');
+  resurrectedPanels.forEach(panel => {
+    const id = panel.id || "(no id)";
+    const inner = panel.innerHTML.trim();
+
+    if (!inner || inner.length < 10) {
+      console.warn(`👻 Hollow Panel Detected: #${id}`);
+      panel.innerHTML = `
+        <div class="console-header">🩻 [${id}] Console Placeholder</div>
+        <div class="console-body">
+          <p><em>This console has not yet been assigned content. Check for injection logic or template bind failure.</em></p>
+        </div>
+      `;
+    } else {
+      console.log(`✅ Panel #${id} contains ${inner.length} characters of content.`);
+    }
+  });
+
+  // === Phase 313.5 — Soul Imprint Rebinding & Dynamic Payload Recovery ===
+  console.log("🔧 Phase 313.5 — Initiating Soul Imprint Rebinding...");
+
+  const consoleIdList = [
+    "countConsole",
+    "deltaAnalyzerConsole",
+    "reportingHubConsole",
+    "sessionManagerConsole",
+    "utilityHubConsole",
+    "whispererConsole",
+    "sovereignTerminal"
+  ];
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ Panel '${id}' not found in DOM.`);
+      return;
+    }
+
+    if (panel.innerHTML.trim().length === 0 || panel.innerHTML.includes("Placeholder")) {
+      panel.innerHTML = `
+        <div class="console-header">🔄 Rebinding: ${id}</div>
+        <div class="console-body">
+          <p><em>Reconstructed content injected. Awaiting full system sync...</em></p>
+        </div>
+      `;
+      panel.classList.add("console-rebound");
+      console.log(`🩺 Soul Imprint rebound for: ${id}`);
+    } else {
+      console.log(`✅ Panel ${id} already contains valid content.`);
+    }
+  });
+
+  console.log("✅ Phase 313.5 — Soul Imprint Rebinding Complete");
+
+  // === Phase 314.0 — Internal Logic Resurrection Protocol ===
+  console.log("🧠 Phase 314.0 — Internal Logic Resurrection Protocol Initiated");
+
+  const resurrectionRoutines = {
+    countConsole: window.getCountDockContent,
+    deltaAnalyzerConsole: window.getDeltaAnalyzerContent,
+    reportingHubConsole: window.getReportingHubContent,
+    sessionManagerConsole: window.getSessionManagerContent,
+    utilityHubConsole: window.getUtilityHubContent,
+    whispererConsole: window.renderWhispererMemory,
+    sovereignTerminal: window.renderSageTerminal
+  };
+
+  Object.entries(resurrectionRoutines).forEach(([id, builder]) => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ Resurrection skipped — Panel '${id}' not found.`);
+      return;
+    }
+
+    if (panel.innerHTML.includes("Rebinding")) {
+      if (typeof builder === "function") {
+        const result = builder();
+        if (typeof result === "string") {
+          panel.innerHTML = result;
+          console.log(`🔮 Dynamic content restored for '${id}'`);
+        } else {
+          console.warn(`⚠ Builder for '${id}' did not return string content.`);
+        }
+      } else {
+        console.warn(`⚠ No valid builder function found for '${id}'`);
+      }
+    } else {
+      console.log(`✅ '${id}' already has bound content.`);
+    }
+  });
+
+  console.log("✅ Phase 314.0 — Internal Logic Resurrection Complete");
+
+  // === Phase 315.0 — Signal Link Reintegration & Panel Behavior Hooks ===
+  console.log("📡 Phase 315.0 — Signal Link Reintegration Initiated");
+
+  const interactionMap = {
+    countConsole: () => {
+      SafeBind("countConsole", "click", () => {
+        console.log("🧩 Count Console interaction triggered.");
+      });
+    },
+    deltaAnalyzerConsole: () => {
+      SafeBind("deltaAnalyzerConsole", "click", () => {
+        console.log("📈 Delta Analyzer interaction triggered.");
+      });
+    },
+    reportingHubConsole: () => {
+      SafeBind("reportingHubConsole", "click", () => {
+        console.log("📄 Reporting Hub interaction triggered.");
+      });
+    },
+    sessionManagerConsole: () => {
+      SafeBind("sessionManagerConsole", "click", () => {
+        console.log("📂 Session Manager activated.");
+      });
+    },
+    utilityHubConsole: () => {
+      SafeBind("utilityHubConsole", "click", () => {
+        console.log("🛠 Utility Hub interaction triggered.");
+      });
+    },
+    whispererConsole: () => {
+      SafeBind("whispererConsole", "click", () => {
+        console.log("🔊 Whisperer Console activated.");
+      });
+    },
+    sovereignTerminal: () => {
+      SafeBind("sovereignTerminal", "click", () => {
+        console.log("💻 Sovereign Terminal input focus engaged.");
+      });
+    }
+  };
+
+  Object.entries(interactionMap).forEach(([id, hookFn]) => {
+    const panel = document.getElementById(id);
+    if (panel && typeof hookFn === "function") {
+      try {
+        hookFn();
+        console.log(`🔗 Behavior hook bound for ${id}`);
+      } catch (err) {
+        console.warn(`⚠️ Error binding behavior for ${id}:`, err);
+      }
+    } else {
+      console.warn(`⚠️ No panel or hook found for ${id}`);
+    }
+  });
+
+  console.log("✅ Phase 315.0 — Signal Link Reintegration Complete");
+
+  // === Phase 316.0 — Core Signal Testing & Event Flow Diagnostics ===
+  console.log("🧪 Phase 316.0 — Core Signal Testing & Event Flow Diagnostics Initiated");
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ [Diagnostics] Panel '${id}' not found for signal test.`);
+      return;
+    }
+
+    // Emit test ping event
+    const pingEvent = new CustomEvent("sovereignPing", {
+      detail: { panelId: id, timestamp: Date.now() }
+    });
+
+    panel.dispatchEvent(pingEvent);
+    console.log(`📡 Ping event dispatched for '${id}'`);
+
+    // Temporary listener for echo test
+    const echoHandler = (e) => {
+      console.log(`🔁 Echo received from '${id}':`, e.detail);
+      panel.removeEventListener("sovereignPingEcho", echoHandler);
+    };
+
+    panel.addEventListener("sovereignPingEcho", echoHandler);
+
+    // Timeout fallback
+    setTimeout(() => {
+      panel.removeEventListener("sovereignPingEcho", echoHandler);
+      console.warn(`⏱ No echo response from '${id}' within timeout window.`);
+    }, 1500);
+  });
+
+  console.log("✅ Phase 316.0 — Event Dispatch & Echo Diagnostics Complete");
+
+  // === Phase 317.0 — Anomaly Link Rebinding & Latent Channel Awakening ===
+  console.log("🧩 Phase 317.0 — Anomaly Link Rebinding Initiated");
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ [Rebind] Panel '${id}' not found in DOM.`);
+      return;
+    }
+
+    // Listen for ping to trigger echo
+    panel.addEventListener("sovereignPing", (e) => {
+      console.log(`🛰 Responding to ping on ${id}`);
+      const echo = new CustomEvent("sovereignPingEcho", {
+        detail: {
+          receivedFrom: e.detail.panelId,
+          echoTime: Date.now(),
+          responseStatus: "💫 Rebound Acknowledged"
+        }
+      });
+      panel.dispatchEvent(echo);
+    });
+
+    // Check for suppressed or non-responsive behavior
+    if (!panel.classList.contains("console-rebound")) {
+      panel.classList.add("console-rebound");
+      panel.innerHTML += `<div class="console-diagnostic">💡 Latent channel awakened for '${id}'</div>`;
+      console.log(`⚡ Latent behavior channel awakened for '${id}'`);
+    }
+  });
+
+  console.log("✅ Phase 317.0 — Anomaly Link Rebinding Complete");
+
+  // === Phase 318.0 — Sovereign Memory Sync & Historical Overlay Validation ===
+  console.log("🧬 Phase 318.0 — Sovereign Memory Sync Initiated");
+
+  const overlayKeyPrefix = "dockOverlay_";
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ [Overlay] Panel '${id}' not found for memory sync.`);
+      return;
+    }
+
+    const storedOverlay = localStorage.getItem(`${overlayKeyPrefix}${id}`);
+    if (storedOverlay) {
+      try {
+        const parsed = JSON.parse(storedOverlay);
+        if (parsed && parsed.content) {
+          panel.innerHTML = parsed.content;
+          panel.classList.add("console-memory-overlay");
+          console.log(`🧠 Memory overlay applied to '${id}'`);
+        }
+      } catch (err) {
+        console.warn(`⚠ Failed to parse overlay for '${id}':`, err);
+      }
+    } else {
+      console.log(`📭 No memory overlay found for '${id}'`);
+    }
+  });
+
+  console.log("✅ Phase 318.0 — Memory Sync & Overlay Validation Complete");
+
+  // === Phase 319.0 — Legacy Restoration Engine & Temporal Backfill Protocols ===
+  console.log("⏳ Phase 319.0 — Legacy Restoration Engine Initiated");
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ Legacy restoration skipped — Panel '${id}' not found.`);
+      return;
+    }
+
+    const legacyContentKey = `legacyBackup_${id}`;
+    const legacyContent = localStorage.getItem(legacyContentKey);
+
+    if (legacyContent && !panel.classList.contains("console-memory-overlay")) {
+      try {
+        const content = JSON.parse(legacyContent);
+        if (content && typeof content.html === "string") {
+          panel.innerHTML = content.html;
+          panel.classList.add("console-legacy-restore");
+          console.log(`🕰 Legacy content restored to '${id}'`);
+        }
+      } catch (err) {
+        console.warn(`⚠ Failed to parse legacy content for '${id}':`, err);
+      }
+    } else {
+      console.log(`📭 No legacy content found or overlay already active for '${id}'`);
+    }
+  });
+
+  console.log("✅ Phase 319.0 — Legacy Restoration Complete");
+
+  // === Phase 320.0 — Sovereign Uplink Test & Panel State Commit ===
+  console.log("📶 Phase 320.0 — Sovereign Uplink Test Initiated");
+
+  const panelSnapshot = {
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+    panels: {}
+  };
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`❌ Uplink skipped — Panel '${id}' not found.`);
+      return;
+    }
+
+    panelSnapshot.panels[id] = {
+      visible: panel.style.display !== "none" && panel.style.visibility !== "hidden",
+      zIndex: panel.style.zIndex,
+      contentLength: panel.innerHTML.trim().length,
+      position: {
+        top: panel.style.top || null,
+        left: panel.style.left || null
+      },
+      classes: [...panel.classList]
+    };
+
+    console.log(`📡 Panel '${id}' snapshot captured.`);
+  });
+
+  localStorage.setItem("sovereignUplinkSnapshot", JSON.stringify(panelSnapshot));
+  console.log("✅ Phase 320.0 — Panel State Committed to Uplink Memory");
+
+  // === Phase 321.0 — Operator Recall Sync & Event Horizon Tagging ===
+  console.log("🧠 Phase 321.0 — Operator Recall Sync Initiated");
+
+  const operatorRecallKey = "operatorRecallState";
+  const recallState = {
+    syncTime: new Date().toISOString(),
+    systemTag: "SAGECRAFT_OP_RECALL",
+    panelCount: consoleIdList.length,
+    recallPoints: {}
+  };
+
+  consoleIdList.forEach(id => {
+    const panel = document.getElementById(id);
+    if (!panel) {
+      console.warn(`⚠ Recall tag skipped — Panel '${id}' not found.`);
+      return;
+    }
+
+    recallState.recallPoints[id] = {
+      lastSeen: Date.now(),
+      classSignature: [...panel.classList],
+      anchorPosition: {
+        top: panel.style.top || null,
+        left: panel.style.left || null
+      },
+      overlayState: panel.classList.contains("console-memory-overlay"),
+      legacyState: panel.classList.contains("console-legacy-restore"),
+      rebound: panel.classList.contains("console-rebound")
+    };
+
+    console.log(`📍 Recall point tagged for '${id}'`);
+  });
+
+  localStorage.setItem(operatorRecallKey, JSON.stringify(recallState));
+  console.log("✅ Phase 321.0 — Operator Recall Sync Complete");
+
+  // === Phase 322.0 — Sovereign Resurrection Seal & Ritual Completion Stamp ===
+  console.log("🔮 Phase 322.0 — Sovereign Resurrection Seal Initiated");
+
+  const ritualSeal = {
+    timestamp: new Date().toISOString(),
+    manifest: "SAGECRAFT_ASCENDANT_CORE",
+    sessionId: `ASCEND-${Math.floor(Math.random() * 1e6)}`,
+    verifiedPanels: consoleIdList.length,
+    integrityToken: btoa(consoleIdList.join(":") + "::RESURRECTED")
+  };
+
+  localStorage.setItem("sovereignRitualSeal", JSON.stringify(ritualSeal));
+
+  console.log("✅ Phase 322.0 — Resurrection Ritual Complete & Seal Stored", ritualSeal);
+
+  // === Phase 323.0 — Ghost Panel Differentiation & Shell Tagging ===
+  console.log("👻 Phase 323.0 — Ghost Panel Differentiation Initiated");
+
+  const knownPanelIds = new Set([
+    ...consoleIdList,
+    ...Object.keys(SOVEREIGN_PANEL_REGISTRY || {})
+  ]);
+
+  const allDockPanels = document.querySelectorAll(".dock-panel, .holo-console");
+
+  allDockPanels.forEach(panel => {
+    const id = panel.id;
+    if (!id || !knownPanelIds.has(id)) {
+      panel.classList.add("console-ghost-shell");
+      panel.setAttribute("data-status", "ghost");
+      panel.style.outline = "2px dashed magenta";
+      panel.style.backgroundColor = "rgba(255,0,255,0.05)";
+      panel.innerHTML += `<div class="ghost-tag">👻 Ghost Shell Detected: '${id || "no-id"}'</div>`;
+      console.warn(`👻 Ghost shell identified: '${id || "no-id"}'`);
+    } else {
+      console.log(`✅ Verified mesh-linked panel: '${id}'`);
+    }
+  });
+
+  console.log("✅ Phase 323.0 — Ghost Panel Differentiation Complete");
+
+  // === Phase 324.5 — Ghost Panel Reclassification Protocol ===
+  console.log("🔍 Phase 324.5 — Reclassifying Ghost Panels with Content");
+
+  const ghostPanels = document.querySelectorAll(".console-ghost-shell");
+
+  ghostPanels.forEach(panel => {
+    const htmlLength = panel.innerHTML.trim().length;
+    if (htmlLength > 0) {
+      panel.classList.remove("console-ghost-shell");
+      panel.classList.add("console-unbound-active");
+      panel.setAttribute("data-status", "unbound-active");
+      panel.style.outline = "2px dashed orange";
+      panel.innerHTML += `<div class="ghost-tag">🟠 Reclassified as Unbound Active</div>`;
+      console.log(`🟠 '${panel.id || "no-id"}' reclassified as unbound-active (content length: ${htmlLength})`);
+    } else {
+      console.log(`👻 '${panel.id || "no-id"}' remains ghost-shell (empty)`);
+    }
+  });
+
+  console.log("✅ Phase 324.5 — Ghost Reclassification Complete");
+
+  // === Phase 325.0 — Controlled Ghost Purge Protocol ===
+  console.log("🧹 Phase 325.0 — Controlled Ghost Purge Initiated");
+
+  const ghostShells = document.querySelectorAll(".console-ghost-shell");
+  const purgeLog = [];
+
+  ghostShells.forEach(panel => {
+    const id = panel.id || "(no-id)";
+    purgeLog.push(id);
+    panel.remove();
+    console.warn(`💀 Purged ghost panel: '${id}'`);
+  });
+
+  console.log(`✅ Phase 325.0 — Purged ${purgeLog.length} ghost panels`);
+  if (purgeLog.length) {
+    console.log("🗂 Purge Summary:", purgeLog);
+  }
+
+  // === Phase 326.0 — Echo Traceback & Phantom Reinstatement Audit ===
+  console.log("🧪 Phase 326.0 — Echo Traceback Audit Initiated");
+
+  const activePanelIds = new Set();
+  document.querySelectorAll(".dock-panel, .holo-console").forEach(panel => {
+    if (panel.id) activePanelIds.add(panel.id);
+  });
+
+  const duplicateMap = {};
+  document.querySelectorAll("[id]").forEach(el => {
+    const id = el.id;
+    if (!duplicateMap[id]) duplicateMap[id] = [];
+    duplicateMap[id].push(el);
+  });
+
+  const duplicates = Object.entries(duplicateMap).filter(([_, els]) => els.length > 1);
+  if (duplicates.length > 0) {
+    console.warn("⚠️ Duplicate IDs detected:", duplicates.map(([id]) => id));
+  }
+
+  const lastPurgeLog = JSON.parse(localStorage.getItem("lastGhostPurgeLog") || "[]");
+  const resurrected = lastPurgeLog.filter(id => activePanelIds.has(id));
+
+  if (resurrected.length > 0) {
+    console.warn("👻 Phantom panels detected after purge:", resurrected);
+  }
+
+  console.log("✅ Phase 326.0 — Echo Traceback Audit Complete");
+
+  // === Phase 326.5 — Phantom Exorcism Protocol ===
+  console.log("🧯 Phase 326.5 — Phantom Exorcism Protocol Initiated");
+
+  const purgeList = JSON.parse(localStorage.getItem("lastGhostPurgeLog") || "[]");
+  let purgedCount = 0;
+
+  purgeList.forEach(id => {
+    const elems = document.querySelectorAll(`#${id}`);
+    if (elems.length > 0) {
+      elems.forEach(el => {
+        el.remove();
+        purgedCount++;
+        console.warn(`💀 Exorcised phantom: '${id}'`);
+      });
+    }
+  });
+
+  console.log(`✅ Phase 326.5 — Phantom Exorcism Complete (${purgedCount} elements removed)`);
+
+  // === Phase 327.0 — Sovereign ID Conflict Resolution ===
+  console.log("🛠 Phase 327.0 — Sovereign ID Conflict Resolution Initiated");
+
+  const idTracker = {};
+  const allElementsWithId = document.querySelectorAll("[id]");
+  let conflictCount = 0;
+
+  allElementsWithId.forEach(el => {
+    const id = el.id;
+    if (!idTracker[id]) {
+      idTracker[id] = [el];
+    } else {
+      idTracker[id].push(el);
+      const duplicateIndex = idTracker[id].length;
+      const newId = `${id}-duplicate-${duplicateIndex}`;
+      el.setAttribute("id", newId);
+      el.classList.add("duplicate-id-resolved");
+      el.style.outline = "2px dotted red";
+      el.setAttribute("data-duplicate-from", id);
+      console.warn(`🪓 ID conflict resolved: '${id}' ➡ '${newId}'`);
+      conflictCount++;
+    }
+  });
+
+  console.log(`✅ Phase 327.0 — ID Conflict Resolution Complete (${conflictCount} resolved)`);
+
+  // === Phase 328.0 — Duplicate Manifest Generation Protocol ===
+  console.log("📜 Phase 328.0 — Duplicate Manifest Generation Initiated");
+
+  const duplicateManifest = [];
+
+  document.querySelectorAll(".duplicate-id-resolved").forEach(el => {
+    const originalId = el.getAttribute("data-duplicate-from") || "(unknown)";
+    duplicateManifest.push({
+      originalId: originalId,
+      newId: el.id,
+      tag: el.tagName,
+      parent: el.parentElement?.id || "(no parent id)",
+      contentLength: el.innerHTML.trim().length
+    });
+  });
+
+  console.table(duplicateManifest);
+  localStorage.setItem("duplicateManifest", JSON.stringify(duplicateManifest, null, 2));
+
+  console.log(`✅ Phase 328.0 — Duplicate Manifest Generated (${duplicateManifest.length} entries)`);
+
+  // === Phase 329.0 — Sovereign Cleanse & Sanctum Rehoming Protocol ===
+  console.log("🧹 Phase 329.0 — Sovereign Cleanse & Sanctum Rehoming Initiated");
+
+  // Create the Sanctum container if it doesn't exist
+  let sanctum = document.getElementById("sovereignSanctum");
+  if (!sanctum) {
+    sanctum = document.createElement("div");
+    sanctum.id = "sovereignSanctum";
+    sanctum.style.border = "2px dashed #a0f";
+    sanctum.style.padding = "12px";
+    sanctum.style.margin = "20px";
+    sanctum.style.background = "#110022";
+    sanctum.style.color = "#fff";
+    sanctum.innerHTML = "<h3>🧬 Sovereign Sanctum</h3><p>Reclaimed panels reside here for rebind.</p>";
+    document.body.appendChild(sanctum);
+  }
+
+  const manifest = JSON.parse(localStorage.getItem("duplicateManifest") || "[]");
+  let purged = 0;
+  let rehomed = 0;
+  const keptIds = new Set();
+
+  manifest.forEach(entry => {
+    const el = document.getElementById(entry.newId);
+    if (!el) return;
+
+    const preserveConditions =
+      entry.parent.includes("consolePanelGroup") ||
+      entry.parent.includes("grimoireConsole") ||
+      entry.parent.includes("whispererConsole") ||
+      entry.contentLength > 2000;
+
+    if (preserveConditions) {
+      // Rehome into Sanctum if not already appended
+      sanctum.appendChild(el);
+      el.classList.add("sanctified-panel");
+      el.style.border = "1px solid #a0f";
+      el.setAttribute("data-rebound", "true");
+      rehomed++;
+      keptIds.add(entry.newId);
+    } else {
+      el.remove();
+      purged++;
+    }
+  });
+
+  console.log(`✅ Phase 329.0 — Sovereign Cleanse Complete (${purged} purged, ${rehomed} rehomed to sovereignSanctum)`);
+
+  // === Phase 330.0 — Sanctum Rebind Pass ===
+  console.log("🔗 Phase 330.0 — Sanctum Rebind Pass Initiated");
+
+  const sanctifiedPanels = document.querySelectorAll('#sovereignSanctum [data-rebound="true"]');
+  let reboundCount = 0;
+  let failedBindings = [];
+
+  sanctifiedPanels.forEach(panel => {
+    const originalId = panel.getAttribute("data-duplicate-from");
+    if (!originalId) {
+      failedBindings.push({ id: panel.id, reason: "No originalId reference" });
+      return;
+    }
+
+    // Attempt to rebind known mesh behaviors
+    try {
+      switch (originalId) {
+        case "oracleConsole":
+          // Re-attach oracle listeners
+          panel.querySelector("input")?.addEventListener("keydown", e => {
+            if (e.key === "Enter") console.log("🔮 Oracle query:", e.target.value);
+          });
+          break;
+
+        case "sageFeedConsole":
+          // Rebind Sage feed submit logic
+          panel.querySelector("button")?.addEventListener("click", () => {
+            const input = panel.querySelector("textarea");
+            const log = panel.querySelector('[id*="feedLog"]');
+            if (input && log) {
+              const msg = input.value.trim();
+              const p = document.createElement("p");
+              p.textContent = "🌀 " + msg;
+              log.appendChild(p);
+              input.value = "";
+            }
+          });
+          break;
+
+        case "countConsole":
+          // Placeholder behavior for inventory count display
+          panel.querySelectorAll("div, span, section").forEach(el => {
+            el.style.outline = "1px dashed #6f6";
+          });
+          break;
+
+        // Add additional rebind cases as needed...
+
+        default:
+          failedBindings.push({ id: panel.id, reason: "No binding rule for " + originalId });
+          return;
+      }
+
+      panel.setAttribute("data-rebound-status", "active");
+      panel.style.boxShadow = "0 0 12px #6f6";
+      reboundCount++;
+    } catch (err) {
+      failedBindings.push({ id: panel.id, reason: err.message });
+    }
+  });
+
+  console.log(`✅ Phase 330.0 — Sanctum Rebind Complete (${reboundCount} rebound)`);
+  if (failedBindings.length > 0) {
+    console.warn("⚠️ Rebind Failures:", failedBindings);
+  }
+
+  // === Phase 331.0 — Final Sanctification Sweep & Ghost Collapse ===
+  console.log("🧹 Phase 331.0 — Final Sanctification Sweep Initiated");
+
+  const allDuplicates = document.querySelectorAll('[id*="-duplicate-"]');
+  let ghostsCollapsed = 0;
+  let shadowVault = [];
+
+  allDuplicates.forEach(el => {
+    const isSanctified = el.closest("#sovereignSanctum");
+    const isAlive = el.getAttribute("data-rebound-status") === "active";
+    const isVisible = el.offsetParent !== null;
+    const isEmpty = el.innerHTML.trim().length === 0;
+
+    if (!isSanctified && !isAlive && (isEmpty || !isVisible)) {
+      shadowVault.push({
+        id: el.id,
+        tag: el.tagName,
+        reason: isEmpty ? "Empty Shell" : "Hidden Shadow"
+      });
+      el.remove();
+      ghostsCollapsed++;
+    }
+  });
+
+  console.log(`✅ Phase 331.0 — Ghost Collapse Complete (${ghostsCollapsed} removed)`);
+  if (shadowVault.length > 0) {
+    localStorage.setItem("shadowVault", JSON.stringify(shadowVault, null, 2));
+    console.warn("🪦 Shadow Vault archived to localStorage:", shadowVault);
+  }
+
+  // === Phase 332.0 — Lore Engine Bootstrap & Whisperer Echo Relay ===
+  console.log("📜 Phase 332.0 — Lore Engine Bootstrap & Whisperer Echo Relay Initiated");
+
+  function whisperToConsole(msg) {
+    const echoTargets = [
+      document.querySelector("#whispererConsoleOutput"),
+      document.querySelector('[id*="whispererConsoleOutput"][data-rebound-status="active"]'),
+      document.querySelector("#grimoirePanelContent"),
+      document.querySelector('[id*="grimoirePanelContent"][data-rebound-status="active"]')
+    ].filter(Boolean);
+
+    echoTargets.forEach(target => {
+      const entry = document.createElement("p");
+      entry.textContent = `🗝️ ${msg}`;
+      entry.className = "echo-whisper";
+      target.appendChild(entry);
+    });
+
+    console.log("🪶 Whisper Echo:", msg);
+  }
+
+  // Optional test whisper
+  setTimeout(() => {
+    whisperToConsole("The soul remembers even when the interface forgets...");
+  }, 800);
+
+  // Hook Sage Feed and Oracle to echo system
+  const sageFeedInput = document.querySelector('[id*="sageFeedInput"][data-rebound-status="active"]');
+  const oracleInput = document.querySelector('[id*="oracleInput"][data-rebound-status="active"]');
+
+  if (sageFeedInput) {
+    sageFeedInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") whisperToConsole("🌀 " + e.target.value);
+    });
+  }
+
+  if (oracleInput) {
+    oracleInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") whisperToConsole("🔮 Oracle responds: " + e.target.value);
+    });
+  }
+
+  console.log("✅ Phase 332.0 — Lore & Whisperer Echo Relay Active");
+
+  // === Phase 333.0 — Echo Channel Relay & Diagnostic Broadcast Sync ===
+  console.log("📣 Phase 333.0 — Echo Channel Relay & Diagnostic Broadcast Sync Initiated");
+
+  const echoTargets = [
+    "#forecastConsole",
+    "#sageFeedConsole",
+    "#grimoireConsole",
+    "#loreEngineConsole"
+  ];
+
+  echoTargets.forEach(selector => {
+    const el = document.querySelector(`[id*="${selector.replace('#','')}"][data-rebound-status="active"]`) || document.querySelector(selector);
+    if (el) {
+      el.addEventListener("sovereignBroadcast", e => {
+        const echoMsg = e.detail?.message || "📡 Unknown broadcast message";
+        const p = document.createElement("p");
+        p.textContent = echoMsg;
+        p.className = "broadcast-echo";
+        el.appendChild(p);
+        console.log(`📣 EchoChannel: '${selector}' received broadcast ->`, echoMsg);
+      });
+    }
+  });
+
+  // 🔁 Global broadcast trigger
+  window.sovereignBroadcast = function(msg) {
+    const event = new CustomEvent("sovereignBroadcast", { detail: { message: `📡 ${msg}` } });
+    echoTargets.forEach(selector => {
+      const el = document.querySelector(`[id*="${selector.replace('#','')}"][data-rebound-status="active"]`) || document.querySelector(selector);
+      if (el) el.dispatchEvent(event);
+    });
+    console.log("📡 Sovereign broadcast dispatched:", msg);
+  };
+
+  // Optional test ping
+  setTimeout(() => {
+    sovereignBroadcast("Phase 333.0 broadcast test: channels online.");
+  }, 600);
+
+  console.log("✅ Phase 333.0 — Echo Channel Relay Operational");
+
+  // === Phase 334.0 — UI Hygiene & Signal Purge ===
+  console.log("🧹 Phase 334.0 — UI Hygiene & Signal Purge Initiated");
+
+  (function cleanDuplicatePanels() {
+    const allPanels = document.querySelectorAll("[id*='-duplicate-']");
+    let removedCount = 0;
+
+    allPanels.forEach(panel => {
+      const originalId = panel.id.split("-duplicate-")[0];
+      const keep = document.getElementById(originalId);
+
+      if (!keep) {
+        // Reassign if no original exists
+        panel.id = originalId;
+        panel.setAttribute("data-rebound-status", "cleaned");
+      } else {
+        panel.remove();
+        removedCount++;
+      }
+    });
+
+    console.log(`🧼 Phase 334.0 — Removed ${removedCount} duplicate/ghost panels`);
+  })();
+
+  (function rehomeOrphans() {
+    const approvedParents = [
+      "consolePanelGroup", "sanctum", "predictiveHud"
+    ];
+
+    const floating = Array.from(document.querySelectorAll("section, div")).filter(el => {
+      const pid = el.parentElement?.id || "";
+      return (
+        el.id && !el.closest(approvedParents.map(id => `#${id}`).join(", "))
+      );
+    });
+
+    floating.forEach(el => {
+      document.querySelector("#consolePanelGroup")?.appendChild(el);
+      el.setAttribute("data-rebound-status", "reparented");
+    });
+
+    console.log(`🏠 Phase 334.0 — Reparented ${floating.length} orphan panels`);
+  })();
+
+  (function trimLoreEchoes() {
+    const selectors = [".echo-whisper", ".broadcast-echo"];
+    selectors.forEach(selector => {
+      document.querySelectorAll(selector).forEach(panel => {
+        const parent = panel.parentElement;
+        const entries = parent?.querySelectorAll(selector);
+        if (entries && entries.length > 25) {
+          [...entries].slice(0, entries.length - 25).forEach(e => e.remove());
+        }
+      });
+    });
+
+    console.log("✂️ Phase 334.0 — Trimmed excessive lore/broadcast echoes");
+  })();
+
+  console.log("✅ Phase 334.0 — Mesh Clean, Ready for Neural Sync");
+
+  // === Phase 334.3 — Sovereign Containment Audit & Panel Rehoming ===
+  console.log("📦 Phase 334.3 — Sovereign Containment Audit Initiated");
+
+  const dockGrid = document.getElementById("dockGrid");
+  const operatorDockGrid = document.getElementById("operatorDockGrid");
+
+  const allPanelsToCheck = document.querySelectorAll(".dock-panel, .holo-console");
+  allPanelsToCheck.forEach(panel => {
+    const isContained =
+      panel.closest(".dock-panel-group") ||
+      panel.closest("#dockGrid") ||
+      panel.closest("#operatorDockGrid");
+
+    if (!isContained) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "dock-panel-group";
+      wrapper.style.display = "flex";
+      wrapper.style.flexDirection = "column";
+      wrapper.style.margin = "10px";
+      wrapper.appendChild(panel);
+
+      if (dockGrid) {
+        dockGrid.appendChild(wrapper);
+        console.log(`📎 Rehomed uncontained panel: '${panel.id}' ➜ #dockGrid`);
+      } else if (operatorDockGrid) {
+        operatorDockGrid.appendChild(wrapper);
+        console.log(`📎 Rehomed uncontained panel: '${panel.id}' ➜ #operatorDockGrid`);
+      } else {
+        document.body.appendChild(wrapper);
+        console.warn(`⚠️ Fallback: Rehomed '${panel.id}' directly to body (no grid container found).`);
+      }
+    }
+  });
+
+  console.log("✅ Phase 334.3 — Containment Audit Complete");
+
+  // === Phase 334.5 — UI Stabilization & Resynchronization Layer ===
+  console.log("🧘 Phase 334.5 — UI Stabilization & Resynchronization Layer Initiated");
+
+  // Trigger repaint and reflow
+  document.querySelectorAll(".dock-panel, .holo-console").forEach(panel => {
+    panel.style.transition = "opacity 0.2s ease-in-out";
+    panel.style.opacity = "0.99"; // Trigger reflow
+    setTimeout(() => {
+      panel.style.opacity = "1";
+    }, 50);
+  });
+
+  // Force resize recalculation
+  window.dispatchEvent(new Event('resize'));
+  console.log("📐 Resize event dispatched for layout recalibration");
+
+  // Reset z-index tiers for all panels to stack logically
+  const allPanelsForZ = [...document.querySelectorAll(".dock-panel, .holo-console")];
+  allPanelsForZ.sort((a, b) => (a.id || "").localeCompare(b.id || ""));
+  allPanelsForZ.forEach((panel, index) => {
+    panel.style.zIndex = `${100 + index}`;
+  });
+  console.log("🧱 Sovereign Z-index layers recalibrated");
+
+  // Scroll anchoring (optional refinement)
+  document.querySelectorAll(".dock-panel-group").forEach(group => {
+    group.style.scrollSnapAlign = "start";
+    group.style.scrollMarginTop = "10px";
+  });
+  console.log("🧲 Scroll snapping enforced on dock groups");
+
+  // Lock body scroll if any modals or overlays are active
+  const modal = document.querySelector(".sovereign-modal, .access-overlay");
+  if (modal) {
+    document.body.style.overflow = "hidden";
+    console.log("🔒 Body scroll locked due to active modal");
+  } else {
+    document.body.style.overflow = "";
+    console.log("🔓 Body scroll unlocked");
+  }
+
+  console.log("✅ Phase 334.5 — UI Stabilization & Resynchronization Complete");
+
+  console.log("🧿 Phase 312.0 — Soul Imprint Audit Complete");
+
+  // 🛠️ Phase 311.4 — Sovereign Panel Interaction Layer Activation
+  const allPanels = document.querySelectorAll(".holo-console");
+  allPanels.forEach(panel => {
+    // Make draggable
+    panel.style.position = "absolute";
+    panel.style.cursor = "move";
+    panel.onmousedown = function (e) {
+      e.preventDefault();
+      const shiftX = e.clientX - panel.getBoundingClientRect().left;
+      const shiftY = e.clientY - panel.getBoundingClientRect().top;
+
+      function moveAt(pageX, pageY) {
+        panel.style.left = pageX - shiftX + 'px';
+        panel.style.top = pageY - shiftY + 'px';
+      }
+
+      function onMouseMove(event) {
+        moveAt(event.pageX, event.pageY);
+      }
+
+      document.addEventListener('mousemove', onMouseMove);
+
+      document.onmouseup = function () {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.onmouseup = null;
+      };
+    };
+    panel.ondragstart = function () {
+      return false;
+    };
+
+    // Focus behavior
+    panel.addEventListener("mousedown", () => {
+      allPanels.forEach(p => p.style.zIndex = "10");
+      panel.style.zIndex = "1000";
+    });
+
+    // Ensure interaction possible
+    panel.style.pointerEvents = "auto";
+    panel.style.userSelect = "text";
+  });
+  console.log("✅ Phase 311.4 — Sovereign Panel Interaction Layer Activated");
+}, 2200);
 // === Sovereign Dock Panel Map for Alias Resolution ===
 
 // === Utility: SafeBind for Robust Event Listener Attachment ===
+
+// === Reveal Dock Panel Utility ===
+function revealDockPanel(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return console.warn(`⛔ Panel ${panelId} not found.`);
+
+  const dockGrid = document.getElementById("dockGrid");
+  dockGrid?.classList.remove("hidden");
+
+  panel.classList.remove("hidden");
+  panel.style.display = "block";
+  panel.style.opacity = "1";
+  panel.style.visibility = "visible";
+  panel.style.transform = "translateY(0)";
+  panel.style.zIndex = "450";
+
+  const panelGroup = panel.closest(".dock-panel-group");
+  if (panelGroup) {
+    panelGroup.classList.remove("collapsed");
+    panelGroup.classList.remove("hidden");
+  }
+}
 function SafeBind(selector, event, handler) {
   const el = document.getElementById(selector);
   if (el) {
@@ -61,22 +1194,86 @@ var OperatorDockWiring = {
             return;
         }
 
-        dockDefinitions.forEach(def => {
-            let panel = document.getElementById(def.id);
-            if (!panel) {
-                panel = document.createElement("div");
-                panel.id = def.id;
-                panel.classList.add("tab-section", "dock-panel");
-                dockGrid.appendChild(panel);
-                console.log(`✅ Sovereign Dock Panel Created: ${def.id}`);
+    dockDefinitions.forEach(def => {
+        let panel = document.getElementById(def.id);
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.id = def.id;
+            panel.classList.add("tab-section", "dock-panel");
+            dockGrid.appendChild(panel);
+            console.log(`✅ Sovereign Dock Panel Created: ${def.id}`);
+            // --- Force visibility override after panel appended ---
+            const dockPanel = document.getElementById(def.id);
+            if (dockPanel) {
+                dockPanel.style.display = "block";
+                dockPanel.style.visibility = "visible";
+                dockPanel.style.opacity = "1";
+                dockPanel.style.zIndex = "1"; // Ensure it's above hidden overlays
+                dockPanel.classList.remove("hidden", "collapsed");
+                console.log(`✅ Visibility override applied to: ${def.id}`);
+                // === Inserted: Reliable panel footprint and visual styling ===
+                dockPanel.style.minHeight = "240px";
+                dockPanel.style.minWidth = "400px";
+                dockPanel.style.margin = "12px";
+                dockPanel.style.padding = "8px";
+                dockPanel.style.backgroundColor = "#111";
+                dockPanel.style.border = "2px solid lime";
+                dockPanel.style.boxShadow = "0 0 12px lime";
+                dockPanel.style.overflowY = "auto";
+                dockPanel.style.flex = "0 0 auto";
+                dockPanel.style.zIndex = "1000";
+                dockPanel.style.position = "relative";
+                // If this is a .holo-console, reveal nested and log SoulLink
+                if (dockPanel.classList.contains("holo-console")) {
+                  revealNestedElements(dockPanel);
+                  console.log(`🧠 SoulLink awakened for: #${dockPanel.id}`);
+                }
+            } else {
+                console.warn(`⚠️ Dock panel not found for visibility injection: ${def.id}`);
             }
-            panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
-        });
+        } else {
+            // Panel exists, ensure styling is applied after forcing display
+            panel.style.display = "block";
+            // === Inserted: Reliable panel footprint and visual styling ===
+            panel.style.minHeight = "240px";
+            panel.style.minWidth = "400px";
+            panel.style.margin = "12px";
+            panel.style.padding = "8px";
+            panel.style.backgroundColor = "#111";
+            panel.style.border = "2px solid lime";
+            panel.style.boxShadow = "0 0 12px lime";
+            panel.style.overflowY = "auto";
+            panel.style.flex = "0 0 auto";
+            panel.style.zIndex = "1000";
+            panel.style.position = "relative";
+            // If this is a .holo-console, reveal nested and log SoulLink
+            if (panel.classList.contains("holo-console")) {
+              revealNestedElements(panel);
+              console.log(`🧠 SoulLink awakened for: #${panel.id}`);
+            }
+        }
+        panel.innerHTML = `<h2>${def.label}</h2><p>${def.description}</p>`;
+    });
 
         console.log("✅ Sovereign Dock Population Matrix Injection Complete.");
     },
     dockSchemaVersion: 1,
     eventHooks: {},
+    injectDiagnosticLabels: function () {
+        console.log("🔮 Injecting diagnostic labels into dock panels...");
+
+        const dockPanels = document.querySelectorAll(".dock-panel");
+        dockPanels.forEach(panel => {
+            if (!panel.innerHTML.trim()) {
+                panel.innerHTML = `
+                    <h2 style="color: magenta; font-weight: bold;">📛 ${panel.id}</h2>
+                    <p>This panel is active but has no content injected.</p>
+                `;
+            }
+        });
+
+        console.log("✅ Diagnostic labels injected into empty dock panels.");
+    },
 // (rest of object unchanged)
 
     on: function(eventName, callback) {
@@ -240,6 +1437,19 @@ var OperatorDockWiring = {
             } else {
                 panel.classList.add("hidden");
             }
+        }
+
+        // --- Visibility override after registration/wiring ---
+        const dockPanel = document.getElementById(dockId);
+        if (dockPanel) {
+            dockPanel.style.display = "block";
+            dockPanel.style.visibility = "visible";
+            dockPanel.style.opacity = "1";
+            dockPanel.style.zIndex = "1"; // Ensure it's above hidden overlays
+            dockPanel.classList.remove("hidden", "collapsed");
+            console.log(`✅ Visibility override applied to: ${dockId}`);
+        } else {
+            console.warn(`⚠️ Dock panel not found for visibility injection: ${dockId}`);
         }
 
         // Save immediately after registration
@@ -1434,6 +2644,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.warn("⚠️ OperatorDockWiring.populateDockMatrix not found.");
     }
+    if (typeof OperatorDockWiring.injectDiagnosticLabels === "function") {
+        OperatorDockWiring.injectDiagnosticLabels();
+    }
 });
 
 // === HoloConsole Collapsible Toggle Logic ===
@@ -1455,28 +2668,95 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 // === Orbit Button Registration (data-target based, improved toggle logic) ===
+  // Panel activation logic with nested layout visibility (refactored)
+  function showDockPanel(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) {
+      console.warn(`⛔ Panel ${panelId} not found.`);
+      return;
+    }
+
+    // Unhide the parent dockGrid
+    const dockGrid = document.getElementById('dockGrid');
+    if (dockGrid?.classList.contains('hidden')) {
+      dockGrid.classList.remove('hidden');
+    }
+
+    // Unhide the panel group if collapsed
+    const group = panel.closest('.dock-panel-group');
+    if (group?.classList.contains('collapsed')) {
+      group.classList.remove('collapsed');
+    }
+
+    // === Force visibility override for panel (fix for inherited/blocked styles) ===
+    panel.classList.remove("hidden");
+    panel.classList.remove("collapsed");
+    panel.style.display = "block";
+    panel.style.opacity = "1";
+    panel.style.visibility = "visible";
+    panel.style.zIndex = 1000;
+    panel.style.height = "auto";
+    panel.style.transform = "translateY(0)";
+
+    // --- legacy force overrides ---
+    panel.style.position = "relative";
+
+    // Expand its parent if needed
+    const dockGroup = panel.closest(".dock-panel-group");
+    if (dockGroup) {
+      dockGroup.classList.remove("collapsed");
+      dockGroup.style.display = "flex";
+    }
+
+    const dockGridElem = panel.closest("#dockGrid");
+    if (dockGridElem) {
+      dockGridElem.classList.remove("hidden");
+      dockGridElem.style.display = "grid";
+      dockGridElem.style.visibility = "visible";
+    }
+
+    console.log(`✅ Panel ${panelId} fully activated and visible.`);
+  }
+
   document.querySelectorAll('.orbit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-target');
+      // Remove 'active-orbit' from all panels and hide them
+      document.querySelectorAll('.dock-panel').forEach(p => {
+        p.classList.remove('active-orbit');
+        p.classList.add('hidden');
+      });
+      // Activate the panel using the new showDockPanel function
+      showDockPanel(targetId);
+      // Mark as active-orbit if found
       const panel = document.getElementById(targetId);
+      if (panel) {
+        panel.classList.add('active-orbit');
+        // === Force visibility override for panel (fix for inherited/blocked styles) ===
+        panel.classList.remove("hidden");
+        panel.classList.remove("collapsed");
+        panel.style.display = "block";
+        panel.style.opacity = "1";
+        panel.style.visibility = "visible";
+        panel.style.zIndex = 1000;
+        panel.style.height = "auto";
+        panel.style.transform = "translateY(0)";
+        // Legacy override
+        panel.style.position = "relative";
 
-      if (!panel) {
-        console.warn(`⚠️ Panel not found for ID: ${targetId}`);
-        return;
-      }
+        // Expand its parent if needed
+        const dockGroup = panel.closest(".dock-panel-group");
+        if (dockGroup) {
+          dockGroup.classList.remove("collapsed");
+          dockGroup.style.display = "flex";
+        }
 
-      const isVisible = !panel.classList.contains('hidden');
-
-      // Hide all other panels
-      document.querySelectorAll('.dock-panel').forEach(p => p.classList.add('hidden'));
-
-      // Toggle visibility
-      if (!isVisible) {
-        panel.classList.remove('hidden');
-        console.log(`✅ Panel ${targetId} activated.`);
-      } else {
-        panel.classList.add('hidden');
-        console.log(`❌ Panel ${targetId} hidden.`);
+        const dockGrid = panel.closest("#dockGrid");
+        if (dockGrid) {
+          dockGrid.classList.remove("hidden");
+          dockGrid.style.display = "grid";
+          dockGrid.style.visibility = "visible";
+        }
       }
     });
   });
@@ -1684,6 +2964,19 @@ setTimeout(() => {
         `;
         document.body.appendChild(lorePanel);
         console.log("✅ Lore Engine Console initialized and wired to DOM");
+        // --- Force panel visible overrides after wiring ---
+        const panelId = "loreEngineConsole";
+        const dockPanel = document.getElementById(panelId);
+        if (dockPanel) {
+          dockPanel.style.display = "block";
+          dockPanel.style.visibility = "visible";
+          dockPanel.style.opacity = "1";
+          dockPanel.style.zIndex = "1";
+          dockPanel.classList.remove("hidden", "collapsed");
+          console.log(`✅ Visibility override applied to: ${panelId}`);
+        } else {
+          console.warn(`⚠️ Dock panel not found for visibility injection: ${panelId}`);
+        }
         // 🧠 Contextual Lore Injection Trigger
         if (typeof SovereignBus !== "undefined" && typeof SovereignBus.emit === "function") {
           SovereignBus.emit("loreEvent", {
@@ -1775,12 +3068,12 @@ if (typeof SovereignBus !== "undefined" && typeof SovereignBus.listen === "funct
   });
 }
 
-// === Additional Subsystem Dock Registrations ===
 OperatorDockWiring.registerSubsystemDock({
     dockId: "whispererConsole",
     onClick: () => {
         console.log("👁 Whisperer Console Activated");
         alert("🧠 Whisperer Mesh Online — Listening Beyond the Veil...");
+        revealDockPanel("whispererConsole");
     },
     visible: false
 });
@@ -1789,6 +3082,21 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("📊 Sovereign Live Counts Panel Activated");
         alert("📊 Live Counts Panel Loaded — Inventory Counting System Online");
+        const countPanel = document.getElementById("countConsole");
+        if (countPanel) {
+            revealDockPanel("countConsole");
+        } else {
+            console.warn("⚠ Dock panel 'count' not found. Delaying registration and retrying...");
+            setTimeout(() => {
+                const retryPanel = document.getElementById("countConsole");
+                if (retryPanel) {
+                    registerSubsystemDock("count", retryPanel);
+                    console.log("✅ Dock panel 'countConsole' registered on retry.");
+                } else {
+                    console.error("❌ Retry failed: 'countConsole' still not found.");
+                }
+            }, 500); // retry after short delay
+        }
     }
 });
 
@@ -1797,6 +3105,7 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("Δ Sovereign Delta Analyzer Panel Activated");
         alert("🔍 Delta Analyzer Panel Loaded — Drift Detection Online");
+        revealDockPanel("deltaAnalyzerConsole");
     }
 });
 
@@ -1805,6 +3114,7 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("📄 Reporting Hub Activated");
         alert("📄 Reporting Hub Loaded — Report Generation Ready");
+        revealDockPanel("reportingHubConsole");
     }
 });
 
@@ -1813,6 +3123,7 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("📂 Session Manager Activated");
         alert("📂 Session Manager Loaded — Archive and Recovery Online");
+        revealDockPanel("sessionManagerConsole");
     }
 });
 
@@ -1821,7 +3132,34 @@ OperatorDockWiring.registerSubsystemDock({
     onClick: () => {
         console.log("🛠 Utility Hub Activated");
         alert("🛠 Utility Hub Loaded — Diagnostic Tools Ready");
+        revealDockPanel("utilityHubConsole");
     }
+});
+
+// === Sovereign Command Console Subsystem Dock Registration ===
+registerSubsystemDock({
+  id: "sovereignCommandConsole",
+  title: "Sovereign Command",
+  orbit: "sovereignCommand",
+  domElementId: "sovereignCommandConsole",
+  classList: ["panel", "sovereign-command-console"],
+  inject: true,
+  template: `
+    <div class="console-header">🛸 Sovereign Command Console</div>
+    <div class="console-body">
+      <div class="console-section">
+        <p><strong>Directive Input:</strong></p>
+        <input type="text" id="sovereignCommandInput" placeholder="e.g., override protocol gamma">
+        <button class="execute-command">Execute</button>
+      </div>
+      <div class="console-section">
+        <p><strong>Log Output:</strong></p>
+        <ul class="sovereign-command-log">
+          <li class="faint">Awaiting command...</li>
+        </ul>
+      </div>
+    </div>
+  `
 });
 
 // === Register subsystem alias "whisperer" for "whispererConsole" ===
@@ -1880,6 +3218,8 @@ function registerSubsystemDock(config) {
     }
     console.warn("registerSubsystemDock: Invalid configuration object.", config);
 }
+
+// (activateDockPanel function removed, use showDockPanel instead)
 
 registerSubsystemDock({
   orbit: 'whisperer',
@@ -2061,3 +3401,39 @@ const recentList = document.getElementById("recentList");
 if (!recentList) {
   console.warn("⚠️ [HUD Warning] recentList not found. Will revalidate on next HUD cycle.");
 }
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "oracleConsole",
+    onClick: () => {
+        console.log("🔮 Oracle Console Activated");
+        revealDockPanel("oracleConsole");
+    }
+});
+
+OperatorDockWiring.registerSubsystemDock({
+    dockId: "grimoireConsole",
+    onClick: () => {
+        console.log("📜 Grimoire Console Activated");
+        revealDockPanel("grimoireConsole");
+    }
+});
+// 🚨 Phase 311.0 — Dock Panel Interactivity Audit
+document.querySelectorAll('.holo-console').forEach(panel => {
+  panel.addEventListener('click', () => {
+    console.log(`🧪 Interactivity Audit: Panel ${panel.id || 'unknown'} clicked.`);
+  });
+});
+console.log("✅ Phase 311.0: Dock Panel Interactivity Audit hooks applied.");
+// === Final Resurrection Scan Diagnostic Injection ===
+setTimeout(() => {
+  console.log("🔍 Final Resurrection Scan Initiated");
+  const consoles = document.querySelectorAll(".holo-console");
+  consoles.forEach((panel, index) => {
+    const style = window.getComputedStyle(panel);
+    const rect = panel.getBoundingClientRect();
+    console.log(`🔮 Console #${index + 1} — ID: ${panel.id}`);
+    console.log("→ display:", style.display, "| visibility:", style.visibility, "| opacity:", style.opacity);
+    console.log("→ rect:", rect);
+    console.log("→ z-index:", style.zIndex, "| position:", style.position, "| background:", style.backgroundColor);
+  });
+  console.log("✅ Final Resurrection Scan Complete.");
+}, 1500);

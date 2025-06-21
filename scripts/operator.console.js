@@ -1,5 +1,29 @@
 // === Phase X+ — Orbit Button Interaction Memory (Orbit Memory Ghosts) ===
 // This section visually echoes orbit button clicks with a ghost effect.
+
+// === Debug Fallback: Reveal All Dock Panels (for diagnostics/inspection) ===
+// Call window.revealAllDockPanels() from the browser console to force all dock panels and dockGrid into view.
+window.revealAllDockPanels = () => {
+  const allPanels = document.querySelectorAll(".dock-panel");
+  allPanels.forEach((panel) => {
+    panel.classList.remove("hidden", "collapsed");
+    panel.style.display = "block";
+    panel.style.opacity = "1";
+    panel.style.visibility = "visible";
+    panel.style.position = "relative";
+    panel.style.zIndex = "1000";
+    panel.style.height = "auto";
+  });
+  const dockGrid = document.getElementById("dockGrid");
+  if (dockGrid) {
+    dockGrid.classList.remove("hidden", "collapsed");
+    dockGrid.style.display = "grid";
+    dockGrid.style.opacity = "1";
+    dockGrid.style.visibility = "visible";
+  }
+  console.log("✅ All dock panels force-revealed for inspection.");
+};
+
 (function orbitMemoryGhostsEcho() {
   // Helper: create the ghost overlay layer if not present
   function ensureGhostLayer() {
