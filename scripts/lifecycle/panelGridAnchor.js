@@ -3,12 +3,25 @@ import { getAllConsolePanels } from '../ascendancy/consoleAtlas.js';
 
 export function anchorPanelsToGrid() {
   const panels = getAllConsolePanels();
+  const grid = document.getElementById('sovereignGridSystem');
+
+  if (!grid) {
+    console.warn("⚠️ Grid system not found. Aborting panel anchoring.");
+    return;
+  }
 
   panels.forEach(panel => {
     if (!(panel instanceof HTMLElement)) return;
     const id = panel.getAttribute('id');
-    const savedPosition = localStorage.getItem(`panel-grid-position-${id}`);
+    const zone = panel.dataset.gridArea || 'staging-zone';
+    const anchor = document.querySelector(`[data-grid-zone="${zone}"]`) || grid;
 
+    if (!anchor.contains(panel)) {
+      anchor.appendChild(panel);
+      console.log(`📌 Anchored ${id || '(no id)'} to zone: ${zone}`);
+    }
+
+    const savedPosition = localStorage.getItem(`panel-grid-position-${id}`);
     if (savedPosition) {
       try {
         const { top, left } = JSON.parse(savedPosition);
@@ -20,6 +33,8 @@ export function anchorPanelsToGrid() {
       }
     }
   });
+
+  console.log("✅ All panels anchored to their respective zones.");
 }
 
 export function storePanelPosition(id, top, left) {

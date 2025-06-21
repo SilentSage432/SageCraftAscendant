@@ -1066,6 +1066,14 @@ document.addEventListener("DOMContentLoaded", () => {
       panel.appendChild(aura);
     }
   });
+  // === Expose Snap Trigger for Dev Console Usage ===
+  if (!window.SovereignSweep) {
+    window.SovereignSweep = {};
+  }
+  window.SovereignSweep.runSnapValidation = () => {
+    const event = new Event("DOMContentLoaded");
+    document.dispatchEvent(event);
+  };
 });
 
 // Grid Finalization Trigger on Load
