@@ -7,12 +7,116 @@ import { dynamicRegistry, autoRegisterPanels } from '../grid/gridAutoRegistrar.j
 import { logSnapEvent } from './snapEventLog.js';
 import { createSnapGridOverlay } from '../grid/gridOverlayRenderer.js';
 
+// 🪐 Phase 392: Multi-Orbit Grid Layering System
+const GRID_ORBITS = {
+  primary: [],
+  secondary: [],
+  auxiliary: [],
+};
+
+document.querySelectorAll('.holo-console').forEach(panel => {
+  const role = panel.getAttribute('data-role') || '';
+  if (role === 'terminal' || role === 'forecast') {
+    GRID_ORBITS.primary.push(panel);
+  } else if (role === 'dock' || role === 'utility' || role === 'reporting') {
+    GRID_ORBITS.secondary.push(panel);
+  } else {
+    GRID_ORBITS.auxiliary.push(panel);
+  }
+});
+
+// 📜 Phase 394: Snap Engine Init Log Enhancer
+console.groupCollapsed('%c🚀 Snap Engine Initialization', 'color: #6cf; font-weight: bold;');
+console.log(`📦 Total Panels Detected: ${document.querySelectorAll('.holo-console').length}`);
+console.log(`🔹 Primary Orbit: ${GRID_ORBITS.primary.length}`);
+console.log(`🔹 Secondary Orbit: ${GRID_ORBITS.secondary.length}`);
+console.log(`🔹 Auxiliary Orbit: ${GRID_ORBITS.auxiliary.length}`);
+console.groupEnd();
+
+// 🎯 Phase 395: Role Verification Beacon
+document.querySelectorAll('.holo-console').forEach(panel => {
+  const role = panel.getAttribute('data-role');
+  if (!role) {
+    console.warn(`🟡 WARNING: Panel ${panel.id} missing data-role attribute.`);
+  } else {
+    console.log(`✅ Panel ${panel.id} assigned role: ${role}`);
+  }
+});
+
+// 🌀 Phase 393: Orbital Grid Render Pass
+function renderOrbitGroup(group, zBase = 10) {
+  group.forEach((panel, index) => {
+    panel.style.zIndex = zBase + index;
+    panel.classList.add('orbit-rendered');
+    console.log(`🌀 Rendered ${panel.id} in orbit with zIndex ${zBase + index}`);
+  });
+}
+
+renderOrbitGroup(GRID_ORBITS.primary, 100);
+renderOrbitGroup(GRID_ORBITS.secondary, 50);
+renderOrbitGroup(GRID_ORBITS.auxiliary, 10);
+
 // Master Snap Engine for aligning all console panels to the grid
 document.addEventListener("DOMContentLoaded", () => {
   console.log('%c🌐 Panel Snap Engine Initialized', 'color: lime; font-weight: bold; font-size: 14px;');
+  // --- Phase 0: Panel DOM Order Injection by Role Priority ---
+  // This block injects the panel role DOM order logic before any grid/snap logic.
+  const ROLE_PRIORITY = [
+    'terminal',
+    'forecast',
+    'dock',
+    'reporting',
+    'utility',
+    'session',
+    'anomaly',
+    'observer',
+  ];
+  function getPanelRole(panel) {
+    return panel.getAttribute('data-role') || panel.getAttribute('data-console-type') || '';
+  }
+  function sortPanelsByRole(panels) {
+    return Array.from(panels).sort((a, b) => {
+      const roleA = getPanelRole(a);
+      const roleB = getPanelRole(b);
+      const idxA = ROLE_PRIORITY.indexOf(roleA);
+      const idxB = ROLE_PRIORITY.indexOf(roleB);
+      return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+    });
+  }
+  // Fetch all holo-console panels and reorder them based on role priority
+  const allHoloPanels = document.querySelectorAll('.holo-console');
+  const sortedPanels = sortPanelsByRole(allHoloPanels);
+  sortedPanels.forEach(panel => {
+    panel.parentNode && panel.parentNode.appendChild(panel); // Reorder in DOM
+  });
+  // --- End Phase 0 ---
   autoRegisterPanels();
   createSnapGridOverlay();
   finalizeGridAlignment();
+  // 🔒 Phase 390: Grid Lock Sync Pulse — storing locked coordinates
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    const rect = panel.getBoundingClientRect();
+    panel.setAttribute('data-snap-x', Math.round(rect.left));
+    panel.setAttribute('data-snap-y', Math.round(rect.top));
+    console.log(`🔒 Locked ${panel.id} at (${rect.left}, ${rect.top})`);
+  });
+
+  // 🧲 Phase 391: Snap Drift Compensation Layer
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    const lockedX = parseInt(panel.getAttribute('data-snap-x'), 10);
+    const lockedY = parseInt(panel.getAttribute('data-snap-y'), 10);
+    const rect = panel.getBoundingClientRect();
+
+    const dx = Math.abs(rect.left - lockedX);
+    const dy = Math.abs(rect.top - lockedY);
+
+    if (dx > 2 || dy > 2) {
+      console.warn(`⚠️ Snap drift detected on ${panel.id}. Re-aligning...`);
+      panel.style.left = `${lockedX}px`;
+      panel.style.top = `${lockedY}px`;
+      panel.style.position = 'absolute';
+    }
+  });
   const panels = document.querySelectorAll('.holo-console-panel');
 
   // Phase 378 — Panel Role Declaration Layer
@@ -834,19 +938,104 @@ function visuallyConfirmSnap(panel) {
     panel.classList.remove('snap-confirm');
   }, 600);
 }
-// Phase 395 — Snap Glyph Aura Synchronization Style
-const auraStyle = document.createElement('style');
-auraStyle.textContent = `
-  .snap-glyph-aura {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 8px;
-    pointer-events: none;
-    transition: box-shadow 0.3s ease-in-out;
+  // Phase 395 — Snap Glyph Aura Synchronization Style
+  const auraStyle = document.createElement('style');
+  auraStyle.textContent = `
+    .snap-glyph-aura {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 8px;
+      pointer-events: none;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .active-aura {
+      box-shadow: 0 0 12px 4px rgba(0, 255, 255, 0.6);
+    }
+  `;
+  document.head.appendChild(auraStyle);
+
+  // 🫀 Phase 396: Grid Pulse Tracker
+  function emitGridPulse() {
+    const activePanels = document.querySelectorAll('.holo-console.orbit-rendered');
+    const timestamp = new Date().toLocaleTimeString();
+
+    console.groupCollapsed(`🔄 Grid Pulse @ ${timestamp}`);
+    activePanels.forEach(panel => {
+      const rect = panel.getBoundingClientRect();
+      console.log(`📍 ${panel.id}: (${Math.round(rect.left)}, ${Math.round(rect.top)})`);
+    });
+    console.groupEnd();
   }
 
-  .active-aura {
-    box-shadow: 0 0 12px 4px rgba(0, 255, 255, 0.6);
+  window.dispatchGridPulse = emitGridPulse; // Allow manual triggering
+  emitGridPulse(); // Initial pulse on load
+
+  // 🧠 Phase 397: Panel Intelligence Signal Mapper
+  function mapPanelIntelligence() {
+    const allPanels = document.querySelectorAll('.holo-console');
+    const intelligenceMap = {};
+
+    allPanels.forEach(panel => {
+      const role = panel.getAttribute('data-role') || 'unassigned';
+      intelligenceMap[panel.id] = {
+        role,
+        orbit: panel.classList.contains('orbit-rendered') ? 'assigned' : 'unlinked',
+        locked: panel.classList.contains('panel-locked') || false,
+        coords: (() => {
+          const r = panel.getBoundingClientRect();
+          return { x: Math.round(r.left), y: Math.round(r.top) };
+        })()
+      };
+    });
+
+    console.groupCollapsed('%c🧠 Panel Intelligence Map', 'color: #ff6ec7; font-weight: bold;');
+    console.table(intelligenceMap);
+    console.groupEnd();
+
+    return intelligenceMap;
   }
-`;
-document.head.appendChild(auraStyle);
+
+  window.generatePanelIntelMap = mapPanelIntelligence; // Expose to window for manual inspection
+  mapPanelIntelligence(); // Auto-run on load
+
+  // 🔁 Phase 398: Panel Intelligence Heartbeat Loop
+  setInterval(() => {
+    const panelCount = document.querySelectorAll('.holo-console.orbit-rendered').length;
+    const activeLocks = document.querySelectorAll('.holo-console.panel-locked').length;
+    const timestamp = new Date().toLocaleTimeString();
+
+    console.log(`🫧 [${timestamp}] Heartbeat: ${panelCount} orbit panels, ${activeLocks} locked`);
+  }, 15000); // fires every 15 seconds
+
+  // 🧱 Phase 399: Final Grid Alignment Sentinel
+  function verifyGridAlignment() {
+    const snapped = document.querySelectorAll('.holo-console.grid-snapped');
+    const offGrid = [];
+
+    snapped.forEach(panel => {
+      const style = getComputedStyle(panel);
+      if (style.position !== 'absolute' || !panel.style.left || !panel.style.top) {
+        offGrid.push(panel.id);
+      }
+    });
+
+    if (offGrid.length > 0) {
+      console.warn(`🧱 Grid Sentinel Alert: ${offGrid.length} panels failed snap alignment`);
+      console.table(offGrid);
+    } else {
+      console.log('✅ Grid Sentinel: All snapped panels aligned successfully.');
+    }
+  }
+
+  window.runGridSentinel = verifyGridAlignment;
+  verifyGridAlignment();
+
+  // 🎇 Phase 400: Harmony Declaration — Final Initialization Banner
+  console.groupCollapsed('%c🌌 SOVEREIGN GRID ONLINE — 400 PANEL PHASES COMPLETE', 'color: cyan; font-weight: bold; font-size: 14px;');
+  console.log('%c🎯 Snap Grid Finalized', 'color: lightgreen;');
+  console.log('%c🔗 Role Map Active', 'color: lightblue;');
+  console.log('%c💠 Intelligence Pulse Live', 'color: violet;');
+  console.log('%c📡 Grid Sentinel Standing By', 'color: gold;');
+  console.log('%c🫧 Heartbeat Stable', 'color: pink;');
+  console.groupEnd();
