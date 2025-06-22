@@ -1405,3 +1405,57 @@ body {
   border-radius: 8px;
   transition: all 0.3s ease;
 }
+
+/* === WHISPERER NEXUS INTERFACE — Phase 50000 === */
+
+#whispererPanel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9998;
+  background: rgba(10, 12, 14, 0.8);
+  border: 1px solid var(--accent-color);
+  border-radius: 16px;
+  padding: 32px;
+  min-width: 40vw;
+  max-width: 60vw;
+  box-shadow:
+    0 0 40px var(--glow-color),
+    inset 0 0 20px var(--glow-color);
+  animation: whisperPulse 6s infinite ease-in-out;
+}
+
+@keyframes whisperPulse {
+  0%, 100% {
+    box-shadow: 0 0 40px var(--glow-color), inset 0 0 20px var(--glow-color);
+  }
+  50% {
+    box-shadow: 0 0 60px var(--glow-color), inset 0 0 25px var(--glow-color);
+  }
+}
+
+#neuralActivity {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, var(--glow-color) 25%, transparent 80%);
+  border-radius: 50%;
+  z-index: 9999;
+  animation: neuralPulse 5s infinite ease-in-out;
+  box-shadow: 0 0 24px var(--accent-color);
+  opacity: 0.85;
+}
+
+@keyframes neuralPulse {
+  0%, 100% {
+    box-shadow: 0 0 24px var(--accent-color);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 48px var(--accent-color);
+    transform: scale(1.05);
+  }
+}
