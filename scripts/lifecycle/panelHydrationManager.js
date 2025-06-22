@@ -24,3 +24,16 @@ export function hydrateEmptyPanels() {
 }
 
 document.addEventListener("DOMContentLoaded", hydrateEmptyPanels);
+
+export function togglePanel(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) {
+    console.warn(`⚠️ Panel with ID "${panelId}" not found.`);
+    return;
+  }
+  panel.classList.toggle('active');
+  console.log(`🔁 Toggled panel: ${panelId} → ${panel.classList.contains('active') ? 'Visible' : 'Hidden'}`);
+}
+
+// Expose to window for inline button onclick access
+window.togglePanel = togglePanel;

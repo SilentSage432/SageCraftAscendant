@@ -17,7 +17,6 @@
   <!-- iOS Splash Screen (Portrait) -->
   <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="stylesheet" href="https://unpkg.com/phosphor-icons@1.4.2/src/css/ph.css">
   <style>
     .lore-entry {
       opacity: 0;
@@ -76,8 +75,19 @@
       </label>
     </div>
     <!-- === SOVEREIGN GRID SYSTEM LAYOUT (REPLACES ALL PANELS/CONSOLES) === -->
-    <div id="sovereignGrid" class="grid-container">
+    <div id="sovereignGrid"
+         class="grid-container console-panel legacy-echo classified-legacy warp-stabilized"
+         data-harmony="true"
+         data-role="observer"
+         data-grid-area="staging-zone"
+         data-status="active"
+         data-grid-visual="active"
+         data-legacy="true">
+
       <!-- Sovereign panels will anchor here -->
+
+      <div class="panel-label">sovereignGrid</div>
+      <div class="console-contour"></div>
     </div>
     <div id="sovereignGridSystem">
       <div id="orbitBarZone"></div>
@@ -186,27 +196,17 @@
 </script>
 </script>
 <script src="scripts/console/console.directives.js"></script>
-<script type="module" src="scripts/wiring/buttonHooks.js"></script>
-<script type="module" src="scripts/wiring/panelVerification.js"></script>
-<script type="module" src="scripts/wiring/uiSanitizer.js"></script>
 <script type="module" src="scripts/wiring/consoleLifecycle.js"></script>
 <script type="module" src="scripts/wiring/inputObserver.js"></script>
 </script>
 </script>
-<script type="module" src="scripts/wiring/commandDispatcher.js"></script>
 <script type="module" src="scripts/wiring/commandFeedback.js"></script>
-<script type="module" src="scripts/cleanup/panelSanitizer.js"></script>
 </script>
   <script type="module" src="scripts/wiring/uiGridHarmonizer.js"></script>
-  <script type="module" src="scripts/ascendancy/consolePanelMemory.js"></script>
-  <script type="module" src="scripts/ascendancy/consoleArrayNormalizer.js"></script>
-  <script type="module" src="scripts/ascendancy/uiHarmonyEngine.js"></script>
   <script type="module" src="scripts/ascendancy/memorySocketLinker.js"></script>
   <script type="module" src="scripts/ascendancy/legacyEchoRecovery.js"></script>
   <script type="module" src="scripts/ascendancy/legacyEchoRehousing.js"></script>
-  <script type="module" src="scripts/ascendancy/consoleAtlas.js"></script>
   <script type="module" src="scripts/ascendancy/consoleRelayBinder.js"></script>
-  <script type="module" src="scripts/ascendancy/consoleRecovery.js"></script>
 <!-- 🧠 Neural Command Bridge Toggle Button -->
 <div id="neuralBridgeToggle" onclick="toggleNeuralCommandBridge()" style="
   position: fixed;
@@ -414,6 +414,42 @@
     <h3 style="margin-top: 0;">📋 Agent Lifecycle</h3>
     <ul id="lifecycleList" style="list-style: none; padding-left: 0; margin: 0;"></ul>
   </div>
+
+  <!-- 🧠 Session Manager Console -->
+  <div id="sessionManagerConsole" class="holo-console-panel" data-role="session-manager" data-zone="core-grid">
+    <div class="console-title">Session Manager</div>
+    <div class="session-body">
+      <div><strong>Status:</strong> Active</div>
+      <div><strong>Uptime:</strong> 00:00:00</div>
+      <div><strong>Last Sync:</strong> —</div>
+    </div>
+  </div>
+
+  <!-- 🧬 Memory Kernel Panel -->
+  <div id="memoryKernelPanel" class="holo-console-panel hidden" data-role="memory-kernel" data-zone="right-dock">
+    <div class="console-title">Memory Kernel</div>
+    <div class="memory-body">
+      <p><em>Core directives and echo fragments will be displayed here.</em></p>
+      <ul class="memory-list">
+        <!-- Dynamic entries will populate here -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- 🧭 Operator Status Panel -->
+  <div id="operatorStatusPanel" class="operator-fixed holo-console-panel" data-role="status-monitor" data-zone="bottom-left">
+    <div class="status-content">🟢 All systems nominal</div>
+  </div>
+
+  <!-- 🔮 Oracle Console -->
+  <div id="oracleConsole" class="holo-console-panel hidden" data-role="oracle" data-zone="lore-core">
+    <div class="console-title">The Silent Sage</div>
+    <div class="oracle-body">
+      <p><em>"Speak, and the echoes shall respond."</em></p>
+      <div class="oracle-response"></div>
+    </div>
+  </div>
+
 </div>
 <!-- 📖 Sanctum Lore Archive Panel -->
 </div>
@@ -717,6 +753,7 @@ function toggleGlyphLegend() {
 <!-- === COMMAND SYSTEM & FEEDBACK === -->
 <script type="module" src="scripts/wiring/commandDispatcher.js"></script>
 <script type="module" src="scripts/ascendancy/commandFeedback.js"></script>
+<script type="module" src="scripts/command/whispererTerminal.js"></script>
 
 <!-- === VALIDATION LAYERS === -->
 <script type="module" src="scripts/ascendancy/buttonValidator.js"></script>
@@ -810,7 +847,8 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/lifecycle/panelGridAnchor.js"></script>
   <!-- 🌀 Whisperer Nexus Core -->
   <div id="whispererPanel" class="nexus-core holo-console-panel" data-role="whisperer" data-zone="center-stage">
-    <div class="terminal-output">🌌 Welcome, Operator.</div>
+    <div id="whispererDisplay" class="terminal-output">🌌 Welcome, Operator.</div>
+    <input id="whispererInput" type="text" placeholder="Speak to the system..." autocomplete="off" />
   </div>
 
   <!-- 🧠 Neural Activity Node -->
@@ -1590,6 +1628,30 @@ function showToast(message = "✅ Done") {
       background: rgba(0,255,255,0.1);
     }
   </style>
+  <style>
+    .panel-label {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 2px 4px;
+      border-radius: 3px;
+      z-index: 999;
+    }
+
+    .console-contour {
+      position: absolute;
+      border: 1px dashed var(--accent-color, #00ffff);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
     <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true">
       <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">📊 Delta Analyzer</header>
@@ -1667,6 +1729,21 @@ function showToast(message = "✅ Done") {
     </div>
 
     <!-- Injected missing orbital panels -->
+    <!-- 🧪 Debug Console Toggles -->
+    <div id="panelToggles" style="position:fixed;top:1rem;right:1rem;z-index:9999;">
+      <button onclick="togglePanel('forecastChamber')">Forecast</button>
+      <button onclick="togglePanel('oracleConsole')">Oracle</button>
+      <button onclick="togglePanel('memoryKernelPanel')">Memory</button>
+    </div>
+
+
+    <!-- 🌩️ Forecast Chamber -->
+    <div id="forecastChamber" class="holo-console-panel hidden" data-role="forecast" data-zone="orbital-access">
+      <div class="console-title">Forecast Chamber</div>
+      <div class="forecast-body">
+        <p>Awaiting signal calibration...</p>
+      </div>
+    </div>
     <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true">
       <button class="panel-close" onclick="closeConsole(this)">✖️</button>
       <header class="console-header">🗂 Reporting Hub</header>
@@ -3747,27 +3824,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* === Normalize Holo Console Panels === */
-    .holo-console {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      position: absolute !important;
-      z-index: -1 !important;
-    }
+   /* === Sovereign Console Panel Visibility — Grid Safe === */
+.holo-console {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: block; /* Maintain grid alignment */
+}
 
-    .holo-console.console-active {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      height: auto !important;
-      margin: auto !important;
-      padding: 20px !important;
-      position: relative !important;
-      z-index: 10 !important;
-    }
+/* When active */
+.holo-console.console-active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 20px;
+  margin: 0;
+  z-index: 10;
+  transform: scale(1.01);
+}
   </style>
   <script>
     function submitReport() {
