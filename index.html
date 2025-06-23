@@ -18,6 +18,40 @@
   <link rel="apple-touch-startup-image" href="icon/splash-1080x1920.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <style>
+    /* === UI UTILITIES === */
+    .sovereign-zone-anchor {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-gap: 16px;
+      padding: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .debug-outline {
+      outline: 1px dashed magenta;
+      background-color: rgba(255, 0, 255, 0.03);
+    }
+
+    .console-active-snap {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      z-index: 10 !important;
+      animation: fadeInSnap 0.3s ease-in;
+    }
+
+    @keyframes fadeInSnap {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
     .lore-entry {
       opacity: 0;
       transform: rotateX(-90deg);
@@ -60,7 +94,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
   <!-- LiquidGlass styles should be loaded after all other head links -->
-  <link rel="stylesheet" href="scripts/liquidGlass/liquidGlass.css">
+ <!-- Base styles -->
+<!--link rel="stylesheet" href="scripts/liquidGlass/liquidGlass.css"-->
+
+<!-- Overrides and resets -->
+<link rel="stylesheet" href="styles/liquidGlassReset.css">
+<!-- <link rel="stylesheet" href="scripts/styles/debugclarity.css"> -->
+  <link rel="stylesheet" href="styles/uiGridRestoration.css" />
+</head>
+<script>
+  // Lock scroll to top briefly on load
+  function lockScrollToTop() {
+    window.scrollTo(0, 0);
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  // Unlock scroll after short delay
+  function unlockScroll() {
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    lockScrollToTop();
+  });
+
+  window.addEventListener("load", () => {
+    lockScrollToTop();
+    setTimeout(() => {
+      unlockScroll();
+      window.scrollTo(0, 0);
+    }, 1500); // Delay to stabilize layout
+  });
+</script>
   <meta name="theme-color" content="#2a003f" />
   <script src="https://apis.google.com/js/api.js"></script>
   <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="440t4dh1sy47nue"></script>
@@ -76,16 +143,14 @@
     </div>
     <!-- === SOVEREIGN GRID SYSTEM LAYOUT (REPLACES ALL PANELS/CONSOLES) === -->
     <div id="sovereignGrid"
-         class="grid-container console-panel legacy-echo classified-legacy warp-stabilized"
+         class="sovereign-zone-anchor debug-outline"
          data-harmony="true"
          data-role="observer"
          data-grid-area="staging-zone"
          data-status="active"
          data-grid-visual="active"
          data-legacy="true">
-
       <!-- Sovereign panels will anchor here -->
-
       <div class="panel-label">sovereignGrid</div>
       <div class="console-contour"></div>
     </div>
@@ -722,6 +787,7 @@ function toggleGlyphLegend() {
   </script>
 <!-- === UI FOUNDATION & WIRING === -->
 <script type="module" src="scripts/wiring/buttonHooks.js"></script>
+<script type="module" src="scripts/stability/earlyScrollSuppressor.js"></script>
 <script type="module" src="scripts/wiring/panelVerification.js"></script>
 <script type="module" src="scripts/wiring/consoleGroupSanitizer.js"></script>
 <script type="module" src="scripts/ascendancy/consoleGridAllocator.js"></script>
@@ -729,6 +795,8 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/consoleGridVisualizer.js"></script>
 <script type="module" src="scripts/ascendancy/panelCoordinateAtlas.js"></script>
 <script type="module" src="scripts/ascendancy/consoleDockRelinker.js"></script>
+<script type="module" src="scripts/stability/scrollIntercept.js"></script>
+<script type="module" src="scripts/stability/scrollTrace.js"></script>
 
 <!-- === CLEANUP & SANITATION === -->
 <script type="module" src="scripts/wiring/uiSanitizer.js"></script>
@@ -853,6 +921,49 @@ function toggleGlyphLegend() {
 
   <!-- 🧠 Neural Activity Node -->
   <div id="neuralActivity" class="neural-core-indicator" title="Neural Activity Monitoring"></div>
+  <script>
+    // Block any element from stealing scroll focus
+    const blockScrollSteal = () => {
+      document.querySelectorAll('*').forEach(el => {
+        el.blur?.();
+      });
+      window.scrollTo(0, 0);
+    };
+
+    // Re-run scroll lock on any new focus
+    document.addEventListener('focus', blockScrollSteal, true);
+    document.addEventListener('DOMContentLoaded', blockScrollSteal);
+    window.addEventListener('load', () => {
+      blockScrollSteal();
+      setTimeout(blockScrollSteal, 250);
+      setTimeout(blockScrollSteal, 500);
+      setTimeout(blockScrollSteal, 1000);
+    });
+  </script>
+  <script>
+    // Finalized scroll lock logic that allows manual scrolling but prevents unwanted load jumps
+    function stabilizeInitialScroll() {
+      // Reset to top only once on full load
+      window.scrollTo(0, 0);
+    }
+
+    window.addEventListener("load", () => {
+      stabilizeInitialScroll();
+      setTimeout(stabilizeInitialScroll, 100);
+      setTimeout(stabilizeInitialScroll, 500);
+    });
+
+    // Remove any rogue script-triggered scrolls without interfering with manual scroll
+    const observer = new MutationObserver(() => {
+      if (window.scrollY > 5) {
+        window.scrollTo(0, 0);
+      }
+    });
+
+    // Activate only on initial burst (first few seconds)
+    setTimeout(() => observer.disconnect(), 3000);
+    observer.observe(document.body, { childList: true, subtree: true });
+  </script>
 </body>
 <script>
   function toggleDevConsole() {
@@ -3942,6 +4053,63 @@ document.addEventListener("DOMContentLoaded", () => {
         panel.style.display = "none";
       }
     }
+  </script>
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }, 10);
+    });
+  </script>
+  <script>
+    // Disable anchor, focus, or rogue script scroll behavior
+    window.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    });
+  
+    // Catch late scroll attempts after full render
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+      }, 200);
+    });
+  
+    // Catch ANY scroll attempts and kill them
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 0) {
+        window.scrollTo(0, 0);
+      }
+    });
+  </script>
+  <script>
+    // Absolutely prevent scrolling at all costs
+    function lockScrollToTop() {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+  
+    // On DOM Ready
+    document.addEventListener("DOMContentLoaded", lockScrollToTop);
+  
+    // On Full Load
+    window.addEventListener("load", () => {
+      lockScrollToTop();
+      setTimeout(lockScrollToTop, 100);  // In case layout shifts
+      setTimeout(lockScrollToTop, 500);  // In case late scripts fire
+      setTimeout(lockScrollToTop, 1000); // In case there's a cursed delay
+    });
+  
+    // On any scroll attempt, kill it
+    window.addEventListener("scroll", () => {
+      if (window.scrollY !== 0) {
+        lockScrollToTop();
+      }
+    });
   </script>
 </body>
 </html>

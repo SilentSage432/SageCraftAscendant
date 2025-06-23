@@ -1,0 +1,304 @@
+/* === 🔄 SAGECRAFT CSS RESET: liquidGlassReset.css === */
+
+/* Universal Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base Typography */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: #0b0c10;
+  color: #c5c6c7;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: block;
+  position: relative;
+}
+
+/* Layout Zones */
+#sovereignGrid,
+.grid-row,
+.grid-panel,
+.dock-grid,
+.dock-panel {
+  display: grid;
+  grid-gap: 20px;
+  padding: 10px;
+}
+
+/* Grid Columns */
+#sovereignGrid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-items: start;
+  justify-items: center;
+}
+
+/* Console Panels */
+.holo-console,
+.dock-panel {
+  background-color: rgba(20, 22, 30, 0.95);
+  border: 1px solid #00ffff33;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 8px rgba(0, 255, 255, 0.15),
+    inset 0 0 6px rgba(0, 255, 255, 0.1);
+}
+
+/* Visibility and Z-Index Defaults */
+.holo-console,
+.dock-panel {
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+  z-index: 10;
+}
+
+/* Label and Contour Cleanup */
+.panel-label,
+.console-contour {
+  position: absolute;
+  pointer-events: none;
+  font-size: 0.75rem;
+  z-index: 1;
+  border: 1px dashed magenta;
+  color: magenta;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 2px 4px;
+  border-radius: 4px;
+  mix-blend-mode: screen;
+}
+
+/* === 🧩 Sovereign Grid Architecture === */
+
+/* Grid Row Structure */
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* Snap Zones & Anchoring */
+#sovereignGridSystem {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+#orbitBarZone,
+#footerStatusZone,
+#forecastConsoleSection,
+#loreEngineSection {
+  min-height: 60px;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px dashed rgba(0, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+/* Dock Panel Grouping */
+.dock-panel-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Console Hierarchy and Layers */
+.holo-console.console-active {
+  z-index: 100;
+}
+
+#sovereignGrid .holo-console {
+  position: relative;
+  z-index: 5;
+}
+
+#sovereignGrid {
+  border: 2px dashed magenta;
+  backdrop-filter: blur(2px);
+}
+
+/* === 🧲 Snapped Panel Positioning === */
+.holo-console.snap-pinned {
+  position: absolute !important;
+  max-width: 480px;
+  min-height: 180px;
+  background-color: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+  padding: 12px;
+  z-index: 20;
+}
+
+/* === 🐞 DEBUG VISUALS: Toggle Helpers === */
+.debug-outline * {
+  outline: 1px dashed rgba(255, 0, 0, 0.3);
+}
+
+.debug-z-index::after {
+  content: attr(style);
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(255, 0, 255, 0.3);
+  color: white;
+  font-size: 10px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.console-debug-boundary {
+  border: 2px dashed limegreen !important;
+}
+
+.console-active {
+  border: 2px solid #00ffff !important;
+}
+
+.grid-panel.debug-visible {
+  background-color: rgba(255, 255, 0, 0.05);
+}
+
+.panel-label.debug {
+  background-color: rgba(255, 0, 255, 0.2);
+  color: white;
+  font-weight: bold;
+}
+
+#neuralActivity {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, var(--glow-color) 25%, transparent 80%);
+    border-radius: 50%;
+    z-index: 9999;
+    animation: neuralPulse 5s infinite ease-in-out;
+    box-shadow: 0 0 24px var(--accent-color);
+    opacity: 0.85;
+  }
+  
+  @keyframes neuralPulse {
+    0%, 100% {
+      box-shadow: 0 0 24px var(--accent-color);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 48px var(--accent-color);
+      transform: scale(1.05);
+    }
+  }
+
+  
+/* === 🧭 Sovereign Layout Enhancements === */
+
+/* === 📐 Sovereign Panel Layout Stabilizer === */
+#dockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  align-items: start;
+  justify-items: center;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 40px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+}
+
+.dock-panel {
+  min-height: 280px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Center the Whisperer Console */
+#whispererConsole.snap-pinned {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  max-width: 600px;
+  width: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow: 0 0 18px rgba(0, 255, 255, 0.5);
+  background-color: rgba(10, 12, 20, 0.95);
+  border: 2px solid cyan;
+  border-radius: 12px;
+  padding: 28px;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* Snap Grid Padding */
+#sovereignGridSystem {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  padding: 40px;
+  gap: 40px;
+  align-items: start;
+  justify-content: center;
+}
+
+/* Panel Group Separation */
+.dock-panel-group {
+  gap: 24px;
+}
+
+/* Optional: Position Specific Panels to Avoid Overlap */
+#oracleConsole.snap-pinned {
+  top: 5%;
+  left: 10%;
+}
+#grimoireConsole.snap-pinned {
+  top: 60%;
+  left: 10%;
+}
+#sageFeedConsole.snap-pinned {
+  top: 20%;
+  left: 70%;
+}
+
+
+/* === 🔒 Snap Prevention Patch === */
+html, body {
+  scroll-behavior: auto !important;
+  overflow-anchor: none !important;
+}
+
+/* Lock critical placeholder zones early */
+#primaryConsoleRow,
+#secondaryConsoleRow,
+#forecastConsoleSection {
+  min-height: 100px;
+  transition: none !important;
+}

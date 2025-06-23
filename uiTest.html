@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SageCraft UI Test</title>
+  <link rel="stylesheet" href="styles/liquidGlassReset.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <div id="sovereignGridSystem">
+    <div id="whispererConsole" class="dock-panel holo-console-panel console-active">
+      <h1>The Whisperer Console</h1>
+      <p>This is a placeholder for the Whisperer UI element.</p>
+    </div>
+  </div>
+
+  <script>
+    // Lock scroll to top on load and prevent auto scroll
+    window.addEventListener("load", () => {
+      window.scrollTo(0, 0);
+    });
+  </script>
+</body>
+</html>

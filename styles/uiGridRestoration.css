@@ -1,0 +1,51 @@
+
+
+
+/* === UI GRID RESTORATION LAYER === */
+
+.holo-console-panel {
+  position: relative;
+  z-index: 5;
+  margin: 8px;
+  padding: 16px;
+  background-color: rgba(15, 15, 20, 0.85);
+  border: 1px dashed var(--accent-color, magenta);
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Restore base panel structure */
+.grid-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 300px;
+  min-height: 200px;
+  margin: 12px;
+  padding: 12px;
+  background-color: rgba(25, 25, 35, 0.85);
+  border: 2px solid var(--accent-color, magenta);
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(255, 0, 255, 0.25);
+}
+
+/* Reinforce visible gridlines */
+.console-contour {
+  border: 1px dashed var(--accent-color, magenta);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Active console visibility */
+.console-active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 10 !important;
+}

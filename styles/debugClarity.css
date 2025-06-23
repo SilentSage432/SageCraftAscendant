@@ -1,0 +1,53 @@
+
+
+
+/* === 🔍 DEBUG VISUAL MAP — Sovereign Debug Layer === */
+
+/* High-contrast gridlines for layout zones */
+.grid-container, .grid-row, .grid-panel, .dock-grid, .dock-panel-group {
+  outline: 2px dashed magenta !important;
+  background-color: rgba(255, 0, 255, 0.03) !important;
+}
+
+/* Visualize all holo-console panels */
+.holo-console, .holo-console-panel {
+  outline: 2px solid cyan !important;
+  background-color: rgba(0, 255, 255, 0.03) !important;
+}
+
+/* Force visible stacking context for z-index debugging */
+.holo-console-panel::before {
+  content: attr(id);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 10px;
+  padding: 2px 4px;
+  color: #000;
+  background: yellow;
+  border: 1px solid black;
+  z-index: 9999;
+}
+
+/* Highlight console sections */
+.console-section, .console-body, .console-header {
+  outline: 1px dashed limegreen !important;
+  background-color: rgba(50, 205, 50, 0.05) !important;
+}
+
+/* Label staging zones */
+[data-grid-area="staging-zone"] {
+  outline: 2px dotted orange !important;
+}
+
+/* Boost visibility of active panels */
+.console-active {
+  box-shadow: 0 0 10px 2px lime !important;
+  background-color: rgba(0, 255, 0, 0.04) !important;
+}
+
+/* Reveal hidden elements for visual trace */
+.hidden {
+  opacity: 0.2 !important;
+  pointer-events: none !important;
+}

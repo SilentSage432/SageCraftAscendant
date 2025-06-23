@@ -421,33 +421,18 @@ html {
 /* 🧬 Phase 18005 — Panel Display Fix */
 
 .holo-console {
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 100%;
-  max-width: 100%;
-  min-width: unset;
-  min-height: 220px;
-  margin: 0;
-  padding: 10px;
-  overflow: auto;
-  position: static !important;
-  border: 2px solid lime;
-  background-color: #111;
-  color: #0f0;
-  box-sizing: border-box;
+  display: block;
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  grid-column: span 1;
+  pointer-events: none;
 }
 
-.holo-console.active {
-  position: static !important;
-  border: 2px dashed lime;
-  background-color: rgba(17, 17, 17, 0.9);
-  color: #0f0;
-  box-shadow:
-    0 0 12px rgba(90, 245, 233, 0.3),
-    0 0 24px rgba(90, 245, 233, 0.2),
-    inset 0 0 12px rgba(122, 255, 252, 0.3);
-  animation: scanPulse 6s linear infinite;
-  z-index: 500; /* or remove this and let layout flow naturally */
+.holo-console.console-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
 }
 
 .console-body {
@@ -1774,4 +1759,123 @@ body {
   top: 2px;
   left: 2px;
   z-index: 9999;
+}
+
+/* === GRID LAYOUT ENFORCEMENT & DEBUG SUPPRESSION === */
+#dockGrid,
+.dock-panel-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: start;
+  justify-items: stretch;
+}
+
+.panel-label,
+.console-contour {
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  opacity: 0.1;
+}
+
+#sovereignGrid {
+  outline: 1px dashed magenta;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dock-panel {
+  outline: 1px dashed cyan;
+}
+
+.panel-label,
+.console-contour {
+  z-index: 0 !important;
+  opacity: 0.05 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+}
+
+.dock-panel,
+.holo-console,
+.holo-console-panel {
+  z-index: 999 !important;
+  position: relative !important;
+}
+
+
+/* === SOVEREIGN UI STRUCTURAL ALIGNMENT === */
+
+html, body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: #0a0a0a;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#sovereignGridSystem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding-top: 40px;
+  position: relative;
+}
+
+.grid-row {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.grid-panel {
+  width: 300px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed magenta;
+  margin: 0 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.holo-console-panel {
+  position: relative;
+  z-index: 10;
+}
+
+.holo-console-panel.console-active {
+  z-index: 99;
+}
+
+/* === Z-INDEX REASSIGNMENT PATCH === */
+.panel-label:not(.console-active),
+.console-contour {
+  z-index: 0 !important;
+  pointer-events: none !important;
+  opacity: 0.3 !important;
+}
+
+.dock-panel.holo-console-panel.console-active {
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+#sovereignGridSystem,
+.grid-row,
+.grid-panel {
+  position: relative;
+  z-index: 10;
+}
+
+body.debug-mode .panel-label {
+  border: 1px dashed magenta;
+  opacity: 0.5;
 }
