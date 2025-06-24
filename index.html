@@ -154,7 +154,7 @@
       <div class="panel-label">sovereignGrid</div>
       <div class="console-contour"></div>
     </div>
-    <div id="sovereignGridSystem">
+    <div id="sovereignGridSystem" class="staging-zone"></div>
       <div id="orbitBarZone"></div>
 
       <div class="grid-row" id="primaryConsoleRow">
@@ -3424,6 +3424,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   <!-- 🌀 Whisperer Entity Module -->
   <script type="module" src="scripts/entities/theWhisperer.js"></script>
+
+  <script type="module" src="scripts/stability/snapPinLock.js"></script>
+  <script type="module" src="scripts/stability/panelSnapTracer.js"></script>
+  <script type="module" src="scripts/stability/snapPinDefender.js"></script>
+  <script type="module" src="scripts/lifecycle/panelSnapAnchor.js"></script>
+  <script type="module" src="scripts/lifecycle/panelZoneAnchor.js"></script>
+  <script type="module" src="scripts/lifecycle/snapGridFinalizer.js"></script>
+  <script type="module" src="scripts/lifecycle/snapMemoryEngine.js"></script>
+  <script type="module" src="scripts/lifecycle/snapMemoryRecall.js"></script>
+  <script type="module" src="scripts/lifecycle/autoSnapMemoryRecall.js"></script>
+  <script type="module" src="scripts/lifecycle/snapMemoryGuardian.js"></script>
 
   <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
   <script>

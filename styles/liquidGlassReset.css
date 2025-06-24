@@ -288,6 +288,36 @@ html, body {
   left: 70%;
 }
 
+#countConsole.snap-pinned {
+  top: 10%;
+  left: 25%;
+}
+
+#deltaAnalyzerConsole.snap-pinned {
+  top: 25%;
+  left: 25%;
+}
+
+#reportingHubConsole.snap-pinned {
+  top: 40%;
+  left: 25%;
+}
+
+#sessionManagerConsole.snap-pinned {
+  top: 10%;
+  left: 60%;
+}
+
+#utilityHubConsole.snap-pinned {
+  top: 25%;
+  left: 60%;
+}
+
+#auditConsole.snap-pinned {
+  top: 40%;
+  left: 60%;
+}
+
 
 /* === 🔒 Snap Prevention Patch === */
 html, body {
@@ -302,3 +332,87 @@ html, body {
   min-height: 100px;
   transition: none !important;
 }
+
+
+/* === 🧩 Snap Positioning: Newly Discovered Consoles === */
+#forecastConsole.snap-pinned {
+  top: 5%;
+  left: 5%;
+}
+#pulseMonitorConsole.snap-pinned {
+  top: 20%;
+  left: 5%;
+}
+#exceptionManagerConsole.snap-pinned {
+  top: 35%;
+  left: 5%;
+}
+#oracle.snap-pinned {
+  top: 50%;
+  left: 5%;
+}
+#sageTerminal.snap-pinned {
+  top: 65%;
+  left: 5%;
+}
+#loreEngineConsole.snap-pinned {
+  top: 80%;
+  left: 5%;
+}
+#sigilEditPanel-2.snap-pinned {
+  top: 5%;
+  left: 70%;
+}
+#sigilRenderConsole.snap-pinned {
+  top: 20%;
+  left: 70%;
+}
+#progressDashboardConsole.snap-pinned {
+  top: 35%;
+  left: 70%;
+}
+#masterExportHubConsole.snap-pinned {
+  top: 50%;
+  left: 70%;
+}
+#mappingsConsole.snap-pinned {
+  top: 65%;
+  left: 70%;
+}
+#toolsConsole.snap-pinned {
+  top: 80%;
+  left: 70%;
+}
+#configPanelConsole.snap-pinned {
+  top: 95%;
+  left: 70%;
+}
+
+/* === 🌐 Snap Fallback Safety === */
+.holo-console:not(.snap-pinned) {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 auto;
+}
+
+/* === ✅ Sovereign Final Grid Snap Confirmation === */
+#sovereignGridSystem .holo-console.snap-pinned {
+    outline: 2px dashed limegreen;
+    background-color: rgba(0, 30, 0, 0.85);
+    box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+    animation: snapHighlightPulse 1.8s ease-in-out infinite;
+  }
+  
+  /* Animation pulse to confirm snapped panels */
+  @keyframes snapHighlightPulse {
+    0%, 100% {
+      outline-color: limegreen;
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+    }
+    50% {
+      outline-color: springgreen;
+      box-shadow: 0 0 24px rgba(0, 255, 0, 0.7);
+    }
+  }

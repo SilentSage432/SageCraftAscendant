@@ -156,3 +156,9 @@ import('/scripts/bootstrap/bootstrapNeural.js').then(module => {
 }).catch(err => {
   console.error("❌ Failed to load bootstrapNeural.js:", err);
 });
+
+
+// Snap Memory Auto-Recall
+window.addEventListener("DOMContentLoaded", () => {
+  window?.SovereignMemory?.recallFinalSnapState?.();
+});
