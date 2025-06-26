@@ -1,0 +1,63 @@
+/* === Gameplay Console Styling === */
+.holo-console {
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  background-color: rgba(5, 5, 20, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.5rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.console-grid-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(10, 10, 25, 0.6);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+  border-radius: 10px;
+}
+
+/* Center Terminal Priority */
+#sovereignTerminal {
+  flex: 1 1 100%;
+  order: 0;
+  max-width: 100%;
+  min-height: 300px;
+  z-index: 10;
+}
+
+/* General Panel Sizing */
+.holo-console:not(#sovereignTerminal) {
+  flex: 1 1 30%;
+  min-width: 280px;
+  max-width: 500px;
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .holo-console:not(#sovereignTerminal) {
+    flex: 1 1 100%;
+  }
+  #sovereignTerminal {
+    min-height: 200px;
+  }
+}
+
+#gameplayArenaMount {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 2rem;
+  margin: auto;
+  max-width: 95vw;
+  min-height: 60vh;
+  background: rgba(10, 10, 25, 0.7);
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+}

@@ -1,0 +1,59 @@
+<!-- 🔮 Sigil Forge Toggle Button -->
+<div id="sigilToggle" onclick="toggleSigilForge()" style="position: fixed; top: 160px; right: 20px; font-size: 22px; cursor: pointer; z-index: 10000;" title="Open Sigil Forge Panel">
+    🧙‍♂️
+  </div>
+  
+  <!-- 🧬 Sigil Forge Panel -->
+  <div id="sigilForgePanel" class="holo-console-panel holo-console" data-role="sigil-forge" data-grid-area="staging-zone" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+    <h3 style="margin-top: 0;">🧬 Sigil Forge</h3>
+    <div id="sigilContent">
+      <p>Select an archetype and forge a glyph.</p>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+        <button onclick="promptExportByType()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">📤 Export by Type</button>
+        <button onclick="promptExportByElement()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">🌌 Export by Element</button>
+      </div>
+      <button onclick="forgeSigil()">Forge New Sigil</button>
+    </div>
+  
+    <!-- 🗃️ Sigil Archive Search -->
+    <div style="margin-bottom: 10px;">
+      <input
+        id="sigilSearchInput"
+        type="text"
+        placeholder="🔍 Search Sigils..."
+        oninput="filterSigilArchive()"
+        style="width: 100%; padding: 6px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc;"
+      />
+    </div>
+  
+    <div id="sigilArchiveScroll" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #888; background: rgba(255, 255, 255, 0.05); margin-top: 10px; border-radius: 5px; font-size: 14px;">
+      <!-- Sigil Archive will render here -->
+    </div>
+  
+    <!-- 🔧 Sigil Edit Panel -->
+    <div id="sigilEditPanel" style="margin-top: 20px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; display: none;">
+      <h3>Edit Sigil</h3>
+      <label for="editSigilName-2">Name:</label><br>
+      <input type="text" id="editSigilName-2" style="width: 100%; margin-bottom: 10px;"><br>
+  
+      <label for="editSigilType-2">Type:</label><br>
+      <input type="text" id="editSigilType-2" style="width: 100%; margin-bottom: 10px;"><br>
+  
+      <label for="editSigilElement-2">Element:</label><br>
+      <input type="text" id="editSigilElement-2" style="width: 100%; margin-bottom: 10px;"><br>
+  
+      <label for="editSigilGlyph-2">Glyph Code:</label><br>
+      <input type="text" id="editSigilGlyph-2" style="width: 100%; margin-bottom: 12px;"><br>
+  
+      <button onclick="submitSigilEdit()" style="padding: 8px 16px; background: #4af; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Submit Edit</button>
+    </div>
+  </div>
+  
+  <script>
+    function toggleSigilForge() {
+      const panel = document.getElementById("sigilForgePanel");
+      if (panel) {
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+      }
+    }
+  </script>

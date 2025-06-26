@@ -1,0 +1,27 @@
+<!-- 🔄 Agent Lifecycle Toggle Button -->
+<div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; bottom: 100px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
+  🧬
+</div>
+
+<!-- 📋 Agent Lifecycle Panel -->
+<div id="agentLifecyclePanel" style="display:none; position: fixed; bottom: 160px; right: 20px; width: 260px; background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
+  <h3 style="margin-top: 0;">📋 Agent Lifecycle</h3>
+  <ul id="lifecycleList" style="list-style: none; padding-left: 0; margin: 0;"></ul>
+</div>
+
+<!-- 🫀 Agent Lifeline Monitor Panel -->
+<div id="agentLifelinePanel" style="margin-top: 10px; border: 1px solid #888; padding: 8px; border-radius: 5px; background: #1b1b1b; color: #9cf; font-family: monospace; font-size: 0.8em;">
+  <b>🫀 Agent Lifeline Monitor</b>
+  <ul id="agentLifelineList" style="margin-top: 6px; padding-left: 16px;"></ul>
+  <button onclick="refreshAgentLifeline()" style="margin-top: 6px; background: #222; color: #9cf; border: 1px solid #555; padding: 4px 8px; font-size: 0.75em; cursor: pointer; border-radius: 4px;">
+    🔁 Refresh Lifeline
+  </button>
+</div>
+
+<script>
+  function toggleLifecyclePanel() {
+    const panel = document.getElementById("agentLifecyclePanel");
+    if (!panel) return;
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+  }
+</script>

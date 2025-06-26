@@ -45,6 +45,35 @@ whenReady(() => {
         });
       };
 
+      SageCraftAscendant.OperatorConsole.registerForecastModalControls = function () {
+        const modal = document.getElementById("forecastDriftModal");
+        const closeBtn = document.getElementById("closeDriftChartBtn");
+
+        if (!modal) return;
+
+        // Start hidden
+        modal.style.display = "none";
+        modal.style.visibility = "hidden";
+        modal.style.opacity = "0";
+
+        // Toggle function
+        window.toggleForecastModal = function () {
+          const isVisible = modal.style.display === "block";
+          modal.style.display = isVisible ? "none" : "block";
+          modal.style.visibility = isVisible ? "hidden" : "visible";
+          modal.style.opacity = isVisible ? "0" : "1";
+        };
+
+        // Close button
+        closeBtn?.addEventListener("click", () => {
+          modal.style.display = "none";
+          modal.style.visibility = "hidden";
+          modal.style.opacity = "0";
+        });
+
+        console.log("🧿 Forecast modal toggle initialized.");
+      };
+
       SageCraftAscendant.OperatorConsole.revealDockPanel = function (panelId) {
         const panel = document.getElementById(panelId);
         if (panel) {
@@ -53,6 +82,10 @@ whenReady(() => {
           panel.style.opacity = 1;
           panel.style.visibility = 'visible';
           panel.style.zIndex = 500;
+          panel.style.top = "60px";
+          panel.style.left = "60px";
+          panel.style.position = "absolute";
+          console.log(`📌 Position reset inside revealDockPanel: ${panelId}`);
           console.log(`✅ revealDockPanel: ${panelId} made visible.`);
         } else {
           console.warn(`⚠️ revealDockPanel: ${panelId} not found.`);
@@ -60,33 +93,32 @@ whenReady(() => {
       };
 
       console.log("✅ OperatorConsoleReady bootstrap complete.");
+      SageCraftAscendant.OperatorConsole.registerForecastModalControls();
       if (typeof SageCraftAscendant.OperatorConsole.revealDockPanel === 'function') {
-        SageCraftAscendant.OperatorConsole.revealDockPanel("countConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("deltaAnalyzerConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("reportingHubConsole");
+        SageCraftAscendant.OperatorConsole.revealDockPanel("coreCommandInput");
+        SageCraftAscendant.OperatorConsole.revealDockPanel("neuralPulsePanel");
         SageCraftAscendant.OperatorConsole.revealDockPanel("sessionManagerConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("utilityHubConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("loreEngineConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("whispererConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("sageFeedConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("oracleConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("forecastConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("commandBridgeConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("sovereignHubConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("artifactVaultConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("memoryKernelConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("neuralMatrixConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("systemPulseConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("sovereignTerminal");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("eventPulseConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("observerRelayConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("etherealLensConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("navigationArrayConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("quantumBeaconConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("protocolBufferConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("temporalAnchorConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("consciousnessStreamConsole");
-        SageCraftAscendant.OperatorConsole.revealDockPanel("dimensionalTetherConsole");
+
+        // 🧼 Hide all other panels by default
+        document.querySelectorAll('.holo-console').forEach(panel => {
+          if (!["coreCommandInput", "neuralPulsePanel", "sessionManagerConsole"].includes(panel.id)) {
+            panel.style.display = "none";
+            panel.classList.add("hidden");
+            panel.style.opacity = 0;
+            panel.style.visibility = "hidden";
+            panel.style.zIndex = 0;
+          }
+        });
+        // 📌 Force all holo-console panels back to viewport
+        document.querySelectorAll('.holo-console').forEach(panel => {
+          if (panel.style.display !== 'none') {
+            panel.style.top = "60px";
+            panel.style.left = "60px";
+            panel.style.position = "absolute";
+            panel.style.zIndex = 500;
+            console.log(`📌 Resurrection position correction applied: ${panel.id}`);
+          }
+        });
       } else {
         console.warn("⚠️ revealDockPanel method not available on OperatorConsole.");
       }
@@ -102,4 +134,16 @@ whenReady(() => {
   }
 
   waitForOperatorConsole();
+
+  window.addEventListener("load", () => {
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      const style = getComputedStyle(panel);
+      if (style.display !== "none") {
+        panel.style.top = "60px";
+        panel.style.left = "60px";
+        panel.style.position = "absolute";
+        console.log(`📌 Reset position: ${panel.id}`);
+      }
+    });
+  });
 });

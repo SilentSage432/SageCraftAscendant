@@ -79,6 +79,26 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 // 🧠 Whisperer Memory Core Genesis — Phase XXV-A
+// === Whisperer Sovereign Identity Binding — Phase 19.5 ===
+if (!window.SovereignPanels) window.SovereignPanels = {};
+window.SovereignPanels["whisperer"] = {
+  id: "whisperer",
+  role: "terminal",
+  zone: "center",
+  sovereign: true,
+  snap: true,
+  anchor: "mainGridCenter",
+  visible: true,
+  locked: false,
+  title: "The Whisperer",
+  manifest: {
+    snapClass: "snap-terminal",
+    theme: "aether",
+    context: "primary-terminal",
+    priority: 10
+  }
+};
+console.log("📌 Sovereign Whisperer identity registered with grid.");
 console.log("👁️ theWhisperer.js module online — Echo functions standing by.");
 
 // Access check helper for operator tiers
@@ -661,6 +681,138 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     WhispererMemory.record(`Diagnostic Signal → ${JSON.stringify(data)}`);
   });
+  // === Lore Signal Feed ===
+  window.SovereignBus?.on?.("loreSignal", (data) => {
+    console.log("📜 Lore Signal received:", data);
+    const loreEcho = document.createElement("div");
+    loreEcho.textContent = `[LORE] ${data?.tag || "Untitled Lore Entry"}: ${data?.content || "No details provided."}`;
+    loreEcho.classList.add("log-entry", "lore-entry");
+    document.getElementById("whispererConsoleOutput")?.appendChild(loreEcho);
+    WhispererMemory.record(`Lore Signal → ${JSON.stringify(data)}`);
+  });
+  window.SovereignBus?.on?.("whispererSmartRoute", (data) => {
+    console.log("🧬 [SmartRoute] Routed to Whisperer:", data);
+    const liveOutput = document.getElementById("whispererConsoleOutput");
+    if (liveOutput) {
+      const div = document.createElement("div");
+      div.textContent = `[${new Date().toLocaleTimeString()}] SMARTROUTE → ${JSON.stringify(data)}`;
+      div.classList.add("log-entry", "smartroute");
+      div.style.color = "#9be7ff";
+      div.style.fontStyle = "italic";
+      div.style.padding = "6px 10px";
+      div.style.borderLeft = "4px solid #9be7ff";
+      div.style.marginBottom = "4px";
+      div.style.backgroundColor = "rgba(20,30,40,0.3)";
+      liveOutput.appendChild(div);
+      liveOutput.scrollTop = liveOutput.scrollHeight;
+    }
+    WhispererMemory.record({
+      module: "SmartRoute",
+      status: typeof data === "string" ? data : JSON.stringify(data),
+      type: "diagnostic",
+      urgency: "low",
+      tierRequired: 0,
+      timestamp: new Date().toISOString()
+    });
+  });
+  window.SovereignBus?.on?.("whispererSmartSignal", (data) => {
+    console.log("🧠 [SmartSignal] Processing routed whisperer signal:", data);
+  
+    const liveOutput = document.getElementById("whispererConsoleOutput");
+    if (!liveOutput) return;
+  
+    // Classify signal if needed
+    const type = classifyLogEntry(data);
+    const module = data?.module || "Unknown Module";
+    const status = data?.status || "No status provided";
+    const urgency = data?.urgency || "normal";
+    const timestamp = new Date().toLocaleTimeString();
+  
+    // Construct smart log line
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "smart-signal", `log-${type}`);
+    div.textContent = `🔍 [${timestamp}] ${module}: ${status}`;
+  
+    // Add urgency styles
+    if (urgency === "high") {
+      div.style.border = "2px solid #ff4d4f";
+      div.style.color = "#ff4d4f";
+    } else if (urgency === "low") {
+      div.style.opacity = "0.6";
+    } else {
+      div.style.borderLeft = "4px solid #7af";
+    }
+  
+    // Memory record with echo protocol
+    WhispererMemory.record({
+      module,
+      status,
+      type,
+      urgency,
+      timestamp: new Date().toISOString(),
+      tierRequired: data?.tierRequired || 0
+    });
+  
+    if (liveOutput.children.length > 250) {
+      liveOutput.removeChild(liveOutput.firstChild);
+    }
+    liveOutput.appendChild(div);
+    liveOutput.scrollTop = liveOutput.scrollHeight;
+  });
+
+  // === 🌀 Phase 21: Contextual Echo Threading + Auto-Focus Enhancer ===
+  const whispererInput = document.getElementById("whispererInput");
+  const whispererDisplay = document.getElementById("whispererDisplay");
+
+  if (whispererInput) {
+    whispererInput.addEventListener("focus", () => {
+      whispererDisplay?.classList.add("active-thread");
+    });
+
+    whispererInput.addEventListener("blur", () => {
+      whispererDisplay?.classList.remove("active-thread");
+    });
+
+    whispererInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && whispererInput.value.trim()) {
+        const msg = whispererInput.value.trim();
+        whispererInput.value = "";
+
+        if (whispererDisplay) {
+          const threadEntry = document.createElement("div");
+          threadEntry.textContent = `[${new Date().toLocaleTimeString()}] [OPERATOR]: ${msg}`;
+          threadEntry.classList.add("log-entry", "threaded");
+          whispererDisplay.appendChild(threadEntry);
+          whispererDisplay.scrollTop = whispererDisplay.scrollHeight;
+        }
+
+        WhispererMemory.record(`Operator Input → ${msg}`);
+
+        // === 🌌 Lore Tag Echoes + Memory Flag Detection ===
+        if (msg.includes("::lore")) {
+          const loreEcho = document.createElement("div");
+          loreEcho.classList.add("log-entry", "lore-echo");
+          loreEcho.textContent = `📖 Lore Memory Triggered → ${msg.replace("::lore", "").trim()}`;
+          if (whispererConsoleOutput) {
+            whispererConsoleOutput.appendChild(loreEcho);
+            whispererConsoleOutput.scrollTop = whispererConsoleOutput.scrollHeight;
+          }
+          WhispererMemory.flag?.("lore", msg);
+        }
+
+        if (msg.includes("::flag")) {
+          const flagEcho = document.createElement("div");
+          flagEcho.classList.add("log-entry", "flag-echo");
+          flagEcho.textContent = `🚩 Flagged Memory → ${msg.replace("::flag", "").trim()}`;
+          if (whispererConsoleOutput) {
+            whispererConsoleOutput.appendChild(flagEcho);
+            whispererConsoleOutput.scrollTop = whispererConsoleOutput.scrollHeight;
+          }
+          WhispererMemory.flag?.("flag", msg);
+        }
+      }
+    });
+  }
 
   // === Failsafe Injection for whispererConsoleOutput ===
   // (Removed duplicate fallback block)
@@ -691,3 +843,34 @@ window.triggerWhispererDiagnostic = function () {
 // document.addEventListener("DOMContentLoaded", () => {
 //   window.SovereignBus?.on?.("whispererVitals", renderWhispererVitals);
 // });
+// === Style injection for .lore-echo and .flag-echo ===
+document.addEventListener("DOMContentLoaded", () => {
+  // Only inject once
+  if (!document.getElementById("whisperer-lore-flag-style")) {
+    const style = document.createElement("style");
+    style.id = "whisperer-lore-flag-style";
+    style.textContent = `
+      .lore-echo {
+        background: linear-gradient(90deg, #2b2942 0%, #1d1d2c 100%);
+        color: #ffd6a0 !important;
+        border-left: 4px solid #ffb347;
+        font-style: italic;
+        margin: 4px 0;
+        padding: 6px 12px;
+        border-radius: 6px;
+        box-shadow: 0 0 4px #ffb34744;
+      }
+      .flag-echo {
+        background: linear-gradient(90deg, #3a2222 0%, #261818 100%);
+        color: #ffbdbd !important;
+        border-left: 4px solid #ff4d4f;
+        font-weight: bold;
+        margin: 4px 0;
+        padding: 6px 12px;
+        border-radius: 6px;
+        box-shadow: 0 0 4px #ff4d4f44;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+});

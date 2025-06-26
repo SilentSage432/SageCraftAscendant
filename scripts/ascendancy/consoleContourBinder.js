@@ -2,7 +2,7 @@
 // Phase 350.4 — Console Contour Syncing
 // Description: Links panel outlines to magnetic grid contours for visual alignment
 
-export function bindConsoleContours() {
+/* export function bindConsoleContours() {
   const panels = document.querySelectorAll('.console-panel');
 
   panels.forEach(panel => {
@@ -19,7 +19,7 @@ export function bindConsoleContours() {
       if (contour) updateContourPosition(panel, contour);
     });
   });
-}
+} */
 
 function updateContourPosition(panel, contour) {
   const rect = panel.getBoundingClientRect();
@@ -33,7 +33,7 @@ function updateContourPosition(panel, contour) {
   contour.style.zIndex = '1';
 }
 
-// Auto-init if needed
+/* // Auto-init if needed
 document.addEventListener('DOMContentLoaded', () => {
   bindConsoleContours();
-});
+}); */

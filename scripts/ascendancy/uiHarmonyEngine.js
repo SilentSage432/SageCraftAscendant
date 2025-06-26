@@ -305,34 +305,6 @@ function visualizeDockGridAllocation() {
 
 document.addEventListener("DOMContentLoaded", visualizeDockGridAllocation);
 
-// 🧬 Phase 345.3 — Console Panel Label Reinforcer
-function reinforcePanelLabels() {
-  const panelGroup = document.getElementById("consolePanelGroup");
-  if (!panelGroup) return;
-
-  panelGroup.querySelectorAll(".console-panel").forEach(panel => {
-    if (!panel.querySelector(".panel-label")) {
-      const label = document.createElement("div");
-      label.className = "panel-label";
-      label.textContent = panel.id;
-      label.style.position = "absolute";
-      label.style.top = "2px";
-      label.style.left = "2px";
-      label.style.fontSize = "10px";
-      label.style.background = "rgba(0,0,0,0.5)";
-      label.style.color = "#fff";
-      label.style.padding = "2px 4px";
-      label.style.borderRadius = "3px";
-      label.style.zIndex = "999";
-      panel.style.position = "relative";
-      panel.appendChild(label);
-
-      console.log(`🏷️ Label Reinforced: ${panel.id}`);
-    }
-  });
-}
-
-document.addEventListener("DOMContentLoaded", reinforcePanelLabels);
 
 // 🧬 Phase 345.4 — Console Grid Conflict Detector
 function detectGridConflicts() {
@@ -379,6 +351,7 @@ function focusPrimaryConsole() {
 document.addEventListener("DOMContentLoaded", focusPrimaryConsole);
 
 // 🧬 Phase 345.6 — Ancestral Echo Detector & Isolation Sweep
+/*
 function isolateLegacyEchoes() {
   const panelGroup = document.getElementById("consolePanelGroup");
   if (!panelGroup) return;
@@ -402,19 +375,16 @@ function isolateLegacyEchoes() {
   console.log("🧬 Legacy Echo Isolation Sweep Complete.");
 }
 
-document.addEventListener("DOMContentLoaded", isolateLegacyEchoes);
+// document.addEventListener("DOMContentLoaded", isolateLegacyEchoes);
+*/
 // 🧬 Phase 345.7 — Console Panel Classification Indexer
 function classifyConsolePanels() {
   const panelGroup = document.getElementById("consolePanelGroup");
   if (!panelGroup) return;
 
   panelGroup.querySelectorAll(".console-panel").forEach(panel => {
-    if (panel.dataset.legacy === "true") {
-      panel.classList.add("classified-legacy");
-    } else {
-      panel.classList.add("classified-core");
-    }
-    console.log(`🗂️ Panel Classified: ${panel.id} → ${panel.classList.contains("classified-legacy") ? "Legacy" : "Core"}`);
+    panel.classList.add("classified-core");
+    console.log(`🗂️ Panel Classified: ${panel.id} → Core`);
   });
 }
 

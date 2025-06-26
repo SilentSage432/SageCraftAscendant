@@ -2,7 +2,8 @@ export function bindConsoleToGrid(consoleElement, gridRegionId) {
   const gridRegion = document.getElementById(gridRegionId);
   if (!gridRegion || !consoleElement) return;
 
-  gridRegion.appendChild(consoleElement);
+  const target = document.getElementById("consolePanelGroup") || gridRegion;
+  target.appendChild(consoleElement);
   consoleElement.setAttribute("data-grid-region", gridRegionId);
 }
 

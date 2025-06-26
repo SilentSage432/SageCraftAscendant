@@ -1,0 +1,82 @@
+<!-- 🛠 Dev Console Toggle -->
+<div id="devConsoleToggle" onclick="toggleDevConsole()" style="
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  z-index: 9999;
+  background: #222;
+  color: #00ffff;
+  padding: 6px 12px;
+  font-family: monospace;
+  border: 1px solid #00ffff;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00ffff;
+">
+  🛠 Dev Console
+</div>
+
+<!-- 🧪 Dev Console Panel -->
+<div id="devConsolePanel" class="holo-console default-state" style="
+  display: none;
+  position: fixed;
+  bottom: 175px;
+  left: 20px;
+  z-index: 9998;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid #00ffff;
+  padding: 12px;
+  border-radius: 8px;
+  width: 320px;
+  max-width: 90vw;
+  font-family: monospace;
+  color: #0ff;
+">
+  <label for="devDirectiveInput">Directive JSON:</label>
+  <select id="directivePresetSelect" onchange="loadDirectivePreset()" style="margin-bottom: 6px; width: 100%;">
+    <option value="">🔽 Load Saved Directive...</option>
+    <option value="dockManager.reinitialize">🌀 dockManager → reinitialize()</option>
+    <option value="meshVitals.sync">⚙️ meshVitals → sync()</option>
+    <option value="utilityHub.flushCache">♻️ utilityHub → flushCache()</option>
+  </select>
+  <div style="margin-bottom: 6px;">
+    <button onclick="saveCurrentDirectiveAsPreset()" style="margin-right: 6px;">💾 Save as Preset</button>
+    <button onclick="deleteSelectedPreset()">🗑️ Delete Preset</button>
+  </div>
+  <textarea id="devDirectiveInput" style="width: 100%; height: 80px; margin-top: 6px;"></textarea>
+  <button onclick="dispatchDevDirective()" style="
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: #00ffff;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  ">🚀 Dispatch</button>
+  <pre id="devConsoleLog" style="margin-top:10px; max-height:150px; overflow:auto; font-size:0.85em; background:#111; color:#0ff; padding:8px; border-radius:6px;"></pre>
+  <pre id="feedbackConsole" style="
+    margin-top: 6px;
+    height: 150px;
+    overflow-y: auto;
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 0.85em;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #0f0;
+  "></pre>
+</div>
+
+<script>
+  function toggleDevConsole() {
+    const panel = document.getElementById("devConsolePanel");
+    if (panel) {
+      panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updatePresetDropdown?.();
+  });
+</script>

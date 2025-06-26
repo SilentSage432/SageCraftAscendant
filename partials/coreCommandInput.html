@@ -1,0 +1,20 @@
+<div id="coreCommandInputConsole" class="holo-console-panel snapping orbit-bound" data-role="command" data-grid-area="core-zone" data-snapped="true">
+  <div class="console-header">
+    <h3>Core Command Input</h3>
+    <button onclick="closeConsole(this)">✖</button>
+  </div>
+  <div class="console-body">
+    <input type="text" id="coreCommandInputField" placeholder="Enter command..." style="width: 100%; padding: 10px; font-size: 1rem; border-radius: 6px; background: #111; color: #0f0; border: 1px solid #0f0;" />
+    <button onclick="submitCoreCommand()" style="margin-top: 10px; padding: 8px 16px; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 4px;">Execute</button>
+  </div>
+</div>
+<script>
+  function submitCoreCommand() {
+    const input = document.getElementById('coreCommandInputField');
+    const command = input.value.trim();
+    if (command) {
+      console.log(`🧠 Core Command Executed: ${command}`);
+      input.value = '';
+    }
+  }
+</script>

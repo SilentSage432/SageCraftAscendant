@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SageCraft Ascendant — Sovereign Codex</title>
   <!-- <link rel="stylesheet" href="scripts/styles/sagecraftascendant.css?v=1.0.0"> -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon/icon-192.png" type="image/png" />
   <!-- <meta name="theme-color" content="#1e1e2f" /> -->
   <!-- iOS PWA Splash and Icon Support -->
   <meta name="mobile-web-app-capable" content="yes" />
@@ -99,6 +97,8 @@
 
 <!-- Overrides and resets -->
 <link rel="stylesheet" href="styles/liquidGlassReset.css">
+<link rel="stylesheet" href="styles/sovereignUILayout.css">
+<link rel="stylesheet" href="styles/uiGridLayout.css">
 <!-- <link rel="stylesheet" href="scripts/styles/debugclarity.css"> -->
   <link rel="stylesheet" href="styles/uiGridRestoration.css" />
 </head>
@@ -150,95 +150,58 @@
          data-status="active"
          data-grid-visual="active"
          data-legacy="true">
-      <!-- Sovereign panels will anchor here -->
-      <div class="panel-label">sovereignGrid</div>
-      <div class="console-contour"></div>
+         <div id="sovereignToolbarMount"></div>
+      <!-- 🌀 Whisperer Terminal Interface (restored) -->
+      <div id="whispererPanel" class="nexus-core holo-console-panel" data-role="whisperer" data-zone="center-stage">
+        <div id="whispererDisplay" class="terminal-output">🌌 Welcome, Operator.</div>
+        <input id="whispererInput" type="text" placeholder="Speak to the system..." autocomplete="off" />
+      </div>
+      <!-- Other dynamically rendered panels will follow here -->
     </div>
-    <div id="sovereignGridSystem" class="staging-zone"></div>
-      <div id="orbitBarZone"></div>
-
-      <div class="grid-row" id="primaryConsoleRow">
-        <div class="grid-panel" id="countConsolePanel"></div>
-        <div class="grid-panel" id="deltaAnalyzerPanel"></div>
-        <div class="grid-panel" id="reportingHubPanel"></div>
+    <!-- Responsive Title Wrapper -->
+    <div id="sovereignMainWrapper">
+      <div id="sovereignTitle" class="system-title">
+        <h1>SageCraft Ascendant</h1>
+        <h2>Sovereign Codex</h2>
       </div>
-
-      <div class="grid-row" id="secondaryConsoleRow">
-        <div class="grid-panel" id="sessionManagerPanel"></div>
-        <div class="grid-panel" id="utilityHubPanel"></div>
-        <div class="grid-panel" id="sovereignTerminalPanel"></div>
+    
+      <section id="sovereignTerminal" class="holo-console dock-panel holo-console-panel">
+        <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+        <header class="console-header">💻 Sovereign Terminal</header>
+        <div class="console-body">
+          <div class="panel-content">
+            <p>Awaiting command input...</p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- ✅ Sovereign Dock Panel Grid -->
+    <div id="dockGrid" class="sovereign-dock-grid"></div>
+    <div id="orbitBarZone"></div>
+    <!-- 🪐 Orbit Buttons Dock -->
+    <div id="orbitalDockContainer" class="orbit-button-dock"></div>
+    <!-- Responsive Terminal Wrapper -->
+    <div class="responsive-terminal-container">
+      <div id="centralTerminalConsole" class="holo-console">
+        <!-- terminal contents -->
       </div>
+    </div>
+    <!-- Removed legacy grid-panel static scaffolding -->
+    <div id="footerStatusZone"></div>
 
-      <div id="footerStatusZone"></div>
-
-      <!-- 🌌 Forecast Intelligence Console -->
-      <div id="forecastConsole" class="dock-panel holo-console-panel hidden" data-role="observer" data-grid-area="staging-zone">
-        <!-- Content dynamically injected by renderForecastConsole() -->
-      </div>
-      <div id="orbitalDockContainer" class="holo-console-panel"></div>
-      <div id="dockGrid" class="dock-grid hidden holo-console-panel">
-        <div class="dock-panel-group">
-          <div id="countConsole" class="holo-console dock-panel holo-console-panel hidden" data-permalock>
-            <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
-              📊 Count Console
-            </div>
-            <div class="console-body">
-              <div class="console-section">
-                <p><strong>Metrics:</strong> System count initialized.</p>
-                <ul class="log-list">
-                  <li class="faint">🧮 Awaiting data stream...</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="deltaAnalyzerConsole" class="dock-panel holo-console-panel">
-            <!-- Panel content for Delta Analyzer Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="reportingHubConsole" class="dock-panel holo-console-panel">
-            <!-- Panel content for Reporting Hub Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="sessionManagerConsole" class="dock-panel holo-console-panel">
-            <!-- Panel content for Session Manager Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="utilityHubConsole" class="dock-panel holo-console-panel">
-            <!-- Panel content for Utility Hub Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="oracleConsole" class="dock-panel holo-console-panel" data-role="oracle" data-grid-area="staging-zone">
-            <!-- Panel content for Oracle Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="whispererConsole" class="dock-panel holo-console-panel" data-role="whisperer" data-grid-area="staging-zone">
-            <!-- Panel content for Whisperer Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="sageFeedConsole" class="dock-panel holo-console-panel">
-            <!-- Panel content for Sage Feed Console goes here -->
-          </div>
-        </div>
-        <div class="dock-panel-group">
-          <div id="grimoireConsole" class="dock-panel holo-console-panel" data-role="grimoire" data-grid-area="staging-zone">
-            <!-- Panel content for Grimoire Console goes here -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Forecast Console Section -->
-      <div id="forecastConsoleSection"></div>
-
-      <!-- Lore Engine Section -->
-      <div id="loreEngineSection"></div>
+    <!-- Modular Console Injections -->
+    <div id="consoleMounts">
+      <!-- Panels injected via JavaScript or server-side include -->
+      <!-- Whisperer Console -->
+      <div id="whispererConsoleMount"></div>
+      <!-- Neural Pulse -->
+      <div id="neuralPulsePanelMount"></div>
+      <!-- Echo Archive -->
+      <div id="echoArchiveConsoleMount"></div>
+      <!-- Core Command -->
+      <div id="coreCommandConsoleMount"></div>
+      <!-- Signal Forecast -->
+      <div id="signalForecastConsoleMount"></div>
     </div>
 </script>
 </script>
@@ -272,519 +235,22 @@
   <script type="module" src="scripts/ascendancy/legacyEchoRecovery.js"></script>
   <script type="module" src="scripts/ascendancy/legacyEchoRehousing.js"></script>
   <script type="module" src="scripts/ascendancy/consoleRelayBinder.js"></script>
-<!-- 🧠 Neural Command Bridge Toggle Button -->
-<div id="neuralBridgeToggle" onclick="toggleNeuralCommandBridge()" style="
-  position: fixed;
-  bottom: 120px;
-  left: 20px;
-  z-index: 10000;
-  background: #111;
-  color: #0ff;
-  padding: 6px 10px;
-  font-family: monospace;
-  border: 1px solid #0ff;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 0 8px #0ff;
-">
-  ⚙ Command Bridge
-</div>
-<!-- 🛠 Dev Console Toggle -->
-<div id="devConsoleToggle" onclick="toggleDevConsole()" style="
-  position: fixed;
-  bottom: 80px;
-  left: 20px;
-  z-index: 9999;
-  background: #222;
-  color: #00ffff;
-  padding: 6px 12px;
-  font-family: monospace;
-  border: 1px solid #00ffff;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 0 8px #00ffff;
-">
-  🛠 Dev Console
-</div>
-
-  <!-- 🧬 Agent Lifecycle Toggle -->
-<div id="lifecycleToggle" onclick="toggleLifecyclePanel()" style="position: fixed; bottom: 100px; right: 20px; font-size: 20px; cursor: pointer; color: #0ff; z-index: 10000;" title="Toggle Agent Lifecycle Panel">
-  🧬
-</div>
-
-  <!-- 🔮 Sigil Forge Toggle Button -->
-  <div id="sigilToggle" onclick="toggleSigilForge()" style="position: fixed; top: 160px; right: 20px; font-size: 22px; cursor: pointer; z-index: 10000;" title="Open Sigil Forge Panel">
-    🧙‍♂️
-  </div>
-
-  <!-- 🧬 Sigil Forge Panel -->
-  <div id="sigilForgePanel" class="holo-console-panel" data-role="sigil-forge" data-grid-area="staging-zone" style="display:none; position: fixed; top: 60px; right: 20px; width: 280px; background: rgba(0,0,0,0.9); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
-    <div id="sigilEditorContainer" style="margin-top: 20px; padding: 10px; border-top: 1px solid #555;">
-      <h3>Edit Sigil</h3>
-      <form id="sigilEditForm" onsubmit="event.preventDefault(); submitSigilEdit();">
-        <label for="editSigilName">Name:</label><br>
-        <input type="text" id="editSigilName" name="editSigilName" style="width: 100%; margin-bottom: 8px;"><br>
-
-        <label for="editSigilType">Type:</label><br>
-        <input type="text" id="editSigilType" name="editSigilType" style="width: 100%; margin-bottom: 8px;"><br>
-
-        <label for="editSigilElement">Element:</label><br>
-        <input type="text" id="editSigilElement" name="editSigilElement" style="width: 100%; margin-bottom: 8px;"><br>
-
-        <label for="editSigilGlyph">Glyph Code:</label><br>
-        <input type="text" id="editSigilGlyph" name="editSigilGlyph" style="width: 100%; margin-bottom: 8px;"><br>
-
-        <button type="submit" style="margin-top: 10px;">Save Changes</button>
-      </form>
-    </div>
-    <h3 style="margin-top: 0;">🧬 Sigil Forge</h3>
-    <div id="sigilContent">
-      <p>Select an archetype and forge a glyph.</p>
-      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-        <button onclick="promptExportByType()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">📤 Export by Type</button>
-        <button onclick="promptExportByElement()" style="flex: 1; font-size: 0.8em; padding: 6px; background: #2a003f; color: #fff; border: 1px solid #8844ff; border-radius: 4px;">🌌 Export by Element</button>
-      </div>
-      <button onclick="forgeSigil()">Forge New Sigil</button>
-    </div>
-    <!-- 🗃️ Sigil Archive Search & Scroll Container -->
-    <div style="margin-bottom: 10px;">
-      <input
-        id="sigilSearchInput"
-        type="text"
-        placeholder="🔍 Search Sigils..."
-        oninput="filterSigilArchive()"
-        style="width: 100%; padding: 6px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc;"
-      />
-    </div>
-    <div id="sigilArchiveScroll" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #888; background: rgba(255, 255, 255, 0.05); margin-top: 10px; border-radius: 5px; font-size: 14px;">
-      <!-- Sigil Archive will render here -->
-    </div>
-    <!-- 🔧 Sigil Edit Panel -->
-    <div id="sigilEditPanel" style="margin-top: 20px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.5); color: #fff; display: none;">
-      <h3>Edit Sigil</h3>
-      <label for="editSigilName-2">Name:</label><br>
-      <input type="text" id="editSigilName-2" style="width: 100%; margin-bottom: 10px;"><br>
-
-      <label for="editSigilType-2">Type:</label><br>
-      <input type="text" id="editSigilType-2" style="width: 100%; margin-bottom: 10px;"><br>
-
-      <label for="editSigilElement-2">Element:</label><br>
-      <input type="text" id="editSigilElement-2" style="width: 100%; margin-bottom: 10px;"><br>
-
-      <label for="editSigilGlyph-2">Glyph Code:</label><br>
-      <input type="text" id="editSigilGlyph-2" style="width: 100%; margin-bottom: 12px;"><br>
-
-      <button onclick="submitSigilEdit()" style="padding: 8px 16px; background: #4af; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Submit Edit</button>
-    </div>
-  </div>
-</div>
-<script>
-  // Sigil Forge Toggle
-  function toggleSigilForge() {
-    const panel = document.getElementById("sigilForgePanel");
-    if (panel) {
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-    }
-  }
-</script>
-<script>
-  function toggleLifecyclePanel() {
-    const panel = document.getElementById("agentLifecyclePanel");
-    if (!panel) return;
-    panel.style.display = panel.style.display === "none" ? "block" : "none";
-  }
-</script>
-
-<!-- 🧪 Dev Console Panel -->
-  <div id="devConsolePanel" style="
-  display: none;
-  position: fixed;
-  bottom: 175px;
-  left: 20px;
-  z-index: 9998;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid #00ffff;
-  padding: 12px;
-  border-radius: 8px;
-  width: 320px;
-  max-width: 90vw;
-  font-family: monospace;
-  color: #0ff;
-">
-  <label for="devDirectiveInput">Directive JSON:</label>
-  <select id="directivePresetSelect" onchange="loadDirectivePreset()" style="margin-bottom: 6px; width: 100%;">
-    <option value="">🔽 Load Saved Directive...</option>
-    <option value="dockManager.reinitialize">🌀 dockManager → reinitialize()</option>
-    <option value="meshVitals.sync">⚙️ meshVitals → sync()</option>
-    <option value="utilityHub.flushCache">♻️ utilityHub → flushCache()</option>
-  </select>
-  <div style="margin-bottom: 6px;">
-    <button onclick="saveCurrentDirectiveAsPreset()" style="margin-right: 6px;">💾 Save as Preset</button>
-    <button onclick="deleteSelectedPreset()">🗑️ Delete Preset</button>
-  </div>
-  <textarea id="devDirectiveInput" style="width: 100%; height: 80px; margin-top: 6px;"></textarea>
-  <button onclick="dispatchDevDirective()" style="
-    margin-top: 10px;
-    padding: 6px 10px;
-    background: #00ffff;
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  ">🚀 Dispatch</button>
-</pre>
-  <pre id="devConsoleLog" style="margin-top:10px; max-height:150px; overflow:auto; font-size:0.85em; background:#111; color:#0ff; padding:8px; border-radius:6px;"></pre>
-  <pre id="feedbackConsole" style="
-    margin-top: 6px;
-    height: 150px;
-    overflow-y: auto;
-    background: #000;
-    color: #0f0;
-    font-family: monospace;
-    font-size: 0.85em;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #0f0;
-  "></pre>
-</pre>
-</div>
-  <!-- 🫀 Agent Lifeline Monitor Panel -->
-  <div id="agentLifelinePanel" style="
-    margin-top: 10px;
-    border: 1px solid #888;
-    padding: 8px;
-    border-radius: 5px;
-    background: #1b1b1b;
-    color: #9cf;
-    font-family: monospace;
-    font-size: 0.8em;
-  ">
-    <b>🫀 Agent Lifeline Monitor</b>
-    <ul id="agentLifelineList" style="margin-top: 6px; padding-left: 16px;"></ul>
-    <button onclick="refreshAgentLifeline()" style="
-      margin-top: 6px;
-      background: #222;
-      color: #9cf;
-      border: 1px solid #555;
-      padding: 4px 8px;
-      font-size: 0.75em;
-      cursor: pointer;
-      border-radius: 4px;
-    ">
-      🔁 Refresh Lifeline
-    </button>
-  </div>
-  <!-- 🧬 Agent Lifecycle Registry Panel -->
-  <div id="agentLifecyclePanel" style="display:none; position: fixed; bottom: 160px; right: 20px; width: 260px; background: rgba(0,0,0,0.85); color: white; padding: 12px; border-radius: 8px; font-family: monospace; z-index: 9999;">
-    <h3 style="margin-top: 0;">📋 Agent Lifecycle</h3>
-    <ul id="lifecycleList" style="list-style: none; padding-left: 0; margin: 0;"></ul>
-  </div>
-
-  <!-- 🧠 Session Manager Console -->
-  <div id="sessionManagerConsole" class="holo-console-panel" data-role="session-manager" data-zone="core-grid">
-    <div class="console-title">Session Manager</div>
-    <div class="session-body">
-      <div><strong>Status:</strong> Active</div>
-      <div><strong>Uptime:</strong> 00:00:00</div>
-      <div><strong>Last Sync:</strong> —</div>
-    </div>
-  </div>
-
-  <!-- 🧬 Memory Kernel Panel -->
-  <div id="memoryKernelPanel" class="holo-console-panel hidden" data-role="memory-kernel" data-zone="right-dock">
-    <div class="console-title">Memory Kernel</div>
-    <div class="memory-body">
-      <p><em>Core directives and echo fragments will be displayed here.</em></p>
-      <ul class="memory-list">
-        <!-- Dynamic entries will populate here -->
-      </ul>
-    </div>
-  </div>
-
-  <!-- 🧭 Operator Status Panel -->
-  <div id="operatorStatusPanel" class="operator-fixed holo-console-panel" data-role="status-monitor" data-zone="bottom-left">
-    <div class="status-content">🟢 All systems nominal</div>
-  </div>
-
-  <!-- 🔮 Oracle Console -->
-  <div id="oracleConsole" class="holo-console-panel hidden" data-role="oracle" data-zone="lore-core">
-    <div class="console-title">The Silent Sage</div>
-    <div class="oracle-body">
-      <p><em>"Speak, and the echoes shall respond."</em></p>
-      <div class="oracle-response"></div>
-    </div>
-  </div>
-
-</div>
-<!-- 📖 Sanctum Lore Archive Panel -->
-</div>
-</ul>
-  <div id="anomalySanctumPanel" class="holo-console-panel" data-role="anomaly-sanctum" data-grid-area="staging-zone" style="
-  position: fixed;
-  top: 90px;
-  left: 10px;
-  width: 340px;
-  max-height: 420px;
-  overflow-y: auto;
-  background: radial-gradient(ellipse at center, #1a1a1a 0%, #000000 100%);
-  color: #e2e2e2;
-  border: 2px solid #552288;
-  border-radius: 8px;
-  padding: 14px;
-  font-family: 'EB Garamond', 'Georgia', serif;
-  font-size: 0.9em;
-  display: none;
-  z-index: 9999;
-  box-shadow: 0 0 20px rgba(136, 85, 255, 0.3);
-  backdrop-filter: blur(2px);
-  transition: transform 0.4s ease;
-  transform-origin: left center;
-">
-  <h3 style="margin-top: 0; color: #9ff;">🕯️ Anomaly Sanctum</h3>
-  <!-- Glyph Legend Toggle Block -->
-  <div id="glyphLegendToggle" style="margin-bottom: 8px;">
-    <button onclick="toggleGlyphLegend()" style="
-      font-size: 0.75em;
-      background: #111;
-      color: #ccf;
-      border: 1px solid #444;
-      padding: 4px 6px;
-      cursor: pointer;
-    ">📖 Show Glyph Legend</button>
-    <div id="glyphLegend" style="display: none; font-size: 0.8em; margin-top: 6px; color: #aaa; line-height: 1.5;">
-      ⚙️ <b>System</b> — Sovereign subsystems and internal signals<br>
-      👁️ <b>Ghost</b> — Phantom agents or anomalies<br>
-      💾 <b>Echo</b> — Archived drift agents or memory entries<br>
-      🧿 <b>Unknown</b> — Unclassified or flagged disturbances
-    </div>
-    <div style="margin-top: 10px;">
-      <label style="font-size: 0.75em; color: #ccc;">🔍 Filter by Type:</label>
-      <select id="anomalyFilterSelect" onchange="renderAnomalySanctum()" style="font-size: 0.8em; margin-left: 6px;">
-        <option value="">All</option>
-        <option value="⚙️">System</option>
-        <option value="👁️">Ghost</option>
-        <option value="💾">Echo</option>
-        <option value="🧿">Unknown</option>
-      </select>
-    </div>
-  </div>
-  <!-- End Glyph Legend Toggle Block -->
-  <ul id="anomalyList"></ul>
-  <hr />
-  <h4>🛡️ Warden Audit Log</h4>
-  <pre id="wardenLog" style="font-size: 0.85em; background: #111; padding: 8px; border-radius: 6px; max-height: 150px; overflow-y: auto;"></pre>
-  <div style="margin-top: 10px;">
-    <input id="anomalyInjectInput" placeholder="Enter anomaly key (e.g., GHOST-DELTA01)" style="
-      font-size: 0.8em;
-      width: 220px;
-      padding: 4px;
-      background: #111;
-      color: #9cf;
-      border: 1px solid #444;
-    ">
-    <button onclick="injectAnomaly()" style="
-      font-size: 0.8em;
-      background: #221144;
-      color: #cff;
-      border: 1px solid #446;
-      padding: 4px 10px;
-      margin-left: 4px;
-      cursor: pointer;
-    ">🧪 Inject</button>
-  </div>
-  <div style="margin-top: 12px;">
-    <button onclick="exportAnomalyLog()" style="
-      font-size: 0.8em;
-      background: #112;
-      color: #9cf;
-      border: 1px solid #335;
-      padding: 4px 10px;
-      cursor: pointer;
-    ">📤 Export Anomaly Log (.json)</button>
-  </div>
-  <div style="margin-top: 8px;">
-    <input type="file" id="anomalyImportFile" accept=".json" style="font-size: 0.75em; margin-right: 6px;" />
-    <button onclick="importAnomalyLog()" style="
-      font-size: 0.8em;
-      background: #112;
-      color: #9cf;
-      border: 1px solid #335;
-      padding: 4px 10px;
-      cursor: pointer;
-    ">📥 Import Anomaly Archive</button>
-  </div>
-  <button onclick="exportAnomalyCodex()" style="
-    margin-top: 12px;
-    padding: 6px 10px;
-    font-size: 0.75em;
-    background: #222;
-    color: #9ff;
-    border: 1px solid #444;
-    cursor: pointer;
-  ">📦 Export Memory Codex</button>
-  <label style="display:block; margin-top:10px; font-size:0.75em; color:#aaa;">
-    📥 Import Lore Codex:
-    <input type="file" onchange="importAnomalyCodex(this.files[0])" accept=".json" style="margin-top:4px;">
-  </label>
-</div>
-<script>
-  // Inject Anomaly utility for Anomaly Sanctum
-  function injectAnomaly() {
-    const input = document.getElementById("anomalyInjectInput");
-    const key = input?.value?.trim();
-    if (!key) return alert("⚠️ Enter an anomaly key first.");
-
-    anomalyLog.unshift({
-      key,
-      timestamp: Date.now()
-    });
-
-    renderAnomalySanctum();
-    alert(`🧬 Injected anomaly: ${key}`);
-    input.value = "";
-  }
-</script>
-<script>
-// Glyph Legend Toggle for Anomaly Sanctum
-function toggleGlyphLegend() {
-  const legend = document.getElementById("glyphLegend");
-  const toggleBtn = document.querySelector("#glyphLegendToggle button");
-  const isVisible = legend.style.display === "block";
-  legend.style.display = isVisible ? "none" : "block";
-  toggleBtn.textContent = isVisible ? "📖 Show Glyph Legend" : "📕 Hide Glyph Legend";
-}
 </script>
 </div>
 
-<div id="neuralCommandBridge" class="holo-console-panel" data-role="neural-bridge" data-grid-area="staging-zone" style="position:fixed; bottom:0; left:0; width:100%; background:black; color:#00ffcc; z-index:9999; padding:12px; font-family:monospace; border-top: 2px solid #00ffcc; display:none;">
-  <h3 style="margin-top:0;">🧠 Neural Command Bridge Online</h3>
-  
-  <div style="display:flex; flex-wrap:wrap; gap:12px;">
-    <button onclick="NeuralAuditSentinel.auditWiring()">✅ Audit Integrity Scan</button>
-    <button onclick="SelfHealingEngine.run()">♻ Self-Healing Engine</button>
-    <button onclick="toggleCortexLoop()">🧠 Cortex Loop Control</button>
-    <button onclick="injectOrbit()">🛰 Orbit Injection Utility</button>
-    <button onclick="adjustGovernance()">⚙ Governance Thresholds</button>
-  </div>
+    <!--#include virtual="partials/agentLifecycle.html" -->
 
-  <div id="commandBridgeOutput" style="margin-top:10px; color:#ccc; font-size:0.9em;"></div>
-</div>
-  <!-- 🌌 Forecast Intelligence Console -->
-  <div id="forecastConsole" class="dock-panel holo-console-panel hidden">
-    <!-- Content dynamically injected by renderForecastConsole() -->
-  </div>
-  <div id="orbitalDockContainer" class="holo-console-panel"></div>
-  <div id="dockGrid" class="dock-grid hidden holo-console-panel">
-    <div class="dock-panel-group">
-      <div id="countConsole" class="holo-console dock-panel holo-console-panel hidden" data-permalock>
-        <div class="console-header" onclick="this.parentElement.classList.toggle('collapsed')">
-          📊 Count Console
-        </div>
-        <div class="console-body">
-          <div class="console-section">
-            <p><strong>Metrics:</strong> System count initialized.</p>
-            <ul class="log-list">
-              <li class="faint">🧮 Awaiting data stream...</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="deltaAnalyzerConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Delta Analyzer Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="reportingHubConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Reporting Hub Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="sessionManagerConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Session Manager Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="utilityHubConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Utility Hub Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="oracleConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Oracle Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="whispererConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Whisperer Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="sageFeedConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Sage Feed Console goes here -->
-      </div>
-    </div>
-    <div class="dock-panel-group">
-      <div id="grimoireConsole" class="dock-panel holo-console-panel">
-        <!-- Panel content for Grimoire Console goes here -->
-      </div>
-    </div>
-  </div>
+    <!--#include virtual="partials/coreCommandInput.html" -->
 
-  <!-- Forecast Console Section -->
-  <div id="forecastConsoleSection"></div>
+    <!--#include virtual="partials/echoArchivePanel.html" -->
 
-  <!-- Lore Engine Section -->
-  <div id="loreEngineSection"></div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const orbitButtons = document.querySelectorAll('.orbit-btn');
-      const allPanels = document.querySelectorAll('.holo-console');
+    <!--#include virtual="partials/neuralPulsePanel.html" -->
 
-      orbitButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const targetId = button.getAttribute('data-target');
-          const panel = document.getElementById(targetId);
+    <!--#include virtual="partials/signalForecastConsole.html" -->
 
-          // Hide all panels
-          allPanels.forEach(p => {
-            p.classList.add('hidden');
-            p.setAttribute('aria-hidden', 'true');
-          });
-
-          if (panel) {
-            panel.classList.remove('hidden');
-            panel.setAttribute('aria-hidden', 'false');
-            panel.style.display = 'block';
-            panel.style.visibility = 'visible';
-            panel.style.opacity = '1';
-            panel.style.zIndex = '10';
-            console.log(`✅ Activated panel: ${targetId}`);
-          } else {
-            console.warn(`⚠️ Could not find panel with ID: ${targetId}`);
-          }
-        });
-      });
-
-      console.log(`🧠 Orbit Panel System initialized with ${orbitButtons.length} buttons.`);
-    });
-  </script>
-  <script>
-    const panelIDs = [
-      "countConsole", "deltaAnalyzerConsole", "reportingHubConsole", "sessionManagerConsole",
-      "utilityHubConsole", "sovereignTerminal", "sageFeedConsole", "whispererConsole"
-    ];
-
-    panelIDs.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) {
-        console.warn(`⚠️ Panel with ID "${id}" not found in DOM.`);
-      } else {
-        console.log(`✅ Panel "${id}" is present.`);
-      }
-    });
-  </script>
+    <!--#include virtual="partials/whispererConsole.html" -->
+    <!-- 🔁 Sweep Trigger -->
+    <div include-html="partials/panelSweepTriggers.html"></div>
 <!-- === UI FOUNDATION & WIRING === -->
 <script type="module" src="scripts/wiring/buttonHooks.js"></script>
 <script type="module" src="scripts/stability/earlyScrollSuppressor.js"></script>
@@ -797,6 +263,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/consoleDockRelinker.js"></script>
 <script type="module" src="scripts/stability/scrollIntercept.js"></script>
 <script type="module" src="scripts/stability/scrollTrace.js"></script>
+<script type="module" src="scripts/wiring/orbitWiringSystem.js"></script>
 
 <!-- === CLEANUP & SANITATION === -->
 <script type="module" src="scripts/wiring/uiSanitizer.js"></script>
@@ -819,6 +286,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/consoleHomePositionResolver.js"></script>
 
 <!-- === COMMAND SYSTEM & FEEDBACK === -->
+<script type="module" src="scripts/utility/panelResurrectionGrid.js"></script>
 <script type="module" src="scripts/wiring/commandDispatcher.js"></script>
 <script type="module" src="scripts/ascendancy/commandFeedback.js"></script>
 <script type="module" src="scripts/command/whispererTerminal.js"></script>
@@ -829,6 +297,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/consoleGridValidator.js"></script>
 
 <!-- === UI STABILITY MODULES === -->
+<script type="module" src="scripts/utility/core.panelRoleFixer.js"></script>
 <script type="module" src="scripts/ascendancy/consoleLayoutResolver.js"></script>
 <script type="module" src="scripts/ascendancy/consoleHomeBinder.js"></script>
 <script type="module" src="scripts/ascendancy/consoleContainmentField.js"></script>
@@ -897,6 +366,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/lifecycle/panelSnapEngine.js"></script>
 <script type="module" src="scripts/ui/panelInteractionLinker.js"></script>
 <script type="module" src="scripts/lifecycle/layoutPresetsDropdown.js"></script>
+<script type="module" src="scripts/cleanup/uiGhostCleaner.js"></script>
 
 <!-- === Companion Systems & Lifecycle Modules === -->
 <script type="module" src="scripts/lifecycle/companionKernel.js"></script>
@@ -913,6 +383,7 @@ function toggleGlyphLegend() {
 <script type="module" src="scripts/ascendancy/consoleAnomalyRebinder.js"></script>
 <script type="module" src="scripts/grid/gridSnapCoordinator.js"></script>
 <script type="module" src="scripts/lifecycle/panelGridAnchor.js"></script>
+<script type="module" src="scripts/core/terminalCentering.js"></script>
   <!-- 🌀 Whisperer Nexus Core -->
   <div id="whispererPanel" class="nexus-core holo-console-panel" data-role="whisperer" data-zone="center-stage">
     <div id="whispererDisplay" class="terminal-output">🌌 Welcome, Operator.</div>
@@ -964,6 +435,28 @@ function toggleGlyphLegend() {
     setTimeout(() => observer.disconnect(), 3000);
     observer.observe(document.body, { childList: true, subtree: true });
   </script>
+  <script>
+    // === Snapline Debug Injection ===
+    const snaplines = [
+      { top: '10px', left: '0', width: '100vw', height: '1px', background: 'rgba(255, 0, 0, 0.5)' },
+      { top: 'auto', bottom: '10px', left: '0', width: '100vw', height: '1px', background: 'rgba(0, 255, 0, 0.5)' },
+      { left: '10px', top: '0', width: '1px', height: '100vh', background: 'rgba(0, 0, 255, 0.5)' },
+      { left: 'auto', right: '10px', top: '0', width: '1px', height: '100vh', background: 'rgba(255, 255, 0, 0.5)' }
+    ];
+
+    snaplines.forEach(line => {
+      const div = document.createElement('div');
+      Object.assign(div.style, {
+        position: 'fixed',
+        zIndex: 9999,
+        pointerEvents: 'none',
+        ...line
+      });
+      document.body.appendChild(div);
+    });
+
+    console.log("📐 Snapline Debug Injection complete.");
+  </script>
 </body>
 <script>
   function toggleDevConsole() {
@@ -989,18 +482,27 @@ function toggleGlyphLegend() {
   }
 
   function updatePresetDropdown() {
-    const select = document.getElementById("directivePresetSelect");
-    const presets = getStoredPresets();
+  const select = document.getElementById("directivePresetSelect");
+  const presets = getStoredPresets();
 
-    // Clear and rebuild
-    select.innerHTML = `<option value="">🔽 Load Saved Directive...</option>`;
-    for (const key in presets) {
-      const option = document.createElement("option");
-      option.value = key;
-      option.textContent = key;
-      select.appendChild(option);
-    }
+  // ✅ This logic should be INSIDE the function
+  if (!select) return;
+
+  // Clear and rebuild
+  select.innerHTML = `<option value="">🔽 Load Saved Directive...</option>`;
+  for (const key in presets) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = key;
+    select.appendChild(option);
   }
+}
+
+// ✅ Safe execution only when dropdown exists
+window.addEventListener("DOMContentLoaded", () => {
+  const dropdown = document.getElementById("directivePresetSelect");
+  if (dropdown) updatePresetDropdown();
+});
 
   function saveCurrentDirectiveAsPreset() {
     const name = prompt("Enter preset name (e.g., meshVitals.sync):");
@@ -1031,13 +533,16 @@ function toggleGlyphLegend() {
   }
 
   function loadDirectivePreset() {
-    const key = document.getElementById("directivePresetSelect").value;
-    const presets = getStoredPresets();
-    if (presets[key]) {
-      document.getElementById("devDirectiveInput").value =
-        JSON.stringify(presets[key], null, 2);
-    }
+  const select = document.getElementById("directivePresetSelect");
+  const input = document.getElementById("devDirectiveInput");
+  if (!select || !input) return;
+
+  const key = select.value;
+  const presets = getStoredPresets();
+  if (presets[key]) {
+    input.value = JSON.stringify(presets[key], null, 2);
   }
+}
 
   // Initialize dropdown on load
   updatePresetDropdown();
@@ -1454,518 +959,27 @@ function showToast(message = "✅ Done") {
       <span class="tier-badge">🛡 SOVEREIGN</span>
       <span id="authStatusLight" class="status-light status-authenticated" title="Authenticated"></span>
     </div>
-    <div class="header-title">
-      <img id="mainLogo" src="icon/icon-1280.png" alt="SageCraft Ascendant Logo" style="max-width: 220px; height: auto;" />
-      <h1 class="logo-title">SageCraft Ascendant — Sovereign Codex</h1>
-    </div>
-    <div id="sovereignToolbarMount" class="sovereign-toolbar-container" style="margin-bottom: 20px;">
-      <details class="dropdown">
-        <summary>📊 Forecast Systems</summary>
-        <ul class="dropdown-menu active">
-          <li onclick="toggleDockPanel('forecastConsole')">Forecast Console</li>
-          <li onclick="toggleDockPanel('forecastAnomalyConsole')">Forecast Anomaly Console</li>
-        </ul>
-      </details>
+  
 
-      <details class="dropdown">
-        <summary>🧬 Agent Management</summary>
-        <ul class="dropdown-menu">
-          <li onclick="toggleDockPanel('agentLifecycleConsole')">Agent Lifecycle</li>
-          <li onclick="toggleDockPanel('sessionManagerConsole')">Session Manager</li>
-        </ul>
-      </details>
+<!-- === INSPECTION REPORT FOR STRUCTURAL PLACEHOLDERS & CLUTTER MARKERS === -->
+<!--
+Inspection results for structural placeholders/clutter markers:
 
-      <details class="dropdown">
-        <summary>🛠️ Diagnostic Tools</summary>
-        <ul class="dropdown-menu">
-          <li onclick="toggleDockPanel('countConsole')">Count Console</li>
-          <li onclick="toggleDockPanel('deltaAnalyzerConsole')">Delta Analyzer</li>
-          <li onclick="toggleDockPanel('reportingHubConsole')">Reporting Hub</li>
-          <li onclick="toggleDockPanel('utilityHubConsole')">Utility Hub</li>
-          <li onclick="toggleDockPanel('operatorConsole')">Operator Console</li>
-        </ul>
-      </details>
+1. <div class="panel-label"> — FOUND in <style> only, not as an element in the main HTML.
+2. <div class="console-contour"> — FOUND in <style> only, not as an element in the main HTML.
+3. <div class="orbitMapZone"> — NOT FOUND.
+4. <section id="orbitButtonHelp"> — NOT FOUND.
+5. <section class="holo-console"> containing generic headers like "Docked Panel":
+   - Many <section class="holo-console ..."> found, but none with a header "Docked Panel".
+6. <span class="zone-tag"> — NOT FOUND.
+7. <div class="grid-marker"> — NOT FOUND.
 
-      <details class="dropdown">
-        <summary>📚 Lore & Archive</summary>
-        <ul class="dropdown-menu">
-          <li onclick="toggleDockPanel('grimoireConsole')">Grimoire Console</li>
-          <li onclick="toggleDockPanel('sageFeedConsole')">Sage Feed Console</li>
-        </ul>
-      </details>
-
-      <details class="dropdown">
-        <summary>🔊 Communication & Echo</summary>
-        <ul class="dropdown-menu">
-          <li onclick="toggleDockPanel('oracleConsole')">Oracle Console</li>
-          <li onclick="toggleDockPanel('whispererConsole')">Whisperer Console</li>
-        </ul>
-      </details>
-    </div>
-    <!-- Additional HoloConsole Sovereign Panels -->
-    <!-- Sovereign Orbit Dock Console Panels -->
-    <section class="holo-console hidden" id="pulseMonitorConsole" aria-hidden="true"></section>
-    <!-- 🔮 Oracle Subsystem Panel -->
-    <div id="oracle" class="holo-console hidden">
-      <h2>🔮 Oracle Subsystem</h2>
-      <div id="oracleOutput" class="console-output"></div>
-    </div>
-  </div>
-  <!-- === DOM Alignment Fixes: Forecast Console, Aliases, and DockGrid Stub === -->
-  <!-- 1. Forecast Console -->
-  <section id="forecastConsole" class="holo-console hidden" aria-hidden="true">
-    <header class="console-header">🔮 Forecast Console</header>
-    <div class="console-body">
-      <p>📊 Forecast analysis and anomaly data will appear here.</p>
-    </div>
-  </section>
-    <!-- 2. Full Panel Definitions for count and deltaAnalyzer -->
-    <div id="dockGrid">
-      <div class="dock-panel-group">
-    <section class="holo-console hidden holo-console-panel" id="countConsole" aria-hidden="true" data-permalock>
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">🧮 Count Console</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>🧮 Count Console</h2>
-              <p class="panel-desc">Track, manage, and audit all current item counts in real time.</p>
-              <p>Track any metric or inventory manually.</p>
-
-              <div class="counter-display" id="countDisplay">0</div>
-
-              <div class="counter-controls">
-                <button onclick="updateCounter(1)">➕ Increment</button>
-                <button onclick="updateCounter(-1)">➖ Decrement</button>
-                <button onclick="resetCounter()">🔁 Reset</button>
-              </div>
-
-              <!-- Predictive HUD and count refresh markup -->
-              <div class="status-bar">
-                <span class="dock-status" id="dockStatusText">Status: Operational</span>
-                <span class="last-sync">Last Sync: <span class="last-sync-time" id="lastSync">--:--</span></span>
-              </div>
-              <div class="hud-data">
-                <span>Items: <span class="item-count" id="itemSpan">0</span></span>
-                <span>Categories: <span class="category-count" id="categorySpan">0</span></span>
-              </div>
-              <ul class="recent-activity" id="recentList">
-                <li>No recent activity</li>
-              </ul>
-              <button class="refresh-counts">🔄 Refresh Counts</button>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section class="holo-console dock-panel holo-console-panel hidden" id="deltaAnalyzerConsole" aria-hidden="true">
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">📊 Delta Analyzer</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>📊 Delta Analyzer</h2>
-              <p class="panel-desc">Analyze change over time with delta visualizations and predictive shifts.</p>
-              <p>Compare two values and calculate the delta (A - B).</p>
-
-              <label>
-                Value A:
-                <input type="number" id="deltaValueA" placeholder="Enter Value A">
-              </label>
-              <label>
-                Value B:
-                <input type="number" id="deltaValueB" placeholder="Enter Value B">
-              </label>
-
-              <div class="delta-controls">
-                <button onclick="calculateDelta()">🔍 Analyze</button>
-                <button onclick="clearDeltaInputs()">🧼 Clear</button>
-              </div>
-
-              <div id="deltaResult" class="delta-result">Δ = 0</div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section class="holo-console dock-panel holo-console-panel hidden" id="reportingHubConsole" aria-hidden="true">
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">🗂 Reporting Hub</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>📝 Reporting Hub</h2>
-              <p class="panel-desc">Generate dynamic reports and visualize system metrics.</p>
-              <p>Submit observations, reports, or logs below.</p>
-              <div class="button-group">
-                <button class="run-diagnostics">Run Diagnostics</button>
-                <button class="export-report">Export Report</button>
-                <button class="clear-logs">Clear Logs</button>
-              </div>
-              <div class="log-output"></div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section class="holo-console dock-panel holo-console-panel hidden" id="sessionManagerConsole" aria-hidden="true">
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">📋 Session Manager</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>🧠 Session Manager</h2>
-              <p class="panel-desc">Control active user sessions, memory states, and save points.</p>
-              <p>Name and initiate your active session.</p>
-
-              <label>
-                Session Name:
-                <input type="text" id="sessionNameInput" placeholder="e.g., Forecast Sync 7">
-              </label>
-              <button onclick="startSession()">🚀 Start Session</button>
-
-              <div id="activeSessionDisplay" class="session-display"></div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section class="holo-console dock-panel holo-console-panel hidden" id="utilityHubConsole" aria-hidden="true">
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">🧰 Utility Hub</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>🛠 Utility Hub</h2>
-              <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
-              <p>Run quick diagnostics or utility functions.</p>
-
-              <div class="utility-controls">
-                <button onclick="triggerTestAlert()">🔔 Test Alert</button>
-                <button onclick="runDiagnosticLog()">📋 Log Diagnostic</button>
-                <button onclick="pingPanels()">📡 Ping Panels</button>
-              </div>
-
-              <pre id="utilityOutput" class="utility-output">Awaiting commands...</pre>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section class="holo-console dock-panel holo-console-panel hidden" id="oracleConsole" aria-hidden="true">
-          <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-          <header class="console-header">🔮 Oracle Interface</header>
-          <div class="console-body">
-            <div class="panel-content">
-              <h2>🔮 Oracle Console</h2>
-              <p class="panel-desc">Consult the Oracle for wisdom, lore alignment, and sigil resonance.</p>
-              <p>Consult the Silent Sage. Enter your query below:</p>
-
-              <label>
-                Your Inquiry:
-                <input type="text" id="oracleInput" placeholder="e.g., What is the state of the mesh?">
-              </label>
-              <button onclick="consultOracle()">🧙 Ask the Sage</button>
-
-              <div id="oracleResponse" class="oracle-output">Awaiting your question...</div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section id="sageFeedConsole" class="holo-console dock-panel holo-console-panel hidden" aria-hidden="true">
-          <h2>🧠 Sage Feed Console</h2>
-          <p class="panel-desc">Inject lore, commands, or neural memory directly into the Sage Engine.</p>
-          <p>Enter memory tokens, commands, or lore injections:</p>
-          <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
-          <button class="inject-feed">Inject Memory</button>
-          <div id="feedLog"></div>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section id="grimoireConsole" class="holo-console dock-panel holo-console-panel hidden" aria-hidden="true">
-          <h2 class="console-title">📖 Grimoire Console</h2>
-          <p class="panel-desc">Access the magical Lore Archive and decode hidden secrets.</p>
-          <div id="grimoirePanelContent">
-            <p>Select a memory node to review its imprint...</p>
-          </div>
-          <!-- Lore Archive Table Panel: injected below main lore log panel -->
-          <section id="grimoireTablePanel" class="grimoire-table-panel">
-            <h2>📚 Lore Archive Table</h2>
-            <!-- Table will be rendered here by JS -->
-          </section>
-        </section>
-      </div>
-      <div class="dock-panel-group">
-    <section id="whispererConsole" class="holo-console dock-panel holo-console-panel" data-permalock>
-          <h2 class="console-title">🌀 Whisperer Console</h2>
-          <p class="panel-desc">Receive live feedback, debug insights, and system messages.</p>
-
-          <!-- Whisperer Console Output (ensure this exists and is first in the panel) -->
-          <div id="whispererConsoleOutput" class="console-output"></div>
-
-          <section id="neuralPulseMonitor" class="console-section">
-            <h3>Neural Pulse</h3>
-            <div class="pulse-visual"></div>
-            <p id="pulseStatus">Initializing...</p>
-          </section>
-
-          <section id="echoArchivePanel" class="console-section">
-            <h3>Echo Archive</h3>
-            <ul id="echoLogEntries"></ul>
-          </section>
-
-          <section id="coreCommandInput" class="console-section">
-            <h3>Inject Command</h3>
-            <input type="text" id="sovereignCommand" placeholder="Enter core directive...">
-            <button id="injectCommandBtn">Inject</button>
-            <div id="commandResponse" class="command-feedback"></div>
-          </section>
-        </section>
-      </div>
-    </div>
-  <style>
-    .counter-display {
-      font-size: 3rem;
-      margin: 1rem 0;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff;
-    }
-    .counter-controls button {
-      margin: 0.3rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid #0ff;
-      color: #0ff;
-      cursor: pointer;
-    }
-    .counter-controls button:hover {
-      background: rgba(0,255,255,0.1);
-    }
-  </style>
-  <style>
-    .panel-label {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      font-size: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 2px 4px;
-      border-radius: 3px;
-      z-index: 999;
-    }
-
-    .console-contour {
-      position: absolute;
-      border: 1px dashed var(--accent-color, #00ffff);
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-  </style>
-    <section class="holo-console hidden" id="deltaAnalyzerConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">📊 Delta Analyzer</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>📊 Delta Analyzer</h2>
-          <p class="panel-desc">Analyze change over time with delta visualizations and predictive shifts.</p>
-          <p>Compare two values and calculate the delta (A - B).</p>
-
-          <label>
-            Value A:
-            <input type="number" id="deltaValueA" placeholder="Enter Value A">
-          </label>
-          <label>
-            Value B:
-            <input type="number" id="deltaValueB" placeholder="Enter Value B">
-          </label>
-
-          <div class="delta-controls">
-            <button onclick="calculateDelta()">🔍 Analyze</button>
-            <button onclick="clearDeltaInputs()">🧼 Clear</button>
-          </div>
-
-          <div id="deltaResult" class="delta-result">Δ = 0</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 🧪 Sage Feed Console Elements -->
-    <div id="sageFeedConsole" class="dock-panel holo-console-panel hidden">
-      <h3>🌿 Sage Feed Console</h3>
-      <input
-        type="text"
-        id="sageFeedInput"
-        placeholder="Enter directive..."
-        autocomplete="off"
-      />
-      <button id="sageFeedSubmit">Send</button>
-      <ul id="sageFeedLog"></ul>
-    </div>
-    <!-- 📊 Forecast Console Panel -->
-    <div id="forecastConsole" class="dock-panel holo-console-panel hidden">
-      <h2>📊 Forecast Console</h2>
-      <p>Initializing predictive modules...</p>
-      <!-- Panel content dynamically inserted here -->
-    </div>
-    <!-- 📖 Lore Engine Panel -->
-    <div id="loreEngineConsole" class="dock-panel holo-console-panel hidden" data-role="lore-engine" data-grid-area="staging-zone">
-      <h2>📖 Lore Engine</h2>
-      <p>Initializing Lore Engine Interface...</p>
-      <!-- Future lore content and controls will be injected here -->
-    </div>
-    <!-- 3. Dock Grid Stub -->
-
-    <!-- 🔧 Sigil Editor Panel -->
-    <div id="sigilEditPanel-2" class="holo-console holo-console-panel" style="display: none;">
-      <h2>🔧 Edit Sigil</h2>
-      <label>Name:</label>
-      <input id="editSigilName-3" type="text" placeholder="Enter new name..." /><br>
-
-      <label>Glyph Code:</label>
-      <input id="editSigilGlyph-3" type="text" placeholder="e.g., ∇⟁⌖" /><br>
-
-      <label>Element:</label>
-      <select id="editSigilElement-3">
-        <option value="fire">🔥 Fire</option>
-        <option value="water">💧 Water</option>
-        <option value="earth">🌱 Earth</option>
-        <option value="air">🌪️ Air</option>
-        <option value="ether">✨ Ether</option>
-      </select><br>
-
-      <button onclick="submitSigilEdit()">💾 Save Changes</button>
-      <button onclick="closeSigilEditor()">❌ Cancel</button>
-    </div>
-
-    <!-- Injected missing orbital panels -->
-    <!-- 🧪 Debug Console Toggles -->
-    <div id="panelToggles" style="position:fixed;top:1rem;right:1rem;z-index:9999;">
-      <button onclick="togglePanel('forecastChamber')">Forecast</button>
-      <button onclick="togglePanel('oracleConsole')">Oracle</button>
-      <button onclick="togglePanel('memoryKernelPanel')">Memory</button>
-    </div>
-
-
-    <!-- 🌩️ Forecast Chamber -->
-    <div id="forecastChamber" class="holo-console-panel hidden" data-role="forecast" data-zone="orbital-access">
-      <div class="console-title">Forecast Chamber</div>
-      <div class="forecast-body">
-        <p>Awaiting signal calibration...</p>
-      </div>
-    </div>
-    <section class="holo-console hidden" id="reportingHubConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">🗂 Reporting Hub</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>📝 Reporting Hub</h2>
-          <p class="panel-desc">Generate dynamic reports and visualize system metrics.</p>
-          <p>Submit observations, reports, or logs below.</p>
-          <div class="button-group">
-            <button class="run-diagnostics">Run Diagnostics</button>
-            <button class="export-report">Export Report</button>
-            <button class="clear-logs">Clear Logs</button>
-          </div>
-          <div class="log-output"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="holo-console hidden" id="sessionManagerConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">📋 Session Manager</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>🧠 Session Manager</h2>
-          <p class="panel-desc">Control active user sessions, memory states, and save points.</p>
-          <p>Name and initiate your active session.</p>
-
-          <label>
-            Session Name:
-            <input type="text" id="sessionNameInput" placeholder="e.g., Forecast Sync 7">
-          </label>
-          <button onclick="startSession()">🚀 Start Session</button>
-
-          <div id="activeSessionDisplay" class="session-display"></div>
-        </div>
-      </div>
-    </section>
-    <!-- 🔮 Sigil Render Console -->
-    <div id="sigilRenderConsole" class="holo-console holo-console-panel" style="display:none;">
-      <h2>Sigil Render Console</h2>
-      <input type="text" id="sigilNameInput" placeholder="Enter Sigil Name" style="width: 80%; padding: 5px;">
-      <button onclick="renderSigilPreview()">Render Sigil</button>
-      <div id="sigilRenderOutput" style="margin-top: 15px;"></div>
-    </div>
-    <!-- 🛠 Utility Hub Console Panel (injected after sessionManagerConsole) -->
-    <div id="utilityHubConsole" class="holo-console dock-panel holo-console-panel hidden">
-      <h2>🛠️ Utility Hub</h2>
-      <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
-      <button class="clean-cache">🧹 Clean Cache</button>
-      <button class="resync">🔄 Re-Sync</button>
-      <div class="utility-log"></div>
-    </div>
-
-
-    <section class="holo-console hidden" id="utilityHubConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">🧰 Utility Hub</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>🛠 Utility Hub</h2>
-          <p class="panel-desc">Access utilities, diagnostic tools, and background processes.</p>
-          <p>Run quick diagnostics or utility functions.</p>
-
-          <div class="utility-controls">
-            <button onclick="triggerTestAlert()">🔔 Test Alert</button>
-            <button onclick="runDiagnosticLog()">📋 Log Diagnostic</button>
-            <button onclick="pingPanels()">📡 Ping Panels</button>
-          </div>
-
-          <pre id="utilityOutput" class="utility-output">Awaiting commands...</pre>
-        </div>
-      </div>
-    </section>
-    <!-- Exception Manager Console -->
-    <section class="holo-console hidden" id="exceptionManagerConsole" aria-hidden="true">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">🛠 Exception Manager</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <h2>🛠 Exception Manager</h2>
-          <p>Subsystem for managing and simulating system exceptions.</p>
-          <button class="trigger-exception">Trigger</button>
-          <button class="clear-logs">Clear Logs</button>
-          <button class="view-report">View Report</button>
-          <div class="exception-log" style="margin-top: 10px; border: 1px solid #888; padding: 10px; min-height: 100px;">
-              <!-- Logs will appear here -->
-          </div>
-        </div>
-      </div>
-    </section>
-  <script>
-    function triggerTestAlert() {
-      alert("🔔 Alert triggered from Utility Hub!");
-      logUtility("Alert dispatched.");
-    }
-
-    function runDiagnosticLog() {
-      console.log("📋 Utility Hub Diagnostic: System online.");
-      logUtility("Logged system diagnostic to console.");
-    }
-
-    function pingPanels() {
-      const panels = document.querySelectorAll(".holo-console");
-      logUtility(`📡 Pinged ${panels.length} panels. Status: Responsive.`);
-    }
-
-    function logUtility(message) {
-      const output = document.getElementById("utilityOutput");
-      const timestamp = new Date().toLocaleTimeString();
-      output.textContent = `[${timestamp}] ${message}`;
-    }
+Other notes:
+* There are multiple <style> rules for .panel-label and .console-contour, but no actual elements with those classes in the HTML body.
+* No elements with classes 'orbitMapZone', 'zone-tag', or 'grid-marker' found.
+* No <section id="orbitButtonHelp"> found.
+* No <section class="holo-console"> with a header "Docked Panel" found.
+-->
   </script>
   <style>
     .utility-controls button {
@@ -2109,55 +1123,12 @@ function showToast(message = "✅ Done") {
     }
   </style>
 
-  <div id="orbitClusterWrap" style="display: flex; justify-content: center; padding: 40px 0;">
-    <div id="sovereignOrbitDock" class="orbit-cluster">
-      <!-- 🧠 Orbit Memory Echo Layer -->
-      <!-- Orbit buttons moved to dropdown menu for unified access -->
-    </div>
+  <!-- 🔁 Modular: Orbital Panel Dock -->
+  <div id="orbitalDockMount">
+    <!-- Orbit Docking Panel Injected Here -->
+    <!-- Expected partial include -->
+  <div data-include-html="partials/orbitPanelDock.html"></div>
   </div>
-      <!-- Orbit Buttons Dropdown Cluster -->
-      <div class="dropdown" style="display:inline-block; margin-left:20px;">
-        <button id="sovereignOrbitToggle" class="dropdown-toggle" style="padding: 10px 18px; border-radius: 5px; border: 1px solid #8844ff; background: #1e1e2f; color: #fff; font-family: monospace; font-size: 1.1em; cursor: pointer;">
-          🛰️ Sovereign Orbits
-        </button>
-        <div class="dropdown-content" style="display:none; position:absolute; background:#2a003f; min-width: 250px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3); z-index: 2000; padding: 18px 18px 10px 18px; border-radius: 8px; border: 1px solid #8844ff;">
-          <!-- Core Systems -->
-          <button class="orbit-btn" data-target="countConsole" title="Count Console">
-            <img src="assets/icons/icon-count.png" alt="Count Console" />
-          </button>
-          <button class="orbit-btn" data-target="deltaAnalyzerConsole" title="Delta Analyzer">
-            <img src="assets/icons/icon-delta.png" alt="Delta Analyzer" />
-          </button>
-          <button class="orbit-btn" data-target="reportingHubConsole" title="Reporting Hub">
-            <img src="assets/icons/icon-reporting.png" alt="Reporting Hub" />
-          </button>
-          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
-          <!-- Session & Utility -->
-          <button class="orbit-btn" data-target="sessionManagerConsole" title="Session Manager">
-            <img src="assets/icons/icon-session.png" alt="Session Manager" />
-          </button>
-          <button class="orbit-btn" data-target="utilityHubConsole" title="Utility Hub">
-            <img src="assets/icons/icon-utility.png" alt="Utility Hub" />
-          </button>
-          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
-          <!-- Advanced Interfaces -->
-          <button class="orbit-btn" data-target="oracleConsole" title="Oracle Console">
-            <img src="assets/icons/icon-oracle.png" alt="Oracle Console" />
-          </button>
-          <button class="orbit-btn" data-target="whispererConsole" title="The Whisperer Console">
-            <img src="assets/icons/icon-whisperer-glyph.png" alt="Whisperer Icon" />
-          </button>
-          <button class="orbit-btn sagefeed-orbit" data-target="sageFeedConsole" title="Sage Feed Console">
-            <img src="assets/icons/icon-sagefeed-glyph-v2.png" alt="Sage Feed Console" />
-          </button>
-          <hr style="border:0; border-top:1px solid #552288; margin: 12px 0 8px 0;">
-          <!-- Lore System -->
-          <button class="orbit-btn" data-target="grimoireConsole" title="Grimoire Console">
-            <img src="assets/icons/icon-grimoire-glyph.png" alt="Grimoire Console" />
-          </button>
-        </div>
-      </div>
-      <!-- Dropdown show/hide logic now handled by global script below -->
 </body>
 <script>
   // Sovereign Orbit Dropdown Toggle Logic
@@ -2251,201 +1222,18 @@ function showToast(message = "✅ Done") {
     }
   });
   </script>
-  <header id="sovereignHeader">
-  </header>
-
-  <div id="wardenGlyph" onclick="toggleAnomalySanctum()" title="The Hollow Warden watches..." style="
-  position: absolute;
-  top: 58px;
-  left: 12px;
-  font-size: 1.4em;
-  color: #444;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.4s ease;
-">
-  ☠️
-</div>
-  <!-- 🧭 Sovereign Ascendant Toolbar -->
-  <div id="sovereignToolbar" class="sovereign-toolbar"></div>
-
-  <!-- HoloConsole Sovereign Panels (for SovereignToolbar toggling) -->
-
-
-  <!-- All legacy static Operator Console Panel and legacy tab-section panels removed.
-       Only dynamic Control Deck injection point remains below. -->
-  <div id="operatorConsole" class="tabcontent"></div>
-  <!-- 🧠 Sage Feed Console Interface -->
-  <div id="sageFeedConsole" class="holo-console dock-panel hidden">
-    <h2>🧠 Sage Feed Console</h2>
-    <p class="console-desc">Direct injection to Sage Memory Engine. Enter encoded lore, trigger phrases, or neural directives.</p>
-    <textarea id="sageFeedInput" placeholder="Type a memory, command, or phrase..." rows="5"></textarea>
-    <button id="sageFeedSubmit" class="primary-btn">🔮 Feed the Sage</button>
-    <div id="sageFeedLog" class="sage-feed-log"></div>
-  </div>
-
-  <!-- Neural Operator Console Panel -->
-  <div id="operatorConsolePanel" class="console-section">
-    <!-- Neural Operator Console will render here -->
-  </div>
-
-
-
-
-<!-- Phase 125.8 — Predictive Overlay Remover -->
-  <style>
-    .report-controls button {
-      margin: 0.3rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid #ffa500;
-      color: #ffa500;
-      cursor: pointer;
-    }
-
-    .report-controls button:hover {
-      background: rgba(255,165,0,0.1);
-    }
-
-    #reportInput {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .report-log {
-      list-style: none;
-      padding-left: 0;
-      color: #ffa500;
-      font-family: monospace;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .report-log li {
-      margin-bottom: 0.3rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 1px dashed #ffa500;
-    }
-    #diagnosticOverlay, #dropboxStatusOverlay {
-      display: none !important;
-    }
-    .orbit-btn img.orbit-icon {
-      width: 80%;
-      height: 80%;
-      object-fit: contain;
-      display: block;
-      margin: auto;
-      padding: 10%;
-      box-sizing: border-box;
-    }
-    .orbit-btn.active-orbit {
-      border: 2px solid #cc66ff;
-      box-shadow: 0 0 12px #cc66ff, inset 0 0 6px #cc66ff;
-      transform: scale(1.05);
-      transition: all 0.3s ease;
-    }
-  </style>
-
-  <main class="container neon-container" role="main">
-    <!-- Phase 300.12 — Orbital Dock Visibility Mesh (legacy static dock-toggle bar removed) -->
-    <div class="mobile-wrapper">
-      <div class="fantasy-wrapper electric-vibe">
+  
+    <section id="sovereignTerminal" class="holo-console dock-panel holo-console-panel">
+      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+      <header class="console-header">💻 Sovereign Terminal</header>
+      <div class="console-body">
+        <div class="panel-content">
+          <p>Awaiting command input...</p>
+        </div>
       </div>
-    </div>
-    <!-- 🧱 Sovereign Dock Grid Container -->
-    <!-- === Unified Holo Console Grid (moved just above Sovereign Orbit Dock) === -->
-    <!-- 🧠 Reintegrated Console Panel Group -->
-    <div id="consolePanelGroup" style="position: relative; z-index: 10; margin-top: 30px;">
-      <div id="deltaAnalyzerConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="reportingHubConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="sessionManagerConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-    <div id="sageFeedConsole" class="holo-console dock-panel hidden" aria-hidden="true">
-      <h2>🧠 Sage Feed Console</h2>
-      <p class="panel-desc">Inject lore, commands, or neural memory directly into the Sage Engine.</p>
-      <p>Enter memory tokens, commands, or lore injections:</p>
-      <textarea id="sageFeedInput" placeholder="Feed me knowledge..."></textarea>
-      <button class="inject-feed">Inject Memory</button>
-      <div id="feedLog"></div>
-    </div>
-      <div id="utilityHubConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="exceptionManagerConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="masterExportHubConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="progressDashboardConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="mappingsConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="toolsConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="auditConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-      <div id="oracleConsole" class="holo-console hidden"
-        style="display: none; visibility: hidden; opacity: 0; z-index: -1;"></div>
-    </div>
-    <!-- 🧠 End Console Panel Group -->
-    <!-- 📖 Grimoire Console Panel -->
-    <section id="grimoireConsole" class="holo-console hidden" aria-hidden="true">
-      <h2 class="console-title">📖 Grimoire Console</h2>
-      <p class="panel-desc">Access the magical Lore Archive and decode hidden secrets.</p>
-      <div id="grimoirePanelContent">
-        <p>Select a memory node to review its imprint...</p>
-      </div>
-      <!-- Lore Archive Table Panel: injected below main lore log panel -->
-      <section id="grimoireTablePanel" class="grimoire-table-panel">
-        <h2>📚 Lore Archive Table</h2>
-        <!-- Table will be rendered here by JS -->
-      </section>
     </section>
-    <!-- 🌫️ WHISPERER CONSOLE PANEL -->
-    <!-- Whisperer Controls (injected above console output) -->
-    <div id="whispererControls" class="whisperer-controls">
-      <button data-filter="all">🌐 All</button>
-      <button data-filter="vitals">🩺 Vitals</button>
-      <button data-filter="warning">⚠️ Warnings</button>
-      <button data-filter="diagnostic">🧪 Diagnostics</button>
-      <button data-filter="echo">🌀 Echoes</button>
-      <button id="memoryDiveToggle">🧠 Memory Dive</button>
-    </div>
-    <section id="whispererConsole" class="holo-console panel">
-      <h2 class="console-title">🌀 Whisperer Console</h2>
-      <p class="panel-desc">Receive live feedback, debug insights, and system messages.</p>
-
-      <!-- Whisperer Console Output (ensure this exists and is first in the panel) -->
-      <div id="whispererConsoleOutput" class="console-output"></div>
-
-      <section id="neuralPulseMonitor" class="console-section">
-        <h3>Neural Pulse</h3>
-        <div class="pulse-visual"></div>
-        <p id="pulseStatus">Initializing...</p>
-      </section>
-
-      <section id="echoArchivePanel" class="console-section">
-        <h3>Echo Archive</h3>
-        <ul id="echoLogEntries"></ul>
-      </section>
-
-      <section id="coreCommandInput" class="console-section">
-        <h3>Inject Command</h3>
-        <input type="text" id="sovereignCommand" placeholder="Enter core directive...">
-        <button id="injectCommandBtn">Inject</button>
-        <div id="commandResponse" class="command-feedback"></div>
-      </section>
-    </section>
-    <!-- 📈 Signal Forecast Panel -->
-    <div id="forecastPanel" class="forecast-panel">
-      <h3>📈 Signal Forecast</h3>
-      <div id="forecastEntries" class="forecast-entries">
-        <!-- Forecast signals will populate here -->
-      </div>
-    </div>
+  </div>
+  <!-- 🧠 Center Stage Layout End -->
 <!-- Grimoire Lore Table Render Trigger -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -2455,33 +1243,6 @@ function showToast(message = "✅ Done") {
   });
 </script>
     </main>
-
-    <!-- === Debug Style Injection for #dock-panel-group === -->
-    <script>
-      const style = document.createElement('style');
-      style.innerHTML = `
-        #dock-panel-group *,
-        #dock-panel-group *::before,
-        #dock-panel-group *::after {
-          all: unset !important;
-          display: block !important;
-          visibility: visible !important;
-          opacity: 1 !important;
-          position: relative !important;
-          z-index: 9999 !important;
-          background-color: rgba(255, 0, 255, 0.2) !important;
-          color: magenta !important;
-          outline: 2px dashed magenta !important;
-        }
-
-        #dock-panel-group {
-          display: flex !important;
-          flex-direction: column;
-          background-color: rgba(0,0,0,0.8);
-          padding: 20px;
-        }
-      `;
-      document.head.appendChild(style);
     </script>
 
 <!-- Phase 201.2 — Neural Intake Uploader binding -->
@@ -3056,6 +1817,12 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   </div>
 
+  <!-- 🌌 Modular Gameplay Console Arena -->
+  <div id="gameplayArenaMount">
+    <!-- Consoles from gameplay.html will be injected here by mesh renderer -->
+  </div>
+  <link rel="stylesheet" href="styles/gameplay.css" />
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const terminal = document.getElementById("sovereignTerminal");
@@ -3435,6 +2202,21 @@ document.addEventListener("DOMContentLoaded", () => {
   <script type="module" src="scripts/lifecycle/snapMemoryRecall.js"></script>
   <script type="module" src="scripts/lifecycle/autoSnapMemoryRecall.js"></script>
   <script type="module" src="scripts/lifecycle/snapMemoryGuardian.js"></script>
+  <script type="module" src="scripts/bootstrap/panelLoader.js"></script>
+  <script type="module" src="scripts/lifecycle/panelVisibilityReconciliation.js"></script>
+  <!-- === Stability Modules === -->
+<script type="module" src="scripts/stability/panelLoadoutSanitizer.js"></script>
+<script type="module" src="scripts/stability/uiRenderCompensator.js"></script>
+<script type="module" src="scripts/stability/uiRogueScanner.js"></script>
+<script type="module" src="scripts/stability/scripts/mesh/orbitSummoner.js"></script>
+<script type="module" src="scripts/stability/scripts/stability/scripts/mesh/safePanelSweep.js"></script>
+<script type="module" src="scripts/stability/scripts/stability/scripts/sovereignLoadPlan.js"></script>
+<script type="module" src="scripts/stability/scripts/stability/sovereignStartupVisibility.js"></script>
+<script type="module" src="scripts/stability/uiCloakEngine.js"></script>
+<script type="module" src="scripts/core/sovereignPanelDirective.js"></script>
+<script type="module" src="scripts/core/sovereignPanelEnforcer.js"></script>
+<script type="module" src="scripts/grid/SovereignPanelGridClassifier.js"></script>
+<!-- <script type="module" src="scripts/stability/uiRoguePurger.js"></script> -->
 
   <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
   <script>
@@ -3780,7 +2562,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <!--
   (orbitButtonsBar and its references removed)
   -->
-<script>
+<!-- script>
 // Phase 600.1 — Unified Sovereign Dock Wiring Linkage
 document.addEventListener("DOMContentLoaded", () => {
   const panelMap = {
@@ -3797,10 +2579,9 @@ document.addEventListener("DOMContentLoaded", () => {
     audit: "auditSection",
     configPanel: "configPanelSection"
   };
-
-  // (Removed orbitButtonsBar references. No dockToggleBar present.)
 });
 </script>
+-->
 
 <!-- Phase 900.2 — Sovereign Console Toggle Logic -->
 <script>
@@ -3827,6 +2608,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const signalLog = document.querySelector("#pulseMonitorConsole .signal-log-entries");
   const reflexLog = document.querySelector("#pulseMonitorConsole .reflex-log-entries");
   const refreshBtn = document.querySelector("#pulseMonitorConsole .refresh-pulse-monitor");
+  const pulseBtn = document.querySelector('button[data-panel="#pulseMonitorConsole"]');
 
   function updatePulseMonitor() {
     const now = new Date().toLocaleTimeString();
@@ -3877,8 +2659,6 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshBtn.addEventListener("click", updatePulseMonitor);
   }
 
-  // Optional: auto-refresh when opened
-  const pulseBtn = document.querySelector('button[data-panel="#pulseMonitorConsole"]');
   if (pulseBtn) {
     pulseBtn.addEventListener("click", () => {
       setTimeout(updatePulseMonitor, 100);
@@ -4000,127 +2780,110 @@ document.addEventListener("DOMContentLoaded", () => {
       input.value = '';
     }
 
-    // Updated closeConsole function with full panel reset and orbit button sync
-    function closeConsole(button) {
-      const panel = button.closest(".holo-console");
-      if (!panel) return;
 
-      // Prevent focus-related aria-hidden issue
-      button.blur();
+  function deactivateOrbitButtons(panel) {
+    const orbitButtons = document.querySelectorAll(`.orbit-btn[data-target="${panel.id}"]`);
+    orbitButtons.forEach(btn => btn.classList.remove("active-orbit"));
+  }
 
-      panel.classList.remove("console-active");
-      panel.classList.add("hidden");
-      panel.setAttribute("aria-hidden", "true");
+  function closeConsole(button) {
+    const panel = button.closest(".holo-console");
+    if (!panel) return;
 
-      // Reset styling from .console-active override
-      panel.style.display = "none";
-      panel.style.visibility = "hidden";
-      panel.style.opacity = "0";
-      panel.style.height = "0px";
-      panel.style.margin = "0px";
-      panel.style.padding = "0px";
-      panel.style.position = "absolute";
-      panel.style.zIndex = "-1";
+    button.blur(); // Prevent focus-related aria-hidden issue
+    panel.classList.remove("console-active");
+    panel.classList.add("hidden");
+    panel.setAttribute("aria-hidden", "true");
 
-      // Remove active class from any orbit buttons linked to this panel
-      const orbitButtons = document.querySelectorAll(`.orbit-btn[data-target="${panel.id}"]`);
-      orbitButtons.forEach(btn => btn.classList.remove("active-orbit"));
-    }
-  </script>
-  <style>
-    .session-display {
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #00ffff;
-      font-family: monospace;
-      text-shadow: 0 0 4px #0ff;
-    }
+    // Reset styling
+    panel.style.display = "none";
+    panel.style.visibility = "hidden";
+    panel.style.opacity = "0";
+    panel.style.height = "0px";
+    panel.style.margin = "0px";
+    panel.style.padding = "0px";
+    panel.style.position = "absolute";
+    panel.style.zIndex = "-1";
 
-    #sessionNameInput {
-      margin: 0.5rem 0.5rem 0.5rem 0;
-      padding: 0.4rem;
-      width: 200px;
-      font-size: 1rem;
-    }
+    deactivateOrbitButtons(panel);
+  }
 
-    #sessionManagerConsole button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background: rgba(0,255,255,0.05);
-      border: 1px solid #00ffff;
-      color: #00ffff;
-      cursor: pointer;
-    }
+  function lockScrollToTop() {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }
 
-    #sessionManagerConsole button:hover {
-      background: rgba(0,255,255,0.1);
-    }
-  </style>
-  <script>
-    function closeConsole(button) {
-      const panel = button.closest(".holo-console");
-      if (panel) {
-        panel.setAttribute("aria-hidden", "true");
-        panel.style.display = "none";
-      }
-    }
-  </script>
-  <script>
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      }, 10);
-    });
-  </script>
-  <script>
-    // Disable anchor, focus, or rogue script scroll behavior
-    window.addEventListener('DOMContentLoaded', () => {
-      window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-    });
-  
-    // Catch late scroll attempts after full render
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-      }, 200);
-    });
-  
-    // Catch ANY scroll attempts and kill them
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 0) {
-        window.scrollTo(0, 0);
-      }
-    });
-  </script>
-  <script>
-    // Absolutely prevent scrolling at all costs
-    function lockScrollToTop() {
-      window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-    }
-  
-    // On DOM Ready
-    document.addEventListener("DOMContentLoaded", lockScrollToTop);
-  
-    // On Full Load
-    window.addEventListener("load", () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    lockScrollToTop();
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  });
+
+  window.addEventListener("load", () => {
+    lockScrollToTop();
+    setTimeout(lockScrollToTop, 100);
+    setTimeout(lockScrollToTop, 500);
+    setTimeout(lockScrollToTop, 1000);
+  });
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY !== 0) {
       lockScrollToTop();
-      setTimeout(lockScrollToTop, 100);  // In case layout shifts
-      setTimeout(lockScrollToTop, 500);  // In case late scripts fire
-      setTimeout(lockScrollToTop, 1000); // In case there's a cursed delay
-    });
-  
-    // On any scroll attempt, kill it
-    window.addEventListener("scroll", () => {
-      if (window.scrollY !== 0) {
-        lockScrollToTop();
+    }
+  });
+</script>
+
+<style>
+  .session-display {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #00ffff;
+    font-family: monospace;
+    text-shadow: 0 0 4px #0ff;
+  }
+
+  #sessionNameInput {
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    padding: 0.4rem;
+    width: 200px;
+    font-size: 1rem;
+  }
+
+  #sessionManagerConsole button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background: rgba(0,255,255,0.05);
+    border: 1px solid #00ffff;
+    color: #00ffff;
+    cursor: pointer;
+  }
+
+  #sessionManagerConsole button:hover {
+    background: rgba(0,255,255,0.1);
+  }
+</style>
+<!-- 🔥 Scorched Earth Protocol -->
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const allowedPanels = [
+      "neuralPulsePanel",
+      "sovereignTerminal"
+      // Add more IDs here if you want them to survive
+    ];
+
+    document.querySelectorAll('.holo-console').forEach(panel => {
+      if (!allowedPanels.includes(panel.id)) {
+        console.log(`🔥 Removing: ${panel.id}`);
+        panel.remove(); // Total purge
+      } else {
+        panel.style.display = "grid";
+        panel.style.visibility = "visible";
+        panel.style.opacity = "1";
       }
     });
-  </script>
+  });
+</script>
 </body>
 </html>

@@ -84,47 +84,88 @@ console.log("✅ Loaded panel.registry.js");
 console.log("✅ Loaded operator.console.js");
 loadScript("scripts/panels/forecastConsole.panel.js");
 
-// Unified Sovereign API Bridge + Mount Controller
-import('/scripts/operator/operatorDockWiring.js').then(module => {
-  const OperatorDockWiring = module.default || module.OperatorDockWiring || window.OperatorDockWiring;
+import('/scripts/grid/SovereignPanelGridClassifier.js').then(module => {
+  console.log("✅ SovereignPanelGridClassifier linked and active.");
+  module.classifyPanelsToGridZones();
+  module.bindPanelMemoryAndGridAwareness();
+}).catch(err => {
+  console.error("❌ Failed to load SovereignPanelGridClassifier module:", err);
+});
 
-  if (!OperatorDockWiring || typeof OperatorDockWiring.getDockAPI !== 'function') {
-    console.error("❌ Sovereign API Bridge: OperatorDockWiring or getDockAPI not available.");
+// Unified Sovereign API Bridge + Mount Controller
+function waitForDockAPI(attempt = 0) {
+  const dockWiring = window.OperatorDockWiring;
+  if (dockWiring && typeof dockWiring.getDockAPI === 'function') {
+    window.SovereignAPI = dockWiring.getDockAPI();
+    console.log("✅ Sovereign API Bridge activated: window.SovereignAPI is now live.");
+
+    const api = window.SovereignAPI;
+    const dockPanels = [
+      { id: "countContainer", content: api.getCountDockContent },
+      { id: "deltaAnalyzerSection", content: api.getDeltaAnalyzerContent },
+      { id: "exceptionManagerSection", content: api.getExceptionManagerContent },
+      { id: "progressDashboardSection", content: api.getProgressDashboardContent },
+      { id: "reportingHubSection", content: api.getReportingHubContent },
+      { id: "masterExportHubSection", content: api.getMasterExportHubContent },
+      { id: "utilityHubSection", content: api.getUtilityHubContent },
+      { id: "sessionManagerSection", content: api.getSessionManagerContent },
+      { id: "mappingsSection", content: api.getMappingsContent },
+      { id: "toolsSection", content: api.getToolsContent },
+      { id: "auditSection", content: api.getAuditContent },
+      { id: "configPanelSection", content: api.getConfigPanelContent },
+      { id: "forecastConsoleSection", content: api.getForecastConsoleContent },
+      { id: "loreEngineSection", content: api.getLoreEngineConsoleContent }
+    ];
+
+    dockPanels.forEach(panel => {
+      const target = document.getElementById(panel.id);
+      if (target && typeof panel.content === 'function') {
+        target.innerHTML = panel.content();
+        console.log(`✅ Mounted Sovereign Panel: ${panel.id}`);
+      }
+    });
+
+  } else if (attempt < 50) {
+    console.warn(`⏳ Waiting for OperatorDockWiring... attempt ${attempt + 1}`);
+    setTimeout(() => waitForDockAPI(attempt + 1), 100);
+  } else {
+    console.error("❌ Sovereign API Bridge: OperatorDockWiring or getDockAPI not available after retries.");
+  }
+}
+
+import('/scripts/operator/operatorDockWiring.js').then(module => {
+  waitForDockAPI();
+}).catch(err => {
+  console.error("❌ Failed to load OperatorDockWiring module:", err);
+});
+
+// Load Orbit Wiring System
+import('/scripts/wiring/orbitWiringSystem.js').then(module => {
+  const OrbitWiringSystem = module.OrbitWiringSystem;
+
+  if (!OrbitWiringSystem || typeof OrbitWiringSystem.renderOrbits !== 'function') {
+    console.error("❌ OrbitWiringSystem: renderOrbits not available.");
     return;
   }
 
-  window.SovereignAPI = OperatorDockWiring.getDockAPI();
-  console.log("✅ Sovereign API Bridge activated: window.SovereignAPI is now live.");
+  window.addEventListener("includesLoaded", () => {
+    if (OrbitWiringSystem && typeof OrbitWiringSystem.renderOrbits === "function") {
+      OrbitWiringSystem.renderOrbits();
+      console.log("🧭 Orbit Rendering Initialized after includesLoaded.");
+    } else {
+      console.warn("⚠️ OrbitWiringSystem.renderOrbits not available after includesLoaded.");
+    }
 
-  const api = window.SovereignAPI;
-  const dockPanels = [
-    { id: "countContainer", content: api.getCountDockContent },
-    { id: "deltaAnalyzerSection", content: api.getDeltaAnalyzerContent },
-    { id: "exceptionManagerSection", content: api.getExceptionManagerContent },
-    { id: "progressDashboardSection", content: api.getProgressDashboardContent },
-    { id: "reportingHubSection", content: api.getReportingHubContent },
-    { id: "masterExportHubSection", content: api.getMasterExportHubContent },
-    { id: "utilityHubSection", content: api.getUtilityHubContent },
-    { id: "sessionManagerSection", content: api.getSessionManagerContent },
-    { id: "mappingsSection", content: api.getMappingsContent },
-    { id: "toolsSection", content: api.getToolsContent },
-    { id: "auditSection", content: api.getAuditContent },
-    { id: "configPanelSection", content: api.getConfigPanelContent }
-    ,
-    { id: "forecastConsoleSection", content: api.getForecastConsoleContent },
-    { id: "loreEngineSection", content: api.getLoreEngineConsoleContent }
-  ];
-
-  dockPanels.forEach(panel => {
-    const target = document.getElementById(panel.id);
-    if (target && typeof panel.content === 'function') {
-      target.innerHTML = panel.content();
-      console.log(`✅ Mounted Sovereign Panel: ${panel.id}`);
+    if (typeof renderOrbitalDock === "function") {
+      renderOrbitalDock();
+      console.log("🛰️ Orbital Dock Rendered after includesLoaded.");
+    } else {
+      console.warn("⚠️ renderOrbitalDock not available after includesLoaded.");
     }
   });
 
 }).catch(err => {
-  console.error("❌ Failed to load OperatorDockWiring module:", err);
+  console.error("❌ Failed to load OrbitWiringSystem module:", err);
 });
 
 // Neural Unified Bootstrap Loader
@@ -158,7 +199,41 @@ import('/scripts/bootstrap/bootstrapNeural.js').then(module => {
 });
 
 
+// 🔒 Sovereign Override: Lockdown revealAllDockPanels
+window.revealAllDockPanels = function () {
+  console.warn("🛡️ revealAllDockPanels blocked by Sovereign lockdown.");
+};
+
 // Snap Memory Auto-Recall
 window.addEventListener("DOMContentLoaded", () => {
+  window.SovereignSubsystems?.toolbarRenderer?.renderToolbar?.();
   window?.SovereignMemory?.recallFinalSnapState?.();
+
+  // 🛡️ Sovereign Visibility Lockdown Override
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    panel.style.display = 'none';
+  });
+
+  ['neuralPulsePanel', 'agentLifecyclePanel', 'coreCommandInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'flex';
+  });
+
+  // 🧠 Sovereign Mutation Observer Lock
+  const visibilityWhitelist = ['neuralPulsePanel', 'agentLifecyclePanel', 'coreCommandInput'];
+
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(({ target }) => {
+      if (
+        target.classList?.contains('holo-console') &&
+        !visibilityWhitelist.includes(target.id)
+      ) {
+        target.style.display = 'none';
+      }
+    });
+  });
+
+  document.querySelectorAll('.holo-console').forEach(panel => {
+    observer.observe(panel, { attributes: true, attributeFilter: ['style'] });
+  });
 });

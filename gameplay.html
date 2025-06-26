@@ -1,0 +1,35 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SageCraft Gameplay Hub</title>
+  <link rel="stylesheet" href="styles/liquidGlassReset.css" />
+  <link rel="stylesheet" href="styles/gameplay.css" />
+</head>
+<body>
+  <main id="gameplay-main">
+    <header class="title-banner">
+      <h1>SageCraft Console Arena</h1>
+    </header>
+
+    <section class="console-grid">
+      <!-- Auto-rendered mesh consoles will be positioned here -->
+      <div class="console-wrapper"><div id="sovereignTerminal" class="holo-console core-panel" data-panel="sovereignTerminal"></div></div>
+      <div class="console-wrapper"><div id="countConsole" class="holo-console satellite-panel" data-panel="countConsole"></div></div>
+      <div class="console-wrapper"><div id="deltaAnalyzerConsole" class="holo-console satellite-panel" data-panel="deltaAnalyzerConsole"></div></div>
+      <div class="console-wrapper"><div id="reportingHubConsole" class="holo-console satellite-panel" data-panel="reportingHubConsole"></div></div>
+      <div class="console-wrapper"><div id="sessionManagerConsole" class="holo-console satellite-panel" data-panel="sessionManagerConsole"></div></div>
+      <div class="console-wrapper"><div id="utilityHubConsole" class="holo-console satellite-panel" data-panel="utilityHubConsole"></div></div>
+    </section>
+
+    <footer class="gameplay-footer">
+      <p>&copy; 2025 SageCraft Ascendant Systems</p>
+    </footer>
+  </main>
+
+  <script type="module" src="scripts/gameplay/consoleGridStyler.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+/* === Sovereign UI Layout Grid Foundation === */
+
+#dockGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 40%, 400px), 1fr));
+    gap: clamp(1rem, 2vw, 2rem);
+    padding: clamp(1rem, 4vw, 3rem);
+    max-width: 100%;
+    margin: 0 auto;
+    align-items: start;
+  }
+  
+  .dock-panel-group {
+    display: flex;
+    flex-direction: column;
+    background: rgba(20, 20, 30, 0.85);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  }
+  
+  /* Optional: Consistent padding and margin reset for dock panels */
+  .dock-panel, .holo-console {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+@media (max-width: 600px) {
+  #dockGrid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}

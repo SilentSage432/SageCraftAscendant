@@ -101,8 +101,62 @@ setTimeout(() => {
     });
   }
 
+  // === REMOVE resurrected-placeholder consoles for reportingHubConsole and deltaAnalyzerConsole ===
+  // The following block is intentionally commented out to prevent unwanted placeholder injection:
+  /*
+  // reportingHubConsole placeholder
+  if (!document.getElementById("reportingHubConsole")) {
+    const reportingHubPlaceholder = document.createElement("div");
+    reportingHubPlaceholder.id = "reportingHubConsole";
+    reportingHubPlaceholder.className = "resurrected-placeholder docked snap-pinned";
+    reportingHubPlaceholder.setAttribute("data-signal-linked", "true");
+    reportingHubPlaceholder.style.display = "grid";
+    // ... (any additional setup)
+    document.body.appendChild(reportingHubPlaceholder);
+  }
+
+  // deltaAnalyzerConsole placeholder
+  if (!document.getElementById("deltaAnalyzerConsole")) {
+    const deltaAnalyzerPlaceholder = document.createElement("div");
+    deltaAnalyzerPlaceholder.id = "deltaAnalyzerConsole";
+    deltaAnalyzerPlaceholder.className = "resurrected-placeholder docked snap-pinned";
+    deltaAnalyzerPlaceholder.setAttribute("data-signal-linked", "true");
+    deltaAnalyzerPlaceholder.style.display = "grid";
+    // ... (any additional setup)
+    document.body.appendChild(deltaAnalyzerPlaceholder);
+  }
+  */
+  // 🧼 Manual injection of reportingHubConsole and deltaAnalyzerConsole disabled (modular control active).
+  console.log("🧼 Manual injection of reportingHubConsole and deltaAnalyzerConsole disabled (modular control active).");
+
   console.log("✅ Phase 31.0 — All known panels forcibly revealed.");
 }, 1500);
+
+// === Sage Terminal Panel Renderer (scaffold) ===
+function renderSageTerminal() {
+  const el = document.getElementById("sovereignTerminal");
+  if (!el) return;
+
+  el.innerHTML = `
+    <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+    <header class="console-header">💻 Sovereign Terminal</header>
+    <div class="console-body">
+      <div class="panel-content">
+        <p>Awaiting command input...</p>
+        <input type="text" placeholder="Enter command..." style="width: 100%; padding: 8px; margin-top: 12px; background: #111; color: #0ff; border: 1px solid magenta; border-radius: 4px;" />
+      </div>
+    </div>
+  `;
+
+  el.style.display = "block";
+  el.style.opacity = "1";
+  el.style.visibility = "visible";
+  el.style.position = "fixed";
+  el.style.top = "10%";
+  el.style.left = "50%";
+  el.style.transform = "translateX(-50%)";
+  el.style.zIndex = "9999";
+}
 
 // === Phase 310.9 — Panel Content Injector Audit ===
 setTimeout(() => {
@@ -217,13 +271,18 @@ setTimeout(() => {
     "sovereignTerminal"
   ];
 
+  // Commented out panel injection for reportingHubConsole and deltaAnalyzerConsole
+  /*
   consoleIdList.forEach(id => {
+    if (id === "reportingHubConsole" || id === "deltaAnalyzerConsole") {
+      // Skip manual injection for these panels
+      return;
+    }
     const panel = document.getElementById(id);
     if (!panel) {
       console.warn(`❌ Panel '${id}' not found in DOM.`);
       return;
     }
-
     if (panel.innerHTML.trim().length === 0 || panel.innerHTML.includes("Placeholder")) {
       panel.innerHTML = `
         <div class="console-header">🔄 Rebinding: ${id}</div>
@@ -237,12 +296,16 @@ setTimeout(() => {
       console.log(`✅ Panel ${id} already contains valid content.`);
     }
   });
+  */
+  console.log("🧼 Manual injection of reportingHubConsole and deltaAnalyzerConsole disabled (modular control active).");
 
   console.log("✅ Phase 313.5 — Soul Imprint Rebinding Complete");
 
   // === Phase 314.0 — Internal Logic Resurrection Protocol ===
   console.log("🧠 Phase 314.0 — Internal Logic Resurrection Protocol Initiated");
 
+  // Commented out resurrection routines for reportingHubConsole and deltaAnalyzerConsole
+  /*
   const resurrectionRoutines = {
     countConsole: window.getCountDockContent,
     deltaAnalyzerConsole: window.getDeltaAnalyzerContent,
@@ -254,6 +317,10 @@ setTimeout(() => {
   };
 
   Object.entries(resurrectionRoutines).forEach(([id, builder]) => {
+    if (id === "reportingHubConsole" || id === "deltaAnalyzerConsole") {
+      // Skip manual injection for these panels
+      return;
+    }
     const panel = document.getElementById(id);
     if (!panel) {
       console.warn(`❌ Resurrection skipped — Panel '${id}' not found.`);
@@ -276,6 +343,8 @@ setTimeout(() => {
       console.log(`✅ '${id}' already has bound content.`);
     }
   });
+  */
+  console.log("🧼 Manual injection of reportingHubConsole and deltaAnalyzerConsole disabled (modular control active).");
 
   console.log("✅ Phase 314.0 — Internal Logic Resurrection Complete");
 
@@ -937,6 +1006,7 @@ setTimeout(() => {
     sovereignBroadcast("Phase 333.0 broadcast test: channels online.");
   }, 600);
 
+
   console.log("✅ Phase 333.0 — Echo Channel Relay Operational");
 
   // === Phase 334.0 — UI Hygiene & Signal Purge ===
@@ -975,11 +1045,6 @@ setTimeout(() => {
       );
     });
 
-    floating.forEach(el => {
-      document.querySelector("#consolePanelGroup")?.appendChild(el);
-      el.setAttribute("data-rebound-status", "reparented");
-    });
-
     console.log(`🏠 Phase 334.0 — Reparented ${floating.length} orphan panels`);
   })();
 
@@ -1006,33 +1071,17 @@ setTimeout(() => {
   const dockGrid = document.getElementById("dockGrid");
   const operatorDockGrid = document.getElementById("operatorDockGrid");
 
-  const allPanelsToCheck = document.querySelectorAll(".dock-panel, .holo-console");
-  allPanelsToCheck.forEach(panel => {
-    const isContained =
-      panel.closest(".dock-panel-group") ||
-      panel.closest("#dockGrid") ||
-      panel.closest("#operatorDockGrid");
+const allPanelsToCheck = document.querySelectorAll(".dock-panel, .holo-console");
+allPanelsToCheck.forEach(panel => {
+  const isContained =
+    panel.closest(".dock-panel-group") ||
+    panel.closest("#dockGrid") ||
+    panel.closest("#operatorDockGrid");
 
-    if (!isContained) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "dock-panel-group";
-      wrapper.style.display = "flex";
-      wrapper.style.flexDirection = "column";
-      wrapper.style.margin = "10px";
-      wrapper.appendChild(panel);
-
-      if (dockGrid) {
-        dockGrid.appendChild(wrapper);
-        console.log(`📎 Rehomed uncontained panel: '${panel.id}' ➜ #dockGrid`);
-      } else if (operatorDockGrid) {
-        operatorDockGrid.appendChild(wrapper);
-        console.log(`📎 Rehomed uncontained panel: '${panel.id}' ➜ #operatorDockGrid`);
-      } else {
-        document.body.appendChild(wrapper);
-        console.warn(`⚠️ Fallback: Rehomed '${panel.id}' directly to body (no grid container found).`);
-      }
-    }
-  });
+  if (!isContained) {
+    console.warn(`⚠️ '${panel.id}' is uncontained. Verify placement inside #dockGrid or .dock-panel-group`);
+  }
+});
 
   console.log("✅ Phase 334.3 — Containment Audit Complete");
 
@@ -1165,6 +1214,8 @@ function SafeBind(selector, event, handler) {
 // SafeBind("logList", "click", handleLogList);
 // SafeBind("sessionManagerBtn", "click", openSessionManager);
 // SafeBind("someOtherBtn", "click", handleOtherAction);
+// ❌ Deprecated docking logic — now handled in gameplay.html
+/*
 const SovereignDockPanelMap = {
   count: "#countConsole",
   deltaAnalyzer: "#deltaAnalyzerConsole",
@@ -1174,6 +1225,7 @@ const SovereignDockPanelMap = {
   oracle: "#oracleConsole",
   whisperer: "#whispererConsole"
 };
+*/
 
 // Dock wiring object for future dynamic dock control
 var OperatorDockWiring = {
@@ -1286,9 +1338,11 @@ var OperatorDockWiring = {
                 `;
             }
         });
+      
 
         console.log("✅ Diagnostic labels injected into empty dock panels.");
     },
+  
 // (rest of object unchanged)
 
     on: function(eventName, callback) {
@@ -2547,64 +2601,67 @@ var OperatorDockWiring = {
 
     // === Cross-System Bridge API Interface ===
     getDockAPI: function() {
-        console.log("🌉 Exposing Cross-System Dock API...");
-
-        return {
-            exportDockSnapshot: this.exportDockSnapshot.bind(this),
-            importDockSnapshot: this.importDockSnapshot.bind(this),
-            saveDockState: this.saveDockState.bind(this),
-            restoreDockState: this.restoreDockState.bind(this),
-            resetDockState: this.resetDockState.bind(this),
-            loadSnapshotToSandbox: this.loadSnapshotToSandbox.bind(this),
-            applySandbox: this.applySandbox.bind(this),
-            discardSandbox: this.discardSandbox.bind(this),
-            compareDockStates: this.compareDockStates.bind(this),
-            applyDockDelta: this.applyDockDelta.bind(this),
-            applyDeltaChain: this.applyDeltaChain.bind(this),
-            scanDeltaConflicts: this.scanDeltaConflicts.bind(this),
-            simulateMerge: this.simulateMerge.bind(this),
-            arbitrateMergeConflicts: this.arbitrateMergeConflicts.bind(this),
-            recoverDockState: this.recoverDockState.bind(this),
-            subscribeLiveState: this.subscribeLiveState.bind(this),
-            unsubscribeLiveState: this.unsubscribeLiveState.bind(this),
-            saveProfile: this.saveProfile.bind(this),
-            loadProfile: this.loadProfile.bind(this),
-            deleteProfile: this.deleteProfile.bind(this),
-            listProfiles: this.listProfiles.bind(this),
-            importProfileFromJSON: this.importProfileFromJSON.bind(this),
-            exportProfile: this.exportProfile.bind(this),
-            setDefaultProfile: this.setDefaultProfile.bind(this),
-            getDefaultProfile: this.getDefaultProfile.bind(this),
-            loadDefaultProfile: this.loadDefaultProfile.bind(this),
-            mergeProfiles: this.mergeProfiles.bind(this),
-            assignProfileToRole: this.assignProfileToRole.bind(this),
-            getProfileForRole: this.getProfileForRole.bind(this),
-            activateRole: this.activateRole.bind(this),
-            activateRoles: this.activateRoles.bind(this),
-            setRolePriority: this.setRolePriority.bind(this),
-            getRolePriority: this.getRolePriority.bind(this),
-            defineRoleCluster: this.defineRoleCluster.bind(this),
-            getRoleCluster: this.getRoleCluster.bind(this),
-            activateRoleCluster: this.activateRoleCluster.bind(this),
-            setClusterPriority: this.setClusterPriority.bind(this),
-            getClusterPriority: this.getClusterPriority.bind(this),
-            activateRoleClusters: this.activateRoleClusters.bind(this),
+      console.log("🌉 Exposing Cross-System Dock API...");
+  
+      return {
+          exportDockSnapshot: this.exportDockSnapshot.bind(this),
+          importDockSnapshot: this.importDockSnapshot.bind(this),
+          saveDockState: this.saveDockState.bind(this),
+          restoreDockState: this.restoreDockState.bind(this),
+          resetDockState: this.resetDockState.bind(this),
+          loadSnapshotToSandbox: this.loadSnapshotToSandbox.bind(this),
+          applySandbox: this.applySandbox.bind(this),
+          discardSandbox: this.discardSandbox.bind(this),
+          compareDockStates: this.compareDockStates.bind(this),
+          applyDockDelta: this.applyDockDelta.bind(this),
+          applyDeltaChain: this.applyDeltaChain.bind(this),
+          scanDeltaConflicts: this.scanDeltaConflicts.bind(this),
+          simulateMerge: this.simulateMerge.bind(this),
+          arbitrateMergeConflicts: this.arbitrateMergeConflicts.bind(this),
+          recoverDockState: this.recoverDockState.bind(this),
+          subscribeLiveState: this.subscribeLiveState.bind(this),
+          unsubscribeLiveState: this.unsubscribeLiveState.bind(this),
+          saveProfile: this.saveProfile.bind(this),
+          loadProfile: this.loadProfile.bind(this),
+          deleteProfile: this.deleteProfile.bind(this),
+          listProfiles: this.listProfiles.bind(this),
+          importProfileFromJSON: this.importProfileFromJSON.bind(this),
+          exportProfile: this.exportProfile.bind(this),
+          setDefaultProfile: this.setDefaultProfile.bind(this),
+          getDefaultProfile: this.getDefaultProfile.bind(this),
+          loadDefaultProfile: this.loadDefaultProfile.bind(this),
+          mergeProfiles: this.mergeProfiles.bind(this),
+          assignProfileToRole: this.assignProfileToRole.bind(this),
+          getProfileForRole: this.getProfileForRole.bind(this),
+          activateRole: this.activateRole.bind(this),
+          activateRoles: this.activateRoles.bind(this),
+          setRolePriority: this.setRolePriority.bind(this),
+          getRolePriority: this.getRolePriority.bind(this),
+          defineRoleCluster: this.defineRoleCluster.bind(this),
+          getRoleCluster: this.getRoleCluster.bind(this),
+          activateRoleCluster: this.activateRoleCluster.bind(this),
+          setClusterPriority: this.setClusterPriority.bind(this),
+          getClusterPriority: this.getClusterPriority.bind(this),
+          activateRoleClusters: this.activateRoleClusters.bind(this)
+      };
+  }, // ← include this comma if this function is inside an object
+        
 
             // Sovereign Panel Scaffold API (Phase 500.5)
-            getCountDockContent: () => "<h2>📊 Live Counts</h2><p>Placeholder content for Live Counts panel.</p>",
-            getDeltaAnalyzerContent: () => "<h2>Δ Delta Analyzer</h2><p>Placeholder content for Delta Analyzer.</p>",
-            getExceptionManagerContent: () => "<h2>⚠ Exception Manager</h2><p>Placeholder content for Exception Manager.</p>",
-            getProgressDashboardContent: () => "<h2>🚦 Progress Dashboard</h2><p>Placeholder content for Progress Dashboard.</p>",
-            getReportingHubContent: () => "<h2>📄 Reporting Hub</h2><p>Placeholder content for Reporting Hub.</p>",
-            getMasterExportHubContent: () => "<h2>📤 Master Export Hub</h2><p>Placeholder content for Master Export Hub.</p>",
-            getUtilityHubContent: () => "<h2>🛠 Utility Hub</h2><p>Placeholder content for Utility Hub.</p>",
-            getSessionManagerContent: () => "<h2>📂 Session Manager</h2><p>Placeholder content for Session Manager.</p>",
-            getMappingsContent: () => "<h2>🗺 Mappings Interface</h2><p>Placeholder content for Mappings Interface.</p>",
-            getToolsContent: () => "<h2>🔧 Tools Panel</h2><p>Placeholder content for Tools Panel.</p>",
-            getAuditContent: () => "<h2>📋 Audit Manager</h2><p>Placeholder content for Audit Manager.</p>",
-            getConfigPanelContent: () => "<h2>⚙ Configuration Panel</h2><p>Placeholder content for Configuration Panel.</p>"
-        };
-    },
+/*
+getCountDockContent: () => "<h2>📊 Live Counts</h2><p>Placeholder content for Live Counts panel.</p>",
+getDeltaAnalyzerContent: () => "<h2>Δ Delta Analyzer</h2><p>Placeholder content for Delta Analyzer.</p>",
+getExceptionManagerContent: () => "<h2>⚠ Exception Manager</h2><p>Placeholder content for Exception Manager.</p>",
+getProgressDashboardContent: () => "<h2>🚦 Progress Dashboard</h2><p>Placeholder content for Progress Dashboard.</p>",
+getReportingHubContent: () => "<h2>📄 Reporting Hub</h2><p>Placeholder content for Reporting Hub.</p>",
+getMasterExportHubContent: () => "<h2>📤 Master Export Hub</h2><p>Placeholder content for Master Export Hub.</p>",
+getUtilityHubContent: () => "<h2>🛠 Utility Hub</h2><p>Placeholder content for Utility Hub.</p>",
+getSessionManagerContent: () => "<h2>📂 Session Manager</h2><p>Placeholder content for Session Manager.</p>",
+getMappingsContent: () => "<h2>🗺 Mappings Interface</h2><p>Placeholder content for Mappings Interface.</p>",
+getToolsContent: () => "<h2>🔧 Tools Panel</h2><p>Placeholder content for Tools Panel.</p>",
+getAuditContent: () => "<h2>📋 Audit Manager</h2><p>Placeholder content for Audit Manager.</p>",
+getConfigPanelContent: () => "<h2>⚙ Configuration Panel</h2><p>Placeholder content for Configuration Panel.</p>"
+*/
 
     // === Sovereign Integrity Auditor ===
     runIntegrityAudit: function() {
@@ -2668,7 +2725,7 @@ var OperatorDockWiring = {
     }
 };
 
-// Ensure DOMContentLoaded event is safely bound
+/* Ensure DOMContentLoaded event is safely bound
 document.addEventListener("DOMContentLoaded", () => {
     if (typeof OperatorDockWiring.populateDockMatrix === "function") {
         OperatorDockWiring.populateDockMatrix();
@@ -2839,37 +2896,7 @@ window.OperatorDockConsole = OperatorDockConsole;
 console.log("🧭 Operator Dock Admin Console Ready — Type 'OperatorDockConsole' to begin diagnostics.");
 
 
-// === Phase 300.7: Subsystem Dock Content Injection ===
-
-setTimeout(() => {
-    console.log("🚀 Executing Phase 300.7 Dock Content Injection...");
-
-    const dockContents = {
-        count: `<h2>📊 Live Counts</h2><p>Live inventory counting subsystem online.</p>`,
-        deltaAnalyzer: `<h2>Δ Delta Analyzer</h2><p>Delta analytics subsystem loaded.</p>`,
-        exceptionManager: `<h2>⚠ Exception Manager</h2><p>Monitoring anomaly exceptions.</p>`,
-        progressDashboard: `<h2>🚦 Progress Dashboard</h2><p>System progress indicators operational.</p>`,
-        reportingHub: `<h2>📄 Reporting Hub</h2><p>Report generation subsystem ready.</p>`,
-        masterExportHub: `<h2>📤 Master Export Hub</h2><p>Bulk export interfaces deployed.</p>`,
-        utilityHub: `<h2>🛠 Utility Hub</h2><p>Utility tools accessible here.</p>`,
-        sessionManager: `<h2>📂 Session Manager</h2><p>Session archival and recovery available.</p>`,
-        mappings: `<h2>🗺 Mappings Interface</h2><p>Mapping configuration subsystem loaded.</p>`,
-        tools: `<h2>🔧 Tools Panel</h2><p>Developer and diagnostic tools online.</p>`,
-        audit: `<h2>📋 Audit Manager</h2><p>System audit controls engaged.</p>`,
-        configPanel: `<h2>⚙ Configuration Panel</h2><p>Codex configuration settings loaded.</p>`
-    };
-
-    Object.entries(dockContents).forEach(([dockId, content]) => {
-        const panel = document.getElementById(dockId);
-        if (panel) {
-            panel.innerHTML = content;
-            console.log(`✅ Content injected into ${dockId}`);
-        } else {
-            console.warn(`⚠ Dock panel ${dockId} not found.`);
-        }
-    });
-
-}, 600);
+// Phase 300.7 injection temporarily disabled to allow modular panel control
 
 // === Phase 300.9: Dock Grid Unification Protocol ===
 
@@ -2922,14 +2949,16 @@ setTimeout(() => {
             // console.warn(`⚠ Skipped migration for '${dockId}'`);
         }
     });
-    */
+    
 
     console.log("✅ Phase 300.9 Dock Grid Unification complete.");
 
 }, 800);
+*/
 
 
-// === Phase 300.13: Dynamic Dock Panel Population Injection ===
+
+/*=== Phase 300.13: Dynamic Dock Panel Population Injection ===
 
 setTimeout(() => {
     console.log("🚀 Executing Phase 300.13: Dynamic Dock Panel Population...");
@@ -3029,6 +3058,7 @@ setTimeout(() => {
     }
 
 }, 1000);
+*/
 
 
 // === Phase 700.3-B: Sovereign Dock Toggle Core Rebuild Injection ===
@@ -3408,7 +3438,7 @@ Object.entries(dockConsoles).forEach(([id, content]) => {
     console.log(`✅ ${id} initialized and wired to DOM`);
 });
 
-// Ensure Whisperer Console is ap<truncated__content/>
+// Ensure Whisperer Console is applied correctly.
 
 // === Phase: HUD Element Safe-Binding for Key UI Elements ===
 // Wrap direct getElementById bindings with safe-check for HUD elements
@@ -3481,3 +3511,22 @@ window.addEventListener("load", () => {
   });
   console.log("✅ Sweep Complete — Check for reflow triggers, style overrides, or missing role commitments.");
 });
+// === Sovereign Terminal Console Construction & Rebinding ===
+// Uncommented and re-registered for terminal restoration
+window.renderSageTerminal = () => {
+  const panel = document.createElement("section");
+  panel.id = "sovereignTerminal";
+  panel.classList.add("holo-console", "dock-panel", "holo-console-panel");
+  panel.innerHTML = `
+    <button class="panel-close" onclick="closeConsole(this)">✖️</button>
+    <header class="console-header">💻 Sovereign Terminal</header>
+    <div class="console-body">
+      <div class="panel-content">
+        <p>Awaiting command input...</p>
+      </div>
+    </div>
+  `;
+  document.getElementById("sovereignGridSystem")?.appendChild(panel);
+};
+window.OperatorDockWiring = OperatorDockWiring;
+export { OperatorDockWiring };

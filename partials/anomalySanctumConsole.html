@@ -1,0 +1,26 @@
+<div id="anomalySanctumConsole" class="holo-console hidden" data-role="sanctum">
+  <div class="console-header">
+    <h2>☠ Anomaly Sanctum</h2>
+    <button class="close-btn" onclick="closeConsole(this)">✖</button>
+  </div>
+  <div class="console-body">
+    <p class="faint">Anomalies detected by the system will appear here for classification, suppression, or escalation.</p>
+    <ul class="anomaly-log"></ul>
+  </div>
+</div>
+<script>
+  function injectAnomaly() {
+    const input = document.getElementById("anomalyInjectInput");
+    const key = input?.value?.trim();
+    if (!key) return alert("⚠️ Enter an anomaly key first.");
+
+    anomalyLog.unshift({
+      key,
+      timestamp: Date.now()
+    });
+
+    renderAnomalySanctum();
+    alert(`🧬 Injected anomaly: ${key}`);
+    input.value = "";
+  }
+</script>

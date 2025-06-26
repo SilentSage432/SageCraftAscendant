@@ -1,0 +1,339 @@
+#dockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  justify-items: stretch;
+  align-items: start;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  min-height: 400px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#operatorDockGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dock-panel-group {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.015);
+  padding: 16px;
+  border-radius: 10px;
+  min-width: 320px;
+  max-width: 100%;
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+
+.dock-panel,
+.holo-console {
+  background: rgba(18, 18, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+
+.holo-console.default-state {
+  position: relative;
+  margin: 0 auto 20px auto;
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.dock-panel:hover,
+.holo-console:hover {
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.holo-console {
+  display: block;
+  width: 100%;
+}
+
+#agentLifecycleConsole.snap-pinned {
+  grid-column: span 1;
+  min-width: 340px;
+  max-width: 100%;
+  align-self: start;
+  justify-self: center;
+}
+
+
+#agentLifecyclePanel.snap-pinned {
+  grid-column: span 1;
+  min-width: 340px;
+  max-width: 100%;
+  align-self: start;
+  justify-self: center;
+}
+
+/* === Modular Console Layout Rules === */
+
+/* === Default Visible Console Placement === */
+
+#coreCommandInput.snap-pinned {
+  grid-column: 4 / span 6;
+  grid-row: 2;
+}
+
+#neuralPulsePanel.snap-pinned {
+  grid-column: 11 / span 2;
+  grid-row: 1;
+}
+
+#sessionManagerConsole.snap-pinned {
+  grid-column: 1 / span 3;
+  grid-row: 3;
+}
+
+#agentLifecycleConsole.snap-pinned,
+#agentLifecyclePanel.snap-pinned,
+#anomalySanctumConsole.snap-pinned,
+#auditConsole.snap-pinned,
+#coreCommandInput.snap-pinned,
+#deltaAnalyzerConsole.snap-pinned,
+#devConsolePanel.snap-pinned,
+#echoArchivePanel.snap-pinned,
+#exceptionManagerConsole.snap-pinned,
+#mappingsConsole.snap-pinned,
+#masterExportHubConsole.snap-pinned,
+#memoryKernelConsole.snap-pinned,
+#neuralPulsePanel.snap-pinned,
+#operatorStatusConsole.snap-pinned,
+#oracleConsole.snap-pinned,
+#orbitPanelDock.snap-pinned,
+#panelSweepTriggers.snap-pinned,
+#sessionManagerConsole.snap-pinned,
+#sigilForgeConsole.snap-pinned,
+#signalForecastConsole.snap-pinned,
+#toolsConsole.snap-pinned,
+#utilityHubConsole.snap-pinned {
+  grid-column: span 1;
+  min-width: 340px;
+  max-width: 100%;
+  align-self: start;
+  justify-self: center;
+}
+
+/* === System Identity Banner === */
+
+#sovereignBanner {
+  grid-column: 4 / span 6;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 10px;
+  animation: fadeInBanner 1.4s ease forwards;
+  opacity: 0;
+  text-align: center;
+  z-index: 120;
+}
+
+.banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.system-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  color: #00ffff;
+  letter-spacing: 2px;
+  margin-top: 6px;
+  text-shadow: 0 0 8px rgba(0,255,255,0.5), 0 0 16px rgba(0,255,255,0.25);
+}
+
+.system-sigil {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 8px rgba(0,255,255,0.35));
+}
+
+/* === Core Panel Vertical Stack === */
+
+#coreCommandInput.snap-pinned {
+  grid-column: 4 / span 6;
+  grid-row: 3;
+  margin-bottom: 20px;
+}
+
+#neuralPulsePanel.snap-pinned {
+  grid-column: 4 / span 6;
+  grid-row: 2;
+  margin-bottom: 20px;
+}
+
+#whispererConsole.snap-pinned {
+  grid-column: 4 / span 6;
+  grid-row: 4;
+  margin-bottom: 20px;
+  justify-self: center;
+  box-shadow: 0 2px 5px rgba(0,255,255,0.08);
+}
+
+/* === Orbit Toggle Panel Positioning === */
+
+#orbitPanelDock.snap-pinned {
+  position: absolute;
+  top: 200px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 150;
+}
+
+#orbitPanelDock .orbit-button {
+  background: rgba(0, 255, 255, 0.08);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#orbitPanelDock .orbit-button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+}
+
+
+/* === Hidden Panels (Orbit Activated) === */
+
+#loreEngineConsole,
+#signalForecastConsole,
+#sovereignSanctumConsole,
+#sageFeedConsole,
+#artifactVaultConsole,
+#memoryKernelConsole,
+#navigationArrayConsole {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 0;
+}
+
+/* === Z-Index and Glow Cleanup === */
+
+.holo-console.snap-pinned {
+  z-index: 50;
+  box-shadow: 0 1px 4px rgba(0, 255, 255, 0.06);
+  transition: box-shadow 0.25s ease;
+}
+
+.holo-console.snap-pinned:hover {
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Ensure base z-index for default state */
+.holo-console.default-state {
+  z-index: 20;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* === Layout Enforcement Override === */
+
+.holo-console.snap-pinned {
+  position: relative !important;
+  display: block !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 auto 20px auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* === DockGrid Compliance Enforcement === */
+
+#dockGrid > .holo-console.snap-pinned {
+  position: relative !important;
+  display: grid !important;
+  place-items: start center;
+  margin: 0 auto 20px auto;
+  z-index: 60;
+  opacity: 1;
+  visibility: visible;
+  box-shadow: 0 2px 6px rgba(0, 255, 255, 0.1);
+}
+
+body .holo-console.snap-pinned:not(#dockGrid > .holo-console) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+@keyframes fadeInBanner {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Responsive Support for Smaller Screens === */
+@media (max-width: 768px) {
+  #dockGrid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .dock-panel-group {
+    padding: 12px;
+  }
+
+  .system-title {
+    font-size: 1.5rem;
+  }
+
+  .holo-console {
+    padding: 8px;
+  }
+
+  #orbitPanelDock {
+    top: 120px;
+    right: 20px;
+    gap: 8px;
+  }
+
+  #orbitPanelDock .orbit-button {
+    width: 32px;
+    height: 32px;
+  }
+}

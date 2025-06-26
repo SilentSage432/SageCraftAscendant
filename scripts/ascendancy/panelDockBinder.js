@@ -30,9 +30,9 @@ export function bindPanelsToDock() {
   console.groupEnd();
 }
 
-// Auto-init
-document.addEventListener('DOMContentLoaded', () => {
-  bindPanelsToDock();
-});
+// Auto-init temporarily disabled to allow modular injection control
+// document.addEventListener('DOMContentLoaded', () => {
+//   bindPanelsToDock();
+// });
 
 export { bindPanelsToDock as rebindConsoleToGroup };

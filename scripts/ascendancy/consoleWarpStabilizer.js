@@ -1,5 +1,3 @@
-
-
 // consoleWarpStabilizer.js
 // Phase 351.2 — Console Warp Stabilizer Deployment
 
@@ -14,7 +12,6 @@ export function stabilizeConsoleWarp() {
     }
 
     // Apply warp-stabilizing class to ensure grid cohesion
-    panel.classList.add('warp-stabilized');
   });
 
   console.log('[⚙️] Console Warp Stabilizer initialized.');

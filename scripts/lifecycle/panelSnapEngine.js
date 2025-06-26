@@ -1,3 +1,39 @@
+// === Responsive Mobile Panel Reflow ===
+function reflowPanelsForMobile() {
+  const isMobile = window.innerWidth <= 768;
+  const panels = document.querySelectorAll('.holo-console-panel');
+
+  panels.forEach(panel => {
+    if (isMobile) {
+      Object.assign(panel.style, {
+        position: 'relative',
+        top: 'unset',
+        left: 'unset',
+        right: 'unset',
+        bottom: 'unset',
+        transform: 'none',
+        width: '90%',
+        maxWidth: '90%',
+        margin: '1rem auto',
+        zIndex: '999'
+      });
+    } else {
+      panel.style.position = '';
+      panel.style.top = '';
+      panel.style.left = '';
+      panel.style.right = '';
+      panel.style.bottom = '';
+      panel.style.transform = '';
+      panel.style.width = '';
+      panel.style.maxWidth = '';
+      panel.style.margin = '';
+      panel.style.zIndex = '';
+    }
+  });
+}
+
+window.addEventListener('resize', reflowPanelsForMobile);
+window.addEventListener('load', reflowPanelsForMobile);
 // === Phase Zero: Grid Alignment Cascade ===
 document.addEventListener("DOMContentLoaded", () => {
   // Phase 426: Persistent Grid Memory Binding
@@ -27,23 +63,24 @@ document.addEventListener("DOMContentLoaded", () => {
   restoreGridState();
   window.addEventListener("beforeunload", persistGridState);
   // === PanelSnap Patch: Assign roles to panels based on ID if missing ===
-  document.querySelectorAll('.holo-console').forEach(panel => {
-    if (!panel.dataset.role || panel.dataset.role.trim() === '') {
-      const id = panel.id?.toLowerCase() || '';
-      if (id.includes('terminal')) {
-        panel.dataset.role = 'terminal';
-      } else if (id.includes('oracle')) {
-        panel.dataset.role = 'oracle';
-      } else if (id.includes('pulse')) {
-        panel.dataset.role = 'pulseMonitor';
-      } else if (id.includes('dock')) {
-        panel.dataset.role = 'dockHub';
-      } else {
-        panel.dataset.role = 'unassigned';
-      }
-      console.log(`📌 Assigned role "${panel.dataset.role}" to #${panel.id}`);
+document.querySelectorAll('.holo-console').forEach(panel => {
+  if (!panel.dataset.role || panel.dataset.role.trim() === '') {
+    // Improved contextual data-role assignment from panel id
+    const panelId = panel.getAttribute('id') || '';
+    let fallbackRole = 'unknown';
+
+    if (panelId) {
+      fallbackRole = panelId
+        .replace(/Console|Panel|Dock/gi, '')
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .toLowerCase()
+        .trim();
     }
-  });
+
+    panel.setAttribute('data-role', fallbackRole || 'unassigned');
+    console.log(`📌 Assigned role "${panel.getAttribute('data-role')}" to #${panel.id}`);
+  }
+});
 
   const grid = document.getElementById("sovereignGrid");
   if (!grid) return console.warn("⚠️ sovereignGrid not found.");
@@ -369,8 +406,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   panels.forEach(panel => {
-    const role = panelRoles[panel.id] || 'undefined';
-    panel.dataset.role = role;
+    let role = panelRoles[panel.id];
+    if (!role || role === 'undefined') {
+      role = 'sigil-forge'; // or another default based on context
+    }
+    panel.setAttribute('data-role', role);
     console.log(`[RoleAssign] ${panel.id || '(no id)'} assigned role: ${role}`);
 
     // Phase 379 — Panel Behavior Sync by Role
@@ -491,6 +531,13 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.classList.add('snapping');
     panel.style.left = `${snappedPosition.x}px`;
     panel.style.top = `${snappedPosition.y}px`;
+    // 🔒 Block Y override for specific panels
+    if (panel.id && panel.classList.contains('holo-console')) {
+      console.warn(`🔒 Blocking Y override on ${panel.id}`);
+      panel.style.top = "auto";       // Prevent forced deep stacking
+      panel.style.transform = "none"; // Prevent transform positioning
+      panel.classList.add("panel-pinned"); // Add optional class hook
+    }
     // Phase 389 — Sovereign Echo Trail Injection
     const trail = document.createElement('div');
     trail.className = 'echo-trail';
@@ -789,16 +836,48 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // === Snap Registration: Title Banner and Terminal ===
+  // Ensures main title and terminal respond to resizing and snap alignment
+  function snapToCenter(element) {
+    if (!element) return;
+    element.style.margin = "0 auto";
+    element.style.display = "block";
+    element.style.maxWidth = "95vw";
+    element.style.width = "100%";
+    element.style.boxSizing = "border-box";
+  }
+
+  // Apply on load (when DOM is ready)
+  const titleBanner = document.getElementById("mainTitleBanner");
+  const centralTerminal = document.getElementById("sovereignTerminal");
+  snapToCenter(titleBanner);
+  snapToCenter(centralTerminal);
+
+  // Apply on resize
+  window.addEventListener("resize", () => {
+    snapToCenter(document.getElementById("mainTitleBanner"));
+    snapToCenter(document.getElementById("sovereignTerminal"));
+  });
+
   // Phase 383 — Sovereign Panel Role Visualizer Overlay
   document.querySelectorAll('.holo-console-panel').forEach(panel => {
-    const role = panel.dataset.role || 'undefined';
+    // Ensure stable role assignment
+    let role = panel.getAttribute('data-role');
+    if (!role || role === 'undefined') {
+      role = 'sigil-forge';
+      panel.setAttribute('data-role', role);
+    }
     let badge = panel.querySelector('.role-badge');
-
     if (!badge) {
       badge = document.createElement('div');
       badge.className = 'role-badge';
-      badge.innerText = role;
+      const panelRole = panel.getAttribute('data-role') || 'Unknown Panel';
+      badge.textContent = panelRole;
       panel.appendChild(badge);
+    } else {
+      // Always update badge content to reflect role stability
+      const panelRole = panel.getAttribute('data-role') || 'Unknown Panel';
+      badge.textContent = panelRole;
     }
   });
 
@@ -1675,20 +1754,169 @@ const panelZoneMap = {
 };
 
 document.querySelectorAll('.holo-console').forEach(panel => {
+  // --- Inferred data-role assignment patch ---
+  // Assign or correct panel.dataset.role if missing, 'undefined', or 'sigil-forge'
+  if (!panel.dataset.role || panel.dataset.role === 'undefined' || panel.dataset.role === 'sigil-forge') {
+    const id = panel.id || '';
+    const match = id.match(/^([a-zA-Z]+?)(Console|Panel)?$/i);
+    if (match && match[1]) {
+      panel.dataset.role = match[1].replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+      console.warn(`🔧 Assigned inferred role: ${panel.dataset.role} to panel #${panel.id}`);
+    } else {
+      panel.dataset.role = 'unassigned';
+      console.warn(`⚠️ Could not infer role for panel #${panel.id}, set to 'unassigned'`);
+    }
+  }
+
   const id = panel.id || '';
   // Remove common suffixes for baseId matching (e.g., Console, Panel, Hub, Edit)
   const baseId = id.replace(/Console|Panel|Hub|Edit/g, '').replace(/[-_]\d+$/, '');
   const zone = panelZoneMap[baseId];
 
   if (zone) {
-    panel.dataset.role = zone.role;
+    let role = zone.role;
+    if (!role || role === 'undefined') {
+      role = 'sigil-forge';
+    }
+    panel.setAttribute('data-role', role);
     panel.dataset.gridArea = zone.gridArea;
     panel.style.display = 'grid';
     panel.style.position = 'relative';
   } else {
-    panel.dataset.role = 'unassigned';
+    let role = panel.getAttribute('data-role');
+    if (!role || role === 'undefined') {
+      role = 'sigil-forge';
+      panel.setAttribute('data-role', role);
+    }
     panel.dataset.gridArea = 'holding-zone';
     panel.style.display = 'none';
   }
 });
+
+// === Whisperer Panel Snap Injection ===
+const whispererPanel = document.querySelector('#whispererPanel');
+if (whispererPanel) {
+  whispererPanel.classList.add('snap-pinned', 'docked');
+  Object.assign(whispererPanel.style, {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    position: 'relative',
+    background: 'rgba(0, 0, 0, 0.8)',
+    color: '#00ffee',
+    border: '1px solid #00ffee',
+    padding: '1rem',
+    borderRadius: '10px',
+    width: '100%',
+    maxWidth: '600px',
+    height: 'auto',
+    zIndex: '5',
+    opacity: '1',
+    visibility: 'visible'
+  });
+}
 console.log('✅ Phase 426: Panel roles and zones assigned.');
+const panelPinnedStyle = document.createElement('style');
+panelPinnedStyle.textContent = `
+.panel-pinned {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 9999 !important;
+}
+`;
+document.head.appendChild(panelPinnedStyle);
+
+// Patch for any innerHTML injection of <div class="role-badge">undefined</div>
+// (If such code exists elsewhere, ensure to use the correct fallback)
+// Example usage:
+// let roleBadgeHTML = `<div class="role-badge">${panel.getAttribute('data-role') || 'Unknown Panel'}</div>`;
+
+// === 🧭 Phase 11: Snapline Zone Scanning Logic ===
+
+export function scanSnapZones() {
+  console.log("🧭 Scanning snapline zones...");
+  
+  const snapZones = document.querySelectorAll('[data-zone]');
+  const zoneMap = {};
+
+  snapZones.forEach(zone => {
+    const zoneId = zone.dataset.zone || 'unspecified';
+    const rect = zone.getBoundingClientRect();
+
+    zoneMap[zoneId] = {
+      element: zone,
+      bounds: {
+        top: rect.top,
+        left: rect.left,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height
+      }
+    };
+
+    console.log(`📍 Zone [${zoneId}] scanned`, zoneMap[zoneId].bounds);
+  });
+
+  window.SovereignSnapZones = zoneMap;
+  console.log("✅ Snap zone scan complete.");
+}
+
+window.scanSnapZones = scanSnapZones;
+
+// === Snap Deployment Logic: Snap holo-consoles to designated zones ===
+window.deploySnapZones = function () {
+  const zoneMap = window.SnapZoneMap;
+  if (!zoneMap) {
+    console.warn("⚠️ No SnapZoneMap available. Snap deployment skipped.");
+    return;
+  }
+
+  document.querySelectorAll(".holo-console").forEach(consoleEl => {
+    const zoneId = consoleEl.dataset.zone;
+    const targetZone = zoneMap[zoneId];
+    if (!targetZone) {
+      console.warn(`🛑 Snap Zone [${zoneId}] not found in zone map.`);
+      return;
+    }
+
+    targetZone.appendChild(consoleEl);
+    console.log(`📦 Snapped ${consoleEl.id || '[Unnamed Console]'} to ${zoneId}`);
+  });
+
+  console.log("✅ All holo-consoles snapped to designated zones.");
+};
+
+// Optional: auto-trigger on load
+window.addEventListener("load", () => {
+  console.log("🚀 Triggering deploySnapZones() on load...");
+  window.deploySnapZones();
+});
+
+// === Phase 13: Viewport Recalibration & Dynamic Snap Reinforcement ===
+function recalibrateSnapZones() {
+  console.log("🌀 Recalibrating snap zones based on current viewport...");
+  const consoles = document.querySelectorAll(".holo-console.snap-pinned");
+  consoles.forEach(console => {
+    const zone = console.dataset.zone || "center-stage";
+    // Basic strategy: re-assign class based on current screen width
+    if (window.innerWidth < 600) {
+      console.style.width = "100%";
+      console.style.left = "0";
+    } else {
+      // Restore original size if available
+      console.style.width = "";
+      console.style.left = "";
+    }
+    console.dataset.gridArea = zone;
+  });
+  console.log("✅ Snap zones recalibrated.");
+}
+
+window.addEventListener("resize", recalibrateSnapZones);
+window.addEventListener("orientationchange", recalibrateSnapZones);
+
+// Optional: run once on load
+recalibrateSnapZones();

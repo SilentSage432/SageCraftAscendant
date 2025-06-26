@@ -1,8 +1,7 @@
-
-
 // === Phase 700.10-B: Reporting Subsystem Dock Wiring ===
 
 const ReportingSubsystem = (function () {
+    /*
     function registerReportingDock() {
         console.log("📄 Sovereign Reporting Hub Wiring Activated");
 
@@ -21,11 +20,14 @@ const ReportingSubsystem = (function () {
 
         console.log("✅ Reporting Hub successfully registered.");
     }
+    */
 
+    /*
     // Auto-wire on DOMContentLoaded
     document.addEventListener("DOMContentLoaded", () => {
         registerReportingDock();
     });
+    */
 
     return {
         registerReportingDock
