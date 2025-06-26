@@ -286,3 +286,301 @@ window.SovereignBus?.on?.("launchSecurityAgent", (agentConfig) => {
     ...securityAgent
   });
 });
+
+// 🧠 Phase 31: Whisperer Core Intelligence Signal Reception
+window.SovereignBus?.on?.("whispererIntelPing", (intel) => {
+  if (!intel || !intel.query || !intel.origin) return;
+
+  console.log(`🛰️ Intel Ping Received | From: ${intel.origin} | Query: ${intel.query}`);
+
+  // Echo into Lore for tracking
+  WhispererLoreEngine.echoLoreTag(intel.origin, `Intel Ping → ${intel.query}`);
+
+  // Optional UI feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "intel-ping");
+    div.textContent = `🛰️ Intel from ${intel.origin}: ${intel.query}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+});
+// 🧠 Phase 32: Companion Agent Memory Sync & Pingback Protocol
+window.SovereignBus?.on?.("syncCompanionAgentMemory", (agentData) => {
+  if (!agentData || !agentData.agentId || !agentData.memory) return;
+
+  console.log(`🔁 Syncing Memory for Agent: ${agentData.agentId}`);
+  console.log("🧠 Synced Memory Data:", agentData.memory);
+
+  // Echo to Lore
+  WhispererLoreEngine.echoLoreTag(agentData.agentId, `Memory Sync → ${JSON.stringify(agentData.memory)}`);
+
+  // Optional UI feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "agent-memory-sync");
+    div.textContent = `🔁 Agent ${agentData.agentId} memory sync: ${JSON.stringify(agentData.memory)}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+
+  // Optional pingback
+  window.CompanionSecurityUnit?.receivePingback?.({
+    agentId: agentData.agentId,
+    memory: agentData.memory,
+    timestamp: new Date().toISOString()
+  });
+});
+// 🧠 Phase 33: Whisperer Intent Router + Command Resolution Engine
+window.SovereignBus?.on?.("whispererIntentCommand", (input) => {
+  if (!input || typeof input !== "string") return;
+
+  console.log(`🧭 Intent Received: "${input}"`);
+
+  const lowerInput = input.toLowerCase();
+  let category = "general";
+
+  if (lowerInput.includes("scan") || lowerInput.includes("diagnose")) {
+    category = "diagnostic";
+  } else if (lowerInput.includes("flag") || lowerInput.includes("alert")) {
+    category = "security";
+  } else if (lowerInput.includes("lore") || lowerInput.includes("history")) {
+    category = "lore";
+  } else if (lowerInput.includes("sync") || lowerInput.includes("memory")) {
+    category = "agent-memory";
+  }
+
+  // Echo to Lore for tracking
+  WhispererLoreEngine.echoLoreTag(category, `Intent: ${input}`);
+
+  // Broadcast to other systems
+  window.CompanionIntentHandler?.resolveCommand?.({
+    raw: input,
+    category,
+    time: new Date().toISOString()
+  });
+
+  // Optional UI feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "intent-command");
+    div.textContent = `🧭 Intent Routed [${category}]: "${input}"`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+});
+// 🧠 Phase 34: Whisperer Directive Uplink + Panel Command Injection
+window.SovereignBus?.on?.("whispererDirectiveUplink", (directive) => {
+  if (!directive || !directive.panel || !directive.command) return;
+
+  console.log(`📡 Directive Uplink | Panel: ${directive.panel} | Command: ${directive.command}`);
+
+  // Echo to lore
+  WhispererLoreEngine.echoLoreTag(directive.panel, `Directive → ${directive.command}`);
+
+  // Attempt to locate panel element
+  const targetPanel = document.getElementById(directive.panel);
+  if (targetPanel) {
+    targetPanel.classList.add("highlighted-panel");
+    targetPanel.dataset.lastCommand = directive.command;
+
+    // Optional command feedback
+    const feedback = document.createElement("div");
+    feedback.classList.add("directive-feedback");
+    feedback.textContent = `📡 Directive: ${directive.command}`;
+    targetPanel.appendChild(feedback);
+
+    setTimeout(() => {
+      targetPanel.classList.remove("highlighted-panel");
+      if (targetPanel.contains(feedback)) {
+        targetPanel.removeChild(feedback);
+      }
+    }, 3000);
+  }
+
+  // Optional UI echo
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "directive-uplink");
+    div.textContent = `📡 Directive to [${directive.panel}]: ${directive.command}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+});
+
+// 🧠 Phase 35: Whisperer Agent Directive Cascade + Failover Broadcast
+window.SovereignBus?.on?.("cascadeAgentDirective", (cascade) => {
+  if (!cascade || !cascade.agents || !cascade.command) return;
+
+  console.log(`🌐 Cascade Directive Initiated | Agents: ${cascade.agents.join(", ")} | Command: ${cascade.command}`);
+
+  // Echo to lore
+  cascade.agents.forEach(agentId => {
+    WhispererLoreEngine.echoLoreTag(agentId, `Cascade Command → ${cascade.command}`);
+  });
+
+  // Send to each agent if available
+  if (window.CompanionSecurityUnit?.broadcastToAgents) {
+    window.CompanionSecurityUnit.broadcastToAgents({
+      targets: cascade.agents,
+      command: cascade.command,
+      time: new Date().toISOString()
+    });
+  }
+
+  // Optional failover if not all agents respond
+  if (cascade.enableFailover && window.CompanionSecurityUnit?.fallbackBroadcast) {
+    setTimeout(() => {
+      console.warn(`⚠️ Initiating Failover Broadcast for Cascade: ${cascade.command}`);
+      window.CompanionSecurityUnit.fallbackBroadcast({
+        reason: "Unresponsive Agents",
+        command: cascade.command,
+        time: new Date().toISOString()
+      });
+    }, cascade.failoverTimeout || 5000);
+  }
+
+  // Optional UI feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "cascade-directive");
+    div.textContent = `🌐 Cascade Directive: ${cascade.command} sent to [${cascade.agents.length}] agents`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+});
+
+// 🧠 Phase 36: Whisperer Autonomous Learning Ping + Adaptive Response Log
+window.SovereignBus?.on?.("autonomousLearningPing", (learningData) => {
+  if (!learningData || !learningData.topic || !learningData.insight) return;
+
+  const timestamp = new Date().toISOString();
+  console.log(`🤖 Autonomous Insight | Topic: ${learningData.topic} | Insight: ${learningData.insight}`);
+
+  // Log to Lore Engine
+  WhispererLoreEngine.echoLoreTag(learningData.topic, `Insight: ${learningData.insight}`);
+
+  // Optional UI Feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "learning-ping");
+    div.textContent = `🤖 Insight on "${learningData.topic}": ${learningData.insight}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+
+  // Optional broadcast to learning archive
+  window.WhispererLearningArchive = window.WhispererLearningArchive || [];
+  window.WhispererLearningArchive.push({
+    topic: learningData.topic,
+    insight: learningData.insight,
+    timestamp
+  });
+});
+// 🧠 Phase 37: Whisperer Response Reflection + Agent Insight Probe
+window.SovereignBus?.on?.("reflectWhispererResponse", (reflection) => {
+  if (!reflection || !reflection.prompt || !reflection.response) return;
+
+  const timestamp = new Date().toISOString();
+  console.log(`🔁 Response Reflection | Prompt: "${reflection.prompt}" | Response: "${reflection.response}"`);
+
+  // Echo into Lore Engine
+  WhispererLoreEngine.echoLoreTag("reflection", `Prompt: "${reflection.prompt}" → Response: "${reflection.response}"`);
+
+  // Optional UI Feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "response-reflection");
+    div.textContent = `🔁 Reflected | "${reflection.prompt}" → "${reflection.response}"`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+
+  // Optional broadcast to agent insight probe
+  window.CompanionSecurityUnit?.logInsightProbe?.({
+    prompt: reflection.prompt,
+    response: reflection.response,
+    timestamp
+  });
+});
+// 🧠 Phase 38: Whisperer Insight Categorization + Lore Tag Weighting
+window.SovereignBus?.on?.("categorizeInsight", (insight) => {
+  if (!insight || !insight.topic || !insight.content) return;
+
+  const timestamp = new Date().toISOString();
+  const weightedTag = `${insight.topic.toLowerCase()}::weight-${insight.importance || "normal"}`;
+
+  console.log(`🏷️ Categorizing Insight | Topic: ${insight.topic} | Importance: ${insight.importance || "normal"}`);
+
+  // Push categorized insight to Lore Engine
+  WhispererLoreEngine.echoLoreTag(weightedTag, insight.content);
+
+  // Optional UI Feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "categorized-insight");
+    div.textContent = `🏷️ Insight Categorized | [${weightedTag}]: ${insight.content}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+
+  // Optional weighted tagging system for downstream AI scoring
+  window.WhispererInsightWeightMap = window.WhispererInsightWeightMap || {};
+  window.WhispererInsightWeightMap[weightedTag] = {
+    content: insight.content,
+    time: timestamp,
+    weight: insight.importance || "normal"
+  };
+});
+
+// 🧠 Phase 39: Whisperer UI Feedback Override System
+window.SovereignBus?.on?.("whispererOverrideFeedback", (override) => {
+  if (!override || !override.message || !override.type) return;
+
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`🛠️ UI Override | Type: ${override.type} | Message: ${override.message}`);
+
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", `override-${override.type}`);
+    div.textContent = `🛠️ [OVERRIDE-${override.type.toUpperCase()}] ${override.message} (${timestamp})`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+});
+// 🧠 Phase 40: Whisperer Alert Beacon + Remote Operator Ping
+window.SovereignBus?.on?.("triggerWhispererAlertBeacon", (alertData) => {
+  if (!alertData || !alertData.alert || !alertData.operatorId) return;
+
+  const timestamp = new Date().toISOString();
+  console.log(`🚨 Alert Beacon | Operator: ${alertData.operatorId} | Alert: ${alertData.alert}`);
+
+  // Echo to Lore
+  WhispererLoreEngine.echoLoreTag(alertData.operatorId, `Alert Beacon → ${alertData.alert}`);
+
+  // Optional UI Feedback
+  const whisperFeed = document.getElementById("whispererConsoleOutput");
+  if (whisperFeed) {
+    const div = document.createElement("div");
+    div.classList.add("log-entry", "alert-beacon");
+    div.textContent = `🚨 [${alertData.operatorId}] Beacon Alert: ${alertData.alert}`;
+    whisperFeed.appendChild(div);
+    whisperFeed.scrollTop = whisperFeed.scrollHeight;
+  }
+
+  // Optional ping to remote operator interface
+  window.RemoteOperatorPingSystem?.receiveBeacon?.({
+    operatorId: alertData.operatorId,
+    alert: alertData.alert,
+    time: timestamp
+  });
+});
