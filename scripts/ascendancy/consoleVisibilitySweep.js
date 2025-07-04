@@ -9,6 +9,10 @@ export function performVisibilitySweep() {
   knownConsoleIds.forEach(consoleId => {
     const panel = document.getElementById(consoleId);
     if (panel) {
+      if (consoleId === 'whispererConsole') {
+        console.warn('⛔️ Visibility sweep skipped for whispererConsole');
+        return;
+      }
       panel.style.display = 'none'; // Hide all by default
       panel.classList.remove('active');
     }

@@ -267,6 +267,10 @@ setTimeout(() => {
   };
 
   Object.keys(SOVEREIGN_PANEL_REGISTRY).forEach((panelId, index) => {
+    if (panelId === "whispererConsole") {
+      console.warn("⛔️ Sovereign Anchor override skipped for whispererConsole.");
+      return;
+    }
     const panel = document.getElementById(panelId);
     if (!panel) return;
 

@@ -1132,7 +1132,6 @@ Other notes:
     <!-- Expected partial include -->
   <div data-include-html="partials/orbitPanelDock.html"></div>
   </div>
-</body>
 <script>
   // Sovereign Orbit Dropdown Toggle Logic
   document.addEventListener("DOMContentLoaded", function () {
@@ -2792,6 +2791,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+</script>
+<script>
+  const whisperer = document.getElementById('whispererConsole');
+
+  if (whisperer) {
+    console.log("🔍 Mutation Trap Initialized on #whispererConsole");
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'style') {
+          console.warn("⚠️ Whisperer Style Changed:", whisperer.getAttribute('style'));
+          console.trace("🔍 Style mutation triggered here");
+        }
+      });
+    });
+
+    observer.observe(whisperer, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  } else {
+    console.error("⛔️ whispererConsole not found for mutation trap");
+  }
 </script>
 </body>
 </html>
