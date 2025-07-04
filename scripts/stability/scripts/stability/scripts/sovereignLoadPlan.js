@@ -1,6 +1,6 @@
 console.log("🧠 Sovereign Load Plan Engaged");
 
-// Sacred panels
+// Sacred panels (active consoles to remain visible)
 const panelsToActivate = [
   "countConsole",
   "deltaAnalyzerConsole",
@@ -11,7 +11,7 @@ const panelsToActivate = [
   "oracleConsole"
 ];
 
-// Visibility enforcer
+// Visibility enforcer — run once on load
 function enforcePanelVisibility() {
   document.querySelectorAll(".holo-console").forEach(panel => {
     if (panelsToActivate.includes(panel.id)) {
@@ -27,17 +27,7 @@ function enforcePanelVisibility() {
   });
 }
 
-// Initial sweep
+// Initial sweep (no longer observed dynamically)
 enforcePanelVisibility();
 
-// 🧿 Mutation Observer — Watch for intrusions
-const observer = new MutationObserver(() => {
-  enforcePanelVisibility();
-});
-
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-
-console.log("✅ Sovereign Guard Activated");
+console.log("✅ Sovereign Visibility Guard Engaged");

@@ -3,14 +3,10 @@ console.log("📜 Phase 339.2 — Canonical Panel Verification Sweep Activated")
 
 const panelIds = [
   "countConsole",
-  "deltaAnalyzerConsole",
-  "reportingHubConsole",
   "sessionManagerConsole",
   "utilityHubConsole",
   "oracleConsole",
   "whispererConsole",
-  "sageFeedConsole",
-  "grimoireConsole",
   "auditConsole"
 ];
 

@@ -1,876 +1,737 @@
-// === Early whispererVitals hook to capture events before DOMContentLoaded ===
+// Clean HTML-first logic for Whisperer Terminal
+// Ensure script runs after DOM is loaded
+import { logMessage } from '../modules/whisperer/logger.js';
+import { handleInputSubmission } from '../modules/whisperer/inputHandler.js';
+import { toggleVitalsPanel } from '../modules/whisperer/vitalsToggle.js';
+import { showErrorFeedback } from '../modules/whisperer/errorFeedback.js';
+import { initWhisperer } from '../modules/whisperer/initWhisperer.js';
 
-import { classifyLogEntry } from "../systems/logClassifier.js";
+    const userInput = document.getElementById('whispererInput');
+    const chatContainer = document.getElementById('whispererMessageLog');
+    const sendButton = document.getElementById('whispererSend');
+    const vitalsPanel = document.getElementById('whispererVitals');
+    const toggleVitals = document.getElementById('toggleVitals');
 
-// === Sovereign Tier Override Infrastructure — Phase 16010.1 ===
-const OPERATOR_TIERS = {
-  INITIATE: 0,
-  APPRENTICE: 1,
-  ASCENDANT: 2,
-  SOVEREIGN: 3
-};
+    // === Phase 20: Memory Bookmark + Pinning Layer ===
+    const pinnedMessages = [];
 
-let currentOperatorTier = OPERATOR_TIERS.SOVEREIGN; // default for development
-console.log("🔐 Sovereign Tier Override Infrastructure Initialized. Current Tier:", Object.keys(OPERATOR_TIERS)[currentOperatorTier]);
+    const panelReferences = {};
 
-// SovereignAuth overlay login listener
-document.addEventListener("DOMContentLoaded", () => {
-  const loginBtn = document.getElementById("sovereignAuthBtn");
-  const input = document.getElementById("sovereignPass");
-
-  if (loginBtn && input) {
-    loginBtn.addEventListener("click", () => {
-      const pass = input.value?.trim();
-      if (window.SovereignAuth?.login) {
-        window.SovereignAuth.login(pass);
-      } else {
-        console.warn("🚫 SovereignAuth not available.");
-      }
-    });
-  }
-
-  // === Sovereign Login Panel Activation Script — Phase 16011.7 ===
-  const overlay = document.getElementById("sovereignLoginOverlay");
-  const overlayBtn = document.getElementById("triggerLoginOverlay");
-
-  if (overlay && overlayBtn) {
-    overlayBtn.addEventListener("click", () => {
-      overlay.style.display = "flex";
-    });
-
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        overlay.style.display = "none";
-      }
-    });
-  }
-
-  console.log("🧠 Sovereign Login Overlay UI injection completed.");
-});
-
-// Listen for SovereignAuth login success
-window.addEventListener("sovereignAuthGranted", (e) => {
-  const newTier = e?.detail?.tier;
-  if (typeof newTier === "number") {
-    currentOperatorTier = newTier;
-    console.log(`✅ Operator tier elevated to: ${Object.keys(OPERATOR_TIERS)[newTier]}`);
-  }
-});
-window.addEventListener("DOMContentLoaded", () => {
-  // Ensure whispererVitals is captured even if SovereignBus fires early
-  if (window.SovereignBus?.on) {
-    window.SovereignBus.on("whispererVitals", (data) => {
-      console.log("📡 [WhispererVitals - Early Hook] Live Data:", data);
-      const liveOutput = document.getElementById("whispererConsoleOutput");
-      if (liveOutput) {
-        const div = document.createElement("div");
-        const displayData = data
-          ? typeof data === "object"
-            ? JSON.stringify(data, null, 2)
-            : data
-          : "[null]";
-        div.textContent = `[${new Date().toLocaleTimeString()}] Vitals (early): ${displayData}`;
-        div.classList.add("log-entry", "vitals");
-        liveOutput.appendChild(div);
-      } else {
-        console.warn("🚫 whispererConsoleOutput not found during early vitals.");
-      }
-    });
-  }
-});
-// 🧠 Whisperer Memory Core Genesis — Phase XXV-A
-// === Whisperer Sovereign Identity Binding — Phase 19.5 ===
-if (!window.SovereignPanels) window.SovereignPanels = {};
-window.SovereignPanels["whisperer"] = {
-  id: "whisperer",
-  role: "terminal",
-  zone: "center",
-  sovereign: true,
-  snap: true,
-  anchor: "mainGridCenter",
-  visible: true,
-  locked: false,
-  title: "The Whisperer",
-  manifest: {
-    snapClass: "snap-terminal",
-    theme: "aether",
-    context: "primary-terminal",
-    priority: 10
-  }
-};
-console.log("📌 Sovereign Whisperer identity registered with grid.");
-console.log("👁️ theWhisperer.js module online — Echo functions standing by.");
-
-// Access check helper for operator tiers
-function hasAccess(requiredTier = OPERATOR_TIERS.INITIATE) {
-  return currentOperatorTier >= requiredTier;
-}
-
-// ✅ Canonical SovereignBus listener for Whisperer Vitals (now globally available)
-function renderWhispererVitals(data) {
-  data.type = classifyLogEntry(data); // Classify log type based on content
-  // === Signal Class Inference Injection — Phase 31.6 ===
-  if (typeof data?.signalStrength === "number") {
-    if (data.signalStrength >= 90) {
-      data.signalClass = "prime";
-    } else if (data.signalStrength >= 70) {
-      data.signalClass = "stable";
-    } else {
-      data.signalClass = "critical";
-    }
-  }
-  // --- Classification logic and access gate ---
-  const type = data?.type || "vitals";
-  const tierRequired = data?.tierRequired || OPERATOR_TIERS.INITIATE;
-  const urgency = data?.urgency || "normal";
-
-  if (!hasAccess(tierRequired)) {
-    console.warn(`🔒 Tier restriction: ${Object.keys(OPERATOR_TIERS).find(key => OPERATOR_TIERS[key] === tierRequired)} required.`);
-    return;
-  }
-
-  const container = document.getElementById("whispererConsoleOutput");
-  if (!container) {
-    console.warn("🚫 whispererConsoleOutput not found.");
-    return;
-  }
-
-  const div = document.createElement("div");
-  div.className = `log-entry vitals log-${type}`;
-  div.style.color = "#b9fbc0";
-  div.style.fontFamily = "monospace";
-  div.style.padding = "6px 10px";
-  div.style.borderRadius = "6px";
-  div.style.marginBottom = "4px";
-  div.style.boxShadow = "0 0 4px rgba(0,255,204,0.2)";
-  // Add data-log-type attribute
-  div.setAttribute("data-log-type", type);
-
-  const timestamp = new Date().toLocaleTimeString();
-  const module = data?.module || "Unknown";
-  const status = data?.status || "No status";
-
-  // Tier-based enhancements
-  switch (currentOperatorTier) {
-    case OPERATOR_TIERS.SOVEREIGN:
-      div.style.borderLeft = "4px solid #ffd700";
-      div.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-      div.style.textShadow = "0 0 4px #ffd700";
-      div.textContent = `👑 [${timestamp}] ${module}: ${status}`;
-      break;
-    case OPERATOR_TIERS.ASCENDANT:
-      div.style.borderLeft = "4px solid #7fffd4";
-      div.textContent = `🔮 [${timestamp}] ${module}: ${status}`;
-      break;
-    case OPERATOR_TIERS.APPRENTICE:
-      div.style.borderLeft = "4px solid #00ffcc";
-      div.textContent = `✨ [${timestamp}] ${module}: ${status}`;
-      break;
-    default:
-      div.style.borderLeft = "4px solid gray";
-      div.textContent = `[${timestamp}] ${module}: ${status}`;
-  }
-
-  // === Signal Profile Visualization Enhancer — Phase 16010.2 ===
-  const strength = (typeof data?.signalStrength === "number") ? data.signalStrength : null;
-  if (strength !== null) {
-    const strengthBadge = document.createElement("span");
-    strengthBadge.textContent = ` ${strength}% `;
-    strengthBadge.style.marginLeft = "0.5em";
-    strengthBadge.style.padding = "0 6px";
-    strengthBadge.style.borderRadius = "4px";
-    strengthBadge.style.fontWeight = "bold";
-    strengthBadge.style.color = "#000";
-
-    if (strength < 60) {
-      strengthBadge.style.backgroundColor = "#ff4d4f"; // red
-    } else if (strength < 85) {
-      strengthBadge.style.backgroundColor = "#faad14"; // yellow
-    } else {
-      strengthBadge.style.backgroundColor = "#52c41a"; // green
+    function rememberPanelReference(tag, panelId) {
+        panelReferences[tag] = panelId;
+        simulateTypingResponse(`🧭 Remembered panel reference "${tag}" → ${panelId}`);
     }
 
-    // Attach the badge just after the main text content
-    div.appendChild(strengthBadge);
-  }
+    function recallPanelReference(tag) {
+        const panelId = panelReferences[tag];
+        if (panelId) {
+            simulateTypingResponse(`📌 Recalling panel "${tag}"...`);
+            const targetPanel = document.getElementById(panelId);
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            } else {
+                simulateTypingResponse(`⚠️ Panel "${panelId}" not found.`);
+            }
+        } else {
+            simulateTypingResponse(`❓ No panel reference found for "${tag}".`);
+        }
+    }
 
-  // Add metadata log badge
-  const metaSpan = document.createElement("span");
-  metaSpan.textContent = ` ⏱ ${new Date().toLocaleTimeString()} `;
-  metaSpan.style.fontSize = "0.75em";
-  metaSpan.style.opacity = "0.6";
-  metaSpan.style.marginLeft = "1em";
-  div.appendChild(metaSpan);
+    function pinMessage(messageText, type = 'user') {
+        pinnedMessages.push({ message: messageText, type, timestamp: new Date().toISOString() });
+        simulateTypingResponse(`📌 Message pinned: "${messageText}"`);
+    }
 
-  // Optional: show tier visually in log for quick audit
-  const tierBadge = document.createElement("span");
-  tierBadge.textContent = ` [Tier: ${Object.keys(OPERATOR_TIERS).find(key => OPERATOR_TIERS[key] === currentOperatorTier)}]`;
-  tierBadge.style.fontSize = "0.75em";
-  tierBadge.style.marginLeft = "1em";
-  tierBadge.style.opacity = "0.5";
-  div.appendChild(tierBadge);
-  // === Signal Class Display Injection — Phase 31.6 ===
-  if (data.signalClass) {
-    const classSpan = document.createElement("span");
-    classSpan.textContent = ` Signal: ${data.signalClass.toUpperCase()}`;
-    classSpan.style.fontSize = "0.75em";
-    classSpan.style.marginLeft = "1em";
-    classSpan.style.opacity = "0.5";
-    div.appendChild(classSpan);
-  }
+    function showPinnedMessages() {
+        if (pinnedMessages.length === 0) {
+            simulateTypingResponse('📌 No pinned messages yet.');
+            return;
+        }
 
-  // --- Urgency-based visual cue handling ---
-  if (urgency === "high") {
-    div.style.border = "2px solid #ff4d4f";
-    div.classList.add("urgent");
-  } else if (urgency === "low") {
-    div.style.opacity = "0.6";
-  }
+        const formattedPins = pinnedMessages
+            .map(entry => `[${entry.type}] ${entry.message}`)
+            .join('\n');
 
-  // div.textContent = `[${timestamp}] ${module}: ${status}`; // original line removed/commented out
-  const maxLogs = 250;
-  if (container.children.length > maxLogs) {
-    container.removeChild(container.firstChild);
-  }
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-window.renderWhispererVitals = renderWhispererVitals;
-// Register SovereignBus listener immediately after defining renderWhispererVitals
-if (window.SovereignBus?.on) {
-  window.SovereignBus.on("whispererVitals", window.renderWhispererVitals);
-}
-const WhispererMemory = {
-  _log: [],
+        simulateTypingResponse(`📍 Pinned Messages:\n${formattedPins}`);
+    }
 
-  record(entry) {
-    // Optional filtering logic placeholder:
-    if (entry?.tierRequired && currentOperatorTier < entry.tierRequired) return;
-    // Timestamp normalization
-    const now = new Date();
-    const timestamp = entry?.timestamp
-      ? new Date(entry.timestamp).toLocaleTimeString()
-      : now.toLocaleTimeString();
-    const isoTimestamp = now.toISOString();
-    const memory = {
-      entry,
-      timestamp: isoTimestamp,
-      displayTime: timestamp,
-      type: entry?.type || "echo",
-      tierRequired: entry?.tierRequired || 0
+    // === Phase 7: Command Router + State Action Matrix ===
+    const stateActionMatrix = {
+      help: () => simulateTypingResponse('🧭 Available Commands: /help, /clear, /log, /vitals'),
+      clear: () => {
+          chatContainer.innerHTML = '';
+          simulateTypingResponse('🧹 Terminal cleared.');
+      },
+      log: () => {
+          const recent = getRecentMemory(5).map(entry => `[${entry.type}] ${entry.content}`).join('\n');
+          simulateTypingResponse(`🗂️ Recent Memory:\n${recent}`);
+      },
+      vitals: () => {
+          if (vitalsPanel) {
+              vitalsPanel.classList.add('active');
+              simulateTypingResponse('📊 Vitals panel activated.');
+          }
+      },
+      remember: () => {
+          const recent = whispererMemoryLog.slice().reverse().find(entry => entry.type === 'user');
+          if (recent) {
+              const parts = recent.content.split('→');
+              if (parts.length === 2) {
+                  const tag = parts[0].trim();
+                  const panelId = parts[1].trim();
+                  rememberPanelReference(tag, panelId);
+              } else {
+                  simulateTypingResponse('❓ Format for /remember is "tag → panelId"');
+              }
+          } else {
+              simulateTypingResponse('📌 No recent message to remember.');
+          }
+      },
+      recall: () => {
+          const recent = whispererMemoryLog.slice().reverse().find(entry => entry.type === 'user');
+          if (recent) {
+              recallPanelReference(recent.content.trim());
+          } else {
+              simulateTypingResponse('🔍 No reference tag to recall.');
+          }
+      },
+      activate: () => {
+          const recent = whispererMemoryLog.slice().reverse().find(entry => entry.type === 'user');
+          if (recent) {
+              const panelId = recent.content.trim();
+              const panel = document.getElementById(panelId);
+              if (panel) {
+                  panel.classList.add('active');
+                  simulateTypingResponse(`🟢 Activated panel: "${panelId}"`);
+              } else {
+                  simulateTypingResponse(`⚠️ Panel "${panelId}" not found.`);
+              }
+          } else {
+              simulateTypingResponse('❓ No recent panel ID found to activate.');
+          }
+      }
     };
-    this._log.push(memory);
-    if (this._log.length > 250) this._log.shift();
-    console.log(`🪬 [Whisperer Log Entry] ${entry} @ ${isoTimestamp}`);
-    const echoEvent = new CustomEvent("whispererEcho", { detail: memory });
-    document.dispatchEvent(echoEvent);
-    this.save();
-  },
 
-  save() {
-    try {
-      localStorage.setItem("whispererMemoryLog", JSON.stringify(this._log));
-      console.log("💾 Whisperer memory saved.");
-    } catch (e) {
-      console.warn("⚠️ Whisperer failed to save memory:", e);
-    }
-  },
-
-  load() {
-    const stored = localStorage.getItem("whispererMemoryLog");
-    if (stored) {
-      this._log = JSON.parse(stored);
-      console.log(`📥 Whisperer memory loaded with ${this._log.length} entries.`);
-    }
-  },
-
-  getAll() {
-    return this._log;
-  }
-};
-
-WhispererMemory.load(); // Initialize memory on load
-
-
-// 🌫️ theWhisperer.js — Phase XXIV: Whisperer Genesis Protocol
-
-document.addEventListener("DOMContentLoaded", () => {
-  let uptimeSeconds = 0;
-  let anomalies = 0;
-  let orbitCount = 0;
-
-  const updateVitals = () => {
-    if (signalStrength) signalStrength.textContent = `${Math.floor(Math.random() * 10) + 90}%`;
-    if (anomalyCount) anomalyCount.textContent = anomalies;
-    if (orbitThroughput) orbitThroughput.textContent = orbitCount;
-    if (meshUptime) {
-      meshUptime.textContent = `${Math.floor(uptimeSeconds / 60)}m ${uptimeSeconds % 60}s`;
-    }
-    if (threadCount) threadCount.textContent = `${Math.floor(Math.random() * 12) + 4} threads`;
-    if (networkSync) networkSync.textContent = `${(Math.random() * 100).toFixed(2)}%`;
-    if (meshIntegrity) meshIntegrity.textContent = `${(Math.random() * 5 + 95).toFixed(1)}%`;
-    if (kernelDrift) kernelDrift.textContent = `${(Math.random() * 2).toFixed(3)} Δ`;
-    if (sovereignStatus) sovereignStatus.textContent = "🧠 Connected to Sovereign Bridge";
-  };
-
-  // === Neural Pulse Monitor ===
-  const pulseStatus = document.getElementById("pulseStatus");
-  const pulseVisual = document.querySelector(".pulse-visual");
-
-  let pulseState = true;
-
-  setInterval(() => {
-    if (!pulseStatus || !pulseVisual) return;
-
-    pulseVisual.style.backgroundColor = pulseState ? "#42f57b" : "#0f0f0f";
-    pulseVisual.style.boxShadow = pulseState ? "0 0 12px #42f57b" : "none";
-    pulseStatus.textContent = pulseState ? "💓 Pulse Detected" : "🔍 Awaiting Next Pulse";
-    pulseState = !pulseState;
-  }, 1000);
-  const summonBtn = document.getElementById("whispererSummonBtn");
-  if (summonBtn) {
-    summonBtn.addEventListener("click", () => {
-      const output = document.getElementById("whispererOutput");
-      const logList = document.getElementById("echoLogEntries");
-
-      if (!output) console.warn("🔕 whispererOutput not found");
-      if (!logList) console.warn("🔕 echoLogEntries not found");
-
-      const whispers = [
-        "The wind carries truths unspoken.",
-        "Even shadows have memories.",
-        "Echoes remember what minds forget.",
-        "The truth hides in silence.",
-        "What is forgotten is not gone.",
-        "There are stories etched in dust."
-      ];
-
-      const randomWhisper = whispers[Math.floor(Math.random() * whispers.length)];
-      if (output) output.textContent = randomWhisper;
-
-      if (logList) {
-        const li = document.createElement("li");
-        li.textContent = `${randomWhisper}`;
-        li.classList.add("whisperer-log-entry");
-        logList.prepend(li);
-      }
-
-      WhispererMemory.record(randomWhisper);
-    });
-  } else {
-    console.warn("🔕 summonBtn not found when attempting to assign click listener.");
-  }
-  const logList = document.getElementById("echoLogEntries");
-  const recoveredEntries = WhispererMemory.getAll();
-
-  if (logList && recoveredEntries.length > 0) {
-    logList.innerHTML = ""; // Clear old logs
-    recoveredEntries.slice(-100).reverse().forEach(({ entry, displayTime, type, tierRequired }) => {
-      if (!entry && !entry?.status) return;
-
-      const li = document.createElement("li");
-      li.classList.add("whisperer-log-entry");
-      li.style.display = "flex";
-      li.style.alignItems = "center";
-      li.style.justifyContent = "space-between";
-      li.style.fontFamily = "monospace";
-      li.style.padding = "4px 0";
-      li.style.borderBottom = "1px solid #333";
-
-      const leftGroup = document.createElement("div");
-      leftGroup.style.display = "flex";
-      leftGroup.style.alignItems = "center";
-
-      const time = document.createElement("span");
-      time.textContent = `[${displayTime || "Echo"}]`;
-      time.style.color = "#aaa";
-      time.style.marginRight = "0.75em";
-      time.style.fontSize = "0.85em";
-
-      const icon = document.createElement("span");
-      icon.textContent =
-        entry?.type === "warning" ? "⚠️" :
-        entry?.type === "vitals" ? "🩺" :
-        entry?.type === "diagnostic" ? "🧪" :
-        "🌀";
-      icon.style.marginRight = "0.5em";
-
-      const msg = document.createElement("span");
-      msg.textContent = typeof entry === "string" ? entry : entry.status || JSON.stringify(entry);
-      msg.style.color = (entry?.type === "warning") ? "#ffcc00" : "#cccccc";
-
-      leftGroup.appendChild(time);
-      leftGroup.appendChild(icon);
-      leftGroup.appendChild(msg);
-
-      const rightGroup = document.createElement("div");
-      rightGroup.style.marginLeft = "auto";
-      rightGroup.style.fontSize = "0.75em";
-      rightGroup.style.opacity = "0.5";
-
-      if (tierRequired !== undefined) {
-        const tier = document.createElement("span");
-        tier.textContent = ` [Tier: ${Object.keys(OPERATOR_TIERS).find(k => OPERATOR_TIERS[k] === tierRequired)}]`;
-        rightGroup.appendChild(tier);
-      }
-
-      li.appendChild(leftGroup);
-      li.appendChild(rightGroup);
-      logList.appendChild(li);
-    });
-    console.log(`🔁 Restored ${Math.min(100, recoveredEntries.length)} entries to Echo Archive`);
-  }
-
-  // Additional elements for panel updates
-  const whispererPanel = document.getElementById("whisperer");
-  if (!whispererPanel) console.warn("🔕 whisperer panel not found");
-  if (whispererPanel) whispererPanel.style.display = "block";
-
-  // Ensure whispererConsoleOutput is present
-  let whispererConsoleOutput = document.getElementById("whispererConsoleOutput");
-  if (!whispererConsoleOutput && whispererPanel) {
-    whispererConsoleOutput = document.createElement("div");
-    whispererConsoleOutput.id = "whispererConsoleOutput";
-    whispererConsoleOutput.style.padding = "1rem";
-    whispererConsoleOutput.style.fontFamily = "monospace";
-    whispererConsoleOutput.style.color = "#b9fbc0";
-    whispererConsoleOutput.style.backgroundColor = "rgba(10, 10, 10, 0.85)";
-    whispererConsoleOutput.style.overflowY = "auto";
-    whispererConsoleOutput.style.maxHeight = "200px";
-    whispererConsoleOutput.style.scrollBehavior = "smooth";
-    whispererConsoleOutput.style.border = "1px solid #333";
-    whispererConsoleOutput.style.borderRadius = "6px";
-    whispererConsoleOutput.style.boxShadow = "inset 0 0 6px rgba(0,255,204,0.2)";
-    whispererPanel.appendChild(whispererConsoleOutput);
-    console.log("✅ whispererConsoleOutput dynamically injected into DOM.");
-  }
-
-  const signalStrength = document.getElementById("signalStrength");
-  const anomalyCount = document.getElementById("anomalyCount");
-  const orbitThroughput = document.getElementById("orbitThroughput");
-  const meshUptime = document.getElementById("meshUptime");
-  const threadCount = document.getElementById("threadCount");
-  const networkSync = document.getElementById("networkSync");
-  const meshIntegrity = document.getElementById("meshIntegrity");
-  const kernelDrift = document.getElementById("kernelDrift");
-  const sovereignStatus = document.getElementById("sovereignStatus");
-  const sovereignLog = document.getElementById("sovereignLog");
-  if (!sovereignLog) {
-    console.log("🔕 sovereignLog not found. Injecting placeholder.");
-    const log = document.createElement("ul");
-    log.id = "sovereignLog";
-    log.classList.add("log-console", "sovereign");
-    document.body.appendChild(log);
-    // Define log before applying styles
-    log.style.maxHeight = "200px";
-    log.style.overflowY = "auto";
-    log.style.padding = "0.5rem";
-    log.style.margin = "1rem";
-    log.style.border = "1px solid #444";
-    log.style.backgroundColor = "rgba(0,0,0,0.5)";
-    log.style.fontFamily = "monospace";
-    log.style.fontSize = "0.85rem";
-  }
-  const sentinelLog = document.getElementById("sentinelLog");
-  if (!sentinelLog) {
-    console.warn("🔕 sentinelLog not found. Injecting placeholder.");
-    const newLog = document.createElement("ul");
-    newLog.id = "sentinelLog";
-    newLog.classList.add("log-console", "sentinel");
-    document.body.appendChild(newLog);
-
-    // Define styles after element creation
-    newLog.style.maxHeight = "200px";
-    newLog.style.overflowY = "auto";
-    newLog.style.padding = "0.5rem";
-    newLog.style.margin = "1rem";
-    newLog.style.border = "1px solid #444";
-    newLog.style.backgroundColor = "rgba(0,0,0,0.5)";
-    newLog.style.fontFamily = "monospace";
-    newLog.style.fontSize = "0.85rem";
-  }
-
-  updateVitals();
-
-  // (summonBtn click listener is now guarded above)
-
-  // === Sovereign Event Bus Listener ===
-  if (window.SovereignBus?.on) {
-    window.SovereignBus.on("*", (channel, payload) => {
-      const echo = `🔊 [${channel}] ${typeof payload === "object" ? JSON.stringify(payload) : payload}`;
-      WhispererMemory.record(echo);
-      if (sovereignLog) {
-        const li = document.createElement("li");
-        li.textContent = `[${new Date().toLocaleTimeString()}] ${echo}`;
-        if (sovereignLog.children.length > 250) {
-          sovereignLog.removeChild(sovereignLog.lastChild);
+    // Add command hooks to stateActionMatrix
+    stateActionMatrix['pin'] = () => {
+        const lastMessage = whispererMemoryLog.slice().reverse().find(entry => entry.type === 'user');
+        if (lastMessage) {
+            pinMessage(lastMessage.content, lastMessage.type);
+        } else {
+            simulateTypingResponse('📌 No recent message to pin.');
         }
-        sovereignLog.prepend(li);
-      }
-    });
-    // Diagnostic block: check for whispererConsoleOutput presence
-    setTimeout(() => {
-      const liveOutput = document.getElementById("whispererConsoleOutput");
-      if (!liveOutput) {
-        console.warn("🚫 whispererConsoleOutput NOT FOUND in DOM.");
-      } else {
-        console.log("✅ whispererConsoleOutput FOUND and ready.");
-      }
-    }, 1000);
-    // (Removed redundant SovereignBus.listen("whispererVitals", ...) block)
-  }
+    };
 
-  // Echo listening hook for sovereign echo bridge
-  document.addEventListener("whispererEcho", (e) => {
-    console.log("📡 Whisperer Echo Dispatched:", e.detail);
-  });
+    stateActionMatrix['pins'] = () => {
+        showPinnedMessages();
+    };
 
-  // === Orbit Activity Feed Listener ===
+    // === Phase 22: Directive Stack + Live Intent Queue ===
+    const directiveStack = [];
+    const intentQueue = [];
 
-  setInterval(() => {
-    uptimeSeconds++;
-    updateVitals();
-  }, 1500);
-
-  const orbitLogList = document.getElementById("orbitLogs");
-
-  document.addEventListener("orbitActivated", (e) => {
-    const { id, timestamp } = e.detail;
-    const li = document.createElement("li");
-    const time = new Date(timestamp).toLocaleTimeString();
-    li.textContent = `[${time}] Orbit Activated → ${id}`;
-    if (orbitLogList) {
-      orbitLogList.prepend(li);
+    function pushDirective(directive) {
+        directiveStack.push({ directive, timestamp: new Date().toISOString() });
+        simulateTypingResponse(`🧾 Directive queued: "${directive}"`);
     }
 
-    // Optional: echo to memory
-    WhispererMemory.record(`Orbit Activated: ${id} @ ${time}`);
-  });
-
-  document.addEventListener("orbitActivated", () => {
-    orbitCount++;
-  });
-
-  // Show Whisperer panel when its orbit activates
-  document.querySelectorAll('[data-target="whisperer"]').forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".holo-console.panel").forEach(p => p.style.display = "none");
-      const panel = document.getElementById("whisperer");
-      if (panel) panel.style.display = "block";
-    });
-  });
-
-  // === Vital Scan Simulation Layer ===
-
-  /*
-  // Removed to avoid duplication:
-  setInterval(() => {
-    if (signalStrength) signalStrength.textContent = `${Math.floor(Math.random() * 10) + 90}%`;
-    if (anomalyCount) anomalyCount.textContent = anomalies;
-    if (orbitThroughput) orbitThroughput.textContent = orbitCount;
-    if (meshUptime) {
-      uptimeSeconds++;
-      meshUptime.textContent = `${Math.floor(uptimeSeconds / 60)}m ${uptimeSeconds % 60}s`;
-    }
-    if (threadCount) threadCount.textContent = `${Math.floor(Math.random() * 12) + 4} threads`;
-    if (networkSync) networkSync.textContent = `${(Math.random() * 100).toFixed(2)}%`;
-    if (meshIntegrity) meshIntegrity.textContent = `${(Math.random() * 5 + 95).toFixed(1)}%`;
-    if (kernelDrift) kernelDrift.textContent = `${(Math.random() * 2).toFixed(3)} Δ`;
-    if (sovereignStatus) sovereignStatus.textContent = "🧠 Connected to Sovereign Bridge";
-  }, 1500);
-  */
-
-  // === Sentinel Cortex Monitor ===
-
-  function checkMeshHealth() {
-    const integrityValue = parseFloat(meshIntegrity?.textContent) || 0;
-    const driftValue = parseFloat(kernelDrift?.textContent) || 0;
-
-    if (integrityValue < 96) {
-      const warning = `⚠️ Mesh Integrity dropped to ${integrityValue.toFixed(1)}%`;
-      if (sentinelLog) {
-        const li = document.createElement("li");
-        li.textContent = `[${new Date().toLocaleTimeString()}] ${warning}`;
-        li.classList.add("sentinel-warning");
-        sentinelLog.prepend(li);
-      }
-      const warningObject = {
-        module: "Sentinel",
-        status: warning,
-        type: "warning",
-        urgency: "high",
-        signalStrength: integrityValue,
-        tierRequired: OPERATOR_TIERS.APPRENTICE,
-        timestamp: new Date().toISOString()
-      };
-      WhispererMemory.record(warningObject);
-    }
-
-    if (driftValue > 1.2) {
-      const warning = `⚠️ Kernel Drift spiked to ${driftValue.toFixed(3)} Δ`;
-      if (sentinelLog) {
-        const li = document.createElement("li");
-        li.textContent = `[${new Date().toLocaleTimeString()}] ${warning}`;
-        li.classList.add("sentinel-warning");
-        sentinelLog.prepend(li);
-      }
-      const warningObject = {
-        module: "Sentinel",
-        status: warning,
-        type: "warning",
-        urgency: "high",
-        signalStrength: driftValue,
-        tierRequired: OPERATOR_TIERS.APPRENTICE,
-        timestamp: new Date().toISOString()
-      };
-      WhispererMemory.record(warningObject);
-    }
-  }
-
-  setInterval(checkMeshHealth, 3000);
-
-  setInterval(() => {
-    if (threadCount) threadCount.textContent = `${Math.floor(Math.random() * 12) + 4} threads`;
-    if (networkSync) networkSync.textContent = `${(Math.random() * 100).toFixed(2)}%`;
-    if (meshIntegrity) meshIntegrity.textContent = `${(Math.random() * 5 + 95).toFixed(1)}%`;
-    if (kernelDrift) kernelDrift.textContent = `${(Math.random() * 2).toFixed(3)} Δ`;
-  }, 1750);
-
-  document.addEventListener("sovereignPulse", (e) => {
-    console.log("🛰️ sovereignPulse event received:", e.detail);
-    const { channel, detail, timestamp = Date.now() } = e.detail || {};
-
-    const formatted = `[${new Date(timestamp).toLocaleTimeString()}] ${channel.toUpperCase()}: ${detail}`;
-    if (sovereignLog && channel && detail) {
-      const li = document.createElement("li");
-      li.textContent = formatted;
-      sovereignLog.prepend(li);
-    }
-
-    // Additional UI target: whispererConsoleOutput (if present)
-    const liveOutput = document.getElementById("whispererConsoleOutput");
-    if (liveOutput && channel && detail) {
-      if (liveOutput.children.length > 250) {
-        liveOutput.removeChild(liveOutput.firstChild);
-      }
-      const div = document.createElement("div");
-      div.textContent = formatted;
-      liveOutput.appendChild(div);
-      liveOutput.scrollTop = liveOutput.scrollHeight;
-    }
-
-    // Log to memory
-    if (channel && detail) {
-      WhispererMemory.record(`Sovereign Pulse → ${channel}: ${detail}`);
-    }
-  });
-
-  // === Diagnostic Signal Feed ===
-  window.SovereignBus?.on?.("diagnosticSignalTest", (data) => {
-    console.log("🔍 [diagnosticSignalTest] Signal received:", data);
-    const liveOutput = document.getElementById("whispererConsoleOutput");
-    if (liveOutput) {
-      if (liveOutput.children.length > 250) {
-        liveOutput.removeChild(liveOutput.firstChild);
-      }
-      const div = document.createElement("div");
-      div.textContent = `[${new Date().toLocaleTimeString()}] [DIAGNOSTIC] ${JSON.stringify(data)}`;
-      div.classList.add("log-entry", "diagnostic");
-      liveOutput.appendChild(div);
-      liveOutput.scrollTop = liveOutput.scrollHeight;
-    }
-    WhispererMemory.record(`Diagnostic Signal → ${JSON.stringify(data)}`);
-  });
-  // === Lore Signal Feed ===
-  window.SovereignBus?.on?.("loreSignal", (data) => {
-    console.log("📜 Lore Signal received:", data);
-    const loreEcho = document.createElement("div");
-    loreEcho.textContent = `[LORE] ${data?.tag || "Untitled Lore Entry"}: ${data?.content || "No details provided."}`;
-    loreEcho.classList.add("log-entry", "lore-entry");
-    document.getElementById("whispererConsoleOutput")?.appendChild(loreEcho);
-    WhispererMemory.record(`Lore Signal → ${JSON.stringify(data)}`);
-  });
-  window.SovereignBus?.on?.("whispererSmartRoute", (data) => {
-    console.log("🧬 [SmartRoute] Routed to Whisperer:", data);
-    const liveOutput = document.getElementById("whispererConsoleOutput");
-    if (liveOutput) {
-      const div = document.createElement("div");
-      div.textContent = `[${new Date().toLocaleTimeString()}] SMARTROUTE → ${JSON.stringify(data)}`;
-      div.classList.add("log-entry", "smartroute");
-      div.style.color = "#9be7ff";
-      div.style.fontStyle = "italic";
-      div.style.padding = "6px 10px";
-      div.style.borderLeft = "4px solid #9be7ff";
-      div.style.marginBottom = "4px";
-      div.style.backgroundColor = "rgba(20,30,40,0.3)";
-      liveOutput.appendChild(div);
-      liveOutput.scrollTop = liveOutput.scrollHeight;
-    }
-    WhispererMemory.record({
-      module: "SmartRoute",
-      status: typeof data === "string" ? data : JSON.stringify(data),
-      type: "diagnostic",
-      urgency: "low",
-      tierRequired: 0,
-      timestamp: new Date().toISOString()
-    });
-  });
-  window.SovereignBus?.on?.("whispererSmartSignal", (data) => {
-    console.log("🧠 [SmartSignal] Processing routed whisperer signal:", data);
-  
-    const liveOutput = document.getElementById("whispererConsoleOutput");
-    if (!liveOutput) return;
-  
-    // Classify signal if needed
-    const type = classifyLogEntry(data);
-    const module = data?.module || "Unknown Module";
-    const status = data?.status || "No status provided";
-    const urgency = data?.urgency || "normal";
-    const timestamp = new Date().toLocaleTimeString();
-  
-    // Construct smart log line
-    const div = document.createElement("div");
-    div.classList.add("log-entry", "smart-signal", `log-${type}`);
-    div.textContent = `🔍 [${timestamp}] ${module}: ${status}`;
-  
-    // Add urgency styles
-    if (urgency === "high") {
-      div.style.border = "2px solid #ff4d4f";
-      div.style.color = "#ff4d4f";
-    } else if (urgency === "low") {
-      div.style.opacity = "0.6";
-    } else {
-      div.style.borderLeft = "4px solid #7af";
-    }
-  
-    // Memory record with echo protocol
-    WhispererMemory.record({
-      module,
-      status,
-      type,
-      urgency,
-      timestamp: new Date().toISOString(),
-      tierRequired: data?.tierRequired || 0
-    });
-  
-    if (liveOutput.children.length > 250) {
-      liveOutput.removeChild(liveOutput.firstChild);
-    }
-    liveOutput.appendChild(div);
-    liveOutput.scrollTop = liveOutput.scrollHeight;
-  });
-
-  // === 🌀 Phase 21: Contextual Echo Threading + Auto-Focus Enhancer ===
-  const whispererInput = document.getElementById("whispererInput");
-  const whispererDisplay = document.getElementById("whispererDisplay");
-
-  if (whispererInput) {
-    whispererInput.addEventListener("focus", () => {
-      whispererDisplay?.classList.add("active-thread");
-    });
-
-    whispererInput.addEventListener("blur", () => {
-      whispererDisplay?.classList.remove("active-thread");
-    });
-
-    whispererInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && whispererInput.value.trim()) {
-        const msg = whispererInput.value.trim();
-        whispererInput.value = "";
-
-        if (whispererDisplay) {
-          const threadEntry = document.createElement("div");
-          threadEntry.textContent = `[${new Date().toLocaleTimeString()}] [OPERATOR]: ${msg}`;
-          threadEntry.classList.add("log-entry", "threaded");
-          whispererDisplay.appendChild(threadEntry);
-          whispererDisplay.scrollTop = whispererDisplay.scrollHeight;
+    function processNextDirective() {
+        if (directiveStack.length === 0) {
+            simulateTypingResponse('📭 No directives in stack.');
+            return;
         }
+        const { directive } = directiveStack.shift();
+        simulateTypingResponse(`📜 Processing directive: "${directive}"`);
+        triggerStateResponse(directive);
+        handleInternalCommand(directive);
+    }
 
-        WhispererMemory.record(`Operator Input → ${msg}`);
-
-        // === 🌌 Lore Tag Echoes + Memory Flag Detection ===
-        if (msg.includes("::lore")) {
-          const loreEcho = document.createElement("div");
-          loreEcho.classList.add("log-entry", "lore-echo");
-          loreEcho.textContent = `📖 Lore Memory Triggered → ${msg.replace("::lore", "").trim()}`;
-          if (whispererConsoleOutput) {
-            whispererConsoleOutput.appendChild(loreEcho);
-            whispererConsoleOutput.scrollTop = whispererConsoleOutput.scrollHeight;
-          }
-          WhispererMemory.flag?.("lore", msg);
+    function showDirectiveStack() {
+        if (directiveStack.length === 0) {
+            simulateTypingResponse('🧾 No active directives.');
+            return;
         }
+        const formatted = directiveStack.map(d => `→ ${d.directive}`).join('\n');
+        simulateTypingResponse(`📚 Directive Stack:\n${formatted}`);
+    }
 
-        if (msg.includes("::flag")) {
-          const flagEcho = document.createElement("div");
-          flagEcho.classList.add("log-entry", "flag-echo");
-          flagEcho.textContent = `🚩 Flagged Memory → ${msg.replace("::flag", "").trim()}`;
-          if (whispererConsoleOutput) {
-            whispererConsoleOutput.appendChild(flagEcho);
-            whispererConsoleOutput.scrollTop = whispererConsoleOutput.scrollHeight;
-          }
-          WhispererMemory.flag?.("flag", msg);
+    function queueIntent(intent) {
+        intentQueue.push({ intent, timestamp: new Date().toISOString() });
+        simulateTypingResponse(`🎯 Intent received: "${intent}"`);
+    }
+
+    function reviewIntentQueue() {
+        if (intentQueue.length === 0) {
+            simulateTypingResponse('🧠 No live intents recorded.');
+            return;
         }
-      }
+        const formatted = intentQueue.map(i => `• ${i.intent}`).join('\n');
+        simulateTypingResponse(`🧠 Live Intent Queue:\n${formatted}`);
+    }
+
+    stateActionMatrix['stack'] = () => showDirectiveStack();
+    stateActionMatrix['process'] = () => processNextDirective();
+    stateActionMatrix['intent'] = () => reviewIntentQueue();
+
+    // Integrate with command parsing
+    function handleInternalCommand(command) {
+        const action = stateActionMatrix[command.toLowerCase()];
+        if (action) {
+            action();
+        } else if (command.startsWith('intent:')) {
+            const intent = command.replace('intent:', '').trim();
+            queueIntent(intent);
+        } else if (command.startsWith('stack:')) {
+            const directive = command.replace('stack:', '').trim();
+            pushDirective(directive);
+        } else {
+            simulateTypingResponse(`❓ Unknown command: "${command}"`);
+        }
+    }
+
+
+    // === Phase 3.5: Touch Gesture Layer ===
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    // Tap to focus on input
+    chatContainer.addEventListener('click', () => {
+        userInput.focus();
     });
-  }
 
-  // === Failsafe Injection for whispererConsoleOutput ===
-  // (Removed duplicate fallback block)
+    // Long-press anywhere in the terminal to show pinned messages
+    let pressTimer;
+    chatContainer.addEventListener('touchstart', () => {
+        pressTimer = setTimeout(() => {
+            showPinnedMessages();
+        }, 800);
+    });
 
-// === Failsafe SovereignBus whispererVitals Listener ===
-// (Removed: canonical listener will be registered at the end)
-});
-// 🧪 Manual Diagnostic Emitter for Whisperer — Global Scope Fix
-window.triggerWhispererDiagnostic = function () {
-  if (!window.SovereignBus || !window.SovereignBus.emit) {
-    console.warn("🚫 SovereignBus not available.");
-    return;
-  }
+    chatContainer.addEventListener('touchend', () => {
+        clearTimeout(pressTimer);
+    });
 
-  const diagnosticPayload = {
-    module: "Diagnostic",
-    status: "✅ Triggered from triggerWhispererDiagnostic (global scope)",
-    timestamp: new Date().toISOString()
-  };
+    // Optional: swipe left/right for future navigation
+    chatContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    });
 
-  console.log("🧪 Emitting Diagnostic Signal:", diagnosticPayload);
-  window.SovereignBus.emit("whispererVitals", diagnosticPayload);
-};
-// (Removed redundant whispererVitals output handler)
-// (Removed redundant whispererVitals output handler)
+    chatContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleGesture();
+    });
+
+    function handleGesture() {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 50) {
+                simulateTypingResponse('👈 Swipe right detected');
+            } else if (deltaX < -50) {
+                simulateTypingResponse('👉 Swipe left detected');
+            }
+        } else {
+            if (deltaY > 50) {
+                simulateTypingResponse('👆 Swipe down detected');
+            } else if (deltaY < -50) {
+                simulateTypingResponse('👇 Swipe up detected');
+            }
+        }
+    }
+
+    // === Phase 3: Interactive Behavior Rewiring ===
+    // Bind terminal-specific key commands
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            stateActionMatrix.clear();
+        }
+        if (e.ctrlKey && e.key === 'l') {
+            e.preventDefault();
+            stateActionMatrix.log();
+        }
+    });
+
+    // Whisperer input focus toggler (hotkey: `/`)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement !== userInput) {
+            e.preventDefault();
+            userInput.focus();
+        }
+    });
+
+    // Panel toggler (Ctrl+`)
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === '`') {
+            const terminal = document.getElementById("whispererTerminal");
+            if (terminal) terminal.classList.toggle('hidden');
+        }
+    });
+
+    // Send message on button click
+    sendButton.addEventListener('click', () => {
+        handleSubmit();
+    });
+
+    // Send message on Enter (allow Shift+Enter for newlines)
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+        }
+    });
+
+    // Auto-resize the input as user types
+    userInput.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = `${this.scrollHeight}px`;
+    });
+
+    // Handle message submission
+    function handleSubmit() {
+        const messageText = userInput.value.trim();
+        if (messageText) {
+            const parsedCommand = parseCommand(messageText);
+            if (parsedCommand) {
+                addMessage(`[${parsedCommand.type.toUpperCase()}] ${parsedCommand.value}`, 'system');
+                logMemoryEntry(parsedCommand.type, parsedCommand.value);
+                if (parsedCommand.type === 'sigil') {
+                    triggerLoreHook(parsedCommand.value);
+                } else if (parsedCommand.type === 'command' || parsedCommand.type === 'directive') {
+                    triggerStateResponse(parsedCommand.value);
+                    handleInternalCommand(parsedCommand.value);
+                }
+                // Future: route to internal command handler
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                userInput.focus();
+                return;
+            }
+            addMessage(messageText, 'user');
+            logMemoryEntry('user', messageText);
+            suggestPanelActivation(messageText);
+
+            // Simulated response
+            simulateTypingResponse(`🧠 Whisperer received: "${messageText}"`);
+
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            userInput.focus();
+        }
+    }
+
+    // Add message to the log
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        messageDiv.textContent = text;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Command parser
+    function parseCommand(text) {
+        if (text.startsWith('/')) {
+            return { type: 'command', value: text.slice(1) };
+        } else if (text.startsWith('#')) {
+            return { type: 'sigil', value: text.slice(1) };
+        } else if (text.startsWith('>')) {
+            return { type: 'directive', value: text.slice(1) };
+        } else if (text.startsWith('@')) {
+            return { type: 'target', value: text.slice(1) };
+        }
+        return null;
+    }
+
+    // === Whisperer Memory Kernel ===
+    const whispererMemoryLog = [];
+
+    function logMemoryEntry(type, content) {
+        const timestamp = new Date().toISOString();
+        whispererMemoryLog.push({ timestamp, type, content });
+
+        // Optional: Cap memory size
+        if (whispererMemoryLog.length > 200) {
+            whispererMemoryLog.shift(); // remove oldest entry
+        }
+    }
+
+    // === Phase 6: EventBus & Lore Hooks ===
+    function dispatchWhispererEvent(type, detail) {
+        const event = new CustomEvent(`whisperer:${type}`, { detail });
+        document.dispatchEvent(event);
+    }
+
+    function triggerLoreHook(tag) {
+        dispatchWhispererEvent('lore', { tag });
+        console.log(`📖 Lore Hook triggered for: ${tag}`);
+    }
+
+    function triggerStateResponse(command) {
+        dispatchWhispererEvent('command', { command });
+        console.log(`⚙️ Command State triggered: ${command}`);
+    }
 
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   window.SovereignBus?.on?.("whispererVitals", renderWhispererVitals);
-// });
-// === Style injection for .lore-echo and .flag-echo ===
-document.addEventListener("DOMContentLoaded", () => {
-  // Only inject once
-  if (!document.getElementById("whisperer-lore-flag-style")) {
-    const style = document.createElement("style");
-    style.id = "whisperer-lore-flag-style";
-    style.textContent = `
-      .lore-echo {
-        background: linear-gradient(90deg, #2b2942 0%, #1d1d2c 100%);
-        color: #ffd6a0 !important;
-        border-left: 4px solid #ffb347;
-        font-style: italic;
-        margin: 4px 0;
-        padding: 6px 12px;
-        border-radius: 6px;
-        box-shadow: 0 0 4px #ffb34744;
-      }
-      .flag-echo {
-        background: linear-gradient(90deg, #3a2222 0%, #261818 100%);
-        color: #ffbdbd !important;
-        border-left: 4px solid #ff4d4f;
-        font-weight: bold;
-        margin: 4px 0;
-        padding: 6px 12px;
-        border-radius: 6px;
-        box-shadow: 0 0 4px #ff4d4f44;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+
+
+    function getRecentMemory(limit = 10) {
+        return whispererMemoryLog.slice(-limit);
+    }
+
+    function clearMemoryLog() {
+        whispererMemoryLog.length = 0;
+    }
+
+    // Vitals toggle (optional)
+    if (toggleVitals && vitalsPanel) {
+        toggleVitals.addEventListener('click', () => {
+            vitalsPanel.classList.toggle('active');
+        });
+    }
+
+    // Optional: make addMessage available globally
+    window.addMessageToWhisperer = addMessage;
+
+    // Typing simulation engine
+    function simulateTypingResponse(fullText, delay = 25) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'system');
+        chatContainer.appendChild(messageDiv);
+
+        let index = 0;
+        const typingInterval = setInterval(() => {
+            messageDiv.textContent = fullText.slice(0, index + 1);
+            index++;
+            if (index >= fullText.length) {
+                clearInterval(typingInterval);
+                logMemoryEntry('system', fullText);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }, delay);
+    }
+
+    // === Phase 8: Feedback Pulse System + Vitals Feedback Hooks ===
+    function sendPulseFeedback(type, message) {
+        const pulse = document.createElement('div');
+        pulse.classList.add('vitals-pulse');
+        pulse.dataset.type = type;
+        pulse.textContent = message;
+
+        if (vitalsPanel) {
+            vitalsPanel.appendChild(pulse);
+
+            setTimeout(() => {
+                pulse.classList.add('fade-out');
+                pulse.addEventListener('transitionend', () => pulse.remove());
+            }, 2200);
+        }
+    }
+
+    // Hook into memory logging for feedback injection
+    const originalLogMemoryEntry = logMemoryEntry;
+    logMemoryEntry = function(type, content) {
+        originalLogMemoryEntry(type, content);
+        if (type === 'user' || type === 'command') {
+            sendPulseFeedback(type, content);
+        }
+    };
+    // === Phase 9: Whisperer Status Beacon + System Signal Uplink ===
+    const statusBeacon = document.createElement('div');
+    statusBeacon.id = 'whispererStatusBeacon';
+    statusBeacon.textContent = '⧉ SYSTEM READY';
+    document.getElementById("neuralThrone")?.appendChild(statusBeacon);
+
+    function updateStatusBeacon(message, pulse = false) {
+        statusBeacon.textContent = `⧉ ${message}`;
+        if (pulse) {
+            statusBeacon.classList.add('pulse');
+            setTimeout(() => statusBeacon.classList.remove('pulse'), 1500);
+        }
+    }
+
+    // Listen for core Whisperer events
+    document.addEventListener('whisperer:command', (e) => {
+        updateStatusBeacon(`Command: ${e.detail.command}`, true);
+    });
+
+    document.addEventListener('whisperer:lore', (e) => {
+        updateStatusBeacon(`Lore Hook: ${e.detail.tag}`, true);
+    });
+
+    document.addEventListener('whisperer:status', (e) => {
+        updateStatusBeacon(`${e.detail.message}`, true);
+    });
+
+    // === Phase 10: Signal Forecast Panel Integration ===
+    const forecastPanel = document.getElementById('signalForecastPanel');
+    const forecastLog = document.getElementById('signalForecastLog');
+
+    function logForecastSignal(message, level = 'info') {
+        if (!forecastPanel || !forecastLog) return;
+
+        const logEntry = document.createElement('div');
+        logEntry.classList.add('forecast-entry', `level-${level}`);
+        logEntry.textContent = `🔮 ${message}`;
+
+        forecastLog.appendChild(logEntry);
+        forecastPanel.classList.add('active');
+
+        setTimeout(() => {
+            logEntry.classList.add('fade-out');
+            logEntry.addEventListener('transitionend', () => logEntry.remove());
+        }, 4000);
+    }
+
+    // Sample usage trigger via state actions
+    stateActionMatrix['forecast'] = () => {
+        logForecastSignal('Signal is steady. No anomalies detected.', 'info');
+        simulateTypingResponse('📡 Forecast updated. See signal panel.');
+    };
+
+    // Optional: external modules can call this too
+    window.logForecastSignal = logForecastSignal;
+    // === Phase 11: Modular Action Dispatch + External Trigger Ports ===
+    window.WhispererActionPort = {
+        dispatch: (actionType, payload = {}) => {
+            switch (actionType) {
+                case 'message':
+                    if (payload.text && payload.sender) {
+                        addMessage(payload.text, payload.sender);
+                        logMemoryEntry(payload.sender, payload.text);
+                    }
+                    break;
+                case 'simulate':
+                    if (payload.text) {
+                        simulateTypingResponse(payload.text);
+                    }
+                    break;
+                case 'command':
+                    if (payload.command) {
+                        triggerStateResponse(payload.command);
+                        handleInternalCommand(payload.command);
+                    }
+                    break;
+                case 'lore':
+                    if (payload.tag) {
+                        triggerLoreHook(payload.tag);
+                    }
+                    break;
+                case 'forecast':
+                    if (payload.message) {
+                        logForecastSignal(payload.message, payload.level || 'info');
+                    }
+                    break;
+                case 'vitals':
+                    if (vitalsPanel) {
+                        vitalsPanel.classList.toggle('active');
+                    }
+                    break;
+                default:
+                    console.warn(`Unknown Whisperer action: ${actionType}`);
+            }
+        }
+    };
+
+    // Optional: announce that ports are active
+    console.log('🔌 Whisperer External Trigger Ports Activated');
+
+    // === Phase 12: Session Save/Load Memory Snapshot Protocol ===
+    window.WhispererSessionManager = {
+        saveSnapshot: () => {
+            try {
+                const snapshot = JSON.stringify(whispererMemoryLog);
+                localStorage.setItem('whispererMemorySnapshot', snapshot);
+                simulateTypingResponse('💾 Session snapshot saved.');
+            } catch (e) {
+                console.error('Failed to save session snapshot:', e);
+                simulateTypingResponse('⚠️ Snapshot save failed.');
+            }
+        },
+        loadSnapshot: () => {
+            try {
+                const snapshot = localStorage.getItem('whispererMemorySnapshot');
+                if (snapshot) {
+                    const restored = JSON.parse(snapshot);
+                    restored.forEach(entry => {
+                        addMessage(`[${entry.type}] ${entry.content}`, entry.type === 'user' ? 'user' : 'system');
+                        whispererMemoryLog.push(entry);
+                    });
+                    simulateTypingResponse('📂 Session snapshot restored.');
+                } else {
+                    simulateTypingResponse('❓ No saved session found.');
+                }
+            } catch (e) {
+                console.error('Failed to load session snapshot:', e);
+                simulateTypingResponse('⚠️ Snapshot load failed.');
+            }
+        },
+        clearSnapshot: () => {
+            localStorage.removeItem('whispererMemorySnapshot');
+            simulateTypingResponse('🧹 Snapshot cleared from memory.');
+        }
+    };
+
+    // === Phase 13: Companion Feed + Reactive Memory Trace Logging ===
+    const companionFeed = document.createElement('div');
+    companionFeed.id = 'companionFeedLog';
+    companionFeed.style.display = 'none'; // Toggle visibility via CSS or JS
+    companionFeed.style.position = 'fixed';
+    companionFeed.style.bottom = '10px';
+    companionFeed.style.left = '10px';
+    companionFeed.style.background = 'rgba(0,0,0,0.75)';
+    companionFeed.style.color = '#fff';
+    companionFeed.style.padding = '10px';
+    companionFeed.style.borderRadius = '8px';
+    companionFeed.style.maxWidth = '300px';
+    companionFeed.style.fontSize = '0.85rem';
+    companionFeed.style.zIndex = '1000';
+    document.getElementById("neuralThrone")?.appendChild(companionFeed);
+
+    function logCompanionTrace(entry) {
+        const entryDiv = document.createElement('div');
+        entryDiv.textContent = `🔎 ${new Date().toLocaleTimeString()}: [${entry.type}] ${entry.content}`;
+        companionFeed.appendChild(entryDiv);
+        companionFeed.scrollTop = companionFeed.scrollHeight;
+
+        // Optional fade out
+        entryDiv.classList.add('trace-entry');
+        setTimeout(() => {
+            entryDiv.classList.add('fade-out');
+            entryDiv.addEventListener('transitionend', () => entryDiv.remove());
+        }, 6000);
+    }
+
+    // Reactive memory trace logging
+    const originalAddMessage = addMessage;
+    addMessage = function (text, sender) {
+        originalAddMessage(text, sender);
+        logCompanionTrace({ type: sender, content: text });
+    };
+
+    // === Phase 25: Contextual Panel Suggestion + Smart Activation Links ===
+    function suggestPanelActivation(message) {
+        const knownPanels = ['whispererVitals', 'signalForecastPanel']; // Extend as needed
+        const match = knownPanels.find(id => message.toLowerCase().includes(id.toLowerCase()));
+        if (match) {
+            const suggestion = document.createElement('div');
+            suggestion.classList.add('message', 'system');
+            suggestion.innerHTML = `💡 Would you like to activate <strong>${match}</strong>? <button class="activate-panel-button" data-panel="${match}">Activate</button>`;
+            chatContainer.appendChild(suggestion);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const button = suggestion.querySelector('button.activate-panel-button');
+            button.addEventListener('click', () => {
+                const panel = document.getElementById(match);
+                if (panel) {
+                    panel.classList.add('active');
+                    simulateTypingResponse(`🟢 Activated panel: "${match}"`);
+                } else {
+                    simulateTypingResponse(`⚠️ Panel "${match}" not found.`);
+                }
+            });
+        }
+    }
+    // === Phase 26: Lore Memory Inference Engine + Suggestive Sigil Mapping ===
+    function suggestLoreSigil(message) {
+        const loreMap = {
+            prophecy: 'sigilProphecy',
+            eclipse: 'sigilEclipse',
+            shadow: 'sigilUmbra',
+            flame: 'sigilIgnis',
+            crystal: 'sigilAether',
+            storm: 'sigilTempest'
+        };
+
+        for (const keyword in loreMap) {
+            if (message.toLowerCase().includes(keyword)) {
+                const suggestedSigil = loreMap[keyword];
+                const suggestion = document.createElement('div');
+                suggestion.classList.add('message', 'system');
+                suggestion.innerHTML = `📜 Detected lore keyword: <strong>${keyword}</strong>. Would you like to activate <strong>${suggestedSigil}</strong>? <button class="activate-sigil-button" data-sigil="${suggestedSigil}">Invoke Sigil</button>`;
+                chatContainer.appendChild(suggestion);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                const button = suggestion.querySelector('button.activate-sigil-button');
+                button.addEventListener('click', () => {
+                    triggerLoreHook(suggestedSigil);
+                    simulateTypingResponse(`🔮 Sigil "${suggestedSigil}" invoked.`);
+                });
+
+                break; // only one match per message
+            }
+        }
+    }
+
+    // Enhance handleSubmit to also check for lore suggestion
+    const originalHandleSubmit = handleSubmit;
+    handleSubmit = function () {
+        const messageText = userInput.value.trim();
+        if (messageText) {
+            const parsedCommand = parseCommand(messageText);
+            if (parsedCommand) {
+                addMessage(`[${parsedCommand.type.toUpperCase()}] ${parsedCommand.value}`, 'system');
+                logMemoryEntry(parsedCommand.type, parsedCommand.value);
+                if (parsedCommand.type === 'sigil') {
+                    triggerLoreHook(parsedCommand.value);
+                } else if (parsedCommand.type === 'command' || parsedCommand.type === 'directive') {
+                    triggerStateResponse(parsedCommand.value);
+                    handleInternalCommand(parsedCommand.value);
+                }
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                userInput.focus();
+                return;
+            }
+
+            addMessage(messageText, 'user');
+            logMemoryEntry('user', messageText);
+            suggestPanelActivation(messageText);
+
+            suggestLoreSigil(messageText); // new lore suggestion layer
+
+            // === Phase 27: Smart Trigger System ===
+            const smartTriggers = [
+                {
+                    keywords: ['show me the forecast', 'signal forecast', 'forecast report'],
+                    panelId: 'signalForecastPanel',
+                    response: '📡 Forecast panel activated via smart trigger.'
+                },
+                {
+                    keywords: ['open vitals', 'show vitals', 'vitals panel'],
+                    panelId: 'whispererVitals',
+                    response: '📊 Vitals panel activated via smart trigger.'
+                }
+            ];
+
+            function applySmartTriggers(text) {
+                for (const trigger of smartTriggers) {
+                    if (trigger.keywords.some(keyword => text.toLowerCase().includes(keyword))) {
+                        const panel = document.getElementById(trigger.panelId);
+                        if (panel) {
+                            panel.classList.add('active');
+                            simulateTypingResponse(trigger.response);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            applySmartTriggers(messageText);
+
+            simulateTypingResponse(`🧠 Whisperer received: "${messageText}"`);
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            userInput.focus();
+        }
+    };
+
+// Delegate initialization to modules/initWhisperer.js
+document.addEventListener('DOMContentLoaded', () => {
+    initWhisperer();
 });

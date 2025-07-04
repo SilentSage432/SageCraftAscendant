@@ -19,6 +19,7 @@ function attachButtonWiring(button) {
 }
 
 // Mutation Observer watches for any DOM mutations (new buttons)
+/*
 const observer = new MutationObserver((mutations) => {
   mutations.forEach(mutation => {
     mutation.addedNodes.forEach(node => {
@@ -33,9 +34,9 @@ const observer = new MutationObserver((mutations) => {
   });
 });
 
-// Activate observer after full DOM load
 document.addEventListener("DOMContentLoaded", () => {
   const targetNode = document.body;
   observer.observe(targetNode, { childList: true, subtree: true });
   console.log("✅ Live DOM Wiring Observer (v2.0) activated.");
 });
+*/

@@ -87,11 +87,11 @@ document.querySelectorAll('.holo-console').forEach(panel => {
 
   const panels = document.querySelectorAll(".holo-console");
 
-  panels.forEach(panel => {
-    if (!grid.contains(panel)) {
-      grid.appendChild(panel);
-    }
-  });
+    panels.forEach(panel => {
+      if (!grid.contains(panel)) {
+        grid.appendChild(panel);
+      }
+    });
 
   console.log(`✅ ${panels.length} panels injected into sovereignGrid.`);
 });
@@ -218,7 +218,6 @@ if (!gridSystem) {
     "reportingHubPanel",
     "sessionManagerPanel",
     "utilityHubPanel",
-    "sovereignTerminalPanel"
   ];
 
   orderedPanels.forEach(panelId => {
@@ -294,18 +293,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Grid Sentinel Recalibration Utility ===
   function recalibrateGridSentinels() {
     console.log("🛰️ Recalibrating Grid Sentinels...");
-    document.querySelectorAll(".holo-console").forEach(panel => {
-      if (!panel.classList.contains("locked")) {
-        panel.style.position = "absolute";
-        panel.style.margin = "0";
-        panel.style.padding = "0";
-        panel.style.left = panel.dataset.snapLeft || "0px";
-        panel.style.top = panel.dataset.snapTop || "0px";
-        panel.style.width = panel.dataset.snapWidth || "400px";
-        panel.style.height = panel.dataset.snapHeight || "300px";
-        panel.style.zIndex = panel.dataset.z || "10";
-      }
-    });
+document.querySelectorAll(".holo-console").forEach(panel => {
+  if (panel.id === "whispererConsole") {
+    console.warn("⛔️ Snap Engine skipped layout override for whispererConsole.");
+    return;
+  }
+  if (!panel.classList.contains("locked")) {
+    panel.style.position = "absolute";
+    panel.style.margin = "0";
+    panel.style.padding = "0";
+    panel.style.left = panel.dataset.snapLeft || "0px";
+    panel.style.top = panel.dataset.snapTop || "0px";
+    panel.style.width = panel.dataset.snapWidth || "400px";
+    panel.style.height = panel.dataset.snapHeight || "300px";
+    panel.style.zIndex = panel.dataset.z || "10";
+  }
+});
     console.log("✅ Grid Sentinels recalibrated.");
   }
 
@@ -315,25 +318,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   function enforceGridAlignment() {
     const panels = document.querySelectorAll('.holo-console');
-    panels.forEach(panel => {
-      panel.style.margin = '10px';
-      panel.style.minHeight = '300px';
-      panel.style.boxSizing = 'border-box';
-    });
+panels.forEach(panel => {
+  if (panel.id === 'whispererConsole') {
+    console.warn('⛔️ SnapEngine tried to style whispererConsole. Override applied.');
+    return; // skip whisperer completely
   }
 
-  // Initial enforcement
-  enforceGridAlignment();
+  panel.style.margin = '10px';
+  panel.style.minHeight = '300px';
+  panel.style.boxSizing = 'border-box';
+});
+  }
 
-  // Mutation Observer for changes in layout
-  const observer = new MutationObserver(() => {
-    enforceGridAlignment();
-  });
+  // enforceGridAlignment();
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+// // Mutation Observer for changes in layout
+// const observer = new MutationObserver(() => {
+//   enforceGridAlignment();
+// });
+
+// observer.observe(document.body, {
+//   childList: true,
+//   subtree: true
+// });
   console.log('%c🌐 Panel Snap Engine Initialized', 'color: lime; font-weight: bold; font-size: 14px;');
   // --- Phase 0: Panel DOM Order Injection by Role Priority ---
   // This block injects the panel role DOM order logic before any grid/snap logic.
@@ -406,6 +413,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   panels.forEach(panel => {
+    // Snap Engine Override: Whisperer exempt from auto-snap and repositioning
+    if (panel.id === "whispererConsole") {
+      console.log("🛡️ Snap Engine Override: Whisperer exempt from auto-snap.");
+      return; // Skip repositioning or removal
+    }
     let role = panelRoles[panel.id];
     if (!role || role === 'undefined') {
       role = 'sigil-forge'; // or another default based on context
@@ -475,7 +487,11 @@ document.addEventListener("DOMContentLoaded", () => {
       entries.forEach(entry => {
         const panel = entry.target;
         const role = panel.dataset.role;
-
+        // Exclude whispererConsole from any min/max width/height constraints
+        if (panel.id === "whispererConsole") {
+          // Do not set min/max width/height for whispererConsole
+          return;
+        }
         switch (role) {
           case 'oracle':
             panel.style.minWidth = '250px';
@@ -547,9 +563,12 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => trail.remove(), 1600);
     visuallyConfirmSnap(panel);
     // Phase 372 — Dynamic Panel Resizing: Apply preset dimensions via data attributes
-    panel.style.width = panel.dataset.snapWidth || '300px';
-    panel.style.height = panel.dataset.snapHeight || '200px';
-    console.log(`[Resize] Set ${panel.id || '(no id)'} to ${panel.style.width} × ${panel.style.height}`);
+    // Exclude whispererConsole from fixed width/height
+    if (panel.id !== "whispererConsole") {
+      panel.style.width = panel.dataset.snapWidth || '300px';
+      panel.style.height = panel.dataset.snapHeight || '200px';
+      console.log(`[Resize] Set ${panel.id || '(no id)'} to ${panel.style.width} × ${panel.style.height}`);
+    }
 
     // Phase 373 — Snap Preset Slot Management: Store initial snap dimensions and positions
     if (!window.SovereignSnapPresets) {
@@ -570,8 +589,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (storedPreset) {
       panel.style.left = `${storedPreset.x}px`;
       panel.style.top = `${storedPreset.y}px`;
-      panel.style.width = storedPreset.width;
-      panel.style.height = storedPreset.height;
+      // Exclude whispererConsole from preset width/height
+      if (panel.id !== "whispererConsole") {
+        panel.style.width = storedPreset.width;
+        panel.style.height = storedPreset.height;
+      }
       console.log(`[PresetRecall] Applied preset for ${panelId}`);
     }
 
@@ -642,7 +664,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedPanelState = JSON.parse(sessionStorage.getItem('sovereignPanelState') || '{}');
     Object.entries(savedPanelState).forEach(([id, pos]) => {
       const panel = document.getElementById(id);
-      if (panel && pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+      // 🚫 Safeguard: Skip ghost/unregistered panels
+      if (
+        !panel ||
+        panel.classList.contains('resurrected-placeholder') ||
+        !panel.dataset.registered
+      ) {
+        console.warn(`🛑 Skipping phantom panel: ${id}`);
+        return;
+      }
+      if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
         panel.style.left = `${pos.x}px`;
         panel.style.top = `${pos.y}px`;
         console.log(`[StateMemory] Restored panel ${id} to X:${pos.x}, Y:${pos.y}`);
@@ -650,6 +681,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   } catch (err) {
     console.warn('[StateMemory] Failed to restore layout state.', err);
+  }
+
+  // Phase 370.4.1 — Restore panel positions from localStorage (grid position keys), but skip placeholders/unregistered
+  try {
+    const storedPanelKeys = Object.keys(localStorage).filter(key => key.startsWith('panel-grid-position-'));
+    storedPanelKeys.forEach(key => {
+      const id = key.replace('panel-grid-position-', '');
+      const panel = document.getElementById(id);
+
+      // 🚫 Skip ghost panels
+      if (!panel || panel.classList.contains('resurrected-placeholder') || !panel.dataset.registered) {
+        console.warn(`🛑 Skipping phantom panel: ${id}`);
+        return;
+      }
+
+      try {
+        const { top, left } = JSON.parse(localStorage.getItem(key));
+        panel.style.top = `${top}px`;
+        panel.style.left = `${left}px`;
+        panel.setAttribute('data-anchored', 'true');
+      } catch (err) {
+        console.warn(`⚠️ Failed to parse grid position for ${id}`, err);
+      }
+    });
+  } catch (err) {
+    console.warn('[GridState] Failed to restore panel positions from localStorage.', err);
   }
 
   // Phase 370.5 — Anchor Matrix Enforcement: Ensure all panels have a valid grid anchor
@@ -1752,6 +1809,40 @@ const panelZoneMap = {
   sageTerminal: { role: 'interface', gridArea: 'core-zone' },
   forecastConsole: { role: 'forecast', gridArea: 'signal-zone' }
 };
+
+/* 
+// === Snap Harmony Patch: Whisperer Console Rebind ===
+// Inserted directly after gathering .holo-console panels
+const whisperer = document.getElementById("whispererConsole");
+if (whisperer && !whisperer.classList.contains("holo-console")) {
+  whisperer.classList.add("holo-console", "snap-pinned");
+  console.log("🧲 Phase X: Whisperer Console re-declared as holo-console + snap-pinned");
+}
+
+// --- Snap Rebind: WhispererConsole outside dockGrid ---
+const whispererConsole = document.getElementById("whispererConsole");
+if (whispererConsole) {
+  // Guard clause: prevent rehoming if anchored or explicitly marked
+  if (
+    whispererConsole.classList.contains("anchored-terminal") ||
+    whispererConsole.classList.contains("no-auto-rehome")
+  ) {
+    console.warn("⛔ panelSnapEngine rehoming skipped — whispererConsole is anchored.");
+    // Do not attempt to move or snap whispererConsole
+    // Early return to skip repositioning logic
+  } else if (!whispererConsole.closest("#dockGrid")) {
+    console.log("🔄 Snap Rebind: WhispererConsole found outside dockGrid. Rebinding manually.");
+    document.querySelector("#sovereignTerminalWrapper")?.appendChild(whispererConsole);
+    whispererConsole.classList.add("snap-rebound-confirmed");
+  }
+}
+*/
+
+// Optional: trigger a manual reflow if needed
+if (typeof recalibrateSnapZones === "function") {
+  recalibrateSnapZones();
+  console.log("🔄 Phase X: Snap zones recalibrated after Whisperer injection");
+}
 
 document.querySelectorAll('.holo-console').forEach(panel => {
   // --- Inferred data-role assignment patch ---

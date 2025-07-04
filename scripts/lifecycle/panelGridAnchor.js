@@ -3,6 +3,10 @@ import { getAllConsolePanels } from '../ascendancy/consoleAtlas.js';
 
 export function anchorPanelsToGrid() {
   const panels = getAllConsolePanels();
+
+  // Filter out null or ghost references to prevent phantom resurrection
+  const filteredPanels = Array.from(panels).filter(p => p instanceof HTMLElement && p.id && !p.classList.contains('resurrected-placeholder'));
+
   const grid = document.getElementById('sovereignGridSystem');
 
   if (!grid) {
@@ -10,8 +14,7 @@ export function anchorPanelsToGrid() {
     return;
   }
 
-  panels.forEach(panel => {
-    if (!(panel instanceof HTMLElement)) return;
+  filteredPanels.forEach(panel => {
     const id = panel.getAttribute('id');
     const zone = panel.dataset.gridArea || 'staging-zone';
     const anchor = document.querySelector(`[data-grid-zone="${zone}"]`) || grid;

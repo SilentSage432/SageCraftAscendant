@@ -1,171 +1,440 @@
-/* 🌫️ theWhisperer.css — Phase XXIV: Whisperer Genesis Protocol */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-.whisperer-shroud {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+/* === Reset and Global Styling === */
+html, body {
+  margin: 0;
+  padding: 0;
   height: 100%;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8), #000);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  transition: opacity 0.4s ease;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #1e1f29; /* Match terminal theme */
 }
-
-.hidden {
+body::-webkit-scrollbar {
   display: none;
 }
 
-.whisperer-core {
-  background: #111;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
-  text-align: center;
-  color: #e0e0e0;
-  max-width: 600px;
+
+/* === Sovereign Wrapper for Centering === */
+#sovereignTerminalWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: transparent;
 }
 
-.whisperer-symbol {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #b0cde5;
-  text-shadow: 0 0 6px rgba(144, 207, 255, 0.3);
-}
-
-.whisperer-message {
-  font-style: italic;
-  margin: 1rem 0;
-  font-size: 1.2rem;
-  color: #b6dbff;
-  min-height: 2rem;
-  text-shadow: 0 0 6px rgba(90, 170, 255, 0.3);
-}
-
-.whisperer-button {
-  background-color: #222;
-  color: #a6d4ff;
-  border: 1px solid #a6d4ff;
-  padding: 0.6rem 1.4rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.whisperer-button:hover {
-  background-color: #303a42;
-  box-shadow: 0 0 6px rgba(144, 207, 255, 0.3);
-}
-
-
-/* --- Vital Readings Glow & Contrast Enhancements --- */
-.vital-grid .vital,
-.vital-deck .vital {
-  color: #e0e0ff;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(120, 200, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.vital h3 {
-  font-size: 1rem;
-  color: #90cfff;
-  margin-bottom: 5px;
-  text-shadow: 0 0 3px #004070;
-}
-
-.vital p {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 0 4px #00f0ff;
-}
-
-.vital p.pulse {
-  animation: pulseGlow 1.5s infinite alternate ease-in-out;
-}
-
-@keyframes pulseGlow {
-  from {
-    text-shadow: 0 0 4px #00f0ff;
-  }
-  to {
-    text-shadow: 0 0 12px #66e0ff, 0 0 6px #00f0ff;
-  }
-}
-
-
-/* --- Whisperer Console Scrollbar & Scrolling Styles --- */
-.sovereign-console {
+/* === Neural Throne === */
+#neuralThrone.whisperer-sacred-zone {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  min-height: 85vh;
+  height: 100vh;
   max-height: 100vh;
-  overflow-y: auto;
-  padding-right: 1rem;
-  scroll-behavior: smooth;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.sovereign-console::-webkit-scrollbar {
+/* === Sidebar === */
+#whispererConsole #whispererSidebar {
+  flex: 0 0 clamp(200px, 20vw, 250px);
+  min-width: 180px;
+  background-color: #282a36;
+  border-right: 1px solid #444;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  color: #ccfaff;
+  box-sizing: border-box;
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+#whispererConsole .sidebar-logo {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 2px #00ffff66;
+}
+
+#whispererConsole #conversationHistory {
+  flex: 1;
+  overflow-y: auto;
+}
+
+#whispererConsole #conversationHistory .history-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+  color: #ccfaff;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+#whispererConsole #conversationHistory .history-item:hover {
+  background-color: #30323e;
+}
+
+#whispererConsole #conversationHistory::-webkit-scrollbar {
   width: 6px;
 }
 
-.sovereign-console::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+#whispererConsole #conversationHistory::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 3px;
 }
 
-.sovereign-console::-webkit-scrollbar-thumb {
-  background-color: #90cfff;
+#whispererConsole #conversationHistory::-webkit-scrollbar-track {
+  background: #282a36;
+}
+
+/* === Main Content === */
+/* Unified #whispererConsole #whispererMain block */
+#whispererConsole #whispererMain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 60vh;
+  flex: 1 1 auto;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#whispererConsole .terminal-header {
+  padding: 15px 20px;
+  background: #282a36;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#whispererConsole .terminal-header h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #ccfaff;
+  margin: 0;
+  text-shadow: 0 0 2px #00ffff66;
+}
+
+#whispererConsole .terminal-header .vitals-toggle {
+  padding: 8px 16px;
+  background: #00aaff;
+  color: #fff;
+  border: none;
   border-radius: 6px;
-}
-/* --- Panel Title Glow Enhancement --- */
-.console-section h2 {
-  color: #90cfff;
-  text-shadow:
-    0 0 4px #90cfff,
-    0 0 8px #60b0ff,
-    0 0 12px #4080ff;
-}
-/* --- Title & Header Glow Enhancements --- */
-.console-title,
-.sovereign-console h1,
-.sovereign-console h2,
-.sovereign-console h3 {
-  color: #b6d6ff;
-  text-shadow:
-    0 0 4px #90cfff,
-    0 0 10px #60b0ff,
-    0 0 18px #4080ff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-
-/* --- Whisperer Status Text Glow Enhancements --- */
-#sovereignStatus,
-#pulseStatus,
-#signalFlow,
-#whispererOutput,
-.pulse-readout,
-.system-status {
-  color: #b6d6ff;
-  text-shadow:
-    0 0 4px #90cfff,
-    0 0 10px #60b0ff,
-    0 0 14px #4080ff;
+#whispererConsole .terminal-header .vitals-toggle:hover {
+  background: #008ecc;
 }
 
-#whispererConsoleOutput {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(96, 176, 255, 0.4);
-  color: #b6d6ff;
-  font-family: 'Courier New', monospace;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-  box-shadow: 0 0 6px rgba(144, 207, 255, 0.15);
-  max-height: 400px;
+#whispererConsole .message-log {
+  flex: 1;
   overflow-y: auto;
-  white-space: pre-wrap;
+  padding: clamp(1rem, 2vw, 2rem);
+  padding-bottom: clamp(4rem, 10vh, 6rem);
+  background: #1e1f29;
+  color: #ccfaff;
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+  text-shadow: 0 0 2px #00ffff66;
+  overflow-x: hidden;
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+#whispererConsole .message.user {
+  background-color: #00aaff;
+  margin-left: auto;
+}
+
+#whispererConsole .message.system {
+  background-color: #555;
+  margin-right: auto;
+}
+
+#whispererConsole .message-log::-webkit-scrollbar {
+  width: 8px;
+}
+
+#whispererConsole .message-log::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+#whispererConsole .message-log::-webkit-scrollbar-track {
+  background: #1e1f29;
+}
+
+#whispererConsole .input-container {
+  position: relative;
+  margin-top: auto;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: clamp(0.5rem, 1vw, 1rem);
+  padding: clamp(1rem, 2vw, 2rem);
+  background: #282a36;
+  border-top: 1px solid #444;
+}
+
+#whispererConsole .chat-input {
+  flex: 1;
+  padding: clamp(0.75rem, 1.5vw, 1rem);
+  background: #30323e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  resize: none;
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  outline: none;
+  min-height: 40px;
+  font-family: 'Share Tech Mono', monospace !important;
+}
+
+#whispererConsole .chat-input::placeholder {
+  color: #aaa;
+}
+
+#whispererConsole .send-button {
+  padding: clamp(0.75rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.5rem);
+  background: #00aaff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#whispererConsole .send-button:hover {
+  background: #008ecc;
+}
+
+#whispererVitals.collapsed-vitals-panel {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: relative;
+  width: 250px;
+  height: 100%;
+  background-color: #343541;
+  border-left: 1px solid #555;
+  padding: 20px;
+  color: #ccfaff;
+  overflow-y: auto;
+  z-index: 10;
+  max-height: 0;
+  overflow: hidden;
+}
+
+#whispererVitals.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  max-height: 600px;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+#whispererConsole #whispererVitals::-webkit-scrollbar {
+  width: 6px;
+}
+
+#whispererConsole #whispererVitals::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 3px;
+}
+
+#whispererConsole #whispererVitals::-webkit-scrollbar-track {
+  background: #343541;
+}
+
+/* === Animation === */
+/*
+@keyframes fadeInUp {
+  0% {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  100% {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+*/
+
+.fluid-terminal {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  width: clamp(320px, 90vw, 1600px);
+  height: auto;
+  margin: 0 auto;
+  padding: clamp(1rem, 2vw, 2rem);
+  background-color: rgba(32, 34, 45, 0.97);
+  box-shadow: 0 0 24px rgba(0, 255, 255, 0.3);
+  border-radius: clamp(12px, 2vw, 18px);
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  transition: box-shadow 0.4s ease, background-color 0.4s ease;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  #sovereignTerminalWrapper {
+      padding: 10px;
+      min-height: auto;
+  }
+  .fluid-terminal {
+      flex-direction: column;
+      height: auto;
+      min-height: 80vh;
+      margin: 12px;
+      padding: 0;
+  }
+  #whispererConsole #whispererSidebar {
+      flex: 1 1 100%;
+      border-right: none;
+      border-bottom: 1px solid #444;
+      max-height: 200px;
+  }
+  #whispererConsole #whispererMain {
+      min-height: 50vh;
+  }
+  #whispererConsole .terminal-header h2 {
+      font-size: 1.1rem;
+  }
+  #whispererConsole .vitals-toggle {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  #whispererConsole .chat-input {
+    font-size: 0.9rem;
+  }
+
+  #whispererConsole .send-button {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+
+  #whispererConsole .terminal-header h2 {
+    font-size: 1rem;
+  }
+}
+@media (min-width: 1200px) {
+  #neuralThrone.whisperer-sacred-zone {
+    max-width: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 100%;
+  }
+
+  #sovereignTerminalWrapper {
+    justify-content: center;
+    align-items: stretch;
+  }
+}
+/* === Layout Debug Logging (Non-intrusive) === */
+:root::after {
+  content: "🧪 Whisperer Layout Loaded";
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  font-size: 10px;
+  color: transparent;
+  font-family: 'Share Tech Mono', monospace;
+  pointer-events: none;
+  z-index: 9999;
+}
+/* === Diagnostic Lockdown for Layout Stability === */
+#sovereignTerminalWrapper,
+#neuralThrone.whisperer-sacred-zone {
+  min-width: 1000px;
+  min-height: 600px;
+  width: 100%;
+  height: auto;
+  max-width: 1600px;
+  box-sizing: border-box;
+  transition: none;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+/* Optionally set overflow for whispererConsole */
+
+.static-terminal {
+  width: 1000px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.anchored-terminal {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  position: relative;
+  transform: none !important;
+  left: auto !important;
+  bottom: auto !important;
+}
+
+/* === Anchored Terminal Wrapper Layout Enforcement === */
+.anchored-terminal-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 10000;
+  pointer-events: none; /* allows overlay behavior if needed */
+}
+
+.anchored-terminal-wrapper #whispererConsole {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  align-self: center;
+  flex: 0 1 auto;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  min-width: 600px;
+  background-color: rgba(32, 34, 45, 0.97);
+  border-radius: clamp(12px, 2vw, 18px);
+  box-shadow: 0 0 24px rgba(0, 255, 255, 0.3);
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  position: relative;
 }

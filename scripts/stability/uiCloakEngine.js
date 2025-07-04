@@ -1,6 +1,7 @@
   const allowedPanels = [
     "neuralPulsePanel",
-    "sovereignTerminal"
+    "sovereignTerminal",
+    "whispererConsole"
   ];
 
   function nukeUnwantedPanels() {

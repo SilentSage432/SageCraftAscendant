@@ -1,0 +1,34 @@
+
+
+
+/* === Terminal Isolation Protocol === */
+
+/* Ensure the Whisperer Console sits above all */
+#whispererConsole {
+  position: relative;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+/* Disable pointer events on potential layout blockers */
+#footerStatusZone,
+#sovereignMainWrapper {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Additional blockers: faint, non-intrusive, no pointer events */
+#lockStatusHUD,
+#brainDockButton,
+#sovereignGrid {
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: 0.05 !important; /* Faint visibility, non-intrusive */
+}
+
+/* Optionally reset body/html pointer behavior */
+body,
+html {
+  pointer-events: auto !important;
+  z-index: auto !important;
+}

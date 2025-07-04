@@ -1,9 +1,79 @@
+// === Phase XI.F — Whisperer Console DOM Infinite Surveillance & Dock Panel Rehoming ===
+// Replaces previous sync guard with persistent polling for robustness.
+/*
+const whispererSurveillance = setInterval(() => {
+  const whisperer = document.getElementById("whispererConsole");
+  const dock = document.getElementById("dockGrid");
+
+  if (whisperer && dock) {
+    // --- Anchored-terminal rehoming skip logic ---
+    if (whisperer.classList.contains("anchored-terminal")) {
+      console.warn("⛔ Rehoming skipped — whispererConsole is anchored.");
+      clearInterval(whispererSurveillance);
+      return;
+    }
+    let wrapper = document.getElementById("whispererDockPanel");
+    if (!wrapper) {
+      wrapper = document.createElement("div");
+      wrapper.id = "whispererDockPanel";
+      wrapper.className = "dock-panel holo-console snap-pinned";
+      wrapper.setAttribute("data-zone", "whisperer-zone");
+
+      wrapper.appendChild(whisperer);
+      dock.appendChild(wrapper);
+
+      console.log("🛰️ Phase XI.F: Whisperer console rehomed via recursive surveillance");
+    }
+
+    clearInterval(whispererSurveillance);
+  }
+}, 150);
+*/
+// === Phase XI.G — Whisperer Console MutationObserver DOM Surveillance & Rehoming ===
+// Deploys a MutationObserver for robust, event-driven rehoming as soon as the Whisperer Console is injected.
+/*
+const observer = new MutationObserver((mutationsList, observer) => {
+  const whisperer = document.getElementById("whispererConsole");
+  const dock = document.getElementById("dockGrid");
+
+  if (whisperer && dock) {
+    // --- Anchored-terminal rehoming skip logic (MutationObserver) ---
+    if (whisperer.classList.contains("anchored-terminal")) {
+      console.warn("⛔ MutationObserver rehoming skipped — whispererConsole is anchored.");
+      observer.disconnect();
+      return;
+    }
+    let wrapper = document.getElementById("whispererDockPanel");
+    if (!wrapper) {
+      wrapper = document.createElement("div");
+      wrapper.id = "whispererDockPanel";
+      wrapper.className = "dock-panel holo-console snap-pinned";
+      wrapper.setAttribute("data-zone", "whisperer-zone");
+
+      wrapper.appendChild(whisperer);
+      dock.appendChild(wrapper);
+      console.log("🕵️ Phase XI.G: Whisperer captured via MutationObserver.");
+    }
+
+    observer.disconnect();
+  }
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+*/
 // === Sovereign Panel Override Lock: Prevents post-load forced repositioning if panels are already aligned ===
 document.body.dataset.gridLock = "true";
 
 // === Temporary Auto-Snap Disablement for Manual Panel Placement ===
 window.disableAutoSnap = true;
 document.querySelectorAll('.holo-console').forEach(panel => {
+  if (panel.id === 'whispererConsole') {
+    console.warn('⛔️ operatorDockWiring attempted to rehome whispererConsole. Blocked.');
+    return;
+  }
   panel.dataset.snap = "manual";
   panel.style.transition = "none";
 });
@@ -31,6 +101,10 @@ setTimeout(() => {
   };
 
   allPanels.forEach(panel => {
+    if (panel.id === 'whispererConsole') {
+      console.warn('⛔️ operatorDockWiring attempted to rehome whispererConsole. Blocked.');
+      return;
+    }
     // === Panel Override Lock: Prevent forced repositioning if gridLock is active ===
     const panelOverrideLock = document.body.dataset.gridLock === "true";
     if (panelOverrideLock) {
@@ -100,6 +174,7 @@ setTimeout(() => {
       }
     });
   }
+}, 2000);
 
   // === REMOVE resurrected-placeholder consoles for reportingHubConsole and deltaAnalyzerConsole ===
   // The following block is intentionally commented out to prevent unwanted placeholder injection:
@@ -130,7 +205,6 @@ setTimeout(() => {
   console.log("🧼 Manual injection of reportingHubConsole and deltaAnalyzerConsole disabled (modular control active).");
 
   console.log("✅ Phase 31.0 — All known panels forcibly revealed.");
-}, 1500);
 
 // === Sage Terminal Panel Renderer (scaffold) ===
 function renderSageTerminal() {
@@ -225,6 +299,8 @@ setTimeout(() => {
 
   // 🧩 Dark Revealer Placeholder Injection
   document.querySelectorAll('.console-body').forEach(body => {
+    // skip if ancestor is whispererConsole
+    if (body.closest('#whispererConsole')) return;
     if (!body.innerHTML.trim()) {
       const placeholder = document.createElement('div');
       placeholder.textContent = '🧩 Diagnostic placeholder active';
@@ -242,6 +318,7 @@ setTimeout(() => {
 
   const resurrectedPanels = document.querySelectorAll('.holo-console');
   resurrectedPanels.forEach(panel => {
+    if (panel.id === 'whispererConsole') return;
     const id = panel.id || "(no id)";
     const inner = panel.innerHTML.trim();
 
@@ -268,7 +345,6 @@ setTimeout(() => {
     "sessionManagerConsole",
     "utilityHubConsole",
     "whispererConsole",
-    "sovereignTerminal"
   ];
 
   // Commented out panel injection for reportingHubConsole and deltaAnalyzerConsole
@@ -783,6 +859,8 @@ setTimeout(() => {
   console.log("🧹 Phase 329.0 — Sovereign Cleanse & Sanctum Rehoming Initiated");
 
   // Create the Sanctum container if it doesn't exist
+  const showSanctum = false; // <-- set to true to re-enable
+if (showSanctum) {
   let sanctum = document.getElementById("sovereignSanctum");
   if (!sanctum) {
     sanctum = document.createElement("div");
@@ -795,6 +873,7 @@ setTimeout(() => {
     sanctum.innerHTML = "<h3>🧬 Sovereign Sanctum</h3><p>Reclaimed panels reside here for rebind.</p>";
     document.body.appendChild(sanctum);
   }
+}
 
   const manifest = JSON.parse(localStorage.getItem("duplicateManifest") || "[]");
   let purged = 0;
@@ -1133,6 +1212,7 @@ allPanelsToCheck.forEach(panel => {
   // 🛠️ Phase 311.4 — Sovereign Panel Interaction Layer Activation
   const allPanels = document.querySelectorAll(".holo-console");
   allPanels.forEach(panel => {
+    if (panel.id === 'whispererConsole') return;
     // Make draggable
     panel.style.position = "absolute";
     panel.style.cursor = "move";
@@ -1262,6 +1342,11 @@ var OperatorDockWiring = {
         }
 
     dockDefinitions.forEach(def => {
+        if (def.id === 'whispererConsole') {
+          // Block any attempt to create or rehome whispererConsole here
+          console.warn('⛔️ operatorDockWiring attempted to rehome whispererConsole. Blocked.');
+          return;
+        }
         let panel = document.getElementById(def.id);
         if (!panel) {
             panel = document.createElement("div");
@@ -1401,31 +1486,39 @@ var OperatorDockWiring = {
         }
         const panels = state.panels || {};
         Object.keys(panels).forEach(id => {
+            // Whisperer safeguard: skip if anchored-terminal or no-auto-rehome
+            if (id === "whispererConsole") {
+                const whisperer = document.getElementById("whispererConsole");
+                if (whisperer?.classList.contains("anchored-terminal") || whisperer?.classList.contains("no-auto-rehome")) {
+                    console.warn("🚫 operatorDockWiring: Skipping Whisperer injection due to anchored/manual override.");
+                    return;
+                }
+            }
             const selector = SovereignDockPanelMap[id] || `#${id}`;
             const panel = document.querySelector(selector);
             if (!panel) return;
             const dockInfo = panels[id];
 
-        // Panel Override Lock: skip visibility/position update if gridLock is active
-        const panelOverrideLock = document.body.dataset.gridLock === "true";
-        if (panelOverrideLock) {
-            console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
-            return;
-        }
-        // Optionally log subsystem trying to mutate layout
-        console.warn(`⚠️ Layout mutation attempted by: ${id}`);
-        // Apply visibility
-        if (dockInfo.visible) {
-            panel.classList.remove("hidden");
-        } else {
-            panel.classList.add("hidden");
-        }
+            // Panel Override Lock: skip visibility/position update if gridLock is active
+            const panelOverrideLock = document.body.dataset.gridLock === "true";
+            if (panelOverrideLock) {
+                console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
+                return;
+            }
+            // Optionally log subsystem trying to mutate layout
+            console.warn(`⚠️ Layout mutation attempted by: ${id}`);
+            // Apply visibility
+            if (dockInfo.visible) {
+                panel.classList.remove("hidden");
+            } else {
+                panel.classList.add("hidden");
+            }
 
-        // Apply position
-        if (dockInfo.position) {
-            if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
-            if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
-        }
+            // Apply position
+            if (dockInfo.position) {
+                if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
+                if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
+            }
         });
         console.log("✅ Dock state restored.");
         this.triggerEvent("restore", state);
@@ -1573,31 +1666,39 @@ var OperatorDockWiring = {
         }
         const panels = snapshot.panels || {};
         Object.keys(panels).forEach(id => {
+            // Whisperer safeguard: skip if anchored-terminal or no-auto-rehome
+            if (id === "whispererConsole") {
+                const whisperer = document.getElementById("whispererConsole");
+                if (whisperer?.classList.contains("anchored-terminal") || whisperer?.classList.contains("no-auto-rehome")) {
+                    console.warn("🚫 operatorDockWiring: Skipping Whisperer injection due to anchored/manual override.");
+                    return;
+                }
+            }
             const selector = SovereignDockPanelMap[id] || `#${id}`;
             const panel = document.querySelector(selector);
             if (!panel) return;
             const dockInfo = panels[id];
 
-        // Panel Override Lock: skip visibility/position update if gridLock is active
-        const panelOverrideLock = document.body.dataset.gridLock === "true";
-        if (panelOverrideLock) {
-            console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
-            return;
-        }
-        // Optionally log subsystem trying to mutate layout
-        console.warn(`⚠️ Layout mutation attempted by: ${id}`);
-        // Apply visibility
-        if (dockInfo.visible) {
-            panel.classList.remove("hidden");
-        } else {
-            panel.classList.add("hidden");
-        }
+            // Panel Override Lock: skip visibility/position update if gridLock is active
+            const panelOverrideLock = document.body.dataset.gridLock === "true";
+            if (panelOverrideLock) {
+                console.warn(`🛑 Panel Override Lock Active — Skipping Forced Repositioning for: ${id}`);
+                return;
+            }
+            // Optionally log subsystem trying to mutate layout
+            console.warn(`⚠️ Layout mutation attempted by: ${id}`);
+            // Apply visibility
+            if (dockInfo.visible) {
+                panel.classList.remove("hidden");
+            } else {
+                panel.classList.add("hidden");
+            }
 
-        // Apply position
-        if (dockInfo.position) {
-            if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
-            if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
-        }
+            // Apply position
+            if (dockInfo.position) {
+                if (dockInfo.position.top) panel.style.top = dockInfo.position.top;
+                if (dockInfo.position.left) panel.style.left = dockInfo.position.left;
+            }
         });
 
         // Save the imported state into localStorage
@@ -3128,16 +3229,6 @@ if (typeof SovereignBus !== "undefined" && typeof SovereignBus.listen === "funct
     }
   });
 }
-
-OperatorDockWiring.registerSubsystemDock({
-    dockId: "whispererConsole",
-    onClick: () => {
-        console.log("👁 Whisperer Console Activated");
-        alert("🧠 Whisperer Mesh Online — Listening Beyond the Veil...");
-        revealDockPanel("whispererConsole");
-    },
-    visible: false
-});
 OperatorDockWiring.registerSubsystemDock({
     dockId: "count",
     onClick: () => {
@@ -3526,7 +3617,7 @@ window.renderSageTerminal = () => {
       </div>
     </div>
   `;
-  document.getElementById("sovereignGridSystem")?.appendChild(panel);
+  //document.getElementById("sovereignGridSystem")?.appendChild(panel);//
 };
 window.OperatorDockWiring = OperatorDockWiring;
 export { OperatorDockWiring };

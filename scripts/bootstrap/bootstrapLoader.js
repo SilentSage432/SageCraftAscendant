@@ -220,6 +220,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   // 🧠 Sovereign Mutation Observer Lock
+  /*
   const visibilityWhitelist = ['neuralPulsePanel', 'agentLifecyclePanel', 'coreCommandInput'];
 
   const observer = new MutationObserver(mutations => {
@@ -236,4 +237,5 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.holo-console').forEach(panel => {
     observer.observe(panel, { attributes: true, attributeFilter: ['style'] });
   });
+  */
 });

@@ -15,10 +15,19 @@
   </style>
 </head>
 <body>
-  <div id="sovereignGridSystem">
-    <div id="whispererConsole" class="dock-panel holo-console-panel console-active">
-      <h1>The Whisperer Console</h1>
-      <p>This is a placeholder for the Whisperer UI element.</p>
+  <div id="neuralThrone" class="anchored-terminal">
+    <div class="terminal-header">
+      <h2>Neural Mesh Command Bridge</h2>
+    </div>
+    <div id="whispererMessageLog" class="chat-log-scroll">
+      <!-- Messages will appear here dynamically -->
+    </div>
+    <div id="whispererInputContainer">
+      <textarea id="whispererInput" placeholder="Speak to the Whisperer..." rows="1"></textarea>
+      <button id="whispererSend">Send</button>
+    </div>
+    <div id="whispererVitals" class="collapsed-vitals-panel">
+      <!-- Vitals panel content will be toggled via JS -->
     </div>
   </div>
 

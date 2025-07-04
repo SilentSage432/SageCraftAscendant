@@ -1102,70 +1102,72 @@ window.LegacyOrbitalScaffoldPurge = (function() {
   };
 
 })();
-// === Phase 8000.0: Neural Operator Command Bridge ===
-window.NeuralOperatorConsole = (function() {
+// === Phase 8000.1: Deprecated Operator Console Guard ===
+const ENABLE_OPERATOR_CONSOLE = false;
 
-  function renderOperatorConsole() {
-    console.log("🧭 Rendering Operator Command Console...");
+if (ENABLE_OPERATOR_CONSOLE) {
+  window.NeuralOperatorConsole = (function () {
+    function renderOperatorConsole() {
+      console.log("🧭 Rendering Operator Command Console...");
 
-    const existingPanel = document.getElementById("operatorConsolePanel");
-    if (existingPanel) {
-      console.warn("⚠ Operator Console Panel already exists.");
-      return;
+      const existingPanel = document.getElementById("operatorConsolePanel");
+      if (existingPanel) {
+        console.warn("⚠ Operator Console Panel already exists.");
+        return;
+      }
+
+      const panel = document.createElement("section");
+      panel.id = "operatorConsolePanel";
+      panel.className = "panel tab-section panel-glow operator-console";
+
+      panel.innerHTML = `
+      <h2>🧭 Neural Operator Command Bridge</h2>
+
+      <div class="console-section">
+        <button onclick="NeuralAuditSentinel.auditWiring()">Run Audit Integrity Scan</button>
+        <button onclick="NeuralSelfHealingEngine.runSelfHealing()">Run Self-Healing Engine</button>
+        <button onclick="NeuralForecastEngine.clearForecast()">Clear Forecast History</button>
+        <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
+        <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
+      </div>
+
+      <div class="console-section">
+        <h3>⚖ Governance Policy Controls</h3>
+        <label>Risk Threshold: <input type="number" id="riskThresholdInput" value="\${NeuralGovernancePolicyCore.getPolicy().riskThreshold}"></label><br>
+        <label>Drift Threshold: <input type="number" id="driftThresholdInput" value="\${NeuralGovernancePolicyCore.getPolicy().driftThreshold}"></label><br>
+        <label>Error Threshold: <input type="number" id="errorThresholdInput" value="\${NeuralGovernancePolicyCore.getPolicy().errorThreshold}"></label><br>
+        <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
+      </div>
+
+      <div class="console-section">
+        <h3>🚀 Live Orbit Injection</h3>
+        <label>Key: <input id="injectKey" type="text"></label><br>
+        <label>Label: <input id="injectLabel" type="text"></label><br>
+        <label>Icon: <input id="injectIcon" type="text" value="icon-default.png"></label><br>
+        <label>Modules (comma-separated): <input id="injectModules" type="text"></label><br>
+        <button onclick="injectLiveOrbit()">Inject Orbit</button>
+      </div>
+
+      <div class="console-log">
+        <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
+      </div>
+    `;
+
+      document.body.appendChild(panel);
+      console.log("✅ Operator Command Console Deployed.");
     }
 
-    const panel = document.createElement("section");
-    panel.id = "operatorConsolePanel";
-    panel.className = "panel tab-section panel-glow operator-console";
-
-    panel.innerHTML = `
-  <h2>🧭 Neural Operator Command Bridge</h2>
-
-  <div class="console-section">
-    <button onclick="NeuralAuditSentinel.auditWiring()">Run Audit Integrity Scan</button>
-    <button onclick="NeuralSelfHealingEngine.runSelfHealing()">Run Self-Healing Engine</button>
-    <button onclick="NeuralForecastEngine.clearForecast()">Clear Forecast History</button>
-    <button onclick="NeuralCortexEngine.startCortexLoop()">Start Cortex Loop</button>
-    <button onclick="NeuralOrbitalMeshReconciliation.validateOrbitalMesh()">Validate Orbital Mesh</button>
-  </div>
-
-  <div class="console-section">
-    <h3>⚖ Governance Policy Controls</h3>
-    <label>Risk Threshold: <input type="number" id="riskThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().riskThreshold}"></label><br>
-    <label>Drift Threshold: <input type="number" id="driftThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().driftThreshold}"></label><br>
-    <label>Error Threshold: <input type="number" id="errorThresholdInput" value="${NeuralGovernancePolicyCore.getPolicy().errorThreshold}"></label><br>
-    <button onclick="applyPolicyChanges()">Apply Policy Changes</button>
-  </div>
-
-  <div class="console-section">
-    <h3>🚀 Live Orbit Injection</h3>
-    <label>Key: <input id="injectKey" type="text"></label><br>
-    <label>Label: <input id="injectLabel" type="text"></label><br>
-    <label>Icon: <input id="injectIcon" type="text" value="icon-default.png"></label><br>
-    <label>Modules (comma-separated): <input id="injectModules" type="text"></label><br>
-    <button onclick="injectLiveOrbit()">Inject Orbit</button>
-  </div>
-
-  <div class="console-log">
-    <p>🧪 Use these controls to directly observe and manage neural subsystems.</p>
-  </div>
-`;
-
-    document.body.appendChild(panel);
-    console.log("✅ Operator Command Console Deployed.");
-  }
-
-  return {
-    renderOperatorConsole,
-    renderLiveSystemStatus,
-    renderLiveSystemStatusUI,
-    startLiveRefresh,
-    stopLiveRefresh,
-    startRecoveryLoop,
-    stopRecoveryLoop
-  };
-
-})();
+    return {
+      renderOperatorConsole,
+      renderLiveSystemStatus,
+      renderLiveSystemStatusUI,
+      startLiveRefresh,
+      stopLiveRefresh,
+      startRecoveryLoop,
+      stopRecoveryLoop
+    };
+  })();
+}
 function applyPolicyChanges() {
   const risk = parseInt(document.getElementById("riskThresholdInput").value);
   const drift = parseInt(document.getElementById("driftThresholdInput").value);

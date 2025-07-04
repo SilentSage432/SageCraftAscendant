@@ -5,7 +5,7 @@
   padding: 20px;
   justify-items: stretch;
   align-items: start;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(60, 60, 90, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(4px);
   border-radius: 8px;
@@ -30,7 +30,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(255, 255, 255, 0.05);
   padding: 16px;
   border-radius: 10px;
   min-width: 320px;
@@ -41,7 +41,7 @@
 
 .dock-panel,
 .holo-console {
-  background: rgba(18, 18, 18, 0.8);
+  background: rgba(80, 80, 110, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 6px;
   padding: 10px;
@@ -56,7 +56,7 @@
   left: 0;
   right: auto;
   bottom: auto;
-  z-index: auto;
+  z-index: 20;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
@@ -135,43 +135,6 @@
   justify-self: center;
 }
 
-/* === System Identity Banner === */
-
-#sovereignBanner {
-  grid-column: 4 / span 6;
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0 10px;
-  animation: fadeInBanner 1.4s ease forwards;
-  opacity: 0;
-  text-align: center;
-  z-index: 120;
-}
-
-.banner-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.system-title {
-  font-family: 'Cinzel', serif;
-  font-size: 2.2rem;
-  color: #00ffff;
-  letter-spacing: 2px;
-  margin-top: 6px;
-  text-shadow: 0 0 8px rgba(0,255,255,0.5), 0 0 16px rgba(0,255,255,0.25);
-}
-
-.system-sigil {
-  height: 48px;
-  width: auto;
-  filter: drop-shadow(0 0 8px rgba(0,255,255,0.35));
-}
 
 /* === Core Panel Vertical Stack === */
 
@@ -185,14 +148,6 @@
   grid-column: 4 / span 6;
   grid-row: 2;
   margin-bottom: 20px;
-}
-
-#whispererConsole.snap-pinned {
-  grid-column: 4 / span 6;
-  grid-row: 4;
-  margin-bottom: 20px;
-  justify-self: center;
-  box-shadow: 0 2px 5px rgba(0,255,255,0.08);
 }
 
 /* === Orbit Toggle Panel Positioning === */
@@ -229,7 +184,6 @@
 /* === Hidden Panels (Orbit Activated) === */
 
 #loreEngineConsole,
-#signalForecastConsole,
 #sovereignSanctumConsole,
 #sageFeedConsole,
 #artifactVaultConsole,
@@ -243,26 +197,20 @@
 
 /* === Z-Index and Glow Cleanup === */
 
-.holo-console.snap-pinned {
+.holo-console.snap-pinned:not(#whispererConsole) {
   z-index: 50;
   box-shadow: 0 1px 4px rgba(0, 255, 255, 0.06);
   transition: box-shadow 0.25s ease;
 }
 
-.holo-console.snap-pinned:hover {
+.holo-console.snap-pinned:not(#whispererConsole):hover {
   z-index: 100;
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
-/* Ensure base z-index for default state */
-.holo-console.default-state {
-  z-index: 20;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
 /* === Layout Enforcement Override === */
 
-.holo-console.snap-pinned {
+.holo-console.snap-pinned:not(#whispererConsole) {
   position: relative !important;
   display: block !important;
   grid-column: auto !important;
@@ -278,7 +226,7 @@
 
 /* === DockGrid Compliance Enforcement === */
 
-#dockGrid > .holo-console.snap-pinned {
+#dockGrid > .holo-console.snap-pinned:not(#whispererConsole) {
   position: relative !important;
   display: grid !important;
   place-items: start center;
@@ -287,23 +235,6 @@
   opacity: 1;
   visibility: visible;
   box-shadow: 0 2px 6px rgba(0, 255, 255, 0.1);
-}
-
-body .holo-console.snap-pinned:not(#dockGrid > .holo-console) {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-
-@keyframes fadeInBanner {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* === Responsive Support for Smaller Screens === */
@@ -327,7 +258,7 @@ body .holo-console.snap-pinned:not(#dockGrid > .holo-console) {
   }
 
   #orbitPanelDock {
-    top: 120px;
+    top: 120px; 
     right: 20px;
     gap: 8px;
   }

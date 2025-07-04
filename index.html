@@ -97,6 +97,9 @@
 
 <!-- Overrides and resets -->
 <link rel="stylesheet" href="styles/liquidGlassReset.css">
+<!-- <link rel="stylesheet" href="styles/terminal/whispererConsole.css"> -->
+<link rel="stylesheet" href="styles/theWhisperer.css" />
+<link rel="stylesheet" href="styles/terminalIsolation.css" />
 <link rel="stylesheet" href="styles/sovereignUILayout.css">
 <link rel="stylesheet" href="styles/uiGridLayout.css">
 <!-- <link rel="stylesheet" href="scripts/styles/debugclarity.css"> -->
@@ -134,75 +137,85 @@
 </head>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <body class="liquid-glass-ui">
+  <body>
+    <script>
+      window.addEventListener("load", () => {
+        document.body.classList.add("loaded");
+      });
+    </script>
+    <!-- 🚨 Sovereign Terminal Wrapper -->
+    <!-- (WhispererConsole moved to sovereignTerminalWrapper below) -->
     <div style="position: fixed; top: 10px; right: 20px; z-index: 10000;">
       <label style="font-family: monospace; color: #fff;">
         <input type="checkbox" id="restoreToggle" checked />
         🔁 Restore Last Panel
       </label>
     </div>
-    <!-- === SOVEREIGN GRID SYSTEM LAYOUT (REPLACES ALL PANELS/CONSOLES) === -->
-    <div id="sovereignGrid"
-         class="sovereign-zone-anchor debug-outline"
-         data-harmony="true"
-         data-role="observer"
-         data-grid-area="staging-zone"
-         data-status="active"
-         data-grid-visual="active"
-         data-legacy="true">
-         <div id="sovereignToolbarMount"></div>
-      <!-- 🌀 Whisperer Terminal Interface (restored) -->
-      <div id="whispererPanel" class="nexus-core holo-console-panel" data-role="whisperer" data-zone="center-stage">
-        <div id="whispererDisplay" class="terminal-output">🌌 Welcome, Operator.</div>
-        <input id="whispererInput" type="text" placeholder="Speak to the system..." autocomplete="off" />
-      </div>
-      <!-- Other dynamically rendered panels will follow here -->
-    </div>
-    <!-- Responsive Title Wrapper -->
-    <div id="sovereignMainWrapper">
-      <div id="sovereignTitle" class="system-title">
-        <h1>SageCraft Ascendant</h1>
-        <h2>Sovereign Codex</h2>
-      </div>
-    
-      <section id="sovereignTerminal" class="holo-console dock-panel holo-console-panel">
-        <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-        <header class="console-header">💻 Sovereign Terminal</header>
-        <div class="console-body">
-          <div class="panel-content">
-            <p>Awaiting command input...</p>
-          </div>
+    <!-- 🧠 Throne Shell: Modern Console Anchor -->
+    <div id="sovereignTerminalWrapper">
+      <main id="neuralThrone" class="whisperer-sacred-zone">
+        <!--
+          The Whisperer console should be statically wrapped in a container
+          that is NOT inside any snap-target, dock-grid, or auto-snap zone.
+        -->
+        <div class="anchored-terminal-wrapper" style="border: 2px solid lime; padding: 10px;">
+          <section id="whispererConsole" class="no-auto-rehome">
+            
+            <aside id="whispererSidebar">
+              <div class="sidebar-logo">🧠</div>
+              <nav id="conversationHistory">
+                <!-- Conversation items added dynamically -->
+              </nav>
+            </aside>
+      
+            <div id="whispererMain">
+              <div class="terminal-header">
+                <h2>Neural Mesh Command Bridge</h2>
+                <button id="toggleVitals" class="vitals-toggle">Vitals</button>
+              </div>
+      
+              <div id="whispererMessageLog" class="message-log">
+                <!-- Messages will appear here dynamically -->
+              </div>
+      
+              <form id="whispererInputContainer" class="input-container">
+                <textarea id="whispererInput" class="chat-input" placeholder="Send a message..." rows="1"></textarea>
+                <button id="whispererSend" class="send-button" type="submit">➤</button>
+              </form>
+      
+              <div id="whispererVitals" class="collapsed-vitals-panel">
+                <div>System Status: Online</div>
+                <!-- Add more vitals here -->
+              </div>
+            </div>
+      
+          </section>
         </div>
-      </section>
+      </main>
     </div>
-    <!-- ✅ Sovereign Dock Panel Grid -->
-    <div id="dockGrid" class="sovereign-dock-grid"></div>
-    <div id="orbitBarZone"></div>
-    <!-- 🪐 Orbit Buttons Dock -->
-    <div id="orbitalDockContainer" class="orbit-button-dock"></div>
     <!-- Responsive Terminal Wrapper -->
-    <div class="responsive-terminal-container">
-      <div id="centralTerminalConsole" class="holo-console">
-        <!-- terminal contents -->
-      </div>
-    </div>
-    <!-- Removed legacy grid-panel static scaffolding -->
-    <div id="footerStatusZone"></div>
+    <!--
+<div class="responsive-terminal-container">
+  <div id="centralTerminalConsole" class="holo-console">
+    [terminal contents temporarily removed]
+  </div>
+</div>
+-->
+    <!-- === Sovereign Console Anchor Zones (snap zones for major consoles) === -->
+    <!-- 🧠 Whisperer Console Anchor -->
+    <div id="whispererConsoleMount" class="sovereign-mount whisperer-anchor"></div>
 
-    <!-- Modular Console Injections -->
-    <div id="consoleMounts">
-      <!-- Panels injected via JavaScript or server-side include -->
-      <!-- Whisperer Console -->
-      <div id="whispererConsoleMount"></div>
-      <!-- Neural Pulse -->
-      <div id="neuralPulsePanelMount"></div>
-      <!-- Echo Archive -->
-      <div id="echoArchiveConsoleMount"></div>
-      <!-- Core Command -->
-      <div id="coreCommandConsoleMount"></div>
-      <!-- Signal Forecast -->
-      <div id="signalForecastConsoleMount"></div>
-    </div>
+    <!-- 💓 Neural Pulse Panel Anchor -->
+    <div id="neuralPulseConsoleMount" class="sovereign-mount neural-anchor"></div>
+
+    <!-- 🌀 Echo Archive Panel Anchor -->
+    <div id="echoArchiveConsoleMount" class="sovereign-mount echo-anchor"></div>
+
+    <!-- ⚙️ Core Command Input Anchor -->
+    <div id="coreCommandConsoleMount" class="sovereign-mount corecmd-anchor"></div>
+
+    <!-- 🌩️ Signal Forecast Console Anchor -->
+    <div id="signalForecastConsoleMount" class="sovereign-mount forecast-anchor"></div>
 </script>
 </script>
  <!-- 1. Sovereign Event Bus should be FIRST -->
@@ -264,6 +277,7 @@
 <script type="module" src="scripts/stability/scrollIntercept.js"></script>
 <script type="module" src="scripts/stability/scrollTrace.js"></script>
 <script type="module" src="scripts/wiring/orbitWiringSystem.js"></script>
+<script type="module" defer src="scripts/operator/operatorDockWiring.js"></script>
 
 <!-- === CLEANUP & SANITATION === -->
 <script type="module" src="scripts/wiring/uiSanitizer.js"></script>
@@ -354,7 +368,6 @@
 <script type="module" src="scripts/stability/consoleStabilityDriftMonitor.js"></script>
 <script type="module" src="scripts/stability/consolePanelFluxBinder.js"></script>
 <script type="module" src="scripts/stability/consolePanelSyncGuardian.js"></script>
-<script type="module" src="scripts/stability/terminalAnchorBinder.js"></script>
 <script type="module" src="scripts/stability/consoleViewAligner.js"></script>
 <script type="module" src="scripts/stability/interfaceLayoutMatrix.js"></script>
 <script type="module" src="scripts/stability/interfaceKinetics.js"></script>
@@ -384,11 +397,6 @@
 <script type="module" src="scripts/grid/gridSnapCoordinator.js"></script>
 <script type="module" src="scripts/lifecycle/panelGridAnchor.js"></script>
 <script type="module" src="scripts/core/terminalCentering.js"></script>
-  <!-- 🌀 Whisperer Nexus Core -->
-  <div id="whispererPanel" class="nexus-core holo-console-panel" data-role="whisperer" data-zone="center-stage">
-    <div id="whispererDisplay" class="terminal-output">🌌 Welcome, Operator.</div>
-    <input id="whispererInput" type="text" placeholder="Speak to the system..." autocomplete="off" />
-  </div>
 
   <!-- 🧠 Neural Activity Node -->
   <div id="neuralActivity" class="neural-core-indicator" title="Neural Activity Monitoring"></div>
@@ -954,11 +962,6 @@ function showToast(message = "✅ Done") {
       }
     });
   </script>
-  <div class="logo-banner-flex">
-    <div id="operatorTierStatus" class="operator-tier-status sovereign-active">
-      <span class="tier-badge">🛡 SOVEREIGN</span>
-      <span id="authStatusLight" class="status-light status-authenticated" title="Authenticated"></span>
-    </div>
   
 
 <!-- === INSPECTION REPORT FOR STRUCTURAL PLACEHOLDERS & CLUTTER MARKERS === -->
@@ -1157,82 +1160,6 @@ Other notes:
 
   <!-- Whisperer Orbit external navigation logic removed; now handled via data-target like other orbits -->
   <!-- Ensure required console panels exist directly below #sovereignOrbitDock -->
-  <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Panel IDs & class
-    const expectedPanels = [
-      { id: "countConsole", className: "holo-console" },
-      { id: "deltaAnalyzerConsole", className: "holo-console" },
-      { id: "reportingHubConsole", className: "holo-console" },
-      { id: "sessionManagerConsole", className: "holo-console" },
-      { id: "utilityHubConsole", className: "holo-console" },
-      { id: "oracleConsole", className: "holo-console" },
-    ];
-    // Find the sovereignOrbitDock node
-    const dock = document.getElementById("sovereignOrbitDock");
-    if (dock) {
-      // Find last console panel after the dock (if any) to insert after
-      let insertAfter = dock.parentNode;
-      // Gather all direct siblings after #sovereignOrbitDock
-      let next = dock.parentNode.nextSibling;
-      let lastConsole = null;
-      while (next) {
-        if (next.nodeType === 1 && next.classList && next.classList.contains("holo-console")) {
-          lastConsole = next;
-        }
-        next = next.nextSibling;
-      }
-      // Insert missing panels after the last known console, or after dock
-      let insertParent = dock.parentNode.parentNode;
-      let insertRef = dock.parentNode.nextSibling;
-      // Check for each panel
-      expectedPanels.forEach(panel => {
-        if (!document.getElementById(panel.id)) {
-          // Create and insert the missing panel
-          const div = document.createElement("div");
-          div.id = panel.id;
-          div.className = panel.className;
-          insertParent.insertBefore(div, insertRef);
-        }
-      });
-    }
-    // Predictive HUD DOM structure
-    function createPredictiveHudDom() {
-      const hud = document.createElement("div");
-      hud.id = "predictiveHud";
-      hud.className = "hud-container";
-      hud.innerHTML = `
-        <div id="dockStatusText">Dock: N/A</div>
-        <div id="lastSync">Last Sync: N/A</div>
-        <div>Items: <span id="itemSpan">0</span></div>
-        <div>Categories: <span id="categorySpan">0</span></div>
-        <ul id="recentList"></ul>
-      `;
-      return hud;
-    }
-    let predictiveHud = document.getElementById("predictiveHud");
-    if (!predictiveHud) {
-      // Try to find a container to append it to
-      const container = document.getElementById("predictiveHud") || document.body;
-      if (container && container.id === "predictiveHud") {
-        // Already present, do nothing
-      } else if (container && container.tagName === "BODY") {
-        container.appendChild(createPredictiveHudDom());
-      }
-    }
-  });
-  </script>
-  
-    <section id="sovereignTerminal" class="holo-console dock-panel holo-console-panel">
-      <button class="panel-close" onclick="closeConsole(this)">✖️</button>
-      <header class="console-header">💻 Sovereign Terminal</header>
-      <div class="console-body">
-        <div class="panel-content">
-          <p>Awaiting command input...</p>
-        </div>
-      </div>
-    </section>
-  </div>
   <!-- 🧠 Center Stage Layout End -->
 <!-- Grimoire Lore Table Render Trigger -->
 <script>
@@ -1818,7 +1745,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <!-- 🌌 Modular Gameplay Console Arena -->
-  <div id="gameplayArenaMount">
+  <!-- <div id="gameplayArena"></div> -->
     <!-- Consoles from gameplay.html will be injected here by mesh renderer -->
   </div>
   <link rel="stylesheet" href="styles/gameplay.css" />
@@ -2124,7 +2051,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   <!-- 🧠 Sovereign Toolbar Forge -->
-  <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script>
+  <!-- <script src="scripts/operator/sovereign/sovereignToolbarRenderer.js"></script> -->
   <!-- Bootstrap Neural must come before wiring.js -->
   <script src="scripts/bootstrap/bootstrapNeural.js"></script>
   <!-- Bootstrap Loader (must remain, handles dynamic module loading) -->
@@ -2190,7 +2117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </script>
 
   <!-- 🌀 Whisperer Entity Module -->
-  <script type="module" src="scripts/entities/theWhisperer.js"></script>
+ <script type="module" src="scripts/entities/theWhisperer.js"></script>
 
   <script type="module" src="scripts/stability/snapPinLock.js"></script>
   <script type="module" src="scripts/stability/panelSnapTracer.js"></script>
@@ -2216,6 +2143,10 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="scripts/core/sovereignPanelDirective.js"></script>
 <script type="module" src="scripts/core/sovereignPanelEnforcer.js"></script>
 <script type="module" src="scripts/grid/SovereignPanelGridClassifier.js"></script>
+<script type="module" src="scripts/lifecycle/terminalInterferenceScanner.js"></script>
+<script type="module" src="scripts/system/legacySanctum.js"></script>
+<script type="module" src="scripts/terminal/whispererConsoleReady.js"></script>
+<script type="module" src="scripts/layout/terminalAnchor.js"></script>
 <!-- <script type="module" src="scripts/stability/uiRoguePurger.js"></script> -->
 
   <!-- 🧠 Dock Toggle Bar Panel Runtime Toggle Logic -->
@@ -2308,8 +2239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // });
   </script>
 
-<!-- 🧭 HUD Toggle Button -->
-<div id="brainDockButton" class="hud-toggle-icon" onclick="toggleHudPanel()">🧭</div>
+
   <style>
     .command-bridge-toggle {
       position: fixed;
@@ -2533,30 +2463,8 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 
   <!-- 🧠 Phase 16011 — Sovereign Operator Access -->
-  <div id="operatorLoginTrigger" onclick="toggleLoginPanel()">👤</div>
-
-<div id="sovereignLoginWrapper" style="display: none;">
-  <div id="operatorLoginOverlay" class="sovereign-overlay">
-    <div class="login-panel">
-      <h2>🧬 Sovereign Operator Access</h2>
-      <input type="text" id="operatorUsername" placeholder="Operator ID" />
-      <input type="password" id="operatorPassword" placeholder="Access Key" />
-      <button id="operatorLoginBtn">Authenticate</button>
-      <div id="loginFeedback" class="login-feedback"></div>
-    </div>
-  </div>
-</div>
-
-  <!-- 🛡️ Sovereign Operator Login Overlay -->
-  <div id="sovereignLoginOverlay" class="sovereign-login-overlay hidden">
-    <div class="login-panel">
-      <h2>Sovereign Operator Access</h2>
-      <p class="login-subtext">Tier Override Required</p>
-      <input type="password" id="sovereignLoginInput" placeholder="Enter Override Key..." />
-      <button id="sovereignLoginBtn">Authenticate</button>
-      <div id="sovereignLoginFeedback" class="login-feedback"></div>
-    </div>
-  </div>
+  <!-- 🔒 Login Panels temporarily removed.
+    Will be re-integrated via terminal commands in Phase 5.4.1 -->
 
   <!-- Orbit Removal Panel Handlers -->
   <!--
